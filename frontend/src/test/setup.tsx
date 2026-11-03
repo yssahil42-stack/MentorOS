@@ -15,7 +15,13 @@ vi.mock('react-router-dom', async () => {
         return {};
       }
     },
-    useSearchParams: () => [new URLSearchParams(), vi.fn()],
+    useSearchParams: (defaultInit?: any) => {
+      try {
+        return (actual as any).useSearchParams(defaultInit);
+      } catch {
+        return [new URLSearchParams(), vi.fn()];
+      }
+    },
     Link: ({ children, to, ...props }: any) => (
       <a href={typeof to === 'string' ? to : (to?.pathname ?? '')} {...props}>
         {children}

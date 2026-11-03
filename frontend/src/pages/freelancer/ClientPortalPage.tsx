@@ -41,6 +41,12 @@ export default function ClientPortalPage({ projectId: propProjectId }: ClientPor
   const token = searchParams.get('token');
   const isPublicView = !!token && token.startsWith('public-');
 
+  useEffect(() => {
+    if (isPublicView) {
+      document.querySelector('meta[name="robots"]')?.setAttribute('content', 'noindex, nofollow');
+    }
+  }, [isPublicView]);
+
   const { data: publicData, isLoading: publicLoading } = useQuery({
     queryKey: ['public-portal', projectId, token],
     queryFn: () => fetchPublicClientPortal(parseInt(projectId || '0', 10), token || undefined),
