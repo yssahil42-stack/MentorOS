@@ -238,8 +238,11 @@ export function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-2 flex-wrap">
               <h3 className="text-base font-bold text-text-primary truncate">{user.full_name}</h3>
-              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-3xs font-bold uppercase tracking-wider text-white shadow-2xs bg-orange-500">
-                <span>{userPrimaryConfig.label}</span>
+              <span
+                className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-3xs font-bold uppercase tracking-wider text-white shadow-2xs"
+                style={{ backgroundColor: activeRoleConfig.color || '#F97316' }}
+              >
+                <span>{activeRoleConfig.label}</span>
               </span>
             </div>
             <div className="flex items-center gap-1.5 text-xs text-text-muted mt-1 truncate">
@@ -264,7 +267,7 @@ export function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
             <span className="text-3xs uppercase font-mono font-bold text-text-muted block">
               Workspace Role
             </span>
-            <span className="font-semibold text-text-primary block">{userPrimaryConfig.label}</span>
+            <span className="font-semibold text-text-primary block">{activeRoleConfig.label}</span>
           </div>
           <div className="p-3 rounded-xl bg-bg-surface border border-border-base space-y-1">
             <span className="text-3xs uppercase font-mono font-bold text-text-muted block">
@@ -274,28 +277,28 @@ export function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
           </div>
         </div>
 
-        {/* Dynamic Legacy Context (Maintains backwards compatibility for tests) */}
-        {(Boolean(profileData.program) ||
-          Boolean(profileData.primary_goal) ||
-          Boolean(profileData.target_role)) && (
+        {/* Scoped Context & Goals (Only shown if relevant to respective module) */}
+        {((selectedRole === 'student' && Boolean(profileData.program)) ||
+          (selectedRole === 'student' && Boolean(profileData.primary_goal)) ||
+          (selectedRole === 'job_seeker' && Boolean(profileData.target_role))) && (
           <div className="p-3 rounded-xl bg-bg-surface border border-border-base text-xs space-y-1.5">
             <div className="flex items-center gap-1.5 text-3xs font-mono font-bold uppercase tracking-wider text-text-muted">
               <Sparkles className="w-3 h-3 text-orange-500" />
               <span>Context &amp; Goals</span>
             </div>
-            {Boolean(profileData.program) && (
+            {selectedRole === 'student' && Boolean(profileData.program) && (
               <p className="text-text-secondary">
                 <span className="font-semibold text-text-primary">Program: </span>
                 {String(profileData.program)}
               </p>
             )}
-            {Boolean(profileData.primary_goal) && (
+            {selectedRole === 'student' && Boolean(profileData.primary_goal) && (
               <p className="text-text-secondary">
                 <span className="font-semibold text-text-primary">Goal: </span>
                 {String(profileData.primary_goal).replace(/_/g, ' ')}
               </p>
             )}
-            {Boolean(profileData.target_role) && (
+            {selectedRole === 'job_seeker' && Boolean(profileData.target_role) && (
               <p className="text-text-secondary">
                 <span className="font-semibold text-text-primary">Target: </span>
                 {String(profileData.target_role)}
@@ -304,41 +307,21 @@ export function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
           </div>
         )}
 
-        {/* ─── Module-Specific Information Section ───────────────────── */}
+        {/* ─── Module-Specific Information Section (Strictly scoped to respective module) ─── */}
         <div className="p-3.5 sm:p-4 rounded-2xl bg-bg-surface border border-border-base space-y-3">
           <div className="flex items-center justify-between gap-2 flex-wrap">
             <div>
               <h4 className="text-xs font-bold text-text-primary flex items-center gap-1.5">
-                <span className="w-2 h-2 rounded-full bg-orange-500 inline-block" />
-                Module Profile Information
+                <span
+                  className="w-2 h-2 rounded-full inline-block"
+                  style={{ backgroundColor: activeRoleConfig.color || '#F97316' }}
+                />
+                {activeRoleConfig.label} Profile Information
               </h4>
               <p className="text-3xs text-text-muted">
-                Tailored information and preferences specific to each role module.
+                Tailored information and preferences specific to the {activeRoleConfig.label}{' '}
+                module.
               </p>
-            </div>
-
-            {/* Module Tabs */}
-            <div className="flex items-center gap-1 p-0.5 rounded-lg bg-bg-elevated border border-border-base">
-              {MODULE_TABS.map((tab) => {
-                const TabIcon = tab.icon;
-                const isSelected = selectedRole === tab.role;
-                return (
-                  <button
-                    key={tab.role}
-                    type="button"
-                    onClick={() => setSelectedRole(tab.role)}
-                    className={cn(
-                      'flex items-center gap-1 px-2.5 py-1 rounded-md text-3xs font-semibold transition-all cursor-pointer',
-                      isSelected
-                        ? 'bg-orange-500 text-white shadow-2xs'
-                        : 'text-text-muted hover:text-text-primary hover:bg-bg-surface'
-                    )}
-                  >
-                    <TabIcon className="w-3 h-3" />
-                    <span>{tab.label}</span>
-                  </button>
-                );
-              })}
             </div>
           </div>
 

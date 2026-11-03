@@ -500,6 +500,8 @@ vi.mock('lucide-react', () => {
     'MapPinPlus',
     'ShieldCheck',
     'Building',
+    'Building2',
+    'DollarSign',
     'Quote',
     'Github',
     'GitBranch',

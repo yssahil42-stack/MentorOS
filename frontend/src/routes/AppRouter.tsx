@@ -71,8 +71,9 @@ const PublicCaseStudyPage = lazy(() => import('../pages/public/PublicCaseStudyPa
 const JobSeekerDashboard = lazy(() => import('../pages/job_seeker/JobSeekerDashboard'));
 const SearchPlanPage = lazy(() => import('../pages/jobSeeker/SearchPlanPage'));
 const ApplicationsPage = lazy(() => import('../pages/jobSeeker/ApplicationsPage'));
+const ApplicationTrackerPage = lazy(() => import('../pages/job_seeker/ApplicationTrackerPage'));
 const PortfolioTasksPage = lazy(() => import('../pages/jobSeeker/PortfolioTasksPage'));
-const InterviewPrepPage = lazy(() => import('../pages/jobSeeker/InterviewPrepPage'));
+const InterviewPrepPage = lazy(() => import('../pages/job_seeker/InterviewPrepPage'));
 const JobCalendarPage = lazy(() => import('../pages/jobSeeker/JobCalendarPage'));
 const JobNotesPage = lazy(() => import('../pages/jobSeeker/JobNotesPage'));
 const JobProgressPage = lazy(() => import('../pages/jobSeeker/JobProgressPage'));
@@ -211,7 +212,8 @@ export function AppRouter() {
             <Route path="job-seeker" element={<RoleRouteGuard />}>
               <Route path="dashboard" element={<JobSeekerDashboard />} />
               <Route path="search-plan" element={<SearchPlanPage />} />
-              <Route path="applications" element={<ApplicationsPage />} />
+              <Route path="applications" element={<ApplicationTrackerPage />} />
+              <Route path="application-tracker" element={<ApplicationTrackerPage />} />
               <Route path="portfolio" element={<PortfolioTasksPage />} />
               <Route path="interview-prep" element={<InterviewPrepPage />} />
               <Route path="calendar" element={<JobCalendarPage />} />

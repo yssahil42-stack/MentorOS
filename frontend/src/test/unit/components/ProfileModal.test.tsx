@@ -123,36 +123,40 @@ describe('ProfileModal Component', () => {
     expect(screen.queryByText('User Profile')).not.toBeInTheDocument();
   });
 
-  it('renders module information and switches fields by module tab', async () => {
-    render(
+  it('renders only information about its respective module and hides other modules', async () => {
+    // 1. In Student module
+    const { unmount } = render(
       <MemoryRouter initialEntries={['/app/student/dashboard']}>
         <ProfileModal isOpen={true} onClose={mockOnClose} />
       </MemoryRouter>
     );
 
-    expect(screen.getByText('Module Profile Information')).toBeInTheDocument();
+    expect(screen.getByText('Student Profile Information')).toBeInTheDocument();
     expect(screen.getByText('University / Institution')).toBeInTheDocument();
+    // Other modules must NOT be shown
+    expect(screen.queryByText('Primary Tech Stack')).not.toBeInTheDocument();
+    expect(screen.queryByText('Hourly Billing Rate')).not.toBeInTheDocument();
+    expect(screen.queryByText('Target Job Title(s)')).not.toBeInTheDocument();
 
-    // Click Developer tab
-    const devTab = screen.getByRole('button', { name: /Developer/i });
-    fireEvent.click(devTab);
-    expect(screen.getByText('Primary Tech Stack')).toBeInTheDocument();
-
-    // Click Freelancer tab
-    const freelancerTab = screen.getByRole('button', { name: /Freelancer/i });
-    fireEvent.click(freelancerTab);
-    expect(screen.getByText('Hourly Billing Rate')).toBeInTheDocument();
-
-    // Click Job Seeker tab
-    const jobTab = screen.getByRole('button', { name: /Job Seeker/i });
-    fireEvent.click(jobTab);
-    expect(screen.getByText('Target Job Title(s)')).toBeInTheDocument();
-
-    // Click Save
-    const saveBtn = screen.getByRole('button', { name: /Save Job Seeker Information/i });
-    fireEvent.click(saveBtn);
+    const saveStudentBtn = screen.getByRole('button', { name: /Save Student Information/i });
+    fireEvent.click(saveStudentBtn);
     await waitFor(() => {
       expect(mockShowToast).toHaveBeenCalledWith(expect.stringContaining('saved'), 'success');
     });
+
+    unmount();
+
+    // 2. In Developer module
+    render(
+      <MemoryRouter initialEntries={['/app/developer/dashboard']}>
+        <ProfileModal isOpen={true} onClose={mockOnClose} />
+      </MemoryRouter>
+    );
+
+    expect(screen.getByText('Developer Profile Information')).toBeInTheDocument();
+    expect(screen.getByText('Primary Tech Stack')).toBeInTheDocument();
+    // Student fields must NOT be shown
+    expect(screen.queryByText('University / Institution')).not.toBeInTheDocument();
+    expect(screen.queryByText('Hourly Billing Rate')).not.toBeInTheDocument();
   });
 });
