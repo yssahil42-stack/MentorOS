@@ -99,7 +99,7 @@ export function QuickCaptureFab({
           aria-label="Quick capture actions"
         >
           {[
-            { type: 'task', icon: Zap, label: 'Task', color: 'bg-blue-500' },
+            { type: 'task', icon: Zap, label: 'Task', color: 'bg-orange-500' },
             { type: 'idea', icon: Plus, label: 'Idea', color: 'bg-purple-500' },
             { type: 'note', icon: Plus, label: 'Note', color: 'bg-emerald-500' },
             { type: 'deadline', icon: Plus, label: 'Deadline', color: 'bg-amber-500' },

@@ -85,7 +85,7 @@ export function CommandPalette() {
       category: 'Navigation' as const,
       title: nav.label,
       subtitle: nav.to,
-      icon: <Compass className="w-4 h-4 text-blue-400" />,
+      icon: <Compass className="w-4 h-4 text-orange-500 dark:text-orange-400" />,
       action: () => {
         closeCommandPalette();
         navigate(nav.to);

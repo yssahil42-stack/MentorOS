@@ -202,11 +202,11 @@ export function RoleSidebar({ expanded, onToggle }: RoleSidebarProps) {
                 </span>
                 {item.badge === 'AI' &&
                   (expanded ? (
-                    <span className="ml-auto text-[9px] font-extrabold px-1.5 py-0.5 rounded-md bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-2xs shrink-0">
+                    <span className="ml-auto text-[9px] font-extrabold px-1.5 py-0.5 rounded-md bg-gradient-to-r from-orange-500 to-amber-500 text-white shadow-2xs shrink-0">
                       AI
                     </span>
                   ) : (
-                    <span className="absolute top-1 right-1 text-[8px] font-black px-1 py-0.2 rounded bg-blue-600 text-white">
+                    <span className="absolute top-1 right-1 text-[8px] font-black px-1 py-0.2 rounded bg-orange-500 text-white">
                       AI
                     </span>
                   ))}

@@ -203,16 +203,16 @@ export default function StudentProgressPage() {
           </div>
         </Card>
 
-        <Card className="p-4 border-l-4 border-l-indigo-500">
+        <Card className="p-4 border-l-4 border-l-orange-500">
           <div className="flex items-center justify-between text-xs text-text-muted font-semibold uppercase">
             <span>Assignment Submission</span>
-            <CheckCircle2 className="w-4 h-4 text-indigo-400" />
+            <CheckCircle2 className="w-4 h-4 text-orange-500 dark:text-orange-400" />
           </div>
           <div className="mt-2 flex items-baseline gap-2">
             <span className="text-3xl font-black text-text-primary">{taskCompletionRate}%</span>
             <span className="text-xs text-text-muted">on-time</span>
           </div>
-          <div className="mt-2 text-2xs text-indigo-400 font-semibold">
+          <div className="mt-2 text-2xs text-orange-500 dark:text-orange-400 font-semibold">
             {completedTasks.length} assignments submitted
           </div>
         </Card>
@@ -275,7 +275,7 @@ export default function StudentProgressPage() {
                           ? 'bg-student-500'
                           : c.percentage >= 90
                             ? 'bg-amber-400'
-                            : 'bg-indigo-400'
+                            : 'bg-orange-400'
                       }`}
                       style={{ width: `${c.percentage}%` }}
                     />
@@ -355,7 +355,7 @@ export default function StudentProgressPage() {
               </div>
 
               <div className="flex items-center gap-3 p-2.5 rounded-xl bg-bg-surface border border-border-base">
-                <span className="p-2 rounded-lg bg-indigo-500/15 text-indigo-400 shrink-0">
+                <span className="p-2 rounded-lg bg-orange-500/15 text-orange-600 dark:text-orange-400 shrink-0">
                   <CheckCircle2 className="w-4 h-4" />
                 </span>
                 <div>

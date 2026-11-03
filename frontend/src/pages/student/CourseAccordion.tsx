@@ -98,7 +98,7 @@ export const CourseAccordion: React.FC<CourseAccordionProps> = ({
               <div className="flex items-center gap-2.5 min-w-0">
                 <span className="text-text-muted hover:text-text-primary transition-transform">
                   {isExpanded ? (
-                    <ChevronDown className="w-4 h-4 text-blue-500" />
+                    <ChevronDown className="w-4 h-4 text-orange-500" />
                   ) : (
                     <ChevronRight className="w-4 h-4 text-text-muted" />
                   )}
@@ -114,15 +114,15 @@ export const CourseAccordion: React.FC<CourseAccordionProps> = ({
                 <div className="hidden sm:flex items-center gap-2">
                   <div className="w-20 bg-bg-base h-1.5 rounded-full overflow-hidden border border-border-subtle">
                     <div
-                      className="bg-blue-600 h-full rounded-full transition-all duration-300"
+                      className="bg-orange-500 h-full rounded-full transition-all duration-300"
                       style={{ width: `${dynProgress}%` }}
                     />
                   </div>
-                  <span className="text-3xs font-mono font-bold text-blue-600 dark:text-blue-400">
+                  <span className="text-3xs font-mono font-bold text-orange-600 dark:text-orange-400">
                     {dynProgress}%
                   </span>
                 </div>
-                <span className="text-2xs font-semibold px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20">
+                <span className="text-2xs font-semibold px-2 py-0.5 rounded-full bg-blue-500/10 text-orange-600 dark:text-orange-400 border border-blue-500/20">
                   {doneCount}/{allTasks.length} done
                 </span>
               </div>
@@ -132,7 +132,7 @@ export const CourseAccordion: React.FC<CourseAccordionProps> = ({
                 <TaskList
                   tasks={visibleTasks}
                   onToggleTask={onToggleTask}
-                  accentColor="blue"
+                  accentColor="orange"
                   emptyMessage="No assignments in this course yet. Use the input above to add one."
                   onLoadMore={() => onLoadMoreCourseTasks(proj.id)}
                   remainingCount={courseTasks.length - visibleTasks.length}

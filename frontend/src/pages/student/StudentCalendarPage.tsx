@@ -167,7 +167,7 @@ export default function StudentCalendarPage() {
       case 'assignment_deadline':
         return 'bg-amber-500/15 text-amber-400 border-amber-500/30';
       case 'lecture':
-        return 'bg-indigo-500/15 text-indigo-400 border-indigo-500/30';
+        return 'bg-orange-500/15 text-orange-600 dark:text-orange-400 border-indigo-500/30';
       case 'study_block':
         return 'bg-student-500/15 text-student-300 border-student-500/30';
       default:
@@ -283,15 +283,15 @@ export default function StudentCalendarPage() {
           <p className="text-2xs text-student-400 mt-1">Pomodoro sessions</p>
         </Card>
 
-        <Card className="p-4 border-l-4 border-l-indigo-500">
+        <Card className="p-4 border-l-4 border-l-orange-500">
           <div className="flex items-center justify-between text-xs text-text-muted font-semibold uppercase">
             <span>Weekly Lectures</span>
-            <BookOpen className="w-4 h-4 text-indigo-400" />
+            <BookOpen className="w-4 h-4 text-orange-500 dark:text-orange-400" />
           </div>
           <div className="mt-2 text-2xl font-extrabold text-text-primary">
             {events.filter((e) => e.event_type === 'lecture').length}
           </div>
-          <p className="text-2xs text-indigo-400 mt-1">Enrolled modules</p>
+          <p className="text-2xs text-orange-500 dark:text-orange-400 mt-1">Enrolled modules</p>
         </Card>
       </div>
 

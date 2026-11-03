@@ -40,7 +40,7 @@ const CAPTURE_TYPES: { value: CaptureType; label: string; icon: React.ReactNode 
 ];
 
 const TYPE_COLORS: Record<CaptureType, string> = {
-  task: 'bg-blue-500/20 text-blue-600 dark:text-blue-400 border-blue-500/30',
+  task: 'bg-orange-500/20 text-orange-600 dark:text-orange-400 border-orange-500/30',
   idea: 'bg-purple-500/20 text-purple-600 dark:text-purple-400 border-purple-500/30',
   note: 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border-emerald-500/30',
   deadline: 'bg-amber-500/20 text-amber-600 dark:text-amber-400 border-amber-500/30',

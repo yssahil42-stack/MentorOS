@@ -84,17 +84,17 @@ const config: Config = {
         },
         // ─── Solar/Brand Theme Colors (Dynamic Light/Dark Mode) ──
         solar: {
-          50:  'rgb(var(--solar-50-rgb, 239 246 255) / <alpha-value>)',
-          100: 'rgb(var(--solar-100-rgb, 219 234 254) / <alpha-value>)',
-          200: 'rgb(var(--solar-200-rgb, 191 219 254) / <alpha-value>)',
-          300: 'rgb(var(--solar-300-rgb, 147 197 253) / <alpha-value>)',
-          400: 'rgb(var(--solar-400-rgb, 96 165 250) / <alpha-value>)',
-          500: 'rgb(var(--solar-500-rgb, 37 99 235) / <alpha-value>)',
-          600: 'rgb(var(--solar-600-rgb, 29 78 216) / <alpha-value>)',
-          700: 'rgb(var(--solar-700-rgb, 30 64 175) / <alpha-value>)',
-          800: 'rgb(var(--solar-800-rgb, 30 58 138) / <alpha-value>)',
-          900: 'rgb(var(--solar-900-rgb, 23 37 84) / <alpha-value>)',
-          950: 'rgb(var(--solar-950-rgb, 15 23 42) / <alpha-value>)',
+          50:  'rgb(var(--solar-50-rgb, 255 247 237) / <alpha-value>)',
+          100: 'rgb(var(--solar-100-rgb, 255 237 213) / <alpha-value>)',
+          200: 'rgb(var(--solar-200-rgb, 254 215 170) / <alpha-value>)',
+          300: 'rgb(var(--solar-300-rgb, 253 186 116) / <alpha-value>)',
+          400: 'rgb(var(--solar-400-rgb, 251 146 60) / <alpha-value>)',
+          500: 'rgb(var(--solar-500-rgb, 249 115 22) / <alpha-value>)',
+          600: 'rgb(var(--solar-600-rgb, 234 88 12) / <alpha-value>)',
+          700: 'rgb(var(--solar-700-rgb, 194 65 12) / <alpha-value>)',
+          800: 'rgb(var(--solar-800-rgb, 154 52 18) / <alpha-value>)',
+          900: 'rgb(var(--solar-900-rgb, 124 45 18) / <alpha-value>)',
+          950: 'rgb(var(--solar-950-rgb, 67 20 7) / <alpha-value>)',
         },
         // ─── Semantic States ───────────────────────────────────
         success: {

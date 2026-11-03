@@ -166,14 +166,14 @@ export function DailyStandupWidget({ role = 'student', standupData }: DailyStand
           </div>
 
           {/* ─── Column 2: Scheduled Today (From Calendar) ─────────── */}
-          <div className="p-4 rounded-xl bg-blue-500/[0.04] border border-blue-500/20 flex flex-col justify-between space-y-3">
+          <div className="p-4 rounded-xl bg-orange-500/[0.04] border border-orange-500/20 flex flex-col justify-between space-y-3">
             <div>
-              <div className="flex items-center justify-between pb-2 border-b border-blue-500/15">
-                <span className="text-3xs uppercase font-mono font-bold text-blue-400 flex items-center gap-1.5">
-                  <Calendar className="w-3.5 h-3.5 text-blue-400" />
+              <div className="flex items-center justify-between pb-2 border-b border-orange-500/15">
+                <span className="text-3xs uppercase font-mono font-bold text-orange-500 dark:text-orange-400 flex items-center gap-1.5">
+                  <Calendar className="w-3.5 h-3.5 text-orange-500 dark:text-orange-400" />
                   Scheduled Today
                 </span>
-                <span className="text-3xs font-mono font-semibold px-2 py-0.5 rounded-full bg-blue-500/15 text-blue-300 border border-blue-500/25">
+                <span className="text-3xs font-mono font-semibold px-2 py-0.5 rounded-full bg-orange-500/15 text-orange-600 dark:text-orange-300 border border-orange-500/25">
                   {totalTodayItems} on agenda
                 </span>
               </div>
@@ -193,7 +193,7 @@ export function DailyStandupWidget({ role = 'student', standupData }: DailyStand
                     {scheduledItems.map((event) => (
                       <div
                         key={event.id}
-                        className="p-2 rounded-lg bg-bg-surface/80 border border-blue-500/15 text-xs space-y-1"
+                        className="p-2 rounded-lg bg-bg-surface/80 border border-orange-500/15 text-xs space-y-1"
                       >
                         <div className="flex items-center justify-between gap-2">
                           <p className="font-semibold text-text-primary truncate">{event.title}</p>
@@ -205,8 +205,8 @@ export function DailyStandupWidget({ role = 'student', standupData }: DailyStand
                             {event.event_type.replace('_', ' ')}
                           </Badge>
                         </div>
-                        <div className="flex items-center gap-1.5 text-3xs font-mono text-blue-400">
-                          <Clock className="w-3 h-3 text-blue-400 shrink-0" />
+                        <div className="flex items-center gap-1.5 text-3xs font-mono text-orange-500 dark:text-orange-400">
+                          <Clock className="w-3 h-3 text-orange-500 dark:text-orange-400 shrink-0" />
                           <span>{formatEventTime(event.start_at, event.end_at)}</span>
                         </div>
                       </div>
@@ -235,7 +235,7 @@ export function DailyStandupWidget({ role = 'student', standupData }: DailyStand
               </div>
             </div>
 
-            <div className="pt-2 border-t border-blue-500/10 flex items-center justify-between text-3xs font-mono text-blue-400">
+            <div className="pt-2 border-t border-blue-500/10 flex items-center justify-between text-3xs font-mono text-orange-500 dark:text-orange-400">
               <Link
                 to={calendarRoute}
                 className="hover:underline flex items-center gap-1 font-semibold"

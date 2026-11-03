@@ -131,12 +131,12 @@ export default function StudentDashboard() {
             maxTilt={4}
             depth={35}
             variant="default"
-            className="p-5 border border-border-base hover:border-blue-500/35 transition-all shadow-card backdrop-blur-md"
+            className="p-5 border border-border-base hover:border-orange-500/35 transition-all shadow-card backdrop-blur-md"
           >
             <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3.5 border-b border-border-base gap-3">
               <div>
                 <h3 className="text-sm sm:text-base font-bold text-text-primary flex items-center gap-2">
-                  <span className="p-1 rounded-lg bg-blue-500/15 text-blue-600 dark:text-blue-400 border border-blue-500/25">
+                  <span className="p-1 rounded-lg bg-orange-500/15 text-orange-600 dark:text-orange-400 border border-orange-500/25">
                     <BookOpen className="w-4 h-4" />
                   </span>
                   <span>Courses &amp; Assignments</span>
@@ -150,7 +150,7 @@ export default function StudentDashboard() {
                   <button
                     key={f}
                     onClick={() => setTaskFilter(f)}
-                    className={`px-2.5 py-1 rounded-lg capitalize font-medium transition-all ${taskFilter === f ? 'bg-blue-500/20 text-blue-600 dark:text-blue-300 font-semibold shadow-2xs border border-blue-500/30' : 'text-text-muted hover:text-text-primary'}`}
+                    className={`px-2.5 py-1 rounded-lg capitalize font-medium transition-all ${taskFilter === f ? 'bg-orange-500/20 text-orange-600 dark:text-orange-300 font-semibold shadow-2xs border border-orange-500/30' : 'text-text-muted hover:text-text-primary'}`}
                   >
                     {f === 'completed' ? 'Done' : f === 'todo' ? 'To Do' : 'All'}
                   </button>
@@ -161,7 +161,7 @@ export default function StudentDashboard() {
               <button
                 type="button"
                 onClick={() => setSelectedCourseFilter('all')}
-                className={`px-3 py-1 rounded-full font-semibold whitespace-nowrap transition-all border ${selectedCourseFilter === 'all' ? 'bg-blue-600 text-white border-blue-600 shadow-2xs' : 'bg-bg-elevated text-text-muted border-border-base hover:text-text-primary'}`}
+                className={`px-3 py-1 rounded-full font-semibold whitespace-nowrap transition-all border ${selectedCourseFilter === 'all' ? 'bg-orange-500 text-white border-orange-500 shadow-2xs' : 'bg-bg-elevated text-text-muted border-border-base hover:text-text-primary'}`}
               >
                 All Courses ({projects.length})
               </button>
@@ -170,7 +170,7 @@ export default function StudentDashboard() {
                   key={p.id}
                   type="button"
                   onClick={() => setSelectedCourseFilter(p.id)}
-                  className={`px-3 py-1 rounded-full font-medium whitespace-nowrap transition-all border flex items-center gap-1.5 ${selectedCourseFilter === p.id ? 'bg-blue-600 text-white border-blue-600 shadow-2xs' : 'bg-bg-elevated text-text-muted border-border-base hover:text-text-primary'}`}
+                  className={`px-3 py-1 rounded-full font-medium whitespace-nowrap transition-all border flex items-center gap-1.5 ${selectedCourseFilter === p.id ? 'bg-orange-500 text-white border-orange-500 shadow-2xs' : 'bg-bg-elevated text-text-muted border-border-base hover:text-text-primary'}`}
                 >
                   <span>{p.title}</span>
                   <span className="text-3xs font-mono opacity-80">{p.progress}%</span>
@@ -186,7 +186,7 @@ export default function StudentDashboard() {
               </div>
               <div className="w-full bg-bg-base h-2 rounded-full overflow-hidden border border-border-base">
                 <div
-                  className="bg-gradient-to-r from-blue-600 to-indigo-500 h-full rounded-full transition-all duration-500 shadow-2xs"
+                  className="bg-gradient-to-r from-orange-500 to-amber-500 h-full rounded-full transition-all duration-500 shadow-2xs"
                   style={{ width: `${compRate}%` }}
                 />
               </div>
@@ -239,7 +239,7 @@ export default function StudentDashboard() {
               </span>
               <Link
                 to="/app/student/projects"
-                className="text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1 font-semibold text-xs"
+                className="text-orange-600 dark:text-orange-400 hover:underline flex items-center gap-1 font-semibold text-xs"
               >
                 <span>Manage Courses &amp; Milestones</span>
                 <ArrowRight className="w-3.5 h-3.5" />

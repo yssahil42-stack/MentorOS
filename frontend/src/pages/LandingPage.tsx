@@ -112,7 +112,7 @@ const ROLE_SHOWCASES: Record<RoleKey, RoleShowcaseData> = {
     id: 'student',
     name: 'Student',
     icon: GraduationCap,
-    color: '#3B82F6',
+    color: '#F97316',
     workspaceDb: 'student-workspace.db',
     tagline: 'Coursework goals, research projects & exam schedules',
     route: '/app/student/dashboard',

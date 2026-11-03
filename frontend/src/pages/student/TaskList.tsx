@@ -5,7 +5,7 @@ import type { Task, TaskStatus } from '../../types/task';
 interface TaskListProps {
   tasks: Task[];
   onToggleTask: (taskId: number, currentStatus: TaskStatus) => void;
-  accentColor?: 'blue' | 'amber';
+  accentColor?: 'orange' | 'amber';
   emptyMessage?: string;
   onLoadMore?: () => void;
   remainingCount?: number;
@@ -15,21 +15,21 @@ interface TaskListProps {
 export const TaskList: React.FC<TaskListProps> = ({
   tasks,
   onToggleTask,
-  accentColor = 'blue',
+  accentColor = 'orange',
   emptyMessage = 'No assignments in this course yet.',
   onLoadMore,
   remainingCount = 0,
   loadMoreLabel = 'Load more assignments',
 }) => {
   const isAmber = accentColor === 'amber';
-  const activeColor = isAmber ? 'text-amber-600' : 'text-blue-600';
+  const activeColor = isAmber ? 'text-amber-600' : 'text-orange-600';
   const fillActive = isAmber
     ? 'text-amber-600 fill-amber-600/20'
-    : 'text-blue-600 fill-blue-600/20';
-  const hoverBorder = isAmber ? 'hover:border-amber-500/30' : 'hover:border-blue-500/30';
+    : 'text-orange-600 fill-orange-600/20';
+  const hoverBorder = isAmber ? 'hover:border-amber-500/30' : 'hover:border-orange-500/30';
   const buttonBg = isAmber
     ? 'text-amber-500 hover:text-amber-400 bg-amber-500/5 hover:bg-amber-500/10 border-amber-500/20'
-    : 'text-blue-500 hover:text-blue-400 bg-blue-500/5 hover:bg-blue-500/10 border-blue-500/20';
+    : 'text-orange-500 hover:text-orange-400 bg-orange-500/5 hover:bg-orange-500/10 border-orange-500/20';
 
   if (tasks.length === 0) {
     return <p className="text-center py-3 text-3xs text-text-muted italic">{emptyMessage}</p>;

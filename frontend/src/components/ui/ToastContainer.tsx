@@ -53,7 +53,7 @@ function ToastItem({ toast }: { toast: Toast }) {
             toast.action?.onClick();
             dismissToast(toast.id);
           }}
-          className="ml-auto text-xs font-semibold text-blue-400 hover:text-blue-300 underline cursor-pointer focus-visible:outline-none shrink-0"
+          className="ml-auto text-xs font-semibold text-orange-500 hover:text-orange-600 dark:text-orange-400 dark:hover:text-orange-300 underline cursor-pointer focus-visible:outline-none shrink-0"
         >
           {toast.action.label}
         </button>

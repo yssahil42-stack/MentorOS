@@ -43,7 +43,7 @@ export function ProposalReviewPanel({
       case 'calendar_event':
         return <Calendar className="w-4 h-4 text-purple-400" />;
       case 'note':
-        return <FileText className="w-4 h-4 text-blue-400" />;
+        return <FileText className="w-4 h-4 text-orange-500 dark:text-orange-400" />;
     }
   };
 

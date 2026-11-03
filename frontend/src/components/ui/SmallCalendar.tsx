@@ -67,9 +67,9 @@ function getEventTypeBadge(type: CalendarEventType) {
     case 'work_block':
     case 'prep_session':
       return {
-        bg: 'bg-blue-500/15',
-        text: 'text-blue-400',
-        border: 'border-blue-500/30',
+        bg: 'bg-orange-500/15',
+        text: 'text-orange-600 dark:text-orange-400',
+        border: 'border-orange-500/30',
         label: type.replace(/_/g, ' '),
       };
     case 'lecture':

@@ -75,7 +75,7 @@ export default function StudentSettingsPage() {
                   : 'border-border-base bg-bg-surface hover:border-border-hover hover:bg-bg-elevated'
               )}
             >
-              <div className="w-10 h-10 rounded-xl bg-slate-900 border border-slate-700 flex items-center justify-center text-indigo-400 shadow-sm">
+              <div className="w-10 h-10 rounded-xl bg-slate-900 border border-slate-700 flex items-center justify-center text-orange-500 dark:text-orange-400 shadow-sm">
                 <Moon className="w-5 h-5" />
               </div>
               <div className="flex-1 min-w-0">
@@ -202,7 +202,7 @@ export default function StudentSettingsPage() {
           <Button
             type="submit"
             variant="primary"
-            className="!bg-student-500 hover:!bg-student-600 shadow-glow-indigo"
+            className="!bg-student-500 hover:!bg-student-600 shadow-glow-solar"
             icon={<Save className="w-4 h-4" />}
           >
             Save Academic Settings

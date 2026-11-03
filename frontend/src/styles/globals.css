@@ -8,22 +8,22 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ─── Light Mode Tokens (Crisp Modern SaaS Canvas & White Cards) ─── */
+/* ─── Light Mode Tokens (Crisp Modern Orange & White Palette) ─── */
 :root {
   color-scheme: light;
 
-  /* Serene Soft Sky Blue SaaS Canvas (matching reference screenshot) */
-  --bg-base-rgb: 236 244 254; /* #ECF4FE - Sky Blue Canvas from screenshot */
+  /* Warm Orange 50 Canvas & Crisp White Surface Cards */
+  --bg-base-rgb: 255 247 237; /* #FFF7ED - Soft Warm Orange 50 Canvas */
   --bg-surface-rgb: 255 255 255; /* #FFFFFF - Pure White Surface Cards */
-  --bg-elevated-rgb: 244 248 254; /* #F4F8FE - Soft Sky/Ice Tinted Container */
-  --bg-overlay-rgb: 219 234 254; /* #DBEAFE - Soft Blue Overlay */
+  --bg-elevated-rgb: 255 251 247; /* #FFFBF7 - Soft Warm Tinted Elevation */
+  --bg-overlay-rgb: 255 237 213; /* #FFEDD5 - Warm Orange 100 Overlay */
 
-  /* Sleek Modern Sky Border RGB triplets */
-  --border-subtle-rgb: 235 242 250; /* #EBF2FA */
-  --border-base-rgb: 219 234 254; /* #DBEAFE - Clean Sky Card Borders */
-  --border-rgb: 191 219 254; /* #BFDBFE */
-  --border-hover-rgb: 147 197 253; /* #93C5FD */
-  --border-strong-rgb: 37 99 235; /* #2563EB - Electric Royal Blue */
+  /* Sleek Modern Warm Orange Border RGB triplets */
+  --border-subtle-rgb: 255 241 229; /* #FFF1E5 */
+  --border-base-rgb: 254 215 170; /* #FED7AA - Clean Warm Orange Card Borders */
+  --border-rgb: 254 215 170; /* #FED7AA */
+  --border-hover-rgb: 253 186 116; /* #FDBA74 - Orange 300 */
+  --border-strong-rgb: 249 115 22; /* #F97316 - Radiant Brand Orange 500 */
 
   /* High-Contrast Crisp Typography RGB triplets */
   --text-primary-rgb: 15 23 42; /* #0F172A - Deep Slate 900 */
@@ -31,18 +31,18 @@
   --text-muted-rgb: 100 116 139; /* #64748B - Slate 500 */
   --text-faint-rgb: 148 163 184; /* #94A3B8 - Slate 400 */
 
-  /* Solar/Brand Palette RGB in Light Mode (Crisp Electric Blue & Royal Sky - matching reference) */
-  --solar-50-rgb: 239 246 255; /* #EFF6FF */
-  --solar-100-rgb: 219 234 254; /* #DBEAFE */
-  --solar-200-rgb: 191 219 254; /* #BFDBFE */
-  --solar-300-rgb: 147 197 253; /* #93C5FD */
-  --solar-400-rgb: 96 165 250; /* #60A5FA */
-  --solar-500-rgb: 37 99 235; /* #2563EB - Electric Royal Blue */
-  --solar-600-rgb: 29 78 216; /* #1D4ED8 */
-  --solar-700-rgb: 30 64 175; /* #1E40AF */
-  --solar-800-rgb: 30 58 138; /* #1E3A8A */
-  --solar-900-rgb: 23 37 84; /* #172554 */
-  --solar-950-rgb: 15 23 42; /* #0F172A */
+  /* Solar/Brand Palette RGB in Light Mode (Warm Radiant Orange & Pure White) */
+  --solar-50-rgb: 255 247 237; /* #FFF7ED - Orange 50 */
+  --solar-100-rgb: 255 237 213; /* #FFEDD5 - Orange 100 */
+  --solar-200-rgb: 254 215 170; /* #FED7AA - Orange 200 */
+  --solar-300-rgb: 253 186 116; /* #FDBA74 - Orange 300 */
+  --solar-400-rgb: 251 146 60; /* #FB923C - Orange 400 */
+  --solar-500-rgb: 249 115 22; /* #F97316 - Radiant Brand Orange 500 */
+  --solar-600-rgb: 234 88 12; /* #EA580C - Orange 600 */
+  --solar-700-rgb: 194 65 12; /* #C2410C - Orange 700 */
+  --solar-800-rgb: 154 52 18; /* #9A3412 - Orange 800 */
+  --solar-900-rgb: 124 45 18; /* #7C2D12 - Orange 900 */
+  --solar-950-rgb: 67 20 7; /* #431407 - Orange 950 */
 
   /* CSS Variable shortcuts */
   --bg-base: rgb(var(--bg-base-rgb));
@@ -61,12 +61,12 @@
   --text-muted: rgb(var(--text-muted-rgb));
   --text-faint: rgb(var(--text-faint-rgb));
 
-  /* Role Accents (Matching Reference Screenshot Modules) */
-  --solar-amber: #2563eb;
-  --solar-flare: #1d4ed8;
-  --solar-gold: #60a5fa;
-  --color-student: #3b82f6; /* Module 1: Electric Blue */
-  --color-freelancer: #0284c7; /* Module 2: Sky/Cyan Blue */
+  /* Role Accents */
+  --solar-amber: #f97316;
+  --solar-flare: #ea580c;
+  --solar-gold: #fb923c;
+  --color-student: #f97316; /* Module 1: Radiant Orange */
+  --color-freelancer: #ea580c; /* Module 2: Deep Orange Flare */
   --color-developer: #6366f1; /* Module 4: Tech Indigo */
   --color-job-seeker: #10b981; /* Module 3: Emerald Mint */
 
@@ -74,21 +74,21 @@
   --success: #10b981;
   --warning: #f59e0b;
   --danger: #ef4444;
-  --focus: #2563eb;
+  --focus: #ea580c;
 
   /* Glassmorphism */
-  --glass-bg: rgba(255, 255, 255, 0.88);
-  --glass-border: rgba(219, 234, 254, 0.8);
+  --glass-bg: rgba(255, 255, 255, 0.92);
+  --glass-border: rgba(254, 215, 170, 0.8);
   --glass-blur: 16px;
 
   /* Subtle Premium Shadows */
   --shadow-card: 0 1px 3px 0 rgba(15, 23, 42, 0.05), 0 1px 2px -1px rgba(15, 23, 42, 0.03);
   --shadow-card-hover:
-    0 10px 25px -4px rgba(37, 99, 235, 0.1), 0 4px 6px -2px rgba(15, 23, 42, 0.04);
-  --shadow-glass: 0 4px 20px -2px rgba(37, 99, 235, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.95);
+    0 10px 25px -4px rgba(249, 115, 22, 0.12), 0 4px 6px -2px rgba(15, 23, 42, 0.04);
+  --shadow-glass: 0 4px 20px -2px rgba(249, 115, 22, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.95);
   --shadow-glass-lg:
-    0 14px 40px -4px rgba(37, 99, 235, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.98);
-  --shadow-glow-solar: 0 0 28px rgba(37, 99, 235, 0.35);
+    0 14px 40px -4px rgba(249, 115, 22, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.98);
+  --shadow-glow-solar: 0 0 28px rgba(249, 115, 22, 0.35);
 
   /* Sidebar */
   --sidebar-width-collapsed: 64px;
@@ -267,7 +267,7 @@ html.dark {
   }
 
   .gradient-text-solar {
-    background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 50%, #38bdf8 100%);
+    background: linear-gradient(135deg, #c2410c 0%, #ea580c 50%, #f97316 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -391,8 +391,8 @@ html.dark {
   }
   .framer-window-shadow {
     box-shadow:
-      0 0 0 1px rgba(37, 99, 235, 0.12),
-      0 20px 50px -12px rgba(37, 99, 235, 0.15),
+      0 0 0 1px rgba(249, 115, 22, 0.14),
+      0 20px 50px -12px rgba(249, 115, 22, 0.18),
       0 4px 16px -2px rgba(15, 23, 42, 0.05);
   }
   .dark .framer-window-shadow {

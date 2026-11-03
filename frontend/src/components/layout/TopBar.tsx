@@ -96,7 +96,7 @@ export function TopBar({ onMenuClick }: TopBarProps) {
             'flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold text-white shadow-2xs',
             'transition-all duration-200 active:translate-y-[1px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus hover:opacity-95'
           )}
-          style={{ backgroundColor: roleConfig?.color ?? '#3B82F6' }}
+          style={{ backgroundColor: roleConfig?.color ?? '#F97316' }}
           title="Capture Work - Manual form entry (Ctrl+J)"
           aria-label="Capture Work"
         >

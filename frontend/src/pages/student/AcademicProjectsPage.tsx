@@ -243,10 +243,10 @@ export default function AcademicProjectsPage() {
           <p className="text-2xs text-emerald-400 mt-1">Across all courses</p>
         </Card>
 
-        <Card className="p-4 border-l-4 border-l-indigo-500">
+        <Card className="p-4 border-l-4 border-l-orange-500">
           <div className="flex items-center justify-between text-xs text-text-muted font-semibold uppercase">
             <span>AI Research Assistant</span>
-            <Sparkles className="w-4 h-4 text-indigo-400" />
+            <Sparkles className="w-4 h-4 text-orange-500 dark:text-orange-400" />
           </div>
           <div className="mt-2 text-sm font-bold text-text-primary">Ready to Assist</div>
           <button
@@ -255,7 +255,7 @@ export default function AcademicProjectsPage() {
                 'Generate a capstone research methodology with literature review milestones and experiment timeline'
               )
             }
-            className="text-2xs text-indigo-400 hover:text-indigo-300 mt-1 flex items-center gap-1 font-semibold"
+            className="text-2xs text-orange-500 hover:text-orange-600 dark:text-orange-400 dark:hover:text-orange-300 mt-1 flex items-center gap-1 font-semibold"
           >
             Generate Roadmap <ArrowRight className="w-3 h-3" />
           </button>

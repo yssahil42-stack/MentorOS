@@ -164,13 +164,15 @@ export default function StudentNotesPage() {
           <p className="text-2xs text-emerald-400 mt-1">Active semester</p>
         </Card>
 
-        <Card className="p-4 border-l-4 border-l-indigo-500">
+        <Card className="p-4 border-l-4 border-l-orange-500">
           <div className="flex items-center justify-between text-xs text-text-muted font-semibold uppercase">
             <span>AI Summarization</span>
-            <Sparkles className="w-4 h-4 text-indigo-400" />
+            <Sparkles className="w-4 h-4 text-orange-500 dark:text-orange-400" />
           </div>
           <div className="mt-2 text-sm font-bold text-text-primary">1-Click Available</div>
-          <p className="text-2xs text-indigo-400 mt-1">Extract core exam takeaways</p>
+          <p className="text-2xs text-orange-500 dark:text-orange-400 mt-1">
+            Extract core exam takeaways
+          </p>
         </Card>
       </div>
 

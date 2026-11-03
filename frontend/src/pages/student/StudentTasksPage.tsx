@@ -350,10 +350,10 @@ export default function StudentTasksPage() {
           </p>
         </Card>
 
-        <Card className="p-4 border-l-4 border-l-indigo-500">
+        <Card className="p-4 border-l-4 border-l-orange-500">
           <div className="flex items-center justify-between text-xs text-text-muted font-semibold uppercase">
             <span>Study Hours Logged</span>
-            <Clock className="w-4 h-4 text-indigo-400" />
+            <Clock className="w-4 h-4 text-orange-500 dark:text-orange-400" />
           </div>
           <div className="mt-2 text-2xl font-extrabold text-text-primary">
             {(completedMinutes / 60).toFixed(1)}h{' '}
@@ -361,7 +361,7 @@ export default function StudentTasksPage() {
               / {(totalMinutes / 60).toFixed(1)}h
             </span>
           </div>
-          <p className="text-2xs text-indigo-400 mt-1">Estimated workload</p>
+          <p className="text-2xs text-orange-500 dark:text-orange-400 mt-1">Estimated workload</p>
         </Card>
       </div>
 

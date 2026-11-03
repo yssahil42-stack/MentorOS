@@ -487,7 +487,7 @@ function CaptureCard({
         isSelected && 'ring-2 ring-solar-500/50 bg-solar-500/5',
         item.status === 'captured' && 'border-l-solar-500',
         item.status === 'triaged' && 'border-l-emerald-500',
-        item.status === 'synced' && 'border-l-blue-500',
+        item.status === 'synced' && 'border-l-orange-500',
         item.status === 'archived' && 'border-l-text-muted/50 opacity-60'
       )}
     >

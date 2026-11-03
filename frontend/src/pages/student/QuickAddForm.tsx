@@ -24,7 +24,7 @@ export const QuickAddForm: React.FC<QuickAddFormProps> = ({
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
-        className="flex-1 bg-bg-base/80 border border-border-base rounded-xl px-3.5 py-2 text-xs text-text-primary placeholder:text-text-faint focus:outline-none focus:border-blue-500/50 transition-colors shadow-2xs"
+        className="flex-1 bg-bg-base/80 border border-border-base rounded-xl px-3.5 py-2 text-xs text-text-primary placeholder:text-text-faint focus:outline-none focus:border-orange-500/50 transition-colors shadow-2xs"
       />
       <Button
         type="submit"
