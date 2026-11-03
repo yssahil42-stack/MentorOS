@@ -209,6 +209,16 @@ export function AppRouter() {
             {/* Quick Capture (accessible within app) */}
             <Route path="capture" element={<CapturePage />} />
             <Route path="inbox" element={<InboxPage />} />
+            <Route
+              path="settings"
+              element={
+                user ? (
+                  <Navigate to={`/app/${user.role.replace('_', '-')}/settings`} replace />
+                ) : (
+                  <Navigate to="/login" replace />
+                )
+              }
+            />
 
             {/* Default /app → redirect to role dashboard */}
             <Route
