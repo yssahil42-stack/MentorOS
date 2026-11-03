@@ -2,18 +2,10 @@ import React, { useState, useEffect, useRef, lazy, Suspense } from 'react';
 import { useLocation } from 'react-router-dom';
 import {
   Sparkles,
-  Send,
   Loader2,
   CheckCircle2,
-  Calendar,
-  Clock,
-  BookOpen,
   Compass,
-  ArrowRight,
-  Plus,
-  Trash2,
-  Edit2,
-  Check,
+  Clock,
   X,
   Menu,
   RotateCcw,
@@ -91,7 +83,6 @@ export function RoadmapWorkspace({ isOpen, onClose, initialPrompt = '' }: Roadma
   const [activeProposal, setActiveProposal] = useState<AIProposal | null>(null);
   const [strategicGuidance, setStrategicGuidance] = useState<string>('');
   const [phases, setPhases] = useState<EditablePhase[]>([]);
-  const [isEditMode, setIsEditMode] = useState(false);
   const [isSavedSuccess, setIsSavedSuccess] = useState(false);
   const [savedCount, setSavedCount] = useState(0);
 
@@ -343,7 +334,6 @@ export function RoadmapWorkspace({ isOpen, onClose, initialPrompt = '' }: Roadma
     setActiveProposal(null);
     setStrategicGuidance('');
     setPhases([]);
-    setIsEditMode(false);
     setIsSavedSuccess(false);
     setSavedCount(0);
     setTimeout(() => promptInputRef.current?.focus(), 100);
@@ -357,7 +347,6 @@ export function RoadmapWorkspace({ isOpen, onClose, initialPrompt = '' }: Roadma
     setStrategicGuidance(guidance);
     setPhases(parsedPhases);
     setIsSavedSuccess(proposal.status === 'approved');
-    setIsEditMode(false);
     canvasScrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -368,65 +357,17 @@ export function RoadmapWorkspace({ isOpen, onClose, initialPrompt = '' }: Roadma
     handleGenerate(projectPrompt);
   };
 
-  // Toggle task selection in phase
-  const handleToggleTask = (phaseId: number, taskId: number) => {
-    setPhases((prev) =>
-      prev.map((phase) => {
-        if (phase.id !== phaseId) return phase;
-        return {
-          ...phase,
-          tasks: phase.tasks.map((task) =>
-            task.id === taskId ? { ...task, selected: !task.selected } : task
-          ),
-        };
-      })
-    );
-  };
-
-  // Update phase title/desc inline during manual edit
-  const handlePhaseChange = (
-    phaseId: number,
-    field: 'title' | 'duration' | 'description',
-    value: string
-  ) => {
-    setPhases((prev) => prev.map((p) => (p.id === phaseId ? { ...p, [field]: value } : p)));
-  };
-
   // Save roadmap and its items into workspace
   const handleSaveToWorkspace = async () => {
     if (!activeProposal || isSaving) return;
 
     setIsSaving(true);
     try {
-      // Find IDs of all selected items
-      const selectedTaskIds = phases.flatMap((p) =>
-        p.tasks.filter((t) => t.selected).map((t) => t.id)
-      );
-      const milestoneIds = phases.map((p) => p.id);
-      const projectIds = activeProposal.items
-        .filter((i) => i.item_type === 'project')
-        .map((i) => i.id);
-      const noteIds = activeProposal.items.filter((i) => i.item_type === 'note').map((i) => i.id);
-      const eventIds = activeProposal.items
-        .filter((i) => i.item_type === 'calendar_event')
-        .map((i) => i.id);
-
-      const approvedItemIds = Array.from(
-        new Set([...projectIds, ...milestoneIds, ...selectedTaskIds, ...noteIds, ...eventIds])
-      );
-
-      // Apply any overrides from manual edits
-      const itemOverrides: Record<number, Record<string, unknown>> = {};
-      phases.forEach((p) => {
-        itemOverrides[p.id] = {
-          title: p.title,
-          description: p.description,
-        };
-      });
+      // Find IDs of all items in activeProposal
+      const allItemIds = activeProposal.items.map((i) => i.id);
 
       const res = await approveProposalItems(activeProposal, {
-        approved_item_ids: approvedItemIds,
-        item_overrides: itemOverrides,
+        approved_item_ids: allItemIds,
       });
 
       const totalCreated =
@@ -438,7 +379,6 @@ export function RoadmapWorkspace({ isOpen, onClose, initialPrompt = '' }: Roadma
 
       setSavedCount(totalCreated);
       setIsSavedSuccess(true);
-      setIsEditMode(false);
       showToast(`Successfully saved ${totalCreated} items into your workspace!`, 'success');
 
       // Refresh calendar, dashboard, tasks and project queries
@@ -476,18 +416,6 @@ export function RoadmapWorkspace({ isOpen, onClose, initialPrompt = '' }: Roadma
       prompt: 'Create a 2-week active recall sprint and exam simulation roadmap',
     },
   ];
-
-  // Count metrics
-  const allTasksCount = phases.reduce((acc, p) => acc + p.tasks.length, 0);
-  const selectedTasksCount = phases.reduce(
-    (acc, p) => acc + p.tasks.filter((t) => t.selected).length,
-    0
-  );
-  const totalTasksCount = selectedTasksCount;
-  const overallRoadmapProgress =
-    allTasksCount > 0 ? Math.round((selectedTasksCount / allTasksCount) * 100) : 0;
-  const stagedCalendarEvents =
-    activeProposal?.items.filter((i) => i.item_type === 'calendar_event') || [];
 
   return (
     <div className="fixed inset-0 z-50 overflow-hidden flex bg-bg-base text-text-primary animate-fade-in font-sans">
@@ -820,292 +748,31 @@ export function RoadmapWorkspace({ isOpen, onClose, initialPrompt = '' }: Roadma
                     </Suspense>
                   </div>
                 </Card>
-
-                {/* b. Vertical List of Detailed Phase Cards */}
-                <div className="space-y-4">
-                  <div className="space-y-2 px-1">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <BookOpen className="w-4 h-4 text-text-muted" />
-                        <h3 className="text-sm font-bold text-text-primary">
-                          Sequential Roadmap Phases ({phases.length})
-                        </h3>
-                      </div>
-                      <span className="text-xs font-mono text-text-muted">
-                        {selectedTasksCount}/{allTasksCount} tasks staged ({overallRoadmapProgress}
-                        %)
-                      </span>
-                    </div>
-                    <div className="w-full bg-bg-surface h-1.5 rounded-full overflow-hidden border border-border-base">
-                      <div
-                        className="bg-gradient-to-r from-solar-500 to-emerald-400 h-full rounded-full transition-all duration-300"
-                        style={{ width: `${overallRoadmapProgress}%` }}
-                      />
-                    </div>
-                  </div>
-
-                  {phases.map((phase, idx) => (
-                    <Card
-                      key={phase.id}
-                      variant="default"
-                      className="border border-border-base bg-bg-surface overflow-hidden p-5 md:p-6 space-y-4 shadow-none"
-                    >
-                      {/* Phase Header */}
-                      <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-2 pb-3 border-b border-border-base">
-                        <div className="space-y-1 min-w-0 flex-1">
-                          <div className="flex items-center gap-2 flex-wrap">
-                            <span
-                              className="w-2 h-2 rounded-full shrink-0"
-                              style={{ backgroundColor: roleConfig?.color || '#F59E0B' }}
-                            />
-                            {isEditMode ? (
-                              <input
-                                type="text"
-                                value={phase.title}
-                                onChange={(e) =>
-                                  handlePhaseChange(phase.id, 'title', e.target.value)
-                                }
-                                className="h-8 px-2 rounded border border-border-base bg-bg-base text-sm font-bold text-text-primary w-full max-w-md"
-                              />
-                            ) : (
-                              <h4 className="text-base font-bold text-text-primary">
-                                {phase.title}
-                              </h4>
-                            )}
-                          </div>
-
-                          {/* Phase Duration */}
-                          {isEditMode ? (
-                            <input
-                              type="text"
-                              value={phase.duration}
-                              onChange={(e) =>
-                                handlePhaseChange(phase.id, 'duration', e.target.value)
-                              }
-                              className="h-6 px-2 rounded border border-border-base bg-bg-base text-2xs font-mono text-text-muted w-48 mt-1"
-                            />
-                          ) : (
-                            <p className="text-xs font-mono text-text-muted flex items-center gap-1.5">
-                              <Clock className="w-3.5 h-3.5 text-text-faint" />
-                              <span>{phase.duration}</span>
-                            </p>
-                          )}
-                        </div>
-
-                        <Badge
-                          variant="neutral"
-                          size="sm"
-                          className="border-border-base text-2xs shrink-0 self-start"
-                        >
-                          Phase {idx + 1}
-                        </Badge>
-                      </div>
-
-                      {/* Phase Progress Bar */}
-                      {phase.tasks.length > 0 &&
-                        (() => {
-                          const phaseTotal = phase.tasks.length;
-                          const phaseDone = phase.tasks.filter((t) => t.selected).length;
-                          const phaseProg = Math.round((phaseDone / phaseTotal) * 100);
-                          return (
-                            <div className="space-y-1">
-                              <div className="flex items-center justify-between text-3xs font-mono text-text-muted">
-                                <span>Phase Target Progress</span>
-                                <span className="font-bold text-solar-500">
-                                  {phaseDone}/{phaseTotal} tasks ({phaseProg}%)
-                                </span>
-                              </div>
-                              <div className="w-full bg-bg-base h-1.5 rounded-full overflow-hidden border border-border-subtle">
-                                <div
-                                  className="bg-gradient-to-r from-solar-500 to-emerald-400 h-full rounded-full transition-all duration-300"
-                                  style={{ width: `${phaseProg}%` }}
-                                />
-                              </div>
-                            </div>
-                          );
-                        })()}
-
-                      {/* Full Descriptive Paragraph */}
-                      <div>
-                        {isEditMode ? (
-                          <textarea
-                            value={phase.description}
-                            onChange={(e) =>
-                              handlePhaseChange(phase.id, 'description', e.target.value)
-                            }
-                            rows={3}
-                            className="w-full p-2.5 rounded-lg border border-border-base bg-bg-base text-xs text-text-primary"
-                          />
-                        ) : (
-                          <p className="text-xs md:text-sm text-text-secondary leading-relaxed font-normal">
-                            {phase.description}
-                          </p>
-                        )}
-                      </div>
-
-                      {/* Concrete Sub-Tasks */}
-                      {phase.tasks.length > 0 && (
-                        <div className="space-y-2 pt-2 border-t border-border-subtle">
-                          <span className="text-3xs uppercase font-mono text-text-muted font-bold block">
-                            Key Focus Tasks &amp; Milestones ({phase.tasks.length})
-                          </span>
-
-                          <div className="grid grid-cols-1 gap-2">
-                            {phase.tasks.map((task) => (
-                              <div
-                                key={task.id}
-                                onClick={() => handleToggleTask(phase.id, task.id)}
-                                className={cn(
-                                  'p-3 rounded-xl border text-xs flex items-center justify-between gap-3 transition-colors cursor-pointer select-none',
-                                  task.selected
-                                    ? 'bg-bg-elevated/50 border-border-base hover:border-border-hover'
-                                    : 'bg-bg-base/30 border-transparent text-text-muted opacity-60'
-                                )}
-                              >
-                                <div className="flex items-center gap-2.5 min-w-0">
-                                  <div
-                                    className={cn(
-                                      'w-4 h-4 rounded flex items-center justify-center border transition-colors shrink-0',
-                                      task.selected
-                                        ? 'bg-solar-500 border-solar-500 text-white'
-                                        : 'border-border-base bg-bg-surface'
-                                    )}
-                                  >
-                                    {task.selected && <Check className="w-3 h-3 stroke-[3]" />}
-                                  </div>
-                                  <span
-                                    className={cn(
-                                      'font-medium truncate',
-                                      !task.selected && 'line-through text-text-faint'
-                                    )}
-                                  >
-                                    {task.title}
-                                  </span>
-                                </div>
-
-                                <div className="flex items-center gap-2 shrink-0 text-3xs font-mono text-text-muted">
-                                  {task.estimatedMinutes && <span>{task.estimatedMinutes}m</span>}
-                                  {task.priority &&
-                                    !['high', 'low', 'intermediate', 'urgent', 'medium'].includes(
-                                      task.priority.toLowerCase()
-                                    ) && (
-                                      <span className="capitalize px-1.5 py-0.5 rounded bg-bg-surface border border-border-base">
-                                        {task.priority}
-                                      </span>
-                                    )}
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-                    </Card>
-                  ))}
-                </div>
-
-                {/* c. Staged Calendar Sessions */}
-                {stagedCalendarEvents.length > 0 && (
-                  <Card
-                    variant="default"
-                    className="border border-border-base bg-bg-surface overflow-hidden p-5 space-y-3 shadow-none"
-                  >
-                    <div className="flex items-center justify-between pb-2 border-b border-border-base">
-                      <div className="flex items-center gap-2">
-                        <Calendar className="w-4 h-4 text-solar-500" />
-                        <h3 className="text-sm font-bold text-text-primary">
-                          Scheduled Calendar Sessions ({stagedCalendarEvents.length})
-                        </h3>
-                      </div>
-                      <span className="text-2xs text-text-muted">
-                        Auto-syncs to your Calendar on Save
-                      </span>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5">
-                      {stagedCalendarEvents.map((evItem) => {
-                        const evPayload = evItem.payload as AIProposedCalendarEvent;
-                        const startDate = evPayload.start_at ? new Date(evPayload.start_at) : null;
-                        const formattedTime = startDate
-                          ? startDate.toLocaleDateString(undefined, {
-                              weekday: 'short',
-                              month: 'short',
-                              day: 'numeric',
-                              hour: '2-digit',
-                              minute: '2-digit',
-                            })
-                          : 'Scheduled Block';
-
-                        return (
-                          <div
-                            key={evItem.id}
-                            className="p-3 rounded-xl border border-border-base bg-bg-elevated/40 text-xs flex flex-col gap-1.5"
-                          >
-                            <div className="flex items-center justify-between gap-2">
-                              <span className="font-semibold text-text-primary truncate">
-                                {evPayload.title || 'Study Session'}
-                              </span>
-                              <Badge
-                                variant="neutral"
-                                size="sm"
-                                className="text-3xs uppercase capitalize shrink-0"
-                              >
-                                {evPayload.event_type?.replace('_', ' ') || 'Session'}
-                              </Badge>
-                            </div>
-                            <div className="flex items-center gap-1.5 text-3xs font-mono text-text-muted">
-                              <Clock className="w-3 h-3 text-text-faint" />
-                              <span>{formattedTime}</span>
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </Card>
-                )}
               </div>
             )}
           </div>
         </div>
 
-        {/* ─── c. Bottom Action Bar (Fixed at bottom of canvas) ─────────────── */}
+        {/* ─── Bottom Action Bar (Fixed at bottom of canvas) ─────────────── */}
         {activeProposal && !isGenerating && (
           <div className="p-4 border-t border-border-base bg-bg-surface shrink-0 flex flex-col sm:flex-row items-center justify-between gap-3">
-            <div className="flex items-center gap-2 text-xs font-medium text-text-secondary">
+            <div className="flex items-center gap-2 text-xs font-medium text-text-secondary truncate min-w-0">
               {isSavedSuccess ? (
-                <span className="flex items-center gap-1.5 text-emerald-600 font-bold">
-                  <CheckCircle2 className="w-4 h-4" />
-                  Saved {savedCount} items into your workspace & calendar!
+                <span className="flex items-center gap-1.5 text-emerald-600 font-bold truncate">
+                  <CheckCircle2 className="w-4 h-4 shrink-0" />
+                  Saved {savedCount} items into your workspace!
                 </span>
               ) : (
-                <span>
-                  Staged: <strong className="text-text-primary">1 Project</strong> •{' '}
-                  <strong className="text-text-primary">{phases.length} Phases</strong> •{' '}
-                  <strong className="text-text-primary">{totalTasksCount} Tasks</strong>
-                  {stagedCalendarEvents.length > 0 && (
-                    <>
-                      {' '}
-                      •{' '}
-                      <strong className="text-text-primary">
-                        {stagedCalendarEvents.length} Calendar Events
-                      </strong>
-                    </>
-                  )}
+                <span className="truncate">
+                  Roadmap generated for:{' '}
+                  <strong className="text-text-primary">
+                    &ldquo;{activeProposal.request_text}&rdquo;
+                  </strong>
                 </span>
               )}
             </div>
 
-            <div className="flex items-center gap-2.5 w-full sm:w-auto justify-end">
-              {/* "Edit manually" button */}
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => setIsEditMode(!isEditMode)}
-                className="text-xs h-9 px-4 border-border-base active:translate-y-[1px]"
-              >
-                <Edit2 className="w-3.5 h-3.5 mr-1.5 text-text-muted" />
-                {isEditMode ? 'Done editing' : 'Edit manually'}
-              </Button>
-
+            <div className="flex items-center gap-2.5 w-full sm:w-auto justify-end shrink-0">
               {/* "Save to workspace" button with solar gradient */}
               <button
                 type="button"
