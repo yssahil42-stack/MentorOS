@@ -1,5 +1,6 @@
 import React, { Component, type ReactNode, type ErrorInfo } from 'react';
 import ServerErrorPage from '../../pages/ServerErrorPage';
+import { captureException } from '../../config/sentry';
 
 interface ErrorBoundaryProps {
   children: ReactNode;
@@ -28,10 +29,14 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     console.error('Unhandled Application Error:', error, errorInfo);
+    captureException(error, {
+      componentStack: errorInfo.componentStack ?? undefined,
+    });
   }
 
   handleReport = () => {
     if (this.state.error) {
+      captureException(this.state.error, { manualReport: true });
       window.dispatchEvent(new CustomEvent('mentor:error', { detail: this.state.error }));
       this.setState({ reported: true });
     }
