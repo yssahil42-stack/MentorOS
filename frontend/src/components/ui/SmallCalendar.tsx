@@ -226,7 +226,7 @@ export function SmallCalendar({ role }: SmallCalendarProps) {
       <Card3D
         maxTilt={3}
         depth={25}
-        variant="default"
+        variant="secondary"
         className="p-4 sm:p-5 border border-border-base hover:border-solar-500/40 transition-all shadow-card backdrop-blur-md select-none flex flex-col"
       >
         <div className="flex items-center justify-between pb-3 border-b border-border-base">

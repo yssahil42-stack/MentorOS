@@ -328,8 +328,8 @@ export default function InvoiceGeneratorPage() {
           variant="primary"
           size="sm"
           onClick={() => openCaptureModal('ai')}
-          className="!bg-gradient-to-r !from-amber-500 !to-orange-500 hover:!from-amber-600 hover:!to-orange-600 shadow-glow-solar font-bold px-5 h-10 text-stone-950"
-          icon={<Plus className="w-4 h-4 text-stone-950" />}
+          className="bg-orange-500 hover:bg-orange-600 font-bold px-5 h-10 text-white shadow-sm"
+          icon={<Plus className="w-4 h-4 text-white" />}
         >
           AI Invoice Assist
         </Button>
@@ -651,7 +651,7 @@ export default function InvoiceGeneratorPage() {
           <div className="pt-4 border-t border-border-base">
             <Button
               size="lg"
-              className="w-full !bg-gradient-to-r !from-amber-500 !to-orange-500 hover:!from-amber-600 hover:!to-orange-600 shadow-glow-solar font-bold text-stone-950"
+              className="w-full bg-orange-500 hover:bg-orange-600 font-bold text-white shadow-sm"
               onClick={handleGeneratePreview}
               loading={isGenerating}
               icon={<FileText className="w-4 h-4" />}
@@ -894,7 +894,7 @@ export default function InvoiceGeneratorPage() {
                 size="sm"
                 onClick={handleCreateInvoice}
                 loading={isCreating}
-                className="!bg-gradient-to-r !from-amber-500 !to-orange-500 hover:!from-amber-600 hover:!to-orange-600 shadow-glow-solar font-bold text-stone-950"
+                className="bg-orange-500 hover:bg-orange-600 font-bold text-white shadow-sm"
                 icon={<Send className="w-3.5 h-3.5" />}
               >
                 {isCreating ? 'Creating...' : 'Create & Send Invoice'}

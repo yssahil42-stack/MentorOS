@@ -254,8 +254,8 @@ export default function FreelancerProjectsPage() {
             variant="primary"
             size="sm"
             onClick={() => openCaptureModal('ai')}
-            className="!bg-gradient-to-r !from-amber-500 !to-orange-500 hover:!from-amber-600 hover:!to-orange-600 shadow-glow-solar font-bold px-5 h-10 text-stone-950"
-            icon={<Sparkles className="w-4 h-4 text-stone-950" />}
+            className="bg-orange-500 hover:bg-orange-600 font-bold px-5 h-10 text-white shadow-sm"
+            icon={<Sparkles className="w-4 h-4 text-white" />}
           >
             AI Project Generator
           </Button>
@@ -546,7 +546,7 @@ export default function FreelancerProjectsPage() {
                   </div>
                   <div className="w-full bg-bg-base h-2 rounded-full overflow-hidden border border-border-base">
                     <div
-                      className="h-full bg-gradient-to-r from-amber-500 to-orange-400 rounded-full transition-all duration-500"
+                      className="h-full bg-orange-500 rounded-full transition-all duration-500"
                       style={{ width: `${project.progress}%` }}
                     />
                   </div>

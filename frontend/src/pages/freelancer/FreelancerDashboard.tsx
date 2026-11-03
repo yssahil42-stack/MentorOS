@@ -136,7 +136,7 @@ export default function FreelancerDashboard() {
           <Card3D
             maxTilt={4}
             depth={35}
-            variant="default"
+            variant="secondary"
             className="p-5 border border-border-base hover:border-orange-500/35 transition-all shadow-card backdrop-blur-md"
           >
             <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3.5 border-b border-border-base gap-3">
@@ -194,7 +194,7 @@ export default function FreelancerDashboard() {
               </div>
               <div className="w-full bg-bg-base h-2 rounded-full overflow-hidden border border-border-base">
                 <div
-                  className="bg-gradient-to-r from-orange-500 to-amber-500 h-full rounded-full transition-all duration-500 shadow-2xs"
+                  className="bg-orange-500 h-full rounded-full transition-all duration-500 shadow-2xs"
                   style={{ width: `${compRate}%` }}
                 />
               </div>

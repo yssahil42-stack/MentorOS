@@ -51,7 +51,7 @@ export const FreelancerMetrics: React.FC<FreelancerMetricsProps> = ({
           <span className="text-orange-500 font-semibold">{avgProjectProgress}% avg progress</span>
           <div className="w-16 h-1.5 rounded-full bg-bg-base overflow-hidden border border-border-subtle">
             <div
-              className="h-full bg-gradient-to-r from-orange-500 to-amber-500 rounded-full"
+              className="h-full bg-orange-500 rounded-full"
               style={{ width: `${Math.min(100, Math.max(5, avgProjectProgress))}%` }}
             />
           </div>

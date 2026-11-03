@@ -340,8 +340,8 @@ export default function FreelancerTasksPage() {
             variant="primary"
             size="sm"
             onClick={() => openCaptureModal('ai')}
-            className="!bg-gradient-to-r !from-amber-500 !to-orange-500 hover:!from-amber-600 hover:!to-orange-600 shadow-glow-solar font-bold px-5 h-10 text-stone-950"
-            icon={<Sparkles className="w-4 h-4 text-stone-950" />}
+            className="bg-orange-500 hover:bg-orange-600 font-bold px-5 h-10 text-white shadow-sm"
+            icon={<Sparkles className="w-4 h-4 text-white" />}
           >
             AI Task Generator
           </Button>
