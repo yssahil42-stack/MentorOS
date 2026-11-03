@@ -5,11 +5,39 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="color-scheme" content="light dark" />
-    <meta name="description" content="MentorOS — AI powered productivity and workspace management tool where users organize project goals, projects, tasks, schedules, and content." />
+    <meta
+      name="description"
+      content="MentorOS — AI powered productivity and workspace management tool where users organize project goals, projects, tasks, schedules, and content."
+    />
+    <meta
+      property="og:title"
+      content="MentorOS — AI Powered Productivity &amp; Workspace Management"
+    />
+    <meta
+      property="og:description"
+      content="Organize projects, tasks, and schedules with local AI assistance."
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://mentoros.app" />
+    <meta property="og:image" content="/og-image.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="theme-color" content="#2563EB" />
+
+    <!-- JSON-LD Schema: -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "SoftwareApplication",
+        "name": "MentorOS",
+        "applicationCategory": "ProductivityApplication",
+        "operatingSystem": "Web",
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
+      }
+    </script>
     <title>MentorOS — AI Powered Productivity &amp; Workspace Management</title>
     <!-- Anti-FOUC Theme Script -->
     <script>
-      (function() {
+      (function () {
         try {
           var saved = localStorage.getItem('mentoros-theme');
           var isDark = saved === 'dark';
@@ -27,12 +55,23 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="preconnect" href="https://accounts.google.com" />
-    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" />
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" media="print" onload="this.media='all'" />
+    <link
+      rel="preload"
+      as="style"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap"
+    />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap"
+      media="print"
+      onload="this.media = 'all'"
+    />
     <!-- Google Identity Services -->
     <script src="https://accounts.google.com/gsi/client" async defer></script>
   </head>
-  <body class="bg-bg-base text-text-primary antialiased font-sans min-h-screen selection:bg-solar-500/20 selection:text-solar-500">
+  <body
+    class="bg-bg-base text-text-primary antialiased font-sans min-h-screen selection:bg-solar-500/20 selection:text-solar-500"
+  >
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
