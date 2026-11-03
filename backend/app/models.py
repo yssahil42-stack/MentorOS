@@ -2,6 +2,7 @@ import datetime
 from sqlalchemy import (
     Column,
     Integer,
+    Float,
     String,
     Boolean,
     DateTime,
@@ -32,6 +33,7 @@ class User(Base):
     notes = relationship("Note", back_populates="user", cascade="all, delete-orphan")
     goals = relationship("Goal", back_populates="user", cascade="all, delete-orphan")
     content_items = relationship("ContentItem", back_populates="user", cascade="all, delete-orphan")
+    invoices = relationship("Invoice", back_populates="user", cascade="all, delete-orphan")
 
 
 class Project(Base):
@@ -52,6 +54,7 @@ class Project(Base):
     user = relationship("User", back_populates="projects")
     tasks = relationship("Task", back_populates="project")
     milestones = relationship("Milestone", back_populates="project", cascade="all, delete-orphan")
+    invoices = relationship("Invoice", back_populates="project", cascade="all, delete-orphan")
 
 
 class Milestone(Base):
@@ -214,3 +217,51 @@ class ContentItem(Base):
 
     user = relationship("User", back_populates="content_items")
     project = relationship("Project")
+
+
+class Invoice(Base):
+    __tablename__ = "invoices"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    project_id = Column(Integer, ForeignKey("projects.id"), nullable=False)
+    role = Column(String(50), nullable=False, default="freelancer")
+    invoice_number = Column(String(100), nullable=False)
+    status = Column(String(50), default="draft")  # draft, sent, paid, overdue, cancelled
+    issue_date = Column(String(50), nullable=False)
+    due_date = Column(String(50), nullable=False)
+    payment_terms = Column(String(50), default="net_30")  # net_15, net_30, net_45, due_on_receipt
+    subtotal = Column(Float, default=0.0)
+    tax_rate = Column(Float, default=0.0)
+    tax_amount = Column(Float, default=0.0)
+    total = Column(Float, default=0.0)
+    currency = Column(String(10), default="USD")
+    notes = Column(Text, nullable=True)
+    client_name = Column(String(255), nullable=True)
+    client_email = Column(String(255), nullable=True)
+    client_address = Column(Text, nullable=True)
+    paid_at = Column(DateTime, nullable=True)
+    sent_at = Column(DateTime, nullable=True)
+    created_at = Column(DateTime, default=datetime.datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
+
+    user = relationship("User", back_populates="invoices")
+    project = relationship("Project", back_populates="invoices")
+    line_items = relationship("InvoiceLineItem", back_populates="invoice", cascade="all, delete-orphan")
+
+
+class InvoiceLineItem(Base):
+    __tablename__ = "invoice_line_items"
+
+    id = Column(Integer, primary_key=True, index=True)
+    invoice_id = Column(Integer, ForeignKey("invoices.id"), nullable=False)
+    description = Column(String(255), nullable=False)
+    quantity = Column(Float, default=1.0)
+    unit_price = Column(Float, default=0.0)
+    total = Column(Float, default=0.0)
+    sort_order = Column(Integer, default=0)
+    source_type = Column(String(50), nullable=True)  # milestone, task, custom
+    source_id = Column(Integer, nullable=True)
+
+    invoice = relationship("Invoice", back_populates="line_items")
+

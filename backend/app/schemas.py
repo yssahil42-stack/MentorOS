@@ -346,3 +346,107 @@ class AIApprovalResult(BaseModel):
     created_milestones: List[MilestoneOut]
     created_events: List[CalendarEventOut]
     created_notes: List[NoteOut]
+
+
+# --- Invoice Schemas ---
+
+class InvoiceLineItemCreate(InputModel):
+    description: str = Field(min_length=1, max_length=255)
+    quantity: float = Field(default=1.0, ge=0.01)
+    unit_price: float = Field(default=0.0, ge=0.0)
+    source_type: Optional[str] = Field(default=None, max_length=50)
+    source_id: Optional[int] = None
+    sort_order: Optional[int] = Field(default=0)
+
+
+class InvoiceLineItemOut(BaseModel):
+    id: int
+    invoice_id: Optional[int] = None
+    description: str
+    quantity: float
+    unit_price: float
+    total: float
+    sort_order: int
+    source_type: Optional[str] = None
+    source_id: Optional[int] = None
+
+    class Config:
+        from_attributes = True
+
+
+class InvoiceCreate(InputModel):
+    project_id: int = Field(ge=1)
+    invoice_number: Optional[str] = Field(default=None, max_length=100)
+    issue_date: Optional[str] = Field(default=None, max_length=50)
+    due_date: Optional[str] = Field(default=None, max_length=50)
+    payment_terms: Optional[str] = Field(default="net_30", max_length=50)
+    tax_rate: Optional[float] = Field(default=0.0, ge=0.0, le=100.0)
+    currency: Optional[str] = Field(default="USD", max_length=10)
+    notes: Optional[str] = Field(default=None, max_length=5000)
+    client_name: Optional[str] = Field(default=None, max_length=255)
+    client_email: Optional[str] = Field(default=None, max_length=255)
+    client_address: Optional[str] = Field(default=None, max_length=1000)
+    line_items: List[InvoiceLineItemCreate] = Field(default_factory=list)
+
+
+class InvoiceUpdate(InputModel):
+    invoice_number: Optional[str] = Field(default=None, max_length=100)
+    status: Optional[str] = Field(default=None, max_length=50)
+    issue_date: Optional[str] = Field(default=None, max_length=50)
+    due_date: Optional[str] = Field(default=None, max_length=50)
+    payment_terms: Optional[str] = Field(default=None, max_length=50)
+    tax_rate: Optional[float] = Field(default=None, ge=0.0, le=100.0)
+    currency: Optional[str] = Field(default=None, max_length=10)
+    notes: Optional[str] = Field(default=None, max_length=5000)
+    client_name: Optional[str] = Field(default=None, max_length=255)
+    client_email: Optional[str] = Field(default=None, max_length=255)
+    client_address: Optional[str] = Field(default=None, max_length=1000)
+
+
+class InvoiceOut(BaseModel):
+    id: int
+    user_id: int
+    role: str
+    project_id: int
+    invoice_number: str
+    status: str
+    issue_date: str
+    due_date: str
+    payment_terms: str
+    subtotal: float
+    tax_rate: float
+    tax_amount: float
+    total: float
+    currency: str
+    notes: Optional[str] = None
+    paid_at: Optional[datetime] = None
+    sent_at: Optional[datetime] = None
+    client_name: Optional[str] = None
+    client_email: Optional[str] = None
+    client_address: Optional[str] = None
+    project_title: Optional[str] = None
+    line_items: List[InvoiceLineItemOut] = []
+    created_at: datetime
+    updated_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
+class GenerateInvoiceFromProjectRequest(InputModel):
+    project_id: int = Field(ge=1)
+    include_completed_milestones: bool = True
+    include_completed_tasks: bool = True
+    payment_terms: Optional[str] = Field(default="net_30", max_length=50)
+    tax_rate: Optional[float] = Field(default=0.0, ge=0.0, le=100.0)
+    currency: Optional[str] = Field(default="USD", max_length=10)
+    notes: Optional[str] = Field(default=None, max_length=5000)
+
+
+class InvoiceStatsOut(BaseModel):
+    total_invoices: int
+    total_revenue: float
+    outstanding_amount: float
+    overdue_count: int
+    avg_payment_days: float
+

@@ -8,7 +8,7 @@ from fastapi.responses import JSONResponse
 from .database import engine, Base
 from .config import settings
 from .rate_limit import RateLimitMiddleware
-from .routers import auth, tasks, projects, calendar, notes, dashboard, ai
+from .routers import auth, tasks, projects, calendar, notes, dashboard, ai, invoices
 
 logger = logging.getLogger(__name__)
 
@@ -37,6 +37,7 @@ app.include_router(calendar.router, prefix="/api/v1")
 app.include_router(notes.router, prefix="/api/v1")
 app.include_router(dashboard.router, prefix="/api/v1")
 app.include_router(ai.router, prefix="/api/v1")
+app.include_router(invoices.router, prefix="/api/v1")
 
 
 @app.exception_handler(RequestValidationError)
