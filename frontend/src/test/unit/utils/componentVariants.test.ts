@@ -9,6 +9,7 @@ import {
   modalDialogVariants,
   modalOverlayVariants,
   modalBackdropVariants,
+  confirmButtonVariant,
   modalSizes,
 } from '../../../utils/modalVariants';
 import {
@@ -84,6 +85,12 @@ describe('Component Variants Utilities', () => {
     it('exports backdrop variants', () => {
       expect(modalBackdropVariants).toContain('backdrop-blur-sm');
       expect(modalBackdropVariants).toContain('bg-black/60');
+    });
+
+    it('returns confirm button variant based on destructive flag', () => {
+      expect(confirmButtonVariant(true)).toBe('danger');
+      expect(confirmButtonVariant(false)).toBe('primary');
+      expect(confirmButtonVariant()).toBe('primary');
     });
   });
 

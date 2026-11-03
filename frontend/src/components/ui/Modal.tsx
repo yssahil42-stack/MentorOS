@@ -9,6 +9,7 @@ import {
   modalDialogVariants,
   modalOverlayVariants,
   modalBackdropVariants,
+  confirmButtonVariant,
 } from '../../utils/modalVariants';
 
 export * from '../../utils/modalVariants';
@@ -186,7 +187,7 @@ export function ConfirmDialog({
           {cancelLabel}
         </Button>
         <Button
-          variant={destructive ? 'danger' : 'primary'}
+          variant={confirmButtonVariant(destructive)}
           size="sm"
           onClick={onConfirm}
           loading={loading}

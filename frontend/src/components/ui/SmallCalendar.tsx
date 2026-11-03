@@ -22,6 +22,7 @@ import { Modal } from './Modal';
 import { Button } from './Button';
 import { Card } from './Card';
 import { Card3D } from './Card3D';
+import { badgeVariants, BadgeVariant } from '../../utils/badgeVariants';
 import {
   fetchCalendarEvents,
   createCalendarEvent,
@@ -34,59 +35,48 @@ interface SmallCalendarProps {
   role?: string;
 }
 
-function getEventTypeBadge(type: CalendarEventType) {
+function getEventTypeBadge(type: CalendarEventType): {
+  className: string;
+  label: string;
+} {
+  let variant: BadgeVariant = 'default';
   switch (type) {
     case 'exam':
     case 'release':
     case 'delivery_deadline':
-      return {
-        bg: 'bg-red-500/15',
-        text: 'text-red-400',
-        border: 'border-red-500/30',
-        label: type.replace(/_/g, ' '),
-      };
+      variant = 'danger';
+      break;
     case 'assignment_deadline':
     case 'application_deadline':
-      return {
-        bg: 'bg-amber-500/15',
-        text: 'text-amber-400',
-        border: 'border-amber-500/30',
-        label: type.replace(/_/g, ' '),
-      };
+      variant = 'warning';
+      break;
     case 'interview':
     case 'client_review':
     case 'meeting':
-      return {
-        bg: 'bg-emerald-500/15',
-        text: 'text-emerald-400',
-        border: 'border-emerald-500/30',
-        label: type.replace(/_/g, ' '),
-      };
+      variant = 'success';
+      break;
     case 'study_block':
     case 'build_block':
     case 'work_block':
     case 'prep_session':
-      return {
-        bg: 'bg-orange-500/15',
-        text: 'text-orange-600 dark:text-orange-400',
-        border: 'border-orange-500/30',
-        label: type.replace(/_/g, ' '),
-      };
+      variant = 'primary';
+      break;
     case 'lecture':
-      return {
-        bg: 'bg-indigo-500/15',
-        text: 'text-indigo-400',
-        border: 'border-indigo-500/30',
-        label: 'lecture',
-      };
+      variant = 'info';
+      break;
     default:
-      return {
-        bg: 'bg-solar-500/15',
-        text: 'text-solar-400',
-        border: 'border-solar-500/30',
-        label: type.replace(/_/g, ' '),
-      };
+      variant = 'default';
+      break;
   }
+
+  return {
+    className: badgeVariants({
+      variant,
+      size: 'xs',
+      className: 'uppercase font-mono font-bold px-1.5 py-0.5',
+    }),
+    label: type.replace(/_/g, ' '),
+  };
 }
 
 export function SmallCalendar({ role }: SmallCalendarProps) {
@@ -413,11 +403,7 @@ export function SmallCalendar({ role }: SmallCalendarProps) {
                   >
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-1.5">
-                        <span
-                          className={`text-[9px] uppercase font-mono font-bold px-1.5 py-0.2 rounded ${badge.bg} ${badge.text} border ${badge.border}`}
-                        >
-                          {badge.label}
-                        </span>
+                        <span className={badge.className}>{badge.label}</span>
                         <span className="text-[10px] text-text-muted font-mono flex items-center gap-0.5">
                           <Clock className="w-2.5 h-2.5" />
                           {start.toLocaleTimeString([], {
@@ -769,11 +755,7 @@ export function SmallCalendar({ role }: SmallCalendarProps) {
                             className="p-3 rounded-xl bg-bg-surface border border-border-base hover:border-solar-500/40 transition-all flex flex-col space-y-1.5 group shadow-xs"
                           >
                             <div className="flex items-center justify-between gap-2">
-                              <span
-                                className={`text-[9px] uppercase font-mono font-bold px-1.5 py-0.5 rounded ${badge.bg} ${badge.text} border ${badge.border}`}
-                              >
-                                {badge.label}
-                              </span>
+                              <span className={badge.className}>{badge.label}</span>
                               <button
                                 type="button"
                                 onClick={() => deleteMutation.mutate(ev.id)}

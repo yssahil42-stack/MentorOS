@@ -81,27 +81,27 @@ export default function DevCalendarPage() {
     switch (type) {
       case 'build_block':
         return (
-          <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-developer-500/20 text-developer-300 border border-developer-500/30">
+          <Badge variant="info" size="sm">
             Build Block
-          </span>
+          </Badge>
         );
       case 'milestone_target':
         return (
-          <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-amber-500/20 text-amber-300 border border-amber-500/30">
+          <Badge variant="warning" size="sm">
             Milestone Target
-          </span>
+          </Badge>
         );
       case 'release':
         return (
-          <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-purple-500/20 text-purple-300 border border-purple-500/30">
+          <Badge variant="primary" size="sm">
             Release Gate
-          </span>
+          </Badge>
         );
       default:
         return (
-          <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-bg-surface text-text-secondary border border-border-base">
+          <Badge variant="neutral" size="sm">
             Meeting
-          </span>
+          </Badge>
         );
     }
   };

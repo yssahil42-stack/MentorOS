@@ -14,7 +14,7 @@ import {
   Check,
 } from 'lucide-react';
 import { Card3D } from '../ui/Card3D';
-import { Badge } from '../ui/Badge';
+import { Badge, badgeVariants } from '../ui/Badge';
 import { Button } from '../ui/Button';
 import type { DailyStandupData } from '../../types/dashboard';
 import { useWorkspace } from '../../contexts/WorkspaceContext';
@@ -120,7 +120,13 @@ export function DailyStandupWidget({ role = 'student', standupData }: DailyStand
                   <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
                   {isYesterdayWins ? 'Completed Yesterday' : 'Recent Completed'}
                 </span>
-                <span className="text-3xs font-mono font-semibold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-300 border border-emerald-500/20">
+                <span
+                  className={badgeVariants({
+                    variant: 'success',
+                    size: 'xs',
+                    className: 'font-mono font-semibold',
+                  })}
+                >
                   {yesterdayItems.length} finished
                 </span>
               </div>
@@ -169,7 +175,13 @@ export function DailyStandupWidget({ role = 'student', standupData }: DailyStand
                   <Calendar className="w-3.5 h-3.5 text-orange-500 dark:text-orange-400" />
                   Scheduled Today
                 </span>
-                <span className="text-3xs font-mono font-semibold px-2 py-0.5 rounded-full bg-orange-500/10 text-orange-600 dark:text-orange-300 border border-orange-500/20">
+                <span
+                  className={badgeVariants({
+                    variant: 'primary',
+                    size: 'xs',
+                    className: 'font-mono font-semibold',
+                  })}
+                >
                   {totalTodayItems} on agenda
                 </span>
               </div>
@@ -249,13 +261,16 @@ export function DailyStandupWidget({ role = 'student', standupData }: DailyStand
                   nextMilestone.days_remaining !== null &&
                   nextMilestone.days_remaining !== undefined && (
                     <span
-                      className={`text-3xs font-mono font-semibold px-2 py-0.5 rounded-full border ${
-                        nextMilestone.days_remaining <= 0
-                          ? 'bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/20'
-                          : nextMilestone.days_remaining <= 3
-                            ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20'
-                            : 'bg-purple-500/10 text-purple-600 dark:text-purple-300 border-purple-500/20'
-                      }`}
+                      className={badgeVariants({
+                        variant:
+                          nextMilestone.days_remaining <= 0
+                            ? 'danger'
+                            : nextMilestone.days_remaining <= 3
+                              ? 'warning'
+                              : 'info',
+                        size: 'xs',
+                        className: 'font-mono font-semibold',
+                      })}
                     >
                       {nextMilestone.days_remaining === 0
                         ? 'Due today'

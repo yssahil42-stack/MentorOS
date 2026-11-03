@@ -38,3 +38,7 @@ export function modalOverlayVariants({ size = 'md', className }: ModalVariantOpt
 
 export const modalBackdropVariants =
   'absolute inset-0 bg-black/60 backdrop-blur-sm animate-fade-in';
+
+export function confirmButtonVariant(destructive: boolean = false): 'danger' | 'primary' {
+  return destructive ? 'danger' : 'primary';
+}

@@ -28,6 +28,7 @@ import {
 import { Card } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
 import { Modal } from '../../components/ui/Modal';
+import { variantStyles, dotStyles, BadgeVariant } from '../../utils/badgeVariants';
 import { LoadingSkeleton } from '../../components/ui/LoadingSkeleton';
 import type { CalendarEvent, CalendarEventType } from '../../types/calendar';
 
@@ -160,34 +161,21 @@ export default function StudentCalendarPage() {
     return ev.event_type === filterType;
   });
 
+  const eventTypeToVariant: Record<string, BadgeVariant> = {
+    exam: 'danger',
+    assignment_deadline: 'warning',
+    lecture: 'primary',
+    study_block: 'default',
+  };
+
   const getEventBadgeClass = (type: string) => {
-    switch (type) {
-      case 'exam':
-        return 'bg-red-500/15 text-red-400 border-red-500/30';
-      case 'assignment_deadline':
-        return 'bg-amber-500/15 text-amber-400 border-amber-500/30';
-      case 'lecture':
-        return 'bg-orange-500/15 text-orange-600 dark:text-orange-400 border-indigo-500/30';
-      case 'study_block':
-        return 'bg-student-500/15 text-student-300 border-student-500/30';
-      default:
-        return 'bg-slate-500/15 text-slate-400 border-slate-500/30';
-    }
+    const variant = eventTypeToVariant[type] || 'neutral';
+    return variantStyles[variant];
   };
 
   const getEventBadgeDot = (type: string) => {
-    switch (type) {
-      case 'exam':
-        return 'bg-red-500';
-      case 'assignment_deadline':
-        return 'bg-amber-500';
-      case 'lecture':
-        return 'bg-indigo-500';
-      case 'study_block':
-        return 'bg-student-500';
-      default:
-        return 'bg-slate-500';
-    }
+    const variant = eventTypeToVariant[type] || 'neutral';
+    return dotStyles[variant];
   };
 
   const upcomingExams = events.filter((e) => e.event_type === 'exam');
