@@ -10,9 +10,10 @@ interface AuthContextValue {
   user: User | null;
   isAuthenticated: boolean;
   isLoading: boolean;
-  login: (req: LoginRequest)    => Promise<User>;
+  login: (req: LoginRequest) => Promise<User>;
   register: (req: RegisterRequest) => Promise<User>;
-  logout: () => void;
+  loginWithGoogle: (credential: string, role?: string) => Promise<User>;
+  logout: () => Promise<void>;
   refreshUser: () => Promise<void>;
 }
 
@@ -21,7 +22,7 @@ const AuthContext = createContext<AuthContextValue | null>(null);
 // ─── Storage Keys ────────────────────────────────────────────────────────────
 
 const TOKEN_KEY = 'mentor_token';
-const USER_KEY  = 'mentor_user';
+const USER_KEY = 'mentor_user';
 
 // ─── Provider ────────────────────────────────────────────────────────────────
 
@@ -90,7 +91,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return persistSession(res);
   }, []);
 
-  const logout = useCallback(() => {
+  const loginWithGoogle = useCallback(async (credential: string, role?: string): Promise<User> => {
+    const res = await api.post<AuthResponse>('/auth/google', { credential, role });
+    return persistSession(res);
+  }, []);
+
+  const logout = useCallback(async () => {
+    try {
+      await api.post('/auth/logout');
+    } catch {
+      // Best-effort logout notification to server
+    }
     localStorage.removeItem(TOKEN_KEY);
     localStorage.removeItem(USER_KEY);
     localStorage.removeItem('mentor_workspace_role');
@@ -101,15 +112,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   return (
-    <AuthContext.Provider value={{
-      user,
-      isAuthenticated: !!user,
-      isLoading,
-      login,
-      register,
-      logout,
-      refreshUser,
-    }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        isAuthenticated: !!user,
+        isLoading,
+        login,
+        register,
+        loginWithGoogle,
+        logout,
+        refreshUser,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );

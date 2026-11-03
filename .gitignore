@@ -38,6 +38,19 @@ pnpm-debug.log*
 lerna-debug.log*
 .turbo
 
+# Test & Audit Reports
+.lighthouseci/
+*.report.html
+*.report.json
+playwright-report/
+test-results/
+
+# Secrets & Credentials
+backend/client_secret.json
+client_secret*.json
+*.pem
+*.key
+
 # IDE & OS
 .vscode/
 .idea/

@@ -5,7 +5,7 @@ import { useAuth } from '../contexts/AuthContext';
 interface RoleRouteGuardProps {
   children?: React.ReactNode;
   requireAuth?: boolean;
-  requireOnboarding?: boolean;  // default true
+  requireOnboarding?: boolean; // default true
 }
 
 /**

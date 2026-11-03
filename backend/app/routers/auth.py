@@ -1,7 +1,10 @@
+import secrets
+import httpx
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 from ..database import get_db
+from ..config import settings
 from .. import models, schemas
 from ..auth import get_password_hash, verify_password, create_access_token, get_current_user
 
@@ -58,6 +61,84 @@ def login(login_in: schemas.UserLogin, db: Session = Depends(get_db)):
     token = create_access_token(data={"sub": str(user.id)})
     return schemas.TokenResponse(access_token=token, user=_to_user_out(user))
 
+@router.post("/google", response_model=schemas.TokenResponse)
+async def google_login(payload: schemas.GoogleAuthRequest, db: Session = Depends(get_db)):
+    try:
+        async with httpx.AsyncClient(timeout=10.0) as client:
+            resp = await client.get(
+                "https://oauth2.googleapis.com/tokeninfo",
+                params={"id_token": payload.credential},
+            )
+            if resp.status_code != 200:
+                raise HTTPException(
+                    status_code=status.HTTP_401_UNAUTHORIZED,
+                    detail="Invalid or expired Google credential token.",
+                )
+            id_info = resp.json()
+    except httpx.RequestError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail=f"Could not connect to Google authentication service: {exc}",
+        )
+
+    # Verify audience matches client_id
+    token_aud = id_info.get("aud")
+    if token_aud != settings.GOOGLE_CLIENT_ID:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Google token was not issued for this application.",
+        )
+
+    email = id_info.get("email")
+    if not email:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Google profile is missing an email address.",
+        )
+
+    full_name = id_info.get("name") or email.split("@")[0]
+    picture = id_info.get("picture")
+    google_id = id_info.get("sub")
+
+    user = db.query(models.User).filter(models.User.email == email).first()
+    if not user:
+        random_pw = secrets.token_urlsafe(32)
+        user = models.User(
+            email=email,
+            hashed_password=get_password_hash(random_pw),
+            full_name=full_name,
+            role=payload.role or "student",
+            onboarding_completed=True,
+            profile_data={
+                "picture": picture,
+                "google_id": google_id,
+                "auth_provider": "google",
+            },
+        )
+        db.add(user)
+        try:
+            db.commit()
+            db.refresh(user)
+        except IntegrityError:
+            db.rollback()
+            user = db.query(models.User).filter(models.User.email == email).first()
+            if not user:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="Error provisioning user account.",
+                )
+    else:
+        if picture:
+            current_profile = dict(user.profile_data or {})
+            if not current_profile.get("picture"):
+                current_profile["picture"] = picture
+                user.profile_data = current_profile
+                db.commit()
+                db.refresh(user)
+
+    token = create_access_token(data={"sub": str(user.id)})
+    return schemas.TokenResponse(access_token=token, user=_to_user_out(user))
+
 @router.get("/me", response_model=schemas.UserOut)
 def get_me(current_user: models.User = Depends(get_current_user)):
     return _to_user_out(current_user)
@@ -86,3 +167,8 @@ def complete_onboarding_me(
 ):
     data = payload.profile_data or payload.onboarding_data or {}
     return _save_onboarding(data, current_user, db)
+
+@router.post("/logout")
+def logout():
+    return {"message": "Logged out successfully"}
+

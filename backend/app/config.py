@@ -26,7 +26,7 @@ class Settings(BaseModel):
     APP_ENV: str = app_env
     SECRET_KEY: str = configured_secret or secrets.token_urlsafe(32)
     ALGORITHM: str = "HS256"
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "60"))
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "15"))
     DATABASE_URL: str = configured_database_url or "sqlite:///./mentoros.db"
     CORS_ORIGINS: list[str] = [
         origin.strip()
@@ -36,19 +36,13 @@ class Settings(BaseModel):
         )).split(",")
         if origin.strip()
     ]
-    OLLAMA_HOST: str = os.getenv("OLLAMA_HOST", "http://localhost:11434")
-    OLLAMA_MODEL: str = os.getenv("OLLAMA_MODEL", "smollm2:1.7b")
-    # AI Provider Selection
-    AI_PROVIDER: str = os.getenv("AI_PROVIDER", "groq")  # 'groq', 'ollama', 'auto', 'openrouter', 'gemini'
+    # AI Provider: Exclusively Groq
+    AI_PROVIDER: str = "groq"
     GROQ_API_KEY: str = os.getenv("GROQ_API_KEY", "")
     GROQ_MODEL: str = os.getenv("GROQ_MODEL", "openai/gpt-oss-120b")
-    OPENROUTER_API_KEY: str = os.getenv("OPENROUTER_API_KEY", "")
-    OPENROUTER_MODEL: str = os.getenv("OPENROUTER_MODEL", "meta-llama/llama-3.3-70b-instruct:free")
-    GEMINI_API_KEY: str = os.getenv("GEMINI_API_KEY", "")
-    # Custom Remote / Ngrok OpenAI-Compatible Endpoint
-    CUSTOM_OPENAI_URL: str = os.getenv("CUSTOM_OPENAI_URL", "")
-    CUSTOM_OPENAI_MODEL: str = os.getenv("CUSTOM_OPENAI_MODEL", "smollm2:1.7b")
-    CUSTOM_OPENAI_API_KEY: str = os.getenv("CUSTOM_OPENAI_API_KEY", "")
-    AI_TIMEOUT: float = float(os.getenv("AI_TIMEOUT", "60.0"))
+    AI_TIMEOUT: float = float(os.getenv("AI_TIMEOUT", "15.0"))
+    # Google Identity Services / OAuth Credentials
+    GOOGLE_CLIENT_ID: str = os.getenv("GOOGLE_CLIENT_ID", "787072444746-7cp6uis2gfde9ifat86il4rsk34q55a8.apps.googleusercontent.com")
+    GOOGLE_CLIENT_SECRET: str = os.getenv("GOOGLE_CLIENT_SECRET", "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")
 
 settings = Settings()

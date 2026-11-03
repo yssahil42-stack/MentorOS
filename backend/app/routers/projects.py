@@ -1,11 +1,12 @@
 from typing import List, Optional
 from datetime import datetime
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Response
 from sqlalchemy.orm import Session
 from ..database import get_db
 from .. import models, schemas
 from ..auth import get_current_user
 from ..ownership import require_owned_project
+from ..progress import recalculate_project_progress
 
 router = APIRouter(tags=["projects"])
 
@@ -13,16 +14,27 @@ router = APIRouter(tags=["projects"])
 
 @router.get("/projects", response_model=List[schemas.ProjectOut])
 def get_projects(
+    response: Response,
     role: Optional[str] = None,
+    page: Optional[int] = None,
+    page_size: Optional[int] = None,
     current_user: models.User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
     query = db.query(models.Project).filter(models.Project.user_id == current_user.id)
     if role:
         query = query.filter(models.Project.role == role)
-    projects = query.order_by(models.Project.created_at.desc()).all()
+    
+    total = query.count()
+    response.headers["X-Total-Count"] = str(total)
+
+    query = query.order_by(models.Project.created_at.desc())
+    if page is not None and page_size is not None and page > 0 and page_size > 0:
+        query = query.offset((page - 1) * page_size).limit(page_size)
+    projects = query.all()
 
     result = []
+    has_updates = False
     for p in projects:
         total_ms = len(p.milestones)
         completed_ms = sum(1 for m in p.milestones if m.status == "completed")
@@ -31,7 +43,31 @@ def get_projects(
         out.milestone_count = total_ms
         out.completed_milestone_count = completed_ms
         out.task_count = total_tasks
+
+        # Calculate dynamic real-time progress
+        if total_tasks > 0:
+            completed_tasks = sum(1 for t in p.tasks if t.status == "completed")
+            calc_progress = int(round((completed_tasks / total_tasks) * 100))
+        elif total_ms > 0:
+            calc_progress = int(round((completed_ms / total_ms) * 100))
+        else:
+            calc_progress = p.progress or 0
+
+        calc_progress = max(0, min(100, calc_progress))
+        out.progress = calc_progress
+
+        if p.progress != calc_progress:
+            p.progress = calc_progress
+            if calc_progress == 100 and p.status != "completed":
+                p.status = "completed"
+            elif calc_progress < 100 and p.status == "completed":
+                p.status = "active"
+            has_updates = True
+
         result.append(out)
+
+    if has_updates:
+        db.commit()
 
     return result
 
@@ -63,6 +99,21 @@ def get_project(
         milestone.status == "completed" for milestone in milestones
     )
     project_out.task_count = len(tasks)
+
+    # Dynamic progress calculation
+    if tasks:
+        completed_tasks_count = sum(t.status == "completed" for t in tasks)
+        calc_progress = int(round((completed_tasks_count / len(tasks)) * 100))
+    elif milestones:
+        completed_ms_count = sum(m.status == "completed" for m in milestones)
+        calc_progress = int(round((completed_ms_count / len(milestones)) * 100))
+    else:
+        calc_progress = project.progress or 0
+
+    project_out.progress = max(0, min(100, calc_progress))
+    if project.progress != project_out.progress:
+        project.progress = project_out.progress
+        db.commit()
     task_outputs = [schemas.TaskOut.from_orm(task) for task in tasks]
     for task_output, task in zip(task_outputs, tasks):
         task_output.project_title = project.title
@@ -166,6 +217,10 @@ def create_milestone(
     db.add(ms)
     db.commit()
     db.refresh(ms)
+
+    if ms.project_id:
+        recalculate_project_progress(db, ms.project_id, current_user.id)
+
     return ms
 
 @router.patch("/milestones/{milestone_id}", response_model=schemas.MilestoneOut)
@@ -189,9 +244,15 @@ def update_milestone(
 
     if ms_in.status == "completed":
         ms.completed_at = datetime.utcnow()
+    elif ms_in.status and ms_in.status != "completed":
+        ms.completed_at = None
 
     db.commit()
     db.refresh(ms)
+
+    if ms.project_id:
+        recalculate_project_progress(db, ms.project_id, current_user.id)
+
     return ms
 
 @router.delete("/milestones/{milestone_id}", status_code=status.HTTP_204_NO_CONTENT)
@@ -208,6 +269,11 @@ def delete_milestone(
     if not ms:
         raise HTTPException(status_code=404, detail="Milestone not found")
 
+    project_id = ms.project_id
     db.delete(ms)
     db.commit()
+
+    if project_id:
+        recalculate_project_progress(db, project_id, current_user.id)
+
     return None

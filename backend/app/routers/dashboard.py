@@ -190,6 +190,87 @@ def get_dashboard_summary(
         item.project_title = task.project.title if task.project else None
         todays_tasks_out.append(item)
 
+    # ─── Daily Standup & Focus Brief Compilation ──────────────────────────
+    yesterday = today - timedelta(days=1)
+    completed_tasks = [t for t in tasks if t.status == "completed"]
+    yesterday_completed = [
+        t for t in completed_tasks
+        if t.completed_at and t.completed_at.date() == yesterday
+    ]
+    recent_completed = yesterday_completed if yesterday_completed else completed_tasks[:4]
+
+    today_events = [
+        e for e in events
+        if (ed := _date(e.start_at)) is not None and ed == today
+    ]
+    tasks_due_today = [
+        t for t in open_tasks
+        if (due := _date(t.due_date)) is not None and due == today
+    ]
+
+    uncompleted_ms = [m for m in milestones if m.status != "completed"]
+    dated_ms = [m for m in uncompleted_ms if _date(m.target_date) is not None]
+    dated_ms.sort(key=lambda m: _date(m.target_date) or date.max)
+
+    next_ms_target = None
+    if current_milestone and current_milestone.status != "completed":
+        next_ms_target = current_milestone
+    elif dated_ms:
+        next_ms_target = dated_ms[0]
+    elif uncompleted_ms:
+        next_ms_target = uncompleted_ms[0]
+
+    next_ms_payload = None
+    if next_ms_target:
+        days_rem = None
+        if target_d := _date(next_ms_target.target_date):
+            days_rem = (target_d - today).days
+        next_ms_payload = {
+            "id": next_ms_target.id,
+            "title": next_ms_target.title,
+            "project_id": next_ms_target.project_id,
+            "project_title": next_ms_target.project.title if next_ms_target.project else None,
+            "target_date": next_ms_target.target_date,
+            "status": next_ms_target.status,
+            "days_remaining": days_rem,
+        }
+
+    daily_standup = {
+        "yesterday_completed": [
+            {
+                "id": t.id,
+                "title": t.title,
+                "project_title": t.project.title if t.project else None,
+                "completed_at": t.completed_at.isoformat() if t.completed_at else None,
+                "is_yesterday": t.completed_at.date() == yesterday if t.completed_at else False,
+            }
+            for t in recent_completed
+        ],
+        "today_scheduled": [
+            {
+                "id": e.id,
+                "title": e.title,
+                "start_at": e.start_at,
+                "end_at": e.end_at,
+                "event_type": e.event_type,
+                "project_title": e.project.title if e.project else None,
+            }
+            for e in sorted(today_events, key=lambda ev: ev.start_at or "")[:5]
+        ],
+        "tasks_due_today": [
+            {
+                "id": t.id,
+                "title": t.title,
+                "project_title": t.project.title if t.project else None,
+                "priority": t.priority,
+            }
+            for t in tasks_due_today[:5]
+        ],
+        "next_milestone": next_ms_payload,
+        "date_today": today.isoformat(),
+        "date_yesterday": yesterday.isoformat(),
+    }
+
     return {
         "role": active_role,
         "active_projects": len(active_projects),
@@ -198,6 +279,7 @@ def get_dashboard_summary(
         "upcoming_events": len(upcoming_events),
         "todays_tasks": todays_tasks_out,
         "role_summary": role_summary,
+        "daily_standup": daily_standup,
         "ai_suggestion": {
             "id": f"suggestion-{active_role}",
             "text": suggestion_text,
