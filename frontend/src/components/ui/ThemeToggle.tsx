@@ -26,7 +26,7 @@ export function ThemeToggle({
         className={cn(
           'flex items-center gap-2 px-3 py-1.5 rounded-xl border border-border-base bg-bg-surface hover:bg-bg-elevated text-xs font-semibold text-text-secondary hover:text-text-primary transition-all duration-200 shadow-sm active:translate-y-[1px]',
           'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus',
-          className,
+          className
         )}
         aria-label={`Current mode: ${isDark ? 'Dark' : 'Light'}. Click to switch.`}
         title={`Switch to ${isDark ? 'light' : 'dark'} mode`}
@@ -55,7 +55,7 @@ export function ThemeToggle({
           'flex items-center gap-2.5 h-9 w-full rounded-xl px-2.5 text-xs font-medium',
           'border border-border-base bg-bg-surface hover:bg-bg-elevated text-text-secondary hover:text-text-primary',
           'transition-all duration-200 shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus active:translate-y-[1px]',
-          className,
+          className
         )}
         aria-label={`Switch to ${isDark ? 'light' : 'dark'} mode`}
         title={`Switch to ${isDark ? 'light' : 'dark'} mode`}
@@ -64,14 +64,18 @@ export function ThemeToggle({
           <Sun
             className={cn(
               'w-4 h-4 transition-all duration-300 absolute',
-              isDark ? 'opacity-0 rotate-90 scale-50 pointer-events-none' : 'opacity-100 rotate-0 scale-100 text-amber-500',
+              isDark
+                ? 'opacity-0 rotate-90 scale-50 pointer-events-none'
+                : 'opacity-100 rotate-0 scale-100 text-amber-500'
             )}
             aria-hidden="true"
           />
           <Moon
             className={cn(
               'w-4 h-4 transition-all duration-300 absolute',
-              isDark ? 'opacity-100 rotate-0 scale-100 text-indigo-400' : 'opacity-0 -rotate-90 scale-50 pointer-events-none',
+              isDark
+                ? 'opacity-100 rotate-0 scale-100 text-indigo-400'
+                : 'opacity-0 -rotate-90 scale-50 pointer-events-none'
             )}
             aria-hidden="true"
           />
@@ -103,7 +107,7 @@ export function ThemeToggle({
         'active:translate-y-[1px] shadow-sm group',
         'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus',
         sizeClasses[size],
-        className,
+        className
       )}
       aria-label={`Switch to ${isDark ? 'light' : 'dark'} mode`}
       title={`Switch to ${isDark ? 'light' : 'dark'} mode`}
@@ -116,7 +120,7 @@ export function ThemeToggle({
             iconSizes[size],
             isDark
               ? 'opacity-0 rotate-90 scale-50 pointer-events-none'
-              : 'opacity-100 rotate-0 scale-100 text-amber-500 drop-shadow-[0_0_6px_rgba(245,158,11,0.4)]',
+              : 'opacity-100 rotate-0 scale-100 text-amber-500 drop-shadow-[0_0_6px_rgba(245,158,11,0.4)]'
           )}
           aria-hidden="true"
         />
@@ -128,7 +132,7 @@ export function ThemeToggle({
             iconSizes[size],
             isDark
               ? 'opacity-100 rotate-0 scale-100 text-indigo-400 drop-shadow-[0_0_6px_rgba(99,102,241,0.4)]'
-              : 'opacity-0 -rotate-90 scale-50 pointer-events-none',
+              : 'opacity-0 -rotate-90 scale-50 pointer-events-none'
           )}
           aria-hidden="true"
         />

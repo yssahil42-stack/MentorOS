@@ -34,7 +34,7 @@ export function Card3D({
       setIsHovered(true);
       onMouseEnter?.(e);
     },
-    [onMouseEnter],
+    [onMouseEnter]
   );
 
   const handleMouseLeave = useCallback(
@@ -42,15 +42,12 @@ export function Card3D({
       setIsHovered(false);
       onMouseLeave?.(e);
     },
-    [onMouseLeave],
+    [onMouseLeave]
   );
 
   const cardStyle: React.CSSProperties = {
     transition: 'border-color 0.2s ease, box-shadow 0.2s ease',
-    boxShadow:
-      isHovered && !disabled
-        ? '0 6px 20px -2px rgba(0, 0, 0, 0.18)'
-        : undefined,
+    boxShadow: isHovered && !disabled ? '0 6px 20px -2px rgba(0, 0, 0, 0.18)' : undefined,
     ...style,
   };
 
@@ -69,14 +66,12 @@ export function Card3D({
           'bg-bg-elevated/90 border-border-base shadow-card hover:border-border-hover backdrop-blur-md',
         variant === 'glass' &&
           'glass border-glass-border/70 shadow-glass hover:border-border-hover backdrop-blur-xl',
-        className,
+        className
       )}
       {...props}
     >
       {/* Card Content */}
-      <div className="relative z-10 w-full h-full">
-        {children}
-      </div>
+      <div className="relative z-10 w-full h-full">{children}</div>
     </div>
   );
 }

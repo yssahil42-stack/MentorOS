@@ -15,7 +15,10 @@ import {
   Trash2,
   List,
   Grid,
+  Download,
+  ExternalLink,
 } from 'lucide-react';
+import { downloadICSFile, getGoogleCalendarUrl } from '../../utils/icsExport';
 import { useWorkspace } from '../../contexts/WorkspaceContext';
 import {
   fetchCalendarEvents,
@@ -100,8 +103,18 @@ export default function StudentCalendarPage() {
   };
 
   const monthNames = [
-    'January', 'February', 'March', 'April', 'May', 'June',
-    'July', 'August', 'September', 'October', 'November', 'December'
+    'January',
+    'February',
+    'March',
+    'April',
+    'May',
+    'June',
+    'July',
+    'August',
+    'September',
+    'October',
+    'November',
+    'December',
   ];
 
   const currentYear = currentDate.getFullYear();
@@ -197,11 +210,28 @@ export default function StudentCalendarPage() {
               Student Schedule &amp; Timetable
             </h1>
             <p className="text-sm text-text-secondary max-w-2xl">
-              Coordinate class lectures, project deadlines, exam days, and AI-scheduled study revision blocks.
+              Coordinate class lectures, project deadlines, exam days, and AI-scheduled study
+              revision blocks.
             </p>
           </div>
 
-          <div>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                if (events.length === 0) {
+                  showToast('No events to export', 'info');
+                  return;
+                }
+                downloadICSFile(events, 'student-timetable.ics', 'MentorOS Student Schedule');
+                showToast(`Exported ${events.length} timetable events to .ics file!`, 'success');
+              }}
+              className="border-border-base text-xs flex items-center gap-1.5"
+              icon={<Download className="w-3.5 h-3.5 text-solar-500" />}
+            >
+              Export (.ics)
+            </Button>
             <Button
               variant="primary"
               size="sm"
@@ -359,19 +389,14 @@ export default function StudentCalendarPage() {
           {/* Grid Cells */}
           <div className="grid grid-cols-7 auto-rows-[110px] gap-px bg-border-base/50 mt-1 rounded-lg overflow-hidden border border-border-base/50">
             {days.map((item, idx) => {
-              const dayEvents = filteredEvents.filter((e) =>
-                e.start_at.startsWith(item.dateStr)
-              );
-              const isToday =
-                new Date().toISOString().split('T')[0] === item.dateStr;
+              const dayEvents = filteredEvents.filter((e) => e.start_at.startsWith(item.dateStr));
+              const isToday = new Date().toISOString().split('T')[0] === item.dateStr;
 
               return (
                 <div
                   key={idx}
                   className={`bg-bg-surface p-2 flex flex-col justify-between transition-colors overflow-hidden ${
-                    !item.isCurrentMonth
-                      ? 'opacity-35 bg-bg-base/50'
-                      : 'hover:bg-bg-elevated'
+                    !item.isCurrentMonth ? 'opacity-35 bg-bg-base/50' : 'hover:bg-bg-elevated'
                   } ${isToday ? 'ring-1 ring-student-500' : ''}`}
                 >
                   <div className="flex items-center justify-between">
@@ -442,9 +467,7 @@ export default function StudentCalendarPage() {
                     </div>
                     <div>
                       <div className="flex items-center gap-2 flex-wrap">
-                        <h4 className="text-sm font-bold text-text-primary">
-                          {ev.title}
-                        </h4>
+                        <h4 className="text-sm font-bold text-text-primary">{ev.title}</h4>
                         <span
                           className={`text-2xs font-semibold px-2 py-0.5 rounded-md border capitalize ${getEventBadgeClass(
                             ev.event_type
@@ -454,9 +477,7 @@ export default function StudentCalendarPage() {
                         </span>
                       </div>
                       {ev.description && (
-                        <p className="text-xs text-text-muted mt-0.5">
-                          {ev.description}
-                        </p>
+                        <p className="text-xs text-text-muted mt-0.5">{ev.description}</p>
                       )}
                       <div className="flex items-center gap-3 text-2xs text-text-faint mt-1.5">
                         <span className="flex items-center gap-1">
@@ -544,9 +565,7 @@ export default function StudentCalendarPage() {
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-text-secondary mb-1">
-                Date
-              </label>
+              <label className="block text-xs font-semibold text-text-secondary mb-1">Date</label>
               <input
                 type="date"
                 required
@@ -634,9 +653,7 @@ export default function StudentCalendarPage() {
               >
                 {selectedEvent.event_type.replace('_', ' ')}
               </span>
-              <span className="text-2xs text-text-faint">
-                Role: Student Workspace
-              </span>
+              <span className="text-2xs text-text-faint">Role: Student Workspace</span>
             </div>
 
             {selectedEvent.description && (
@@ -668,6 +685,36 @@ export default function StudentCalendarPage() {
               </div>
             </div>
 
+            {/* Calendar Export & Google Sync Options */}
+            <div className="flex items-center gap-2 pt-1">
+              <a
+                href={getGoogleCalendarUrl(selectedEvent)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex-1 py-1.5 px-3 rounded-xl bg-student-500/10 hover:bg-student-500/20 text-student-300 border border-student-500/25 text-2xs font-semibold flex items-center justify-center gap-1.5 transition-colors"
+                title="Add directly to Google Calendar"
+              >
+                <span>Add to Google Calendar</span>
+                <ExternalLink className="w-3 h-3" />
+              </a>
+              <button
+                type="button"
+                onClick={() => {
+                  downloadICSFile(
+                    [selectedEvent],
+                    `${selectedEvent.title.slice(0, 20)}.ics`,
+                    selectedEvent.title
+                  );
+                  showToast('Downloaded .ics event file!', 'success');
+                }}
+                className="py-1.5 px-3 rounded-xl bg-bg-surface hover:bg-bg-elevated text-text-secondary hover:text-text-primary border border-border-base text-2xs font-semibold flex items-center gap-1.5 transition-colors"
+                title="Download single .ics file"
+              >
+                <Download className="w-3 h-3 text-solar-500" />
+                <span>Export .ics</span>
+              </button>
+            </div>
+
             <div className="pt-2 flex justify-between">
               <Button
                 variant="ghost"
@@ -678,11 +725,7 @@ export default function StudentCalendarPage() {
               >
                 Delete Event
               </Button>
-              <Button
-                variant="secondary"
-                size="sm"
-                onClick={() => setSelectedEvent(null)}
-              >
+              <Button variant="secondary" size="sm" onClick={() => setSelectedEvent(null)}>
                 Close
               </Button>
             </div>

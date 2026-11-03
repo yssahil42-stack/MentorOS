@@ -2,15 +2,26 @@
 
 export type CalendarEventType =
   // Student
-  | 'exam' | 'assignment_deadline' | 'study_block' | 'lecture'
+  | 'exam'
+  | 'assignment_deadline'
+  | 'study_block'
+  | 'lecture'
   // Freelancer
-  | 'delivery_deadline' | 'client_review' | 'work_block'
+  | 'delivery_deadline'
+  | 'client_review'
+  | 'work_block'
   // Developer
-  | 'milestone_target' | 'build_block' | 'release'
+  | 'milestone_target'
+  | 'build_block'
+  | 'release'
   // Job Seeker
-  | 'interview' | 'application_deadline' | 'follow_up' | 'prep_session'
+  | 'interview'
+  | 'application_deadline'
+  | 'follow_up'
+  | 'prep_session'
   // Common
-  | 'meeting' | 'other';
+  | 'meeting'
+  | 'other';
 
 export interface CalendarEvent {
   id: number;
@@ -20,8 +31,8 @@ export interface CalendarEvent {
   project_id?: number;
   title: string;
   description?: string;
-  start_at: string;     // ISO datetime
-  end_at: string;       // ISO datetime
+  start_at: string; // ISO datetime
+  end_at: string; // ISO datetime
   all_day?: boolean;
   event_type: CalendarEventType;
   color?: string;

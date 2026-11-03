@@ -80,7 +80,8 @@ export function WorkflowGuide({ role = 'all' }: WorkflowGuideProps) {
               </span>
             </h2>
             <p className="text-3xs sm:text-2xs text-text-muted mt-0.5">
-              From project goal to AI-generated roadmap, execution tracking, and published case studies.
+              From project goal to AI-generated roadmap, execution tracking, and published case
+              studies.
             </p>
           </div>
         </div>

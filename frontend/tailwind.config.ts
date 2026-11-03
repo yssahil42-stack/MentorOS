@@ -82,19 +82,19 @@ const config: Config = {
           700: '#047857',
           900: '#064E3B',
         },
-        // ─── Solar Theme Colors ──────────────────────────────
+        // ─── Solar/Brand Theme Colors (Dynamic Light/Dark Mode) ──
         solar: {
-          50:  '#FFFBEB',
-          100: '#FEF3C7',
-          200: '#FDE68A',
-          300: '#FCD34D',
-          400: '#FBBF24',
-          500: '#F59E0B',   // primary solar amber
-          600: '#D97706',   // solar flare
-          700: '#B45309',
-          800: '#92400E',
-          900: '#78350F',
-          950: '#451A03',
+          50:  'rgb(var(--solar-50-rgb, 239 246 255) / <alpha-value>)',
+          100: 'rgb(var(--solar-100-rgb, 219 234 254) / <alpha-value>)',
+          200: 'rgb(var(--solar-200-rgb, 191 219 254) / <alpha-value>)',
+          300: 'rgb(var(--solar-300-rgb, 147 197 253) / <alpha-value>)',
+          400: 'rgb(var(--solar-400-rgb, 96 165 250) / <alpha-value>)',
+          500: 'rgb(var(--solar-500-rgb, 37 99 235) / <alpha-value>)',
+          600: 'rgb(var(--solar-600-rgb, 29 78 216) / <alpha-value>)',
+          700: 'rgb(var(--solar-700-rgb, 30 64 175) / <alpha-value>)',
+          800: 'rgb(var(--solar-800-rgb, 30 58 138) / <alpha-value>)',
+          900: 'rgb(var(--solar-900-rgb, 23 37 84) / <alpha-value>)',
+          950: 'rgb(var(--solar-950-rgb, 15 23 42) / <alpha-value>)',
         },
         // ─── Semantic States ───────────────────────────────────
         success: {
@@ -112,7 +112,7 @@ const config: Config = {
           light:   '#EF4444',
           bg:      'rgba(220, 38, 38, 0.12)',
         },
-        focus: '#F59E0B',
+        focus: 'var(--focus)',
       },
       // ─── Typography ──────────────────────────────────────────
       fontFamily: {
@@ -149,7 +149,7 @@ const config: Config = {
       boxShadow: {
         'glass':     'var(--shadow-glass)',
         'glass-lg':  'var(--shadow-glass-lg)',
-        'glow-solar':'0 0 28px rgba(245,158,11,0.45)',
+        'glow-solar':'var(--shadow-glow-solar, 0 0 28px rgba(37,99,235,0.35))',
         'glow-amber':'0 0 24px rgba(217,119,6,0.4)',
         'glow-gold': '0 0 30px rgba(251,191,36,0.4)',
         'glow-indigo': '0 0 24px rgba(99,102,241,0.35)',

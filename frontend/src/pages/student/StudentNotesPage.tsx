@@ -16,12 +16,7 @@ import {
   GraduationCap,
 } from 'lucide-react';
 import { useWorkspace } from '../../contexts/WorkspaceContext';
-import {
-  fetchNotes,
-  createNote,
-  updateNote,
-  deleteNote,
-} from '../../services/noteService';
+import { fetchNotes, createNote, updateNote, deleteNote } from '../../services/noteService';
 import { Card } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
 import { Modal } from '../../components/ui/Modal';
@@ -121,7 +116,8 @@ export default function StudentNotesPage() {
               Learning Notes &amp; Revision Guides
             </h1>
             <p className="text-sm text-text-secondary max-w-2xl">
-              Compile lecture concepts, formula sheets, lab records, and use the AI assistant to synthesize exam cheat sheets.
+              Compile lecture concepts, formula sheets, lab records, and use the AI assistant to
+              synthesize exam cheat sheets.
             </p>
           </div>
 
@@ -146,9 +142,7 @@ export default function StudentNotesPage() {
             <span>Total Study Notes</span>
             <FileText className="w-4 h-4 text-student-400" />
           </div>
-          <div className="mt-2 text-2xl font-extrabold text-text-primary">
-            {notes.length}
-          </div>
+          <div className="mt-2 text-2xl font-extrabold text-text-primary">{notes.length}</div>
           <p className="text-2xs text-text-muted mt-1">In your personal vault</p>
         </Card>
 
@@ -157,9 +151,7 @@ export default function StudentNotesPage() {
             <span>Pinned Cheat Sheets</span>
             <Pin className="w-4 h-4 text-amber-400" />
           </div>
-          <div className="mt-2 text-2xl font-extrabold text-text-primary">
-            {pinnedNotes.length}
-          </div>
+          <div className="mt-2 text-2xl font-extrabold text-text-primary">{pinnedNotes.length}</div>
           <p className="text-2xs text-amber-400 mt-1">High priority for revision</p>
         </Card>
 
@@ -168,9 +160,7 @@ export default function StudentNotesPage() {
             <span>Subject Coverage</span>
             <BookOpen className="w-4 h-4 text-emerald-400" />
           </div>
-          <div className="mt-2 text-2xl font-extrabold text-text-primary">
-            4 Modules
-          </div>
+          <div className="mt-2 text-2xl font-extrabold text-text-primary">4 Modules</div>
           <p className="text-2xs text-emerald-400 mt-1">Active semester</p>
         </Card>
 
@@ -179,9 +169,7 @@ export default function StudentNotesPage() {
             <span>AI Summarization</span>
             <Sparkles className="w-4 h-4 text-indigo-400" />
           </div>
-          <div className="mt-2 text-sm font-bold text-text-primary">
-            1-Click Available
-          </div>
+          <div className="mt-2 text-sm font-bold text-text-primary">1-Click Available</div>
           <p className="text-2xs text-indigo-400 mt-1">Extract core exam takeaways</p>
         </Card>
       </div>
@@ -258,9 +246,7 @@ export default function StudentNotesPage() {
             <Card
               key={note.id}
               className={`p-5 flex flex-col justify-between hover:border-student-500/40 transition-all group ${
-                note.is_pinned
-                  ? 'border-amber-500/30 bg-amber-500/[0.02]'
-                  : ''
+                note.is_pinned ? 'border-amber-500/30 bg-amber-500/[0.02]' : ''
               }`}
             >
               <div>
@@ -411,7 +397,9 @@ export default function StudentNotesPage() {
               size="sm"
               onClick={() => {
                 setIsCreateModalOpen(false);
-                openAIDrawer('Generate a comprehensive study note outline for a computer science or engineering topic');
+                openAIDrawer(
+                  'Generate a comprehensive study note outline for a computer science or engineering topic'
+                );
               }}
               icon={<Sparkles className="w-3.5 h-3.5 text-student-400" />}
               className="text-student-400"
@@ -487,11 +475,7 @@ export default function StudentNotesPage() {
                 >
                   Delete
                 </Button>
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  onClick={() => setSelectedNote(null)}
-                >
+                <Button variant="secondary" size="sm" onClick={() => setSelectedNote(null)}>
                   Close
                 </Button>
               </div>

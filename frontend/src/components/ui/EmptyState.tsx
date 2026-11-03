@@ -16,10 +16,7 @@ interface EmptyStateProps {
 export function EmptyState({ icon, title, description, action, className }: EmptyStateProps) {
   return (
     <div
-      className={cn(
-        'flex flex-col items-center justify-center py-16 px-8 text-center',
-        className,
-      )}
+      className={cn('flex flex-col items-center justify-center py-16 px-8 text-center', className)}
       role="region"
       aria-label={title}
     >
@@ -57,7 +54,9 @@ export function ErrorState({
       role="alert"
     >
       <div className="w-12 h-12 rounded-xl bg-danger/10 border border-danger/20 flex items-center justify-center mb-4">
-        <span className="text-danger text-xl" aria-hidden="true">!</span>
+        <span className="text-danger text-xl" aria-hidden="true">
+          !
+        </span>
       </div>
       <p className="text-sm text-text-muted mb-4 max-w-xs">{message}</p>
       {onRetry && (

@@ -16,11 +16,11 @@ interface ModalProps {
 }
 
 const sizeClasses: Record<NonNullable<ModalProps['size']>, string> = {
-  sm:         'max-w-sm',
-  md:         'max-w-md',
-  lg:         'max-w-lg',
-  xl:         'max-w-2xl',
-  full:       'max-w-[95vw]',
+  sm: 'max-w-sm',
+  md: 'max-w-md',
+  lg: 'max-w-lg',
+  xl: 'max-w-2xl',
+  full: 'max-w-[95vw]',
   fullscreen: 'w-full h-full max-w-none max-h-none',
 };
 
@@ -48,12 +48,12 @@ export function Modal({
       if (!dialogRef.current) return;
       const focusable = Array.from(
         dialogRef.current.querySelectorAll<HTMLElement>(
-          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
-        ),
+          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        )
       ).filter((el) => !el.hasAttribute('disabled'));
       if (!focusable.length) return;
       const first = focusable[0];
-      const last  = focusable[focusable.length - 1];
+      const last = focusable[focusable.length - 1];
       if (e.key === 'Tab') {
         if (e.shiftKey && document.activeElement === first) {
           e.preventDefault();
@@ -70,14 +70,20 @@ export function Modal({
     return () => document.removeEventListener('keydown', trap);
   }, [isOpen, onClose]);
 
-  // ─── Body scroll lock ─────────────────────────────────────────
+  // ─── Body scroll lock & a11y backdrop aria-hidden ─────────────
   useEffect(() => {
+    const main = document.getElementById('main-content') ?? document.querySelector('main');
     if (isOpen) {
       document.body.style.overflow = 'hidden';
+      main?.setAttribute('aria-hidden', 'true');
     } else {
       document.body.style.overflow = '';
+      main?.removeAttribute('aria-hidden');
     }
-    return () => { document.body.style.overflow = ''; };
+    return () => {
+      document.body.style.overflow = '';
+      main?.removeAttribute('aria-hidden');
+    };
   }, [isOpen]);
 
   if (!isOpen) return null;
@@ -86,7 +92,7 @@ export function Modal({
     <div
       className={cn(
         'fixed inset-0 z-50 flex items-center justify-center',
-        size === 'fullscreen' ? 'p-0' : 'p-4',
+        size === 'fullscreen' ? 'p-0' : 'p-4'
       )}
       role="dialog"
       aria-modal="true"
@@ -109,7 +115,7 @@ export function Modal({
           size === 'fullscreen'
             ? 'h-screen max-h-screen rounded-none border-0'
             : 'rounded-2xl max-h-[90vh]',
-          sizeClasses[size],
+          sizeClasses[size]
         )}
       >
         {/* Header */}
@@ -139,7 +145,12 @@ export function Modal({
         )}
 
         {/* Body */}
-        <div className={cn('flex-1 overflow-y-auto', size === 'fullscreen' ? 'p-4 sm:p-6 md:p-8' : 'p-6')}>
+        <div
+          className={cn(
+            'flex-1 overflow-y-auto',
+            size === 'fullscreen' ? 'p-4 sm:p-6 md:p-8 flex flex-col min-h-0' : 'p-6'
+          )}
+        >
           {children}
         </div>
 
@@ -151,7 +162,7 @@ export function Modal({
         )}
       </div>
     </div>,
-    document.body,
+    document.body
   );
 }
 
@@ -170,12 +181,15 @@ interface ConfirmDialogProps {
 }
 
 export function ConfirmDialog({
-  isOpen, onClose, onConfirm,
-  title, message,
+  isOpen,
+  onClose,
+  onConfirm,
+  title,
+  message,
   confirmLabel = 'Confirm',
-  cancelLabel  = 'Cancel',
-  destructive  = false,
-  loading      = false,
+  cancelLabel = 'Cancel',
+  destructive = false,
+  loading = false,
 }: ConfirmDialogProps) {
   return (
     <Modal isOpen={isOpen} onClose={onClose} title={title} size="sm">

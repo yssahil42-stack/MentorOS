@@ -7,8 +7,9 @@ import type {
 
 export function fetchCalendarEvents(
   params?: { start?: string; end?: string; role?: string },
+  signal?: AbortSignal
 ): Promise<CalendarEvent[]> {
-  return api.get<CalendarEvent[]>('/calendar/events', { params });
+  return api.get<CalendarEvent[]>('/calendar/events', { params, signal });
 }
 
 export function createCalendarEvent(data: CreateCalendarEventRequest): Promise<CalendarEvent> {
@@ -17,7 +18,7 @@ export function createCalendarEvent(data: CreateCalendarEventRequest): Promise<C
 
 export function updateCalendarEvent(
   id: number,
-  data: UpdateCalendarEventRequest,
+  data: UpdateCalendarEventRequest
 ): Promise<CalendarEvent> {
   return api.patch<CalendarEvent>(`/calendar/events/${id}`, data);
 }

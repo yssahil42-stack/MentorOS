@@ -5,9 +5,17 @@ const recentErrorTimes = new Map<string, number>();
 
 function notifyQueryError(error: unknown) {
   if (typeof window === 'undefined') return;
-  const message = error instanceof Error
-    ? error.message
-    : 'Unable to load data. Please try again.';
+  // Ignore cancelled or aborted queries on unmount
+  const err = error as { name?: string; code?: string; __CANCEL__?: boolean } | null;
+  if (
+    err?.name === 'CanceledError' ||
+    err?.name === 'AbortError' ||
+    err?.code === 'ERR_CANCELED' ||
+    Boolean(err?.__CANCEL__)
+  ) {
+    return;
+  }
+  const message = error instanceof Error ? error.message : 'Unable to load data. Please try again.';
   const now = Date.now();
   const lastReported = recentErrorTimes.get(message) ?? 0;
   if (now - lastReported < 5000) return;
@@ -27,8 +35,8 @@ export const queryClient = new QueryClient({
   }),
   defaultOptions: {
     queries: {
-      staleTime: 1000 * 60 * 2,          // 2 min before refetch
-      gcTime:    1000 * 60 * 10,          // 10 min in cache
+      staleTime: 1000 * 60 * 2, // 2 min before refetch
+      gcTime: 1000 * 60 * 10, // 10 min in cache
       retry: (failureCount, error: unknown) => {
         // Don't retry on 401/403/404
         const status = (error as { status?: number })?.status;
@@ -54,30 +62,33 @@ export const queryKeys = {
   dashboard: () => ['dashboard'] as const,
 
   // Tasks
-  tasks:     (filters?: Record<string, unknown>) => ['tasks', filters] as const,
-  task:      (id: number)                        => ['tasks', id]      as const,
+  tasks: (filters?: Record<string, unknown>) => ['tasks', filters] as const,
+  task: (id: number) => ['tasks', id] as const,
 
   // Projects
-  projects:  (filters?: Record<string, unknown>) => ['projects', filters]    as const,
-  project:   (id: number)                        => ['projects', 'detail', id] as const,
+  projects: (filters?: Record<string, unknown>) => ['projects', filters] as const,
+  project: (id: number) => ['projects', 'detail', id] as const,
 
   // Milestones
   milestones: (projectId?: number) => ['milestones', projectId] as const,
 
   // Calendar
-  events:    (filters?: Record<string, unknown>) => ['calendar', 'events', filters] as const,
+  events: (filters?: Record<string, unknown>) => ['calendar', 'events', filters] as const,
 
   // Notes
-  notes:     (filters?: Record<string, unknown>) => ['notes', filters] as const,
+  notes: (filters?: Record<string, unknown>) => ['notes', filters] as const,
 
   // AI
-  aiProposal:  (id: number) => ['ai', 'proposals', id]   as const,
-  aiStatus:    ()           => ['ai', 'status']           as const,
+  aiProposal: (id: number) => ['ai', 'proposals', id] as const,
+  aiStatus: () => ['ai', 'status'] as const,
 } as const;
 
 /** Invalidate all workspace data (called after AI proposal approval) */
 export function invalidateWorkspace(): Promise<void> {
-  return queryClient.invalidateQueries({ predicate: (q) =>
-    ['dashboard','tasks','projects','milestones','calendar','notes'].includes(String(q.queryKey[0]))
+  return queryClient.invalidateQueries({
+    predicate: (q) =>
+      ['dashboard', 'tasks', 'projects', 'milestones', 'calendar', 'notes'].includes(
+        String(q.queryKey[0])
+      ),
   });
 }

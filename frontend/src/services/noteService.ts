@@ -1,8 +1,12 @@
 import { api } from './api';
 import type { Note, CreateNoteRequest } from '../types/aiProposal';
 
-export function fetchNotes(projectId?: number, role?: string): Promise<Note[]> {
-  return api.get<Note[]>('/notes', { params: { project_id: projectId, role } });
+export function fetchNotes(
+  projectId?: number,
+  role?: string,
+  signal?: AbortSignal
+): Promise<Note[]> {
+  return api.get<Note[]>('/notes', { params: { project_id: projectId, role }, signal });
 }
 
 export function createNote(data: CreateNoteRequest): Promise<Note> {

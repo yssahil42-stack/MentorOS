@@ -31,7 +31,9 @@ export default function StudyPlanPage() {
   // Timer state for Focus Study Session
   const [timerSeconds, setTimerSeconds] = useState(25 * 60);
   const [isTimerRunning, setIsTimerRunning] = useState(false);
-  const [activeSessionTopic, setActiveSessionTopic] = useState('Distributed Systems — Raft Protocol');
+  const [activeSessionTopic, setActiveSessionTopic] = useState(
+    'Distributed Systems — Raft Protocol'
+  );
 
   React.useEffect(() => {
     let interval: any = null;
@@ -120,14 +122,15 @@ export default function StudyPlanPage() {
                 <BookOpen className="w-5 h-5" />
               </span>
               <span className="text-2xs font-mono font-bold px-2.5 py-0.5 rounded-full bg-solar-500/10 text-solar-500 border border-solar-500/25">
-                SYLLABUS &amp; EXAM ROADMAP
+                SYLLABUS &amp; EXAM PREPARATION
               </span>
             </div>
             <h1 className="text-2xl md:text-3xl font-extrabold text-text-primary tracking-tight">
               Study Plans &amp; Revision Sprints
             </h1>
             <p className="text-xs md:text-sm text-text-secondary max-w-2xl">
-              Break down semester syllabi, organize daily focus sessions, and maintain mastery checkpoints with AI-assisted pacing.
+              Break down semester syllabi, organize daily focus sessions, and maintain mastery
+              checkpoints with AI-assisted pacing.
             </p>
           </div>
 
@@ -162,7 +165,9 @@ export default function StudyPlanPage() {
               <Clock className="w-4 h-4 text-solar-500" />
               <span className="text-xs font-bold text-text-primary">Focus Session Timer</span>
             </div>
-            <Badge variant="warning" size="sm">Pomodoro</Badge>
+            <Badge variant="warning" size="sm">
+              Pomodoro
+            </Badge>
           </div>
 
           <div className="text-center my-4">
@@ -170,7 +175,8 @@ export default function StudyPlanPage() {
               {formatTimer(timerSeconds)}
             </p>
             <p className="text-xs text-text-muted mt-2 truncate font-medium">
-              Current Focus: <span className="text-text-primary font-semibold">{activeSessionTopic}</span>
+              Current Focus:{' '}
+              <span className="text-text-primary font-semibold">{activeSessionTopic}</span>
             </p>
           </div>
 
@@ -187,20 +193,10 @@ export default function StudyPlanPage() {
             >
               {isTimerRunning ? 'Pause' : 'Start Focus'}
             </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => resetTimer(25)}
-              title="Reset to 25m"
-            >
+            <Button variant="outline" size="sm" onClick={() => resetTimer(25)} title="Reset to 25m">
               <RotateCcw className="w-3.5 h-3.5" />
             </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => resetTimer(50)}
-              className="text-2xs"
-            >
+            <Button variant="ghost" size="sm" onClick={() => resetTimer(50)} className="text-2xs">
               50m Sprint
             </Button>
           </div>
@@ -212,14 +208,19 @@ export default function StudyPlanPage() {
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
                 <Sparkles className="w-4 h-4 text-solar-500" />
-                <span className="text-xs font-bold text-text-primary">AI Syllabus Readiness Evaluator</span>
+                <span className="text-xs font-bold text-text-primary">
+                  AI Syllabus Readiness Evaluator
+                </span>
               </div>
               <span className="text-2xs text-emerald-500 font-semibold bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
                 Pacing: On Track
               </span>
             </div>
             <p className="text-xs text-text-secondary leading-relaxed">
-              Based on your completed study tasks, you have mastered <strong>68%</strong> of the Distributed Systems syllabus and <strong>42%</strong> of Calculus. AI recommends allocating <strong>2 hours this weekend</strong> to Vector Calculus to guarantee exam readiness.
+              Based on your completed study tasks, you have mastered <strong>68%</strong> of the
+              Distributed Systems syllabus and <strong>42%</strong> of Calculus. AI recommends
+              allocating <strong>2 hours this weekend</strong> to Vector Calculus to guarantee exam
+              readiness.
             </p>
           </div>
 
@@ -249,24 +250,23 @@ export default function StudyPlanPage() {
         <div className="flex items-center justify-between">
           <h2 className="text-base font-bold text-text-primary flex items-center gap-2">
             <Target className="w-4 h-4 text-solar-500" />
-            <span>Active Course Study Roadmaps</span>
+            <span>Active Course Study Plans</span>
           </h2>
-          <span className="text-xs text-text-muted">
-            {studyPlans.length} active syllabus plans
-          </span>
+          <span className="text-xs text-text-muted">{studyPlans.length} active syllabus plans</span>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
           {studyPlans.map((plan) => (
-            <Card key={plan.id} className="p-5 border-border-base space-y-4 hover:border-solar-500/40 transition-colors">
+            <Card
+              key={plan.id}
+              className="p-5 border-border-base space-y-4 hover:border-solar-500/40 transition-colors"
+            >
               <div className="flex items-start justify-between gap-2">
                 <div>
                   <span className="text-2xs font-mono font-bold text-solar-500 uppercase tracking-wider">
                     {plan.course}
                   </span>
-                  <h3 className="text-sm font-bold text-text-primary mt-0.5">
-                    {plan.examTitle}
-                  </h3>
+                  <h3 className="text-sm font-bold text-text-primary mt-0.5">{plan.examTitle}</h3>
                   <p className="text-2xs text-text-muted flex items-center gap-1.5 mt-1">
                     <Calendar className="w-3.5 h-3.5 text-solar-500" />
                     <span>Target Date: {plan.examDate}</span>
@@ -316,7 +316,9 @@ export default function StudyPlanPage() {
                         <CheckCircle2
                           className={cn(
                             'w-4 h-4 shrink-0',
-                            m.status === 'completed' ? 'text-emerald-500' : 'text-text-muted opacity-40'
+                            m.status === 'completed'
+                              ? 'text-emerald-500'
+                              : 'text-text-muted opacity-40'
                           )}
                         />
                         <span className="truncate">{m.title}</span>
@@ -346,9 +348,7 @@ export default function StudyPlanPage() {
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={() =>
-                    openCaptureModal('ai')
-                  }
+                  onClick={() => openCaptureModal('ai')}
                   className="text-2xs text-text-muted hover:text-text-primary"
                 >
                   + Add Checkpoint

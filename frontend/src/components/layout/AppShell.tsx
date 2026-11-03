@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import { RoleSidebar } from './RoleSidebar';
 import { TopBar } from './TopBar';
+import { Breadcrumb } from '../ui/Breadcrumb';
 import { CommandPalette } from './CommandPalette';
 import { AIDrawer } from '../ai/AIDrawer';
 import { AICaptureModal } from '../ai/AICaptureModal';
@@ -46,21 +47,28 @@ export default function AppShell() {
         />
       )}
 
-      {/* Sidebar */}
-      <RoleSidebar
-        expanded={sidebarExpanded}
-        onToggle={() => setSidebarExpanded((v) => !v)}
-      />
+      {/* Sidebar Navigation */}
+      <nav role="navigation" aria-label="Main Navigation">
+        <RoleSidebar expanded={sidebarExpanded} onToggle={() => setSidebarExpanded((v) => !v)} />
+      </nav>
 
       {/* Main content area */}
       <div
         className="flex-1 flex flex-col min-w-0 transition-all duration-400 ease-out-expo relative z-10"
         style={{ marginLeft: sidebarExpanded ? '240px' : '64px' }}
       >
-        <TopBar onMenuClick={() => setSidebarExpanded((v) => !v)} />
+        <header role="banner">
+          <TopBar onMenuClick={() => setSidebarExpanded((v) => !v)} />
+        </header>
+
+        {/* Workspace Breadcrumb Navigation */}
+        <div className="px-4 md:px-6 lg:px-8 py-2 border-b border-border-subtle/50 bg-bg-surface/30 backdrop-blur-xs">
+          <Breadcrumb roleConfig={roleConfig ?? undefined} />
+        </div>
 
         <main
           id="main-content"
+          role="main"
           className="flex-1 p-4 md:p-6 lg:p-8 overflow-auto"
           tabIndex={-1}
         >
@@ -72,7 +80,9 @@ export default function AppShell() {
       </div>
 
       {/* Global AI Assistant Slide-in Drawer */}
-      <AIDrawer />
+      <aside role="complementary" aria-label="AI Assistant Drawer">
+        <AIDrawer />
+      </aside>
 
       {/* Global AI Capture Work Modal (Manual + AI Assistant) */}
       <AICaptureModal />

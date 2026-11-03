@@ -1,18 +1,40 @@
-import { api } from './api';
+import { tasksApi } from './apiClient';
 import type { Task, CreateTaskRequest, UpdateTaskRequest } from '../types/task';
 
-export function fetchTasks(params?: { status?: string; project_id?: number; role?: string }): Promise<Task[]> {
-  return api.get<Task[]>('/tasks', { params });
+export function fetchTasks(
+  params?: {
+    status?: string;
+    project_id?: number;
+    role?: string;
+    page?: number;
+    page_size?: number;
+  },
+  signal?: AbortSignal
+): Promise<Task[]> {
+  return tasksApi.get(params, signal);
+}
+
+export function fetchTasksPaginated(
+  params?: {
+    status?: string;
+    project_id?: number;
+    role?: string;
+    page?: number;
+    page_size?: number;
+  },
+  signal?: AbortSignal
+): Promise<{ data: Task[]; total: number }> {
+  return tasksApi.getPaginated(params, signal);
 }
 
 export function createTask(data: CreateTaskRequest): Promise<Task> {
-  return api.post<Task>('/tasks', data);
+  return tasksApi.create(data);
 }
 
 export function updateTask(id: number, data: UpdateTaskRequest): Promise<Task> {
-  return api.patch<Task>(`/tasks/${id}`, data);
+  return tasksApi.update(id, data);
 }
 
-export async function deleteTask(id: number): Promise<void> {
-  await api.delete(`/tasks/${id}`);
+export function deleteTask(id: number): Promise<void> {
+  return tasksApi.delete(id);
 }

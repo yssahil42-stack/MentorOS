@@ -126,7 +126,8 @@ export default function StudentProgressPage() {
               Academic Progress &amp; Standing
             </h1>
             <p className="text-sm text-text-secondary max-w-2xl">
-              Track course weighted scores, graduation degree credits, study workload pacing, and AI recommendations to maximize GPA.
+              Track course weighted scores, graduation degree credits, study workload pacing, and AI
+              recommendations to maximize GPA.
             </p>
           </div>
 
@@ -166,9 +167,7 @@ export default function StudentProgressPage() {
             <Award className="w-4 h-4 text-student-400" />
           </div>
           <div className="mt-2 flex items-baseline gap-2">
-            <span className="text-3xl font-black text-text-primary">
-              {currentGpa}
-            </span>
+            <span className="text-3xl font-black text-text-primary">{currentGpa}</span>
             <span className="text-xs text-text-muted">/ 4.00</span>
           </div>
           <div className="mt-2 text-2xs text-student-400 font-semibold flex items-center gap-1">
@@ -182,9 +181,7 @@ export default function StudentProgressPage() {
             <GraduationCap className="w-4 h-4 text-amber-400" />
           </div>
           <div className="mt-2 flex items-baseline gap-2">
-            <span className="text-3xl font-black text-text-primary">
-              {earnedCredits}
-            </span>
+            <span className="text-3xl font-black text-text-primary">{earnedCredits}</span>
             <span className="text-xs text-text-muted">/ {totalCredits} credits</span>
           </div>
           <div className="mt-2 text-2xs text-amber-400 font-semibold">
@@ -198,9 +195,7 @@ export default function StudentProgressPage() {
             <Clock className="w-4 h-4 text-emerald-400" />
           </div>
           <div className="mt-2 flex items-baseline gap-2">
-            <span className="text-3xl font-black text-text-primary">
-              {studyHoursWeekly}h
-            </span>
+            <span className="text-3xl font-black text-text-primary">{studyHoursWeekly}h</span>
             <span className="text-xs text-text-muted">this week</span>
           </div>
           <div className="mt-2 text-2xs text-emerald-400 font-semibold flex items-center gap-1">
@@ -214,9 +209,7 @@ export default function StudentProgressPage() {
             <CheckCircle2 className="w-4 h-4 text-indigo-400" />
           </div>
           <div className="mt-2 flex items-baseline gap-2">
-            <span className="text-3xl font-black text-text-primary">
-              {taskCompletionRate}%
-            </span>
+            <span className="text-3xl font-black text-text-primary">{taskCompletionRate}%</span>
             <span className="text-xs text-text-muted">on-time</span>
           </div>
           <div className="mt-2 text-2xs text-indigo-400 font-semibold">
@@ -257,9 +250,7 @@ export default function StudentProgressPage() {
                         <span className="text-2xs font-mono font-bold px-2 py-0.5 rounded bg-bg-base text-student-400 border border-border-base">
                           {c.code}
                         </span>
-                        <h4 className="text-xs font-bold text-text-primary">
-                          {c.title}
-                        </h4>
+                        <h4 className="text-xs font-bold text-text-primary">{c.title}</h4>
                       </div>
                       <span className="text-2xs text-text-muted mt-0.5 block">
                         {c.credits} Credits • Status: {c.status}
@@ -283,8 +274,8 @@ export default function StudentProgressPage() {
                         c.percentage >= 93
                           ? 'bg-student-500'
                           : c.percentage >= 90
-                          ? 'bg-amber-400'
-                          : 'bg-indigo-400'
+                            ? 'bg-amber-400'
+                            : 'bg-indigo-400'
                       }`}
                       style={{ width: `${c.percentage}%` }}
                     />
@@ -312,18 +303,14 @@ export default function StudentProgressPage() {
                     key={d.day}
                     className="flex-1 flex flex-col items-center gap-1.5 h-full justify-end"
                   >
-                    <span className="text-[10px] font-mono text-text-muted">
-                      {d.hours}h
-                    </span>
+                    <span className="text-[10px] font-mono text-text-muted">{d.hours}h</span>
                     <div className="w-full max-w-[28px] bg-bg-base rounded-t-lg overflow-hidden h-full flex items-end border border-border-base">
                       <div
                         className="w-full bg-gradient-to-t from-student-500 to-amber-400 rounded-t-md transition-all duration-500"
                         style={{ height: `${heightPercent}%` }}
                       />
                     </div>
-                    <span className="text-2xs font-semibold text-text-secondary">
-                      {d.day}
-                    </span>
+                    <span className="text-2xs font-semibold text-text-secondary">{d.day}</span>
                   </div>
                 );
               })}
@@ -348,9 +335,7 @@ export default function StudentProgressPage() {
                   <Award className="w-4 h-4" />
                 </span>
                 <div>
-                  <h4 className="text-xs font-bold text-student-300">
-                    Dean's List Candidate
-                  </h4>
+                  <h4 className="text-xs font-bold text-student-300">Dean's List Candidate</h4>
                   <p className="text-[11px] text-text-muted">
                     Maintained 3.88 GPA over the last two terms
                   </p>
@@ -362,9 +347,7 @@ export default function StudentProgressPage() {
                   <Flame className="w-4 h-4" />
                 </span>
                 <div>
-                  <h4 className="text-xs font-bold text-text-primary">
-                    100h Study Club
-                  </h4>
+                  <h4 className="text-xs font-bold text-text-primary">100h Study Club</h4>
                   <p className="text-[11px] text-text-muted">
                     Logged 182 total Pomodoro focus hours
                   </p>
@@ -376,9 +359,7 @@ export default function StudentProgressPage() {
                   <CheckCircle2 className="w-4 h-4" />
                 </span>
                 <div>
-                  <h4 className="text-xs font-bold text-text-primary">
-                    Early Submitter
-                  </h4>
+                  <h4 className="text-xs font-bold text-text-primary">Early Submitter</h4>
                   <p className="text-[11px] text-text-muted">
                     Submitted all CS-480 lab milestones 48h prior to deadline
                   </p>

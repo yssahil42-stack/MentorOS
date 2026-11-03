@@ -8,11 +8,11 @@ export interface Project {
   user_id: number;
   role: string;
   title: string;
-  description?: string;
+  description?: string | null;
   status: ProjectStatus;
   priority: ProjectPriority;
-  target_date?: string;
-  progress: number;           // 0–100
+  target_date?: string | null;
+  progress: number; // 0–100
   milestone_count?: number;
   completed_milestone_count?: number;
   task_count?: number;
@@ -27,18 +27,19 @@ export interface ProjectDetail extends Project {
 
 export interface CreateProjectRequest {
   title: string;
-  description?: string;
+  description?: string | null;
+  status?: ProjectStatus;
   priority?: ProjectPriority;
-  target_date?: string;
+  target_date?: string | null;
   role?: string;
 }
 
 export interface UpdateProjectRequest {
   title?: string;
-  description?: string;
+  description?: string | null;
   status?: ProjectStatus;
   priority?: ProjectPriority;
-  target_date?: string;
+  target_date?: string | null;
   progress?: number;
 }
 

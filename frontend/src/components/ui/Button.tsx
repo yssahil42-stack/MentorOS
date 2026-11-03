@@ -1,13 +1,20 @@
 import React from 'react';
+import { clsx } from 'clsx';
 import { cn } from '../../utils/cn';
+import {
+  buttonVariants,
+  buttonSizes,
+  type ButtonVariant,
+  type ButtonSize,
+} from '../../utils/buttonVariants';
 import { Loader2 } from 'lucide-react';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-type Variant = 'primary' | 'secondary' | 'ghost' | 'danger' | 'success' | 'outline';
-type Size    = 'xs' | 'sm' | 'md' | 'lg';
+export type Variant = ButtonVariant;
+export type Size = ButtonSize;
 
-interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: Variant;
   size?: Size;
   loading?: boolean;
@@ -17,24 +24,6 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   iconRight?: React.ReactNode;
   fullWidth?: boolean;
 }
-
-// ─── Styles ───────────────────────────────────────────────────────────────────
-
-const variantStyles: Record<Variant, string> = {
-  primary:   'bg-student-500 hover:bg-student-600 text-white border-transparent active:translate-y-[1px] active:scale-[0.99] transition-transform duration-100 ease-out',
-  secondary: 'bg-bg-surface hover:bg-bg-elevated text-text-primary border-border-base hover:border-border-hover active:translate-y-[1px] active:scale-[0.99] transition-transform duration-100 ease-out',
-  outline:   'bg-transparent hover:bg-bg-elevated text-text-primary border-border-base hover:border-student-500 active:translate-y-[1px] active:scale-[0.99] transition-transform duration-100 ease-out',
-  ghost:     'bg-transparent hover:bg-bg-elevated text-text-secondary hover:text-text-primary border-transparent active:translate-y-[1px] active:scale-[0.99] transition-transform duration-100 ease-out',
-  danger:    'bg-danger hover:bg-danger/90 text-white border-transparent active:translate-y-[1px] active:scale-[0.99] transition-transform duration-100 ease-out',
-  success:   'bg-success hover:bg-success/90 text-white border-transparent active:translate-y-[1px] active:scale-[0.99] transition-transform duration-100 ease-out',
-};
-
-const sizeStyles: Record<Size, string> = {
-  xs: 'h-7 px-2.5 text-xs gap-1.5',
-  sm: 'h-8 px-3 text-sm gap-1.5',
-  md: 'h-9 px-4 text-sm gap-2',
-  lg: 'h-11 px-5 text-base gap-2.5',
-};
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
@@ -54,7 +43,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       disabled,
       ...props
     },
-    ref,
+    ref
   ) => {
     const isDisabled = disabled || loading;
     const leadIcon = icon ?? leftIcon;
@@ -69,32 +58,40 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
           // Base
           'inline-flex items-center justify-center font-medium rounded-xl border',
           'transition-all duration-150 ease-smooth select-none cursor-pointer',
-          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2 focus-visible:ring-offset-bg-base',
+          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2 focus-visible:ring-offset-bg-surface',
           'touch-target',
           // Selected subtle micro-movement
           isSelected && 'translate-y-[1px] shadow-xs',
-          // Variant
-          variantStyles[variant],
+          // Variant using clsx(buttonVariants[variant])
+          clsx(buttonVariants[variant]),
           // Size
-          sizeStyles[size],
+          buttonSizes[size],
           // Width
           fullWidth && 'w-full',
           // Disabled
           isDisabled && 'opacity-50 cursor-not-allowed pointer-events-none',
-          className,
+          className
         )}
         {...props}
       >
         {loading ? (
-          <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
+          <Loader2 role="status" aria-label="Loading" className="h-4 w-4 animate-spin" />
         ) : (
-          leadIcon && <span className="shrink-0" aria-hidden="true">{leadIcon}</span>
+          leadIcon && (
+            <span className="shrink-0" aria-hidden="true">
+              {leadIcon}
+            </span>
+          )
         )}
         {children && <span>{children}</span>}
-        {!loading && iconRight && <span className="shrink-0 ml-auto" aria-hidden="true">{iconRight}</span>}
+        {!loading && iconRight && (
+          <span className="shrink-0 ml-auto" aria-hidden="true">
+            {iconRight}
+          </span>
+        )}
       </button>
     );
-  },
+  }
 );
 
 Button.displayName = 'Button';

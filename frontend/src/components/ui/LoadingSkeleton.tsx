@@ -13,7 +13,13 @@ function SkeletonBlock({ className }: { className?: string }) {
   return <div className={cn('skeleton rounded-lg', className)} aria-hidden="true" />;
 }
 
-export function LoadingSkeleton({ shape = 'card', variant, lines = 3, count, className }: LoadingSkeletonProps) {
+export function LoadingSkeleton({
+  shape = 'card',
+  variant,
+  lines = 3,
+  count,
+  className,
+}: LoadingSkeletonProps) {
   if (count && count > 1) {
     return (
       <div className={cn('space-y-4', className)}>
@@ -28,10 +34,7 @@ export function LoadingSkeleton({ shape = 'card', variant, lines = 3, count, cla
     return (
       <div className={cn('space-y-2', className)} aria-busy="true" aria-label="Loading content">
         {Array.from({ length: lines }).map((_, i) => (
-          <SkeletonBlock
-            key={i}
-            className={cn('h-4', i === lines - 1 ? 'w-3/4' : 'w-full')}
-          />
+          <SkeletonBlock key={i} className={cn('h-4', i === lines - 1 ? 'w-3/4' : 'w-full')} />
         ))}
       </div>
     );
@@ -47,7 +50,14 @@ export function LoadingSkeleton({ shape = 'card', variant, lines = 3, count, cla
 
   // card (default)
   return (
-    <div className={cn('bg-bg-surface border border-border-subtle rounded-2xl p-5 space-y-3', className)} aria-busy="true" aria-label="Loading content">
+    <div
+      className={cn(
+        'bg-bg-surface border border-border-subtle rounded-2xl p-5 space-y-3',
+        className
+      )}
+      aria-busy="true"
+      aria-label="Loading content"
+    >
       <div className="flex items-center gap-3">
         <SkeletonBlock className="h-9 w-9 rounded-xl shrink-0" />
         <div className="flex-1 space-y-2">

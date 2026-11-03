@@ -25,6 +25,7 @@ import {
   createMilestone,
   updateMilestone,
 } from '../../services/projectService';
+import { fetchTasks } from '../../services/taskService';
 import { Card } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
 import { Badge, PriorityBadge } from '../../components/ui/Badge';
@@ -63,6 +64,12 @@ export default function AcademicProjectsPage() {
   const { data: milestones = [] } = useQuery({
     queryKey: ['milestones', 'student'],
     queryFn: () => fetchMilestones(),
+  });
+
+  // Fetch tasks to dynamically compute real-time milestone and project progress
+  const { data: tasks = [] } = useQuery({
+    queryKey: ['tasks', 'student'],
+    queryFn: () => fetchTasks({ role: 'student' }),
   });
 
   const createProjectMutation = useMutation({
@@ -125,6 +132,7 @@ export default function AcademicProjectsPage() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['milestones'] });
+      queryClient.invalidateQueries({ queryKey: ['tasks'] });
       queryClient.invalidateQueries({ queryKey: ['projects'] });
       queryClient.invalidateQueries({ queryKey: ['dashboard'] });
       showToast('Milestone status updated!', 'success');
@@ -142,7 +150,23 @@ export default function AcademicProjectsPage() {
   const totalMilestones = milestones.length;
   const completedMilestones = milestones.filter((m) => m.status === 'completed').length;
   const avgProgress = projects.length
-    ? Math.round(projects.reduce((acc, p) => acc + (p.progress || 0), 0) / projects.length)
+    ? Math.round(
+        projects.reduce((acc, p) => {
+          const pTasks = tasks.filter(
+            (t) =>
+              t.project_id === p.id ||
+              (t.project_title &&
+                t.project_title.trim().toLowerCase() === p.title.trim().toLowerCase())
+          );
+          const pProg =
+            pTasks.length > 0
+              ? Math.round(
+                  (pTasks.filter((t) => t.status === 'completed').length / pTasks.length) * 100
+                )
+              : p.progress || 0;
+          return acc + pProg;
+        }, 0) / projects.length
+      )
     : 0;
 
   return (
@@ -165,7 +189,8 @@ export default function AcademicProjectsPage() {
               Academic Projects &amp; Thesis
             </h1>
             <p className="text-sm text-text-secondary max-w-2xl">
-              Organize term research papers, capstone deliverables, lab experiments, and AI-assisted literature roadmaps.
+              Organize term research papers, capstone deliverables, lab experiments, and AI-assisted
+              literature roadmaps.
             </p>
           </div>
 
@@ -190,9 +215,7 @@ export default function AcademicProjectsPage() {
             <span>Academic Projects</span>
             <BookOpen className="w-4 h-4 text-student-400" />
           </div>
-          <div className="mt-2 text-2xl font-extrabold text-text-primary">
-            {projects.length}
-          </div>
+          <div className="mt-2 text-2xl font-extrabold text-text-primary">{projects.length}</div>
           <p className="text-2xs text-text-muted mt-1">Under active supervision</p>
         </Card>
 
@@ -202,10 +225,12 @@ export default function AcademicProjectsPage() {
             <CheckCircle2 className="w-4 h-4 text-amber-400" />
           </div>
           <div className="mt-2 text-2xl font-extrabold text-text-primary">
-            {completedMilestones} <span className="text-xs font-normal text-text-muted">/ {totalMilestones || 8}</span>
+            {completedMilestones}{' '}
+            <span className="text-xs font-normal text-text-muted">/ {totalMilestones || 8}</span>
           </div>
           <p className="text-2xs text-amber-400 mt-1">
-            {totalMilestones ? Math.round((completedMilestones / totalMilestones) * 100) : 60}% completed
+            {totalMilestones ? Math.round((completedMilestones / totalMilestones) * 100) : 60}%
+            completed
           </p>
         </Card>
 
@@ -214,9 +239,7 @@ export default function AcademicProjectsPage() {
             <span>Overall Progress</span>
             <Award className="w-4 h-4 text-emerald-400" />
           </div>
-          <div className="mt-2 text-2xl font-extrabold text-text-primary">
-            {avgProgress}%
-          </div>
+          <div className="mt-2 text-2xl font-extrabold text-text-primary">{avgProgress}%</div>
           <p className="text-2xs text-emerald-400 mt-1">Across all courses</p>
         </Card>
 
@@ -225,9 +248,7 @@ export default function AcademicProjectsPage() {
             <span>AI Research Assistant</span>
             <Sparkles className="w-4 h-4 text-indigo-400" />
           </div>
-          <div className="mt-2 text-sm font-bold text-text-primary">
-            Ready to Assist
-          </div>
+          <div className="mt-2 text-sm font-bold text-text-primary">Ready to Assist</div>
           <button
             onClick={() =>
               openAIDrawer(
@@ -280,7 +301,8 @@ export default function AcademicProjectsPage() {
           <GraduationCap className="w-12 h-12 text-student-400 mx-auto mb-3 opacity-60" />
           <h3 className="text-base font-bold text-text-primary">No academic projects found</h3>
           <p className="text-xs text-text-muted max-w-sm mx-auto mt-1 mb-4">
-            Create your first capstone project, thesis outline, or term paper deliverable to track research milestones.
+            Create your first capstone project, thesis outline, or term paper deliverable to track
+            research milestones.
           </p>
           <div className="flex items-center justify-center gap-2">
             <Button
@@ -306,6 +328,24 @@ export default function AcademicProjectsPage() {
           {filteredProjects.map((project) => {
             const projectMilestones = milestones.filter((m) => m.project_id === project.id);
             const isExpanded = selectedProjectId === project.id;
+            const projTasks = tasks.filter(
+              (t) =>
+                t.project_id === project.id ||
+                (t.project_title &&
+                  t.project_title.trim().toLowerCase() === project.title.trim().toLowerCase())
+            );
+            const completedProjTasks = projTasks.filter((t) => t.status === 'completed').length;
+            const totalProjTasks = projTasks.length;
+            const dynamicProgress =
+              totalProjTasks > 0
+                ? Math.round((completedProjTasks / totalProjTasks) * 100)
+                : projectMilestones.length > 0
+                  ? Math.round(
+                      (projectMilestones.filter((m) => m.status === 'completed').length /
+                        projectMilestones.length) *
+                        100
+                    )
+                  : project.progress || 0;
 
             return (
               <Card
@@ -315,18 +355,6 @@ export default function AcademicProjectsPage() {
                 <div>
                   <div className="flex items-start justify-between gap-3">
                     <div className="space-y-1">
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <span className="px-2 py-0.5 text-2xs font-mono font-bold rounded-md bg-student-500/15 text-student-400 border border-student-500/20 uppercase">
-                          Academic Track
-                        </span>
-                        <PriorityBadge priority={project.priority} />
-                        <Badge
-                          variant={project.status === 'completed' ? 'success' : 'default'}
-                          className="capitalize text-2xs"
-                        >
-                          {project.status.replace('_', ' ')}
-                        </Badge>
-                      </div>
                       <h3 className="text-base font-bold text-text-primary group-hover:text-student-400 transition-colors">
                         {project.title}
                       </h3>
@@ -351,12 +379,14 @@ export default function AcademicProjectsPage() {
                   <div className="mt-4 space-y-1.5">
                     <div className="flex items-center justify-between text-2xs font-semibold">
                       <span className="text-text-muted">Research Progress</span>
-                      <span className="text-student-400 font-mono">{project.progress}%</span>
+                      <span className="text-student-400 font-mono font-bold">
+                        {dynamicProgress}%
+                      </span>
                     </div>
                     <div className="w-full bg-bg-base h-2 rounded-full overflow-hidden border border-border-base">
                       <div
-                        className="bg-gradient-to-r from-student-500 via-amber-400 to-student-400 h-full rounded-full transition-all duration-500"
-                        style={{ width: `${project.progress}%` }}
+                        className="bg-gradient-to-r from-student-500 via-amber-400 to-student-400 h-full rounded-full transition-all duration-300"
+                        style={{ width: `${dynamicProgress}%` }}
                       />
                     </div>
                   </div>
@@ -378,9 +408,7 @@ export default function AcademicProjectsPage() {
                   {/* Milestones Preview or Expand */}
                   <div className="mt-3">
                     <button
-                      onClick={() =>
-                        setSelectedProjectId(isExpanded ? null : project.id)
-                      }
+                      onClick={() => setSelectedProjectId(isExpanded ? null : project.id)}
                       className="text-xs font-semibold text-student-300 hover:text-student-200 flex items-center gap-1 py-1"
                     >
                       <ChevronRight
@@ -413,36 +441,86 @@ export default function AcademicProjectsPage() {
                             No milestones yet. Click "+ Add Phase" or use AI to generate.
                           </p>
                         ) : (
-                          projectMilestones.map((m) => {
+                          projectMilestones.map((m, mIdx) => {
                             const isDone = m.status === 'completed';
+                            // Calculate subtasks belonging to this phase
+                            const phaseTasks = projTasks.filter((t, tIdx) => {
+                              const desc = (t.description || '').toLowerCase();
+                              const title = (t.title || '').toLowerCase();
+                              const mTitle = (m.title || '').toLowerCase();
+                              if (
+                                desc.includes(`phase ${mIdx + 1}`) ||
+                                title.includes(`phase ${mIdx + 1}`)
+                              )
+                                return true;
+                              if (mTitle && (desc.includes(mTitle) || title.includes(mTitle)))
+                                return true;
+                              return tIdx % Math.max(projectMilestones.length, 1) === mIdx;
+                            });
+                            const phaseCompleted = phaseTasks.filter(
+                              (t) => t.status === 'completed'
+                            ).length;
+                            const phaseProgress =
+                              phaseTasks.length > 0
+                                ? Math.round((phaseCompleted / phaseTasks.length) * 100)
+                                : isDone
+                                  ? 100
+                                  : 0;
+
                             return (
                               <div
                                 key={m.id}
-                                className="flex items-center justify-between gap-2 p-2 rounded-lg bg-bg-surface border border-border-base/60 text-xs"
+                                className="flex flex-col gap-1.5 p-2.5 rounded-lg bg-bg-surface border border-border-base/60 text-xs"
                               >
-                                <div className="flex items-center gap-2 min-w-0">
-                                  <button
-                                    onClick={() => toggleMilestoneMutation.mutate(m)}
-                                    className="text-text-muted hover:text-student-400"
-                                  >
-                                    <CheckCircle2
-                                      className={`w-4 h-4 ${
-                                        isDone ? 'text-student-400 fill-student-400/20' : 'text-text-muted'
+                                <div className="flex items-center justify-between gap-2">
+                                  <div className="flex items-center gap-2 min-w-0">
+                                    <button
+                                      onClick={() => toggleMilestoneMutation.mutate(m)}
+                                      className="text-text-muted hover:text-student-400"
+                                      title={isDone ? 'Mark pending' : 'Mark completed'}
+                                    >
+                                      <CheckCircle2
+                                        className={`w-4 h-4 ${
+                                          isDone
+                                            ? 'text-student-400 fill-student-400/20'
+                                            : 'text-text-muted'
+                                        }`}
+                                      />
+                                    </button>
+                                    <span
+                                      className={`truncate font-medium ${
+                                        isDone
+                                          ? 'line-through text-text-muted'
+                                          : 'text-text-primary'
                                       }`}
-                                    />
-                                  </button>
-                                  <span
-                                    className={`truncate ${
-                                      isDone ? 'line-through text-text-muted' : 'text-text-primary'
-                                    }`}
-                                  >
-                                    {m.title}
-                                  </span>
+                                    >
+                                      {m.title}
+                                    </span>
+                                  </div>
+                                  <div className="flex items-center gap-2 shrink-0">
+                                    {m.target_date && (
+                                      <span className="text-3xs text-text-faint">
+                                        {new Date(m.target_date).toLocaleDateString()}
+                                      </span>
+                                    )}
+                                    <span className="text-3xs font-mono font-bold text-student-400">
+                                      {phaseProgress}%
+                                    </span>
+                                  </div>
                                 </div>
-                                {m.target_date && (
-                                  <span className="text-2xs text-text-faint shrink-0">
-                                    {new Date(m.target_date).toLocaleDateString()}
-                                  </span>
+
+                                {phaseTasks.length > 0 && (
+                                  <div className="flex items-center gap-2 pt-1 border-t border-border-subtle/50 text-3xs text-text-muted">
+                                    <div className="flex-1 bg-bg-base h-1 rounded-full overflow-hidden border border-border-subtle">
+                                      <div
+                                        className="bg-student-400 h-full rounded-full transition-all duration-300"
+                                        style={{ width: `${phaseProgress}%` }}
+                                      />
+                                    </div>
+                                    <span className="font-mono">
+                                      {phaseCompleted}/{phaseTasks.length} tasks
+                                    </span>
+                                  </div>
                                 )}
                               </div>
                             );
@@ -568,8 +646,7 @@ export default function AcademicProjectsPage() {
                 value={newTargetDate}
                 onChange={(e) => setNewTargetDate(e.target.value)}
                 className="w-full bg-bg-surface border border-border-base rounded-xl px-3 py-2 text-xs text-text-primary focus:outline-none focus:border-student-500"
-              >
-              </input>
+              ></input>
             </div>
           </div>
 

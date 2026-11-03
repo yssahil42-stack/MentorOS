@@ -15,29 +15,41 @@ import {
   ArrowRight,
   GraduationCap,
   Layers,
+  ChevronDown,
+  ChevronRight,
+  RotateCcw,
+  X,
 } from 'lucide-react';
 import { useWorkspace } from '../../contexts/WorkspaceContext';
-import {
-  fetchTasks,
-  createTask,
-  updateTask,
-  deleteTask,
-} from '../../services/taskService';
+import { fetchTasks, createTask, updateTask, deleteTask } from '../../services/taskService';
+import { fetchProjects } from '../../services/projectService';
 import { Card } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
 import { PriorityBadge, StatusBadge } from '../../components/ui/Badge';
 import { Modal } from '../../components/ui/Modal';
 import { LoadingSkeleton } from '../../components/ui/LoadingSkeleton';
 import type { Task, TaskPriority, TaskStatus } from '../../types/task';
+import type { Project } from '../../types/project';
 
 export default function StudentTasksPage() {
   const { openAIDrawer, openCaptureModal, showToast } = useWorkspace();
   const queryClient = useQueryClient();
 
-  const [viewMode, setViewMode] = useState<'kanban' | 'list'>('kanban');
+  const [viewMode, setViewMode] = useState<'kanban' | 'list'>('list');
   const [search, setSearch] = useState('');
   const [filterPriority, setFilterPriority] = useState<string>('all');
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+
+  // Track expanded state for roadmap sections in the task table with localStorage persistence
+  const [expandedRoadmaps, setExpandedRoadmaps] = useState<Record<string, boolean>>(() => {
+    try {
+      const saved = localStorage.getItem('mentoros_expanded_roadmaps_tasks');
+      return saved ? JSON.parse(saved) : {};
+    } catch {
+      return {};
+    }
+  });
+  const [quickAddTitles, setQuickAddTitles] = useState<Record<string, string>>({});
 
   // New Task Form State
   const [newTitle, setNewTitle] = useState('');
@@ -45,12 +57,19 @@ export default function StudentTasksPage() {
   const [newPriority, setNewPriority] = useState<TaskPriority>('medium');
   const [newDueDate, setNewDueDate] = useState('');
   const [newEstMinutes, setNewEstMinutes] = useState(60);
+  const [newProjectId, setNewProjectId] = useState<number | undefined>(undefined);
 
   // Quick Add State
   const [quickTitle, setQuickTitle] = useState('');
 
-  // Fetch strictly role: 'student' tasks
-  const { data: tasks = [], isLoading } = useQuery({
+  // Fetch strictly role: 'student' projects (Generated Roadmaps)
+  const { data: projects = [], isLoading: isProjectsLoading } = useQuery<Project[]>({
+    queryKey: ['projects', 'student'],
+    queryFn: () => fetchProjects('student'),
+  });
+
+  // Fetch strictly role: 'student' tasks (Subtasks)
+  const { data: tasks = [], isLoading: isTasksLoading } = useQuery<Task[]>({
     queryKey: ['tasks', 'student'],
     queryFn: () => fetchTasks({ role: 'student' }),
   });
@@ -63,6 +82,7 @@ export default function StudentTasksPage() {
         priority: newPriority,
         due_date: newDueDate,
         estimated_minutes: Number(newEstMinutes),
+        project_id: newProjectId,
         role: 'student',
       });
     },
@@ -70,12 +90,38 @@ export default function StudentTasksPage() {
       setIsCreateModalOpen(false);
       setNewTitle('');
       setNewDesc('');
+      setNewProjectId(undefined);
       queryClient.invalidateQueries({ queryKey: ['tasks'] });
+      queryClient.invalidateQueries({ queryKey: ['projects'] });
       queryClient.invalidateQueries({ queryKey: ['dashboard'] });
       showToast('Study task added! 🎯', 'success');
     },
     onError: () => {
       showToast('Failed to add study task', 'error');
+    },
+  });
+
+  const addSubtaskMutation = useMutation({
+    mutationFn: async ({ title, projectId }: { title: string; projectId?: number }) => {
+      return createTask({
+        title,
+        project_id: projectId,
+        priority: 'medium',
+        estimated_minutes: 60,
+        role: 'student',
+      });
+    },
+    onSuccess: (_, vars) => {
+      const key = vars.projectId ? String(vars.projectId) : 'unassigned';
+      setQuickAddTitles((prev) => ({ ...prev, [key]: '' }));
+      queryClient.invalidateQueries({ queryKey: ['tasks'] });
+      queryClient.invalidateQueries({ queryKey: ['projects'] });
+      queryClient.invalidateQueries({ queryKey: ['milestones'] });
+      queryClient.invalidateQueries({ queryKey: ['dashboard'] });
+      showToast('Subtask added to roadmap!', 'success');
+    },
+    onError: () => {
+      showToast('Failed to add subtask', 'error');
     },
   });
 
@@ -91,6 +137,8 @@ export default function StudentTasksPage() {
     onSuccess: () => {
       setQuickTitle('');
       queryClient.invalidateQueries({ queryKey: ['tasks'] });
+      queryClient.invalidateQueries({ queryKey: ['projects'] });
+      queryClient.invalidateQueries({ queryKey: ['milestones'] });
       queryClient.invalidateQueries({ queryKey: ['dashboard'] });
       showToast('Task added!', 'success');
     },
@@ -102,6 +150,8 @@ export default function StudentTasksPage() {
     },
     onSuccess: (updated) => {
       queryClient.invalidateQueries({ queryKey: ['tasks'] });
+      queryClient.invalidateQueries({ queryKey: ['projects'] });
+      queryClient.invalidateQueries({ queryKey: ['milestones'] });
       queryClient.invalidateQueries({ queryKey: ['dashboard'] });
       showToast(
         updated.status === 'completed'
@@ -116,6 +166,8 @@ export default function StudentTasksPage() {
     mutationFn: async (id: number) => deleteTask(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tasks'] });
+      queryClient.invalidateQueries({ queryKey: ['projects'] });
+      queryClient.invalidateQueries({ queryKey: ['milestones'] });
       queryClient.invalidateQueries({ queryKey: ['dashboard'] });
       showToast('Task deleted', 'info');
     },
@@ -125,14 +177,98 @@ export default function StudentTasksPage() {
     const matchesSearch =
       t.title.toLowerCase().includes(search.toLowerCase()) ||
       (t.description && t.description.toLowerCase().includes(search.toLowerCase()));
-    const matchesPriority =
-      filterPriority === 'all' || t.priority === filterPriority;
+    const matchesPriority = filterPriority === 'all' || t.priority === filterPriority;
     return matchesSearch && matchesPriority;
   });
 
   const todoTasks = filteredTasks.filter((t) => t.status === 'todo');
   const inProgressTasks = filteredTasks.filter((t) => t.status === 'in_progress');
   const completedTasks = filteredTasks.filter((t) => t.status === 'completed');
+
+  // Group study tasks inside their corresponding Generated Roadmaps
+  interface RoadmapGroup {
+    key: string;
+    projectId?: number;
+    title: string;
+    description?: string | null;
+    priority: string;
+    targetDate?: string | null;
+    subtasks: Task[];
+    completedCount: number;
+    totalCount: number;
+    progressPercent: number;
+    isGeneratedRoadmap: boolean;
+  }
+
+  const roadmapGroups: RoadmapGroup[] = projects.map((project) => {
+    const projectSubtasks = filteredTasks.filter(
+      (t) =>
+        t.project_id === project.id ||
+        (t.project_title &&
+          t.project_title.trim().toLowerCase() === project.title.trim().toLowerCase())
+    );
+    const completedCount = projectSubtasks.filter((t) => t.status === 'completed').length;
+    const totalCount = projectSubtasks.length;
+    const progressPercent =
+      totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : project.progress || 0;
+
+    return {
+      key: String(project.id),
+      projectId: project.id,
+      title: project.title,
+      description: project.description,
+      priority: project.priority,
+      targetDate: project.target_date,
+      subtasks: projectSubtasks,
+      completedCount,
+      totalCount,
+      progressPercent,
+      isGeneratedRoadmap: true,
+    };
+  });
+
+  const matchedTaskIds = new Set(
+    roadmapGroups.flatMap((group) => group.subtasks.map((task) => task.id))
+  );
+  const orphanTasks = filteredTasks.filter((task) => !matchedTaskIds.has(task.id));
+
+  if (orphanTasks.length > 0) {
+    const completedCount = orphanTasks.filter((t) => t.status === 'completed').length;
+    const totalCount = orphanTasks.length;
+    roadmapGroups.push({
+      key: 'unassigned',
+      projectId: undefined,
+      title: 'General Study Tasks & Independent Topics',
+      description: 'Independent study tasks and ad-hoc focus items',
+      priority: 'medium',
+      targetDate: undefined,
+      subtasks: orphanTasks,
+      completedCount,
+      totalCount,
+      progressPercent: totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0,
+      isGeneratedRoadmap: false,
+    });
+  }
+
+  const toggleExpand = (key: string) => {
+    setExpandedRoadmaps((prev) => {
+      const next = {
+        ...prev,
+        [key]: prev[key] === undefined ? false : !prev[key],
+      };
+      try {
+        localStorage.setItem('mentoros_expanded_roadmaps_tasks', JSON.stringify(next));
+      } catch {}
+      return next;
+    });
+  };
+
+  const handleClearFilters = () => {
+    setSearch('');
+    setFilterPriority('all');
+  };
+
+  const hasActiveFilters = search.trim() !== '' || filterPriority !== 'all';
 
   const totalMinutes = tasks.reduce((sum, t) => sum + (t.estimated_minutes || 0), 0);
   const completedMinutes = tasks
@@ -159,7 +295,8 @@ export default function StudentTasksPage() {
               Study Tasks &amp; Focus Board
             </h1>
             <p className="text-sm text-text-secondary max-w-2xl">
-              Organize syllabus assignments, research readings, and track Pomodoro focus intervals without cross-module clutter.
+              Organize syllabus assignments, research readings, and track Pomodoro focus intervals
+              without cross-module clutter.
             </p>
           </div>
 
@@ -184,9 +321,7 @@ export default function StudentTasksPage() {
             <span>To Study (Pending)</span>
             <BookOpen className="w-4 h-4 text-student-400" />
           </div>
-          <div className="mt-2 text-2xl font-extrabold text-text-primary">
-            {todoTasks.length}
-          </div>
+          <div className="mt-2 text-2xl font-extrabold text-text-primary">{todoTasks.length}</div>
           <p className="text-2xs text-text-muted mt-1">Ready for study session</p>
         </Card>
 
@@ -210,7 +345,8 @@ export default function StudentTasksPage() {
             {completedTasks.length}
           </div>
           <p className="text-2xs text-emerald-400 mt-1">
-            {tasks.length ? Math.round((completedTasks.length / tasks.length) * 100) : 0}% completion rate
+            {tasks.length ? Math.round((completedTasks.length / tasks.length) * 100) : 0}%
+            completion rate
           </p>
         </Card>
 
@@ -220,7 +356,10 @@ export default function StudentTasksPage() {
             <Clock className="w-4 h-4 text-indigo-400" />
           </div>
           <div className="mt-2 text-2xl font-extrabold text-text-primary">
-            {(completedMinutes / 60).toFixed(1)}h <span className="text-xs font-normal text-text-muted">/ {(totalMinutes / 60).toFixed(1)}h</span>
+            {(completedMinutes / 60).toFixed(1)}h{' '}
+            <span className="text-xs font-normal text-text-muted">
+              / {(totalMinutes / 60).toFixed(1)}h
+            </span>
           </div>
           <p className="text-2xs text-indigo-400 mt-1">Estimated workload</p>
         </Card>
@@ -256,16 +395,26 @@ export default function StudentTasksPage() {
         </form>
 
         <div className="flex items-center gap-3 w-full md:w-auto justify-between md:justify-end">
-          {/* Search */}
-          <div className="relative w-48">
-            <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-text-muted" />
+          {/* Search with 1-click Clear */}
+          <div className="relative w-52">
+            <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-text-muted pointer-events-none" />
             <input
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search tasks..."
-              className="w-full pl-8 pr-3 py-1.5 bg-bg-base border border-border-base rounded-xl text-xs text-text-primary placeholder:text-text-faint focus:outline-none focus:border-student-500/50"
+              className="w-full pl-8 pr-7 py-1.5 bg-bg-base border border-border-base rounded-xl text-xs text-text-primary placeholder:text-text-muted focus:outline-none focus:border-student-500/50"
             />
+            {search && (
+              <button
+                type="button"
+                onClick={() => setSearch('')}
+                aria-label="Clear search input"
+                className="absolute right-2 top-1/2 -translate-y-1/2 p-0.5 text-text-muted hover:text-text-primary rounded-md focus-visible:outline-none"
+              >
+                <X className="w-3 h-3" />
+              </button>
+            )}
           </div>
 
           {/* Priority filter */}
@@ -280,6 +429,18 @@ export default function StudentTasksPage() {
             <option value="medium">Medium</option>
             <option value="low">Low</option>
           </select>
+
+          {hasActiveFilters && (
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={handleClearFilters}
+              className="h-8 px-2 text-2xs text-text-muted hover:text-student-400"
+            >
+              <RotateCcw className="w-3 h-3 mr-1" />
+              Reset
+            </Button>
+          )}
 
           {/* View mode toggle */}
           <div className="flex items-center gap-1 bg-bg-base p-1 rounded-xl border border-border-base">
@@ -310,7 +471,7 @@ export default function StudentTasksPage() {
       </div>
 
       {/* Main Content: Kanban or List */}
-      {isLoading ? (
+      {isTasksLoading || isProjectsLoading ? (
         <LoadingSkeleton count={3} />
       ) : viewMode === 'kanban' ? (
         /* Kanban View */
@@ -349,6 +510,11 @@ export default function StudentTasksPage() {
                     <h4 className="text-xs font-bold text-text-primary group-hover:text-student-400 transition-colors">
                       {task.title}
                     </h4>
+                    {task.project_title && (
+                      <span className="inline-block text-[10px] font-mono px-2 py-0.5 rounded-md bg-student-500/10 text-student-300 border border-student-500/20 max-w-[200px] truncate mt-1">
+                        {task.project_title}
+                      </span>
+                    )}
                     {task.description && (
                       <p className="text-[11px] text-text-muted mt-1 line-clamp-2">
                         {task.description}
@@ -426,9 +592,12 @@ export default function StudentTasksPage() {
                   </div>
 
                   <div>
-                    <h4 className="text-xs font-bold text-text-primary">
-                      {task.title}
-                    </h4>
+                    <h4 className="text-xs font-bold text-text-primary">{task.title}</h4>
+                    {task.project_title && (
+                      <span className="inline-block text-[10px] font-mono px-2 py-0.5 rounded-md bg-student-500/10 text-student-300 border border-student-500/20 max-w-[200px] truncate mt-1">
+                        {task.project_title}
+                      </span>
+                    )}
                     {task.description && (
                       <p className="text-[11px] text-text-muted mt-1 line-clamp-2">
                         {task.description}
@@ -522,6 +691,11 @@ export default function StudentTasksPage() {
                     <h4 className="text-xs font-semibold line-through text-text-muted">
                       {task.title}
                     </h4>
+                    {task.project_title && (
+                      <span className="inline-block text-[10px] font-mono px-2 py-0.5 rounded-md bg-student-500/10 text-student-300 border border-student-500/20 max-w-[200px] truncate mt-1">
+                        {task.project_title}
+                      </span>
+                    )}
                     {task.description && (
                       <p className="text-[11px] text-text-faint mt-1 line-clamp-1">
                         {task.description}
@@ -555,75 +729,264 @@ export default function StudentTasksPage() {
           </div>
         </div>
       ) : (
-        /* List View */
-        <Card className="p-4 space-y-2">
-          {filteredTasks.length === 0 ? (
-            <p className="text-xs text-text-muted py-8 text-center">
-              No tasks found.
-            </p>
+        /* Study Task Table: Grouped by Generated Roadmap with Subtasks Inside */
+        <div className="space-y-5">
+          {roadmapGroups.length === 0 ? (
+            <Card className="p-12 text-center border-border-base space-y-3">
+              <BookOpen className="w-10 h-10 text-text-muted mx-auto opacity-50" />
+              <h3 className="text-base font-bold text-text-primary">No study roadmaps found</h3>
+              <p className="text-xs text-text-muted max-w-sm mx-auto">
+                No study roadmaps or subtasks available. Clear your filters or generate a new
+                roadmap using the AI Assistant.
+              </p>
+              <div className="flex items-center justify-center gap-3 pt-2">
+                {hasActiveFilters && (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={handleClearFilters}
+                    className="border-border-base hover:border-student-500"
+                  >
+                    <RotateCcw className="w-3.5 h-3.5 mr-1.5" />
+                    Clear Filters
+                  </Button>
+                )}
+                <Button
+                  size="sm"
+                  onClick={() => openAIDrawer()}
+                  className="bg-student-500 hover:bg-student-600 text-white"
+                >
+                  <Sparkles className="w-4 h-4 mr-1.5" />
+                  Generate Roadmap via AI
+                </Button>
+              </div>
+            </Card>
           ) : (
-            filteredTasks.map((task) => {
-              const isDone = task.status === 'completed';
+            roadmapGroups.map((group) => {
+              const isExpanded = expandedRoadmaps[group.key] !== false;
+              const quickAddTitle = quickAddTitles[group.key] || '';
+              const subtaskId = `roadmap-task-subtasks-${group.key}`;
+
               return (
                 <div
-                  key={task.id}
-                  className={`p-3 rounded-xl border flex items-center justify-between gap-3 transition-colors ${
-                    isDone
-                      ? 'bg-bg-surface/40 border-border-base/40 opacity-60'
-                      : 'bg-bg-surface border-border-base hover:border-student-500/40'
-                  }`}
+                  key={group.key}
+                  className="rounded-2xl border border-border-base bg-bg-surface overflow-hidden shadow-sm transition-all hover:border-student-500/30"
                 >
-                  <div className="flex items-center gap-3 min-w-0">
-                    <button
-                      onClick={() =>
-                        updateStatusMutation.mutate({
-                          id: task.id,
-                          status: isDone ? 'todo' : 'completed',
-                        })
+                  {/* Generated Roadmap Header (Accessible Accordion) */}
+                  <div
+                    role="button"
+                    tabIndex={0}
+                    aria-expanded={isExpanded}
+                    aria-controls={subtaskId}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        toggleExpand(group.key);
                       }
-                      className="text-text-muted hover:text-student-400 transition-colors"
-                    >
-                      <CheckCircle2
-                        className={`w-4 h-4 ${
-                          isDone
-                            ? 'text-student-400 fill-student-400/20'
-                            : 'text-text-muted'
-                        }`}
-                      />
-                    </button>
-                    <div className="min-w-0">
-                      <p
-                        className={`text-xs font-semibold ${
-                          isDone ? 'line-through text-text-muted' : 'text-text-primary'
-                        }`}
+                    }}
+                    onClick={() => toggleExpand(group.key)}
+                    className="p-5 cursor-pointer bg-gradient-to-r from-bg-surface via-bg-elevated/60 to-bg-surface flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-border-base/60 select-none hover:bg-bg-elevated/40 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-student-500"
+                  >
+                    <div className="flex items-start md:items-center gap-3.5 min-w-0">
+                      <span
+                        aria-label={isExpanded ? 'Collapse roadmap' : 'Expand roadmap'}
+                        className="mt-0.5 p-1 rounded-lg text-text-muted hover:text-student-400 hover:bg-student-500/10 transition-colors shrink-0"
                       >
-                        {task.title}
-                      </p>
-                      {task.description && (
-                        <p className="text-2xs text-text-faint truncate">
-                          {task.description}
-                        </p>
-                      )}
+                        {isExpanded ? (
+                          <ChevronDown className="w-5 h-5 text-student-400" />
+                        ) : (
+                          <ChevronRight className="w-5 h-5" />
+                        )}
+                      </span>
+
+                      <div className="p-2.5 rounded-xl bg-student-500/10 border border-student-500/20 text-student-400 shrink-0">
+                        <GraduationCap className="w-5 h-5" />
+                      </div>
+
+                      <div className="space-y-1 min-w-0">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className="text-3xs font-mono font-bold px-2 py-0.5 rounded-md bg-student-500/10 text-student-400 border border-student-500/20">
+                            {group.isGeneratedRoadmap ? 'COURSE PROJECT' : 'GENERAL STUDY'}
+                          </span>
+                          <h3 className="text-base font-bold text-text-primary truncate">
+                            {group.title}
+                          </h3>
+                          <PriorityBadge priority={group.priority as any} />
+                        </div>
+                        {group.description && (
+                          <p className="text-xs text-text-secondary line-clamp-1 max-w-2xl">
+                            {group.description}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Progress Bar & Subtask Done Counter */}
+                    <div className="flex items-center gap-4 shrink-0 pl-10 md:pl-0">
+                      <div className="flex flex-col items-end w-full sm:w-auto">
+                        <div className="flex items-center gap-2 text-xs font-mono font-bold text-text-primary">
+                          <span>
+                            {group.completedCount} / {group.totalCount} Done
+                          </span>
+                          <span className="text-student-400">({group.progressPercent}%)</span>
+                        </div>
+                        <div className="w-24 sm:w-36 h-2 bg-bg-base rounded-full overflow-hidden mt-1.5 border border-border-base/50">
+                          <div
+                            className="h-full bg-gradient-to-r from-student-500 to-emerald-400 rounded-full transition-all duration-500"
+                            style={{ width: `${group.progressPercent}%` }}
+                          />
+                        </div>
+                      </div>
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-3 shrink-0">
-                    <PriorityBadge priority={task.priority} />
-                    <span className="text-2xs text-text-muted hidden sm:inline">
-                      {task.estimated_minutes} min
-                    </span>
-                    <button
-                      onClick={() => deleteTaskMutation.mutate(task.id)}
-                      className="p-1 text-text-faint hover:text-red-400"
+                  {/* Nested Subtasks Inside the Roadmap */}
+                  {isExpanded && (
+                    <div
+                      id={subtaskId}
+                      role="region"
+                      aria-label={`${group.title} subtasks`}
+                      className="p-4 bg-bg-base/30 space-y-3"
                     >
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
+                      {group.subtasks.length === 0 ? (
+                        <div className="p-6 text-center border border-dashed border-border-base/80 rounded-xl text-xs text-text-muted">
+                          No subtasks in this roadmap yet. Use the input below to add one.
+                        </div>
+                      ) : (
+                        <div className="space-y-2">
+                          {group.subtasks.map((task) => {
+                            const isDone = task.status === 'completed';
+
+                            return (
+                              <div
+                                key={task.id}
+                                className={`p-3.5 rounded-xl border flex items-center justify-between gap-3 transition-colors ${
+                                  isDone
+                                    ? 'bg-bg-surface/50 border-border-base/50 opacity-65'
+                                    : 'bg-bg-surface border-border-base hover:border-student-500/40'
+                                }`}
+                              >
+                                <div className="flex items-start gap-3 min-w-0">
+                                  {/* Accessible Checkbox Button */}
+                                  <button
+                                    type="button"
+                                    aria-label={
+                                      isDone
+                                        ? `Mark "${task.title}" as incomplete`
+                                        : `Mark "${task.title}" as complete`
+                                    }
+                                    onClick={() =>
+                                      updateStatusMutation.mutate({
+                                        id: task.id,
+                                        status: isDone ? 'todo' : 'completed',
+                                      })
+                                    }
+                                    className="mt-0.5 p-1 shrink-0 text-text-muted hover:text-student-400 transition-colors rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-student-500"
+                                    title={isDone ? 'Mark as incomplete' : 'Mark as completed'}
+                                  >
+                                    <CheckCircle2
+                                      className={`w-5 h-5 transition-transform hover:scale-110 ${
+                                        isDone
+                                          ? 'text-emerald-500 fill-emerald-500/20'
+                                          : 'text-text-muted'
+                                      }`}
+                                    />
+                                  </button>
+
+                                  <div className="min-w-0 space-y-0.5">
+                                    <div className="flex items-center gap-2 flex-wrap">
+                                      <p
+                                        className={`text-xs sm:text-sm font-semibold ${
+                                          isDone
+                                            ? 'line-through text-text-muted'
+                                            : 'text-text-primary'
+                                        }`}
+                                      >
+                                        {task.title}
+                                      </p>
+                                      <PriorityBadge priority={task.priority} />
+                                      <StatusBadge status={task.status} />
+                                    </div>
+                                    {task.description && (
+                                      <p className="text-2xs text-text-secondary line-clamp-2">
+                                        {task.description}
+                                      </p>
+                                    )}
+                                    <div className="flex items-center gap-4 text-2xs text-text-muted pt-0.5">
+                                      {task.due_date && (
+                                        <span className="flex items-center gap-1 text-amber-400">
+                                          <Calendar className="w-3 h-3" />
+                                          {new Date(task.due_date).toLocaleDateString()}
+                                        </span>
+                                      )}
+                                      <span className="flex items-center gap-1 text-student-400">
+                                        <Clock className="w-3 h-3" />
+                                        {task.estimated_minutes || 60}m
+                                      </span>
+                                    </div>
+                                  </div>
+                                </div>
+
+                                {/* Single Delete Action (Redundant Complete Button Removed) */}
+                                <div className="flex items-center shrink-0">
+                                  <button
+                                    type="button"
+                                    onClick={() => deleteTaskMutation.mutate(task.id)}
+                                    aria-label={`Delete subtask "${task.title}"`}
+                                    className="p-2 min-w-[36px] min-h-[36px] flex items-center justify-center rounded-xl text-text-muted hover:text-red-400 hover:bg-red-500/10 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500"
+                                    title="Delete subtask"
+                                  >
+                                    <Trash2 className="w-4 h-4" />
+                                  </button>
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      )}
+
+                      {/* Inline Quick-Add Subtask Input */}
+                      <form
+                        onSubmit={(e) => {
+                          e.preventDefault();
+                          if (!quickAddTitle.trim()) return;
+                          addSubtaskMutation.mutate({
+                            title: quickAddTitle.trim(),
+                            projectId: group.projectId,
+                          });
+                        }}
+                        className="flex items-center gap-2 pt-2"
+                      >
+                        <input
+                          type="text"
+                          value={quickAddTitle}
+                          onChange={(e) =>
+                            setQuickAddTitles((prev) => ({
+                              ...prev,
+                              [group.key]: e.target.value,
+                            }))
+                          }
+                          placeholder={`+ Add a subtask to "${group.title}"…`}
+                          className="flex-1 h-9 px-3.5 rounded-xl text-xs bg-bg-surface border border-border-base focus:border-student-500 focus:outline-none text-text-primary placeholder:text-text-muted"
+                        />
+                        <Button
+                          type="submit"
+                          size="sm"
+                          variant="secondary"
+                          disabled={!quickAddTitle.trim() || addSubtaskMutation.isPending}
+                          className="h-9 px-3 text-xs"
+                        >
+                          <Plus className="w-3.5 h-3.5 mr-1" />
+                          Add Subtask
+                        </Button>
+                      </form>
+                    </div>
+                  )}
                 </div>
               );
             })
           )}
-        </Card>
+        </div>
       )}
 
       {/* Create Task Modal */}
@@ -666,6 +1029,28 @@ export default function StudentTasksPage() {
               className="w-full bg-bg-surface border border-border-base rounded-xl px-3.5 py-2 text-xs text-text-primary focus:outline-none focus:border-student-500"
             />
           </div>
+
+          {projects.length > 0 && (
+            <div>
+              <label className="block text-xs font-semibold text-text-secondary mb-1">
+                Course / Subject
+              </label>
+              <select
+                value={newProjectId ?? ''}
+                onChange={(e) =>
+                  setNewProjectId(e.target.value ? Number(e.target.value) : undefined)
+                }
+                className="w-full bg-bg-surface border border-border-base rounded-xl px-3 py-2 text-xs text-text-primary focus:outline-none focus:border-student-500"
+              >
+                <option value="">Independent Study Task (No assigned course)</option>
+                {projects.map((p) => (
+                  <option key={p.id} value={p.id}>
+                    {p.title}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
 
           <div className="grid grid-cols-3 gap-3">
             <div>

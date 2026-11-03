@@ -133,7 +133,12 @@ export function CommandPalette() {
       category: 'Theme',
       title: `Toggle Theme (Currently ${resolvedTheme === 'dark' ? 'Dark' : 'Light'})`,
       subtitle: `Switch to ${resolvedTheme === 'dark' ? 'Light' : 'Dark'} mode`,
-      icon: resolvedTheme === 'dark' ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-indigo-400" />,
+      icon:
+        resolvedTheme === 'dark' ? (
+          <Sun className="w-4 h-4 text-amber-400" />
+        ) : (
+          <Moon className="w-4 h-4 text-indigo-400" />
+        ),
       action: () => {
         closeCommandPalette();
         toggleTheme();
@@ -178,7 +183,7 @@ export function CommandPalette() {
     (c) =>
       c.title.toLowerCase().includes(query.toLowerCase()) ||
       c.subtitle?.toLowerCase().includes(query.toLowerCase()) ||
-      c.category.toLowerCase().includes(query.toLowerCase()),
+      c.category.toLowerCase().includes(query.toLowerCase())
   );
 
   // Keyboard navigation
@@ -254,7 +259,7 @@ export function CommandPalette() {
                     'flex items-center justify-between p-3 rounded-xl cursor-pointer text-xs transition-colors',
                     isSelected
                       ? 'bg-bg-elevated text-text-primary border border-border-hover'
-                      : 'text-text-secondary hover:bg-bg-elevated/50 border border-transparent',
+                      : 'text-text-secondary hover:bg-bg-elevated/50 border border-transparent'
                   )}
                 >
                   <div className="flex items-center gap-3 min-w-0">
@@ -262,13 +267,9 @@ export function CommandPalette() {
                       {item.icon}
                     </div>
                     <div className="min-w-0">
-                      <div className="font-semibold text-text-primary truncate">
-                        {item.title}
-                      </div>
+                      <div className="font-semibold text-text-primary truncate">{item.title}</div>
                       {item.subtitle && (
-                        <div className="text-[11px] text-text-muted truncate">
-                          {item.subtitle}
-                        </div>
+                        <div className="text-[11px] text-text-muted truncate">{item.subtitle}</div>
                       )}
                     </div>
                   </div>
@@ -280,7 +281,7 @@ export function CommandPalette() {
                     <ArrowRight
                       className={cn(
                         'w-3.5 h-3.5 transition-transform',
-                        isSelected ? 'text-emerald-400 translate-x-0.5' : 'text-transparent',
+                        isSelected ? 'text-emerald-400 translate-x-0.5' : 'text-transparent'
                       )}
                     />
                   </div>
@@ -293,9 +294,13 @@ export function CommandPalette() {
         {/* Footer shortcuts */}
         <div className="px-4 py-2 border-t border-border-base bg-bg-elevated/30 flex items-center justify-between text-[11px] text-text-faint">
           <div className="flex items-center gap-2">
-            <span>Navigate <kbd className="font-mono">↑↓</kbd></span>
+            <span>
+              Navigate <kbd className="font-mono">↑↓</kbd>
+            </span>
             <span>•</span>
-            <span>Select <kbd className="font-mono">↵</kbd></span>
+            <span>
+              Select <kbd className="font-mono">↵</kbd>
+            </span>
           </div>
           <span>MentorOS Global Command</span>
         </div>

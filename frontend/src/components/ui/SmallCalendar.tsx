@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   Calendar as CalendarIcon,
@@ -13,7 +14,10 @@ import {
   CalendarDays,
   ListFilter,
   Sparkles,
+  ExternalLink,
+  Download,
 } from 'lucide-react';
+import { downloadICSFile, getGoogleCalendarUrl } from '../../utils/icsExport';
 import { Modal } from './Modal';
 import { Button } from './Button';
 import { Card } from './Card';
@@ -52,7 +56,7 @@ export function SmallCalendar({ role }: SmallCalendarProps) {
   // Query events
   const { data: events = [] } = useQuery({
     queryKey: ['calendar', role || 'all'],
-    queryFn: () => fetchCalendarEvents(role ? { role } : undefined),
+    queryFn: ({ signal }) => fetchCalendarEvents(role ? { role } : undefined, signal),
   });
 
   // Create Event Mutation
@@ -111,8 +115,18 @@ export function SmallCalendar({ role }: SmallCalendarProps) {
   };
 
   const monthNames = [
-    'January', 'February', 'March', 'April', 'May', 'June',
-    'July', 'August', 'September', 'October', 'November', 'December',
+    'January',
+    'February',
+    'March',
+    'April',
+    'May',
+    'June',
+    'July',
+    'August',
+    'September',
+    'October',
+    'November',
+    'December',
   ];
 
   const weekdayShort = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
@@ -145,24 +159,23 @@ export function SmallCalendar({ role }: SmallCalendarProps) {
         maxTilt={5}
         depth={30}
         variant="default"
-        className="p-4 sm:p-5 border border-border-base hover:border-solar-500/40 transition-all shadow-card backdrop-blur-md"
+        onClick={() => setIsFullScreen(true)}
+        className="p-4 sm:p-5 border border-border-base hover:border-solar-500/40 transition-all shadow-card backdrop-blur-md cursor-pointer group select-none"
       >
         <div className="flex items-center justify-between pb-3 border-b border-border-base">
           <div className="flex items-center gap-2">
-            <span className="p-1.5 rounded-xl bg-gradient-to-br from-solar-500/20 to-orange-500/10 text-solar-500 border border-solar-500/25 shadow-sm">
+            <span className="p-1.5 rounded-xl bg-gradient-to-br from-solar-500/20 to-orange-500/10 text-solar-500 border border-solar-500/25 shadow-sm group-hover:scale-105 transition-transform">
               <CalendarIcon className="w-4 h-4" />
             </span>
             <div>
-              <h3 className="text-xs sm:text-sm font-bold text-text-primary">
+              <h3 className="text-xs sm:text-sm font-bold text-text-primary group-hover:text-solar-500 transition-colors">
                 My Schedule
               </h3>
-              <p className="text-3xs text-text-muted">
-                Click anywhere to open full screen
-              </p>
+              <p className="text-3xs text-text-muted">Click anywhere to open full screen</p>
             </div>
           </div>
 
-          <div className="flex items-center gap-1.5">
+          <div className="flex items-center gap-1.5" onClick={(e) => e.stopPropagation()}>
             <button
               type="button"
               onClick={prevMonth}
@@ -171,7 +184,7 @@ export function SmallCalendar({ role }: SmallCalendarProps) {
             >
               <ChevronLeft className="w-3.5 h-3.5" />
             </button>
-            <span className="text-2xs font-semibold text-text-primary px-1">
+            <span className="text-2xs font-semibold text-text-primary px-1 cursor-default">
               {monthNames[month].slice(0, 3)} {year}
             </span>
             <button
@@ -184,7 +197,10 @@ export function SmallCalendar({ role }: SmallCalendarProps) {
             </button>
             <button
               type="button"
-              onClick={() => setIsFullScreen(true)}
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsFullScreen(true);
+              }}
               className="ml-1 p-1.5 rounded-lg bg-solar-500/10 text-solar-500 hover:bg-solar-500/20 border border-solar-500/25 transition-all active:translate-y-[1px]"
               title="Open Full Screen"
             >
@@ -254,7 +270,11 @@ export function SmallCalendar({ role }: SmallCalendarProps) {
             <Clock className="w-3 h-3 text-solar-500 shrink-0" />
             {todayEvents.length > 0 ? (
               <span className="truncate text-text-primary font-medium">
-                {new Date(todayEvents[0].start_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} • {todayEvents[0].title}
+                {new Date(todayEvents[0].start_at).toLocaleTimeString([], {
+                  hour: '2-digit',
+                  minute: '2-digit',
+                })}{' '}
+                • {todayEvents[0].title}
               </span>
             ) : (
               <span>No more events scheduled today</span>
@@ -356,6 +376,28 @@ export function SmallCalendar({ role }: SmallCalendarProps) {
                 </button>
               </div>
 
+              {/* Export ICS Button */}
+              <button
+                type="button"
+                onClick={() => {
+                  if (events.length === 0) {
+                    showToast('No events to export', 'info');
+                    return;
+                  }
+                  downloadICSFile(
+                    events,
+                    `${role || 'workspace'}-schedule.ics`,
+                    `MentorOS ${role || 'Workspace'} Calendar`
+                  );
+                  showToast(`Exported ${events.length} events to .ics file!`, 'success');
+                }}
+                className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-bg-elevated text-text-secondary hover:text-text-primary border border-border-base transition-colors flex items-center gap-1.5 active:translate-y-[1px]"
+                title="Download .ics Calendar File"
+              >
+                <Download className="w-3.5 h-3.5 text-solar-500" />
+                <span>Export (.ics)</span>
+              </button>
+
               {/* Add Event Button */}
               <Button
                 size="sm"
@@ -365,6 +407,17 @@ export function SmallCalendar({ role }: SmallCalendarProps) {
               >
                 New Event
               </Button>
+
+              {/* Open Dedicated Calendar Page Link */}
+              <Link
+                to={`/app/${role || 'student'}/calendar`}
+                onClick={() => setIsFullScreen(false)}
+                className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-bg-elevated text-text-secondary hover:text-text-primary border border-border-base transition-colors flex items-center gap-1.5"
+                title="Open Dedicated Calendar Page"
+              >
+                <span>Full Page</span>
+                <ExternalLink className="w-3.5 h-3.5" />
+              </Link>
 
               {/* Close Button */}
               <button
@@ -381,80 +434,91 @@ export function SmallCalendar({ role }: SmallCalendarProps) {
           {/* Full Screen Content Body */}
           <div className="flex-1 min-h-0 overflow-y-auto">
             {viewMode === 'month' ? (
-              <div className="h-full flex flex-col border border-border-base rounded-2xl overflow-hidden bg-bg-surface">
-                {/* 7 Weekday Headers */}
-                <div className="grid grid-cols-7 border-b border-border-base bg-bg-elevated text-center py-2.5">
-                  {['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'].map(
-                    (d) => (
+              <div className="h-full flex flex-col border border-border-base rounded-2xl overflow-x-auto bg-bg-surface">
+                <div className="min-w-[560px] sm:min-w-0 flex-1 flex flex-col">
+                  {/* 7 Weekday Headers */}
+                  <div className="grid grid-cols-7 border-b border-border-base bg-bg-elevated text-center py-2.5">
+                    {[
+                      'Sunday',
+                      'Monday',
+                      'Tuesday',
+                      'Wednesday',
+                      'Thursday',
+                      'Friday',
+                      'Saturday',
+                    ].map((d) => (
                       <span
                         key={d}
                         className="text-xs font-bold text-text-secondary uppercase tracking-wider"
                       >
                         {d.slice(0, 3)}
                       </span>
-                    )
-                  )}
-                </div>
+                    ))}
+                  </div>
 
-                {/* Month Grid Cells */}
-                <div className="grid grid-cols-7 flex-1 auto-rows-fr divide-x divide-y divide-border-base">
-                  {/* Empty Offset Days */}
-                  {Array.from({ length: firstDayIndex }).map((_, idx) => (
-                    <div key={`fs-empty-${idx}`} className="bg-bg-base/30 p-2 min-h-[90px]" />
-                  ))}
+                  {/* Month Grid Cells */}
+                  <div className="grid grid-cols-7 flex-1 auto-rows-fr divide-x divide-y divide-border-base">
+                    {/* Empty Offset Days */}
+                    {Array.from({ length: firstDayIndex }).map((_, idx) => (
+                      <div key={`fs-empty-${idx}`} className="bg-bg-base/30 p-2 min-h-[90px]" />
+                    ))}
 
-                  {/* Day Cells */}
-                  {Array.from({ length: daysInMonth }).map((_, idx) => {
-                    const day = idx + 1;
-                    const isToday =
-                      day === today.getDate() &&
-                      month === today.getMonth() &&
-                      year === today.getFullYear();
-                    const dayEvents = eventsByDay[day] || [];
+                    {/* Day Cells */}
+                    {Array.from({ length: daysInMonth }).map((_, idx) => {
+                      const day = idx + 1;
+                      const isToday =
+                        day === today.getDate() &&
+                        month === today.getMonth() &&
+                        year === today.getFullYear();
+                      const dayEvents = eventsByDay[day] || [];
 
-                    return (
-                      <div
-                        key={`fs-day-${day}`}
-                        className={`p-2 min-h-[90px] flex flex-col justify-between transition-colors ${
-                          isToday ? 'bg-solar-500/5' : 'bg-bg-surface hover:bg-bg-elevated/40'
-                        }`}
-                      >
-                        <div className="flex items-center justify-between">
-                          <span
-                            className={`w-6 h-6 flex items-center justify-center rounded-full text-xs font-bold ${
-                              isToday
-                                ? 'bg-solar-500 text-white shadow-glow-solar'
-                                : 'text-text-primary'
-                            }`}
-                          >
-                            {day}
-                          </span>
-                          {dayEvents.length > 0 && (
-                            <span className="text-3xs font-mono text-solar-500 font-bold">
-                              {dayEvents.length} {dayEvents.length === 1 ? 'event' : 'events'}
-                            </span>
-                          )}
-                        </div>
-
-                        {/* Event Pills */}
-                        <div className="mt-1 space-y-1 overflow-y-auto max-h-[85px] pr-0.5">
-                          {dayEvents.map((ev) => (
-                            <button
-                              key={ev.id}
-                              type="button"
-                              onClick={() => setActiveEventDetail(ev)}
-                              className="w-full text-left p-1 rounded-md bg-solar-500/15 border border-solar-500/30 text-solar-400 hover:bg-solar-500/25 transition-colors truncate block"
+                      return (
+                        <div
+                          key={`fs-day-${day}`}
+                          className={`p-2 min-h-[90px] flex flex-col justify-between transition-colors ${
+                            isToday ? 'bg-solar-500/5' : 'bg-bg-surface hover:bg-bg-elevated/40'
+                          }`}
+                        >
+                          <div className="flex items-center justify-between">
+                            <span
+                              className={`w-6 h-6 flex items-center justify-center rounded-full text-xs font-bold ${
+                                isToday
+                                  ? 'bg-solar-500 text-white shadow-glow-solar'
+                                  : 'text-text-primary'
+                              }`}
                             >
-                              <div className="text-3xs font-bold truncate">
-                                {new Date(ev.start_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}{' '}
-                                {ev.title}
-                              </div>
-                            </button>
-                          ))}
+                              {day}
+                            </span>
+                            {dayEvents.length > 0 && (
+                              <span className="text-3xs font-mono text-solar-500 font-bold">
+                                {dayEvents.length} {dayEvents.length === 1 ? 'event' : 'events'}
+                              </span>
+                            )}
+                          </div>
+
+                          {/* Event Pills */}
+                          <div className="mt-1 space-y-1 overflow-y-auto max-h-[85px] pr-0.5">
+                            {dayEvents.map((ev) => (
+                              <button
+                                key={ev.id}
+                                type="button"
+                                onClick={() => setActiveEventDetail(ev)}
+                                className="w-full text-left p-1 rounded-md bg-solar-500/15 border border-solar-500/30 text-solar-400 hover:bg-solar-500/25 transition-colors truncate block"
+                              >
+                                <div className="text-3xs font-bold truncate">
+                                  {new Date(ev.start_at).toLocaleTimeString([], {
+                                    hour: '2-digit',
+                                    minute: '2-digit',
+                                  })}{' '}
+                                  {ev.title}
+                                </div>
+                              </button>
+                            ))}
+                          </div>
                         </div>
-                      </div>
-                    );
-                  })}
+                      );
+                    })}
+                  </div>
                 </div>
               </div>
             ) : (
@@ -484,7 +548,9 @@ export function SmallCalendar({ role }: SmallCalendarProps) {
                             </span>
                             <span className="text-xs text-text-muted flex items-center gap-1 font-mono">
                               <Clock className="w-3 h-3" />
-                              {start.toLocaleDateString()} • {start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - {end.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                              {start.toLocaleDateString()} •{' '}
+                              {start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}{' '}
+                              - {end.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                             </span>
                           </div>
                           <h4 className="text-sm font-bold text-text-primary">{ev.title}</h4>
@@ -562,17 +628,14 @@ export function SmallCalendar({ role }: SmallCalendarProps) {
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-text-secondary mb-1">
-                  Date
-                </label>
+                <label className="block text-xs font-semibold text-text-secondary mb-1">Date</label>
                 <input
                   type="date"
                   required
                   value={eventDateStr}
                   onChange={(e) => setEventDateStr(e.target.value)}
                   className="w-full bg-bg-base border border-border-base rounded-xl px-3 py-2 text-xs text-text-primary focus:outline-none focus:border-solar-500"
-                >
-                </input>
+                ></input>
               </div>
             </div>
 
@@ -651,14 +714,19 @@ export function SmallCalendar({ role }: SmallCalendarProps) {
               </span>
             </div>
 
-            <h3 className="text-base font-bold text-text-primary">
-              {activeEventDetail.title}
-            </h3>
+            <h3 className="text-base font-bold text-text-primary">{activeEventDetail.title}</h3>
 
             <p className="text-xs text-text-muted flex items-center gap-1.5">
               <Clock className="w-3.5 h-3.5 text-solar-500" />
-              {new Date(activeEventDetail.start_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} -{' '}
-              {new Date(activeEventDetail.end_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+              {new Date(activeEventDetail.start_at).toLocaleTimeString([], {
+                hour: '2-digit',
+                minute: '2-digit',
+              })}{' '}
+              -{' '}
+              {new Date(activeEventDetail.end_at).toLocaleTimeString([], {
+                hour: '2-digit',
+                minute: '2-digit',
+              })}
             </p>
 
             {activeEventDetail.description && (
@@ -666,6 +734,36 @@ export function SmallCalendar({ role }: SmallCalendarProps) {
                 {activeEventDetail.description}
               </div>
             )}
+
+            {/* Calendar Export & Sync Options */}
+            <div className="flex items-center gap-2 pt-1">
+              <a
+                href={getGoogleCalendarUrl(activeEventDetail)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex-1 py-1.5 px-3 rounded-xl bg-solar-500/10 hover:bg-solar-500/20 text-solar-500 border border-solar-500/25 text-2xs font-semibold flex items-center justify-center gap-1.5 transition-colors"
+                title="Add to Google Calendar"
+              >
+                <span>Add to Google Calendar</span>
+                <ExternalLink className="w-3 h-3" />
+              </a>
+              <button
+                type="button"
+                onClick={() => {
+                  downloadICSFile(
+                    [activeEventDetail],
+                    `${activeEventDetail.title.slice(0, 20)}.ics`,
+                    activeEventDetail.title
+                  );
+                  showToast('Downloaded .ics event file!', 'success');
+                }}
+                className="py-1.5 px-3 rounded-xl bg-bg-elevated hover:bg-bg-surface text-text-secondary hover:text-text-primary border border-border-base text-2xs font-semibold flex items-center gap-1.5 transition-colors"
+                title="Download single .ics"
+              >
+                <Download className="w-3 h-3 text-solar-500" />
+                <span>Export .ics</span>
+              </button>
+            </div>
 
             <div className="flex items-center justify-between pt-3 border-t border-border-base">
               <button

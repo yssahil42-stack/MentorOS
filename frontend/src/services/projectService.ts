@@ -1,4 +1,4 @@
-import { api } from './api';
+import { projectsApi, milestonesApi } from './apiClient';
 import type {
   Project,
   ProjectDetail,
@@ -9,38 +9,49 @@ import type {
   UpdateMilestoneRequest,
 } from '../types/project';
 
-export function fetchProjects(role?: string): Promise<Project[]> {
-  return api.get<Project[]>('/projects', { params: role ? { role } : undefined });
+export function fetchProjects(
+  params?: string | { role?: string; page?: number; page_size?: number },
+  signal?: AbortSignal
+): Promise<Project[]> {
+  const queryParams = typeof params === 'string' ? { role: params } : params;
+  return projectsApi.get(queryParams, signal);
 }
 
-export function fetchProject(id: number): Promise<ProjectDetail> {
-  return api.get<ProjectDetail>(`/projects/${id}`);
+export function fetchProjectsPaginated(
+  params?: { role?: string; page?: number; page_size?: number },
+  signal?: AbortSignal
+): Promise<{ data: Project[]; total: number }> {
+  return projectsApi.getPaginated(params, signal);
+}
+
+export function fetchProject(id: number, signal?: AbortSignal): Promise<ProjectDetail> {
+  return projectsApi.getById(id, signal);
 }
 
 export function createProject(data: CreateProjectRequest): Promise<Project> {
-  return api.post<Project>('/projects', data);
+  return projectsApi.create(data);
 }
 
 export function updateProject(id: number, data: UpdateProjectRequest): Promise<Project> {
-  return api.patch<Project>(`/projects/${id}`, data);
+  return projectsApi.update(id, data);
 }
 
-export async function deleteProject(id: number): Promise<void> {
-  await api.delete(`/projects/${id}`);
+export function deleteProject(id: number): Promise<void> {
+  return projectsApi.delete(id);
 }
 
-export function fetchMilestones(projectId?: number): Promise<Milestone[]> {
-  return api.get<Milestone[]>('/milestones', { params: { project_id: projectId } });
+export function fetchMilestones(projectId?: number, signal?: AbortSignal): Promise<Milestone[]> {
+  return milestonesApi.get(projectId, signal);
 }
 
 export function createMilestone(data: CreateMilestoneRequest): Promise<Milestone> {
-  return api.post<Milestone>('/milestones', data);
+  return milestonesApi.create(data);
 }
 
 export function updateMilestone(id: number, data: UpdateMilestoneRequest): Promise<Milestone> {
-  return api.patch<Milestone>(`/milestones/${id}`, data);
+  return milestonesApi.update(id, data);
 }
 
-export async function deleteMilestone(id: number): Promise<void> {
-  await api.delete(`/milestones/${id}`);
+export function deleteMilestone(id: number): Promise<void> {
+  return milestonesApi.delete(id);
 }
