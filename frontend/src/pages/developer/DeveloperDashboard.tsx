@@ -14,14 +14,15 @@ import {
 import { useWorkspace } from '../../contexts/WorkspaceContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { fetchDashboardSummary } from '../../services/dashboardService';
-import { fetchTasks, updateTask, createTask } from '../../services/taskService';
-import { fetchProjects } from '../../services/projectService';
+import { tasksApi, projectsApi } from '../../services/apiClient';
 import { Card } from '../../components/ui/Card';
 import { Card3D } from '../../components/ui/Card3D';
 import { Button } from '../../components/ui/Button';
 import { PriorityBadge } from '../../components/ui/Badge';
 import { DashboardSkeleton } from '../../components/ui/LoadingSkeleton';
 import { SmallCalendar } from '../../components/ui/SmallCalendar';
+import { DailyStandupWidget } from '../../components/dashboard/DailyStandupWidget';
+import { ROLE_CONFIGS } from '../../config/roles';
 import type { TaskStatus } from '../../types/task';
 
 export default function DeveloperDashboard() {
@@ -29,43 +30,47 @@ export default function DeveloperDashboard() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
 
+  const roleConfig = ROLE_CONFIGS.developer;
+  const emptyStateConfig = roleConfig.emptyStates.tasks;
+  const promptStarter = roleConfig.firstAiPrompt;
+
   const [quickTaskTitle, setQuickTaskTitle] = useState('');
   const [taskFilter, setTaskFilter] = useState<'all' | 'todo' | 'completed'>('all');
 
   const { data: summary, isLoading: summaryLoading } = useQuery({
     queryKey: ['dashboard', 'developer'],
-    queryFn: () => fetchDashboardSummary('developer'),
+    queryFn: ({ signal }) => fetchDashboardSummary('developer', signal),
   });
 
   const { data: tasks = [], isLoading: tasksLoading } = useQuery({
     queryKey: ['tasks', 'developer'],
-    queryFn: () => fetchTasks(),
+    queryFn: ({ signal }) => tasksApi.get('developer', { signal }),
   });
 
   const { data: projects = [], isLoading: projectsLoading } = useQuery({
     queryKey: ['projects', 'developer'],
-    queryFn: () => fetchProjects(),
+    queryFn: ({ signal }) => projectsApi.get('developer', { signal }),
   });
 
   const toggleMutation = useMutation({
     mutationFn: async ({ id, status }: { id: number; status: TaskStatus }) => {
-      return updateTask(id, { status });
+      return tasksApi.update(id, { status });
     },
     onSuccess: (updated) => {
       queryClient.invalidateQueries({ queryKey: ['tasks'] });
       queryClient.invalidateQueries({ queryKey: ['dashboard'] });
+      queryClient.invalidateQueries({ queryKey: ['projects'] });
+      queryClient.invalidateQueries({ queryKey: ['milestones'] });
       showToast(
-        updated.status === 'completed'
-          ? 'Task marked as done!'
-          : 'Task updated',
-        'success',
+        updated.status === 'completed' ? 'Task marked as done!' : 'Task updated',
+        'success'
       );
     },
   });
 
   const addTaskMutation = useMutation({
     mutationFn: async (title: string) => {
-      return createTask({
+      return tasksApi.create({
         title,
         priority: 'medium',
         estimated_minutes: 45,
@@ -76,6 +81,8 @@ export default function DeveloperDashboard() {
       setQuickTaskTitle('');
       queryClient.invalidateQueries({ queryKey: ['tasks'] });
       queryClient.invalidateQueries({ queryKey: ['dashboard'] });
+      queryClient.invalidateQueries({ queryKey: ['projects'] });
+      queryClient.invalidateQueries({ queryKey: ['milestones'] });
       showToast('Task added to sprint!', 'success');
     },
   });
@@ -96,7 +103,23 @@ export default function DeveloperDashboard() {
     tasks.length > 0 ? Math.round((completedTasks.length / tasks.length) * 100) : 0;
   const avgProjectProgress =
     projects.length > 0
-      ? Math.round(projects.reduce((acc, p) => acc + (p.progress || 0), 0) / projects.length)
+      ? Math.round(
+          projects.reduce((acc, p) => {
+            const pTasks = tasks.filter(
+              (t) =>
+                t.project_id === p.id ||
+                (t.project_title &&
+                  t.project_title.trim().toLowerCase() === p.title.trim().toLowerCase())
+            );
+            const pProg =
+              pTasks.length > 0
+                ? Math.round(
+                    (pTasks.filter((t) => t.status === 'completed').length / pTasks.length) * 100
+                  )
+                : p.progress || 0;
+            return acc + pProg;
+          }, 0) / projects.length
+        )
       : 0;
 
   const filteredTasks = tasks.filter((t) => {
@@ -106,11 +129,6 @@ export default function DeveloperDashboard() {
   });
 
   const displayName = user?.full_name ? user.full_name.split(' ')[0] : 'there';
-  const todayFormatted = new Date().toLocaleDateString(undefined, {
-    weekday: 'long',
-    month: 'short',
-    day: 'numeric',
-  });
 
   return (
     <>
@@ -123,25 +141,26 @@ export default function DeveloperDashboard() {
           className="p-6 md:p-7 border border-border-base/80 bg-gradient-to-r from-bg-surface/90 via-bg-elevated/70 to-bg-surface/90 shadow-card backdrop-blur-xl"
         >
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-            <div className="space-y-1.5">
-              <div className="flex items-center gap-2.5 flex-wrap">
-                <span className="text-3xs uppercase font-mono font-bold px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/25 flex items-center gap-1.5 shadow-sm">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                  Workspace Ready
-                </span>
-                <span className="text-3xs font-mono text-text-muted px-2.5 py-0.5 rounded-full bg-bg-surface/80 border border-border-base">
-                  {todayFormatted}
-                </span>
-              </div>
-              <h1 className="text-2xl md:text-3xl font-extrabold text-text-primary tracking-tight">
+            <div className="space-y-1">
+              <h2 className="text-2xl md:text-3xl font-extrabold text-text-primary tracking-tight">
                 Welcome back, {displayName}
-              </h1>
+              </h2>
               <p className="text-xs sm:text-sm text-text-secondary">
                 Here is your daily schedule, active deliverables, and project progress.
               </p>
             </div>
 
-            <div className="shrink-0">
+            <div className="shrink-0 flex items-center gap-2">
+              <Link to="/app/developer/github-sync">
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  className="font-medium px-4 h-10 transition-all active:translate-y-[1px]"
+                  icon={<FolderGit2 className="w-4 h-4" />}
+                >
+                  GitHub Sync
+                </Button>
+              </Link>
               <Button
                 variant="primary"
                 size="sm"
@@ -177,7 +196,9 @@ export default function DeveloperDashboard() {
               <span className="text-xs text-text-muted">active</span>
             </div>
             <div className="mt-2.5 flex items-center justify-between text-2xs">
-              <span className="text-solar-500 font-semibold">{avgProjectProgress}% avg progress</span>
+              <span className="text-solar-500 font-semibold">
+                {avgProjectProgress}% avg progress
+              </span>
               <div className="w-16 h-1.5 rounded-full bg-bg-base overflow-hidden border border-border-subtle">
                 <div
                   className="h-full bg-gradient-to-r from-amber-500 to-solar-500 rounded-full"
@@ -209,7 +230,8 @@ export default function DeveloperDashboard() {
             <div className="mt-2.5 flex items-center justify-between text-2xs text-text-muted">
               <span>{completedTasks.length} completed</span>
               <span className="font-mono text-3xs font-bold text-amber-400">
-                {tasks.length > 0 ? Math.round((pendingTasks.length / tasks.length) * 100) : 0}% left
+                {tasks.length > 0 ? Math.round((pendingTasks.length / tasks.length) * 100) : 0}%
+                left
               </span>
             </div>
           </Card3D>
@@ -234,7 +256,9 @@ export default function DeveloperDashboard() {
               <span className="text-xs text-text-muted">finished</span>
             </div>
             <div className="mt-2.5 flex items-center justify-between text-2xs">
-              <span className="text-emerald-400 font-semibold">{taskCompletionRate}% completion</span>
+              <span className="text-emerald-400 font-semibold">
+                {taskCompletionRate}% completion
+              </span>
               <div className="w-16 h-1.5 rounded-full bg-bg-base overflow-hidden border border-border-subtle">
                 <div
                   className="h-full bg-gradient-to-r from-emerald-500 to-teal-400 rounded-full"
@@ -268,6 +292,9 @@ export default function DeveloperDashboard() {
             </div>
           </Card3D>
         </div>
+
+        {/* ─── DAILY STANDUP / PROGRESS SUMMARY ─────────────────────── */}
+        <DailyStandupWidget role="developer" standupData={summary?.daily_standup} />
 
         {/* ─── ZONE 2: DAILY ACTION CENTER (TASKS & SCHEDULE) ─────────── */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
@@ -350,8 +377,19 @@ export default function DeveloperDashboard() {
               {/* Task Checklist */}
               <div className="mt-4 space-y-2 max-h-[380px] overflow-y-auto pr-1">
                 {filteredTasks.length === 0 ? (
-                  <div className="p-8 text-center text-xs text-text-muted">
-                    No deliverables here right now.
+                  <div className="p-8 text-center text-xs text-text-muted space-y-3">
+                    <p>{emptyStateConfig.description}</p>
+                    {emptyStateConfig.actionLabel && (
+                      <Button
+                        size="xs"
+                        variant="secondary"
+                        onClick={() => openCaptureModal('ai', promptStarter)}
+                        className="inline-flex items-center gap-1.5"
+                      >
+                        <Sparkles className="w-3.5 h-3.5 text-solar-500" />
+                        {emptyStateConfig.actionLabel}
+                      </Button>
+                    )}
                   </div>
                 ) : (
                   filteredTasks.map((task) => {
@@ -402,9 +440,7 @@ export default function DeveloperDashboard() {
                                   {task.project_title}
                                 </span>
                               )}
-                              {task.estimated_minutes && (
-                                <span>{task.estimated_minutes} min</span>
-                              )}
+                              {task.estimated_minutes && <span>{task.estimated_minutes} min</span>}
                             </div>
                           </div>
                         </div>
@@ -466,57 +502,81 @@ export default function DeveloperDashboard() {
           <div className="mt-4">
             {projects.length === 0 ? (
               <div className="p-8 text-center text-xs text-text-muted space-y-2">
-                <p>No active projects yet.</p>
+                <p>{roleConfig.emptyStates.projects.description}</p>
                 <Button
                   size="xs"
                   variant="secondary"
-                  onClick={() => openCaptureModal('ai')}
+                  onClick={() => openCaptureModal('ai', promptStarter)}
+                  className="inline-flex items-center gap-1.5"
                 >
-                  Create with AI
+                  <Sparkles className="w-3.5 h-3.5 text-solar-500" />
+                  {roleConfig.emptyStates.projects.actionLabel ?? 'Create with AI'}
                 </Button>
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {projects.map((proj) => (
-                  <Card3D
-                    key={proj.id}
-                    maxTilt={6}
-                    depth={15}
-                    variant="glass"
-                    className="p-4 sm:p-5 border border-border-base/90 hover:border-solar-500/40 transition-all flex flex-col justify-between space-y-3.5 group shadow-sm hover:shadow-card-hover"
-                  >
-                    <div className="space-y-1.5">
-                      <div className="flex items-start justify-between gap-2">
-                        <h4 className="text-xs font-bold text-text-primary group-hover:text-solar-500 transition-colors">
-                          <Link to="/app/developer/projects">{proj.title}</Link>
-                        </h4>
-                        <span className="text-xs font-mono font-bold text-solar-500 bg-amber-500/10 px-2 py-0.5 rounded-full border border-amber-500/25">
-                          {proj.progress}%
-                        </span>
-                      </div>
-                      <p className="text-2xs text-text-muted line-clamp-2">
-                        {proj.description || 'No description provided.'}
-                      </p>
-                    </div>
+                {projects.map((proj) => {
+                  const projTasks = tasks.filter(
+                    (t) =>
+                      t.project_id === proj.id ||
+                      (t.project_title &&
+                        t.project_title.trim().toLowerCase() === proj.title.trim().toLowerCase())
+                  );
+                  const completedProjTasks = projTasks.filter(
+                    (t) => t.status === 'completed'
+                  ).length;
+                  const totalProjTasks = projTasks.length;
+                  const dynamicProgress =
+                    totalProjTasks > 0
+                      ? Math.round((completedProjTasks / totalProjTasks) * 100)
+                      : proj.progress || 0;
 
-                    <div className="space-y-2.5">
-                      {/* Progress Bar */}
-                      <div className="w-full bg-bg-base h-2 rounded-full overflow-hidden border border-border-base">
-                        <div
-                          className="bg-gradient-to-r from-solar-500 to-emerald-400 h-full rounded-full transition-all duration-500"
-                          style={{ width: `${proj.progress}%` }}
-                        />
+                  return (
+                    <Card3D
+                      key={proj.id}
+                      maxTilt={6}
+                      depth={15}
+                      variant="glass"
+                      className="p-4 sm:p-5 border border-border-base/90 hover:border-solar-500/40 transition-all flex flex-col justify-between space-y-3.5 group shadow-sm hover:shadow-card-hover"
+                    >
+                      <div className="space-y-1.5">
+                        <div className="flex items-start justify-between gap-2">
+                          <h4 className="text-xs font-bold text-text-primary group-hover:text-solar-500 transition-colors">
+                            <Link to="/app/developer/projects">{proj.title}</Link>
+                          </h4>
+                          <span className="text-xs font-mono font-bold text-solar-500 bg-amber-500/10 px-2 py-0.5 rounded-full border border-amber-500/25">
+                            {dynamicProgress}%
+                          </span>
+                        </div>
+                        <p className="text-2xs text-text-muted line-clamp-2">
+                          {proj.description || 'No description provided.'}
+                        </p>
                       </div>
 
-                      <div className="flex items-center justify-between text-3xs text-text-faint pt-1.5 border-t border-border-base/50">
-                        <span>
-                          {proj.completed_milestone_count || 0}/{proj.milestone_count || 0} milestones
-                        </span>
-                        <span>{proj.task_count || 0} tasks</span>
+                      <div className="space-y-2.5">
+                        {/* Progress Bar */}
+                        <div className="w-full bg-bg-base h-2 rounded-full overflow-hidden border border-border-base">
+                          <div
+                            className="bg-gradient-to-r from-solar-500 to-emerald-400 h-full rounded-full transition-all duration-300"
+                            style={{ width: `${dynamicProgress}%` }}
+                          />
+                        </div>
+
+                        <div className="flex items-center justify-between text-3xs text-text-faint pt-1.5 border-t border-border-base/50">
+                          <span>
+                            {proj.completed_milestone_count || 0}/{proj.milestone_count || 0}{' '}
+                            milestones
+                          </span>
+                          <span>
+                            {totalProjTasks > 0
+                              ? `${completedProjTasks}/${totalProjTasks} tasks`
+                              : `${proj.task_count || 0} tasks`}
+                          </span>
+                        </div>
                       </div>
-                    </div>
-                  </Card3D>
-                ))}
+                    </Card3D>
+                  );
+                })}
               </div>
             )}
           </div>

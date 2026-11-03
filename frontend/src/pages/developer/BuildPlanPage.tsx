@@ -78,14 +78,14 @@ export default function BuildPlanPage() {
       id: 3,
       name: 'Phase 3: Backend API & Persistence',
       icon: <Database className="w-4 h-4 text-amber-400" />,
-      desc: 'FastAPI REST backend with SQLite fallback & JWT authentication',
+      desc: 'FastAPI REST backend with local database & JWT authentication',
       milestones: milestones.filter((m) => m.id === 4),
     },
     {
       id: 4,
       name: 'Phase 4: AI Assistant & Structured Proposals',
       icon: <Bot className="w-4 h-4 text-purple-400" />,
-      desc: 'Local SmolLM2-1.7B-Instruct integration with strict JSON proposal schema',
+      desc: 'Groq ultra-fast AI engine with structured JSON proposal schema',
       milestones: milestones.filter((m) => m.id >= 5),
     },
   ];
@@ -107,7 +107,8 @@ export default function BuildPlanPage() {
             Build Plan &amp; Roadmap
           </h1>
           <p className="text-xs md:text-sm text-text-secondary max-w-2xl">
-            Strategic breakdown of platform features, technical deliverables, and milestone releases.
+            Strategic breakdown of platform features, technical deliverables, and milestone
+            releases.
           </p>
         </div>
 
@@ -116,7 +117,7 @@ export default function BuildPlanPage() {
           className="!bg-developer-500 hover:!bg-developer-600 shadow-glow-emerald shrink-0"
           onClick={() =>
             openAIDrawer(
-              'Analyze my build plan and generate an architectural roadmap with technical risks and milestone deliverables',
+              'Analyze my build plan and generate an architectural roadmap with technical risks and milestone deliverables'
             )
           }
           icon={<Sparkles className="w-4 h-4" />}
@@ -129,9 +130,7 @@ export default function BuildPlanPage() {
       <div className="space-y-4">
         {phases.map((phase) => {
           const isExpanded = expandedPhase === phase.id;
-          const completedCount = phase.milestones.filter(
-            (m) => m.status === 'completed',
-          ).length;
+          const completedCount = phase.milestones.filter((m) => m.status === 'completed').length;
           const totalCount = phase.milestones.length;
           const isAllDone = totalCount > 0 && completedCount === totalCount;
 
@@ -159,9 +158,7 @@ export default function BuildPlanPage() {
                         </Badge>
                       )}
                     </div>
-                    <p className="text-xs text-text-muted mt-0.5 truncate">
-                      {phase.desc}
-                    </p>
+                    <p className="text-xs text-text-muted mt-0.5 truncate">{phase.desc}</p>
                   </div>
                 </div>
 
@@ -216,17 +213,13 @@ export default function BuildPlanPage() {
                             <div className="space-y-0.5 min-w-0">
                               <h4
                                 className={`text-xs font-semibold ${
-                                  done
-                                    ? 'line-through text-text-muted'
-                                    : 'text-text-primary'
+                                  done ? 'line-through text-text-muted' : 'text-text-primary'
                                 }`}
                               >
                                 {m.title}
                               </h4>
                               {m.description && (
-                                <p className="text-[11px] text-text-muted">
-                                  {m.description}
-                                </p>
+                                <p className="text-[11px] text-text-muted">{m.description}</p>
                               )}
                             </div>
                           </div>
@@ -234,9 +227,7 @@ export default function BuildPlanPage() {
                           <div className="flex items-center gap-2 shrink-0 text-xs font-mono text-text-faint">
                             <Clock className="w-3.5 h-3.5 text-amber-400" />
                             <span>
-                              {m.target_date
-                                ? new Date(m.target_date).toLocaleDateString()
-                                : 'TBD'}
+                              {m.target_date ? new Date(m.target_date).toLocaleDateString() : 'TBD'}
                             </span>
                           </div>
                         </div>

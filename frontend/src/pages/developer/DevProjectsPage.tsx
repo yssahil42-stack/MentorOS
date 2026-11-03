@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { useWorkspace } from '../../contexts/WorkspaceContext';
 import { fetchProjects, createProject, deleteProject } from '../../services/projectService';
+import { fetchTasks } from '../../services/taskService';
 import { Card } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
 import { Badge, PriorityBadge } from '../../components/ui/Badge';
@@ -40,6 +41,11 @@ export default function DevProjectsPage() {
     queryFn: () => fetchProjects(),
   });
 
+  const { data: tasks = [] } = useQuery({
+    queryKey: ['tasks', 'developer'],
+    queryFn: () => fetchTasks(),
+  });
+
   const createMutation = useMutation({
     mutationFn: async () => {
       return createProject({
@@ -54,6 +60,7 @@ export default function DevProjectsPage() {
       setNewTitle('');
       setNewDesc('');
       queryClient.invalidateQueries({ queryKey: ['projects'] });
+      queryClient.invalidateQueries({ queryKey: ['milestones'] });
       queryClient.invalidateQueries({ queryKey: ['dashboard'] });
       showToast('Project created successfully!', 'success');
     },
@@ -65,6 +72,7 @@ export default function DevProjectsPage() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['projects'] });
+      queryClient.invalidateQueries({ queryKey: ['milestones'] });
       queryClient.invalidateQueries({ queryKey: ['dashboard'] });
       showToast('Project removed', 'info');
     },
@@ -118,7 +126,7 @@ export default function DevProjectsPage() {
             size="sm"
             onClick={() =>
               openAIDrawer(
-                'Generate a new software project specification with milestones and technical tasks',
+                'Generate a new software project specification with milestones and technical tasks'
               )
             }
             icon={<Sparkles className="w-4 h-4 text-emerald-400" />}
@@ -201,41 +209,55 @@ export default function DevProjectsPage() {
                   <h3 className="text-sm md:text-base font-bold text-text-primary group-hover:text-developer-400 transition-colors">
                     {p.title}
                   </h3>
-                  <p className="text-xs text-text-muted line-clamp-2 mt-1">
-                    {p.description}
-                  </p>
+                  <p className="text-xs text-text-muted line-clamp-2 mt-1">{p.description}</p>
                 </div>
               </div>
 
               {/* Progress & Milestones */}
-              <div className="mt-5 pt-4 border-t border-border-base space-y-3">
-                <div className="flex items-center justify-between text-xs">
-                  <span className="text-text-faint">Progress</span>
-                  <span className="font-mono font-bold text-developer-400">
-                    {p.progress}%
-                  </span>
-                </div>
+              {(() => {
+                const projTasks = tasks.filter(
+                  (t) =>
+                    t.project_id === p.id ||
+                    (t.project_title &&
+                      t.project_title.trim().toLowerCase() === p.title.trim().toLowerCase())
+                );
+                const completedCount = projTasks.filter((t) => t.status === 'completed').length;
+                const totalCount = projTasks.length;
+                const dynamicProgress =
+                  totalCount > 0
+                    ? Math.round((completedCount / totalCount) * 100)
+                    : p.progress || 0;
 
-                <div className="w-full bg-bg-base h-2 rounded-full overflow-hidden border border-border-base">
-                  <div
-                    className="bg-gradient-to-r from-developer-500 to-emerald-400 h-full rounded-full transition-all duration-500"
-                    style={{ width: `${p.progress}%` }}
-                  />
-                </div>
+                return (
+                  <div className="mt-5 pt-4 border-t border-border-base space-y-3">
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="text-text-faint">Progress</span>
+                      <span className="font-mono font-bold text-developer-400">
+                        {dynamicProgress}%
+                      </span>
+                    </div>
 
-                <div className="flex items-center justify-between text-[11px] text-text-faint pt-1">
-                  <span className="flex items-center gap-1">
-                    <Flag className="w-3 h-3 text-amber-400" />
-                    {p.completed_milestone_count || 0}/{p.milestone_count || 0} milestones
-                  </span>
-                  {p.target_date && (
-                    <span className="flex items-center gap-1">
-                      <Calendar className="w-3 h-3 text-cyan-400" />
-                      {new Date(p.target_date).toLocaleDateString()}
-                    </span>
-                  )}
-                </div>
-              </div>
+                    <div className="w-full bg-bg-base h-2 rounded-full overflow-hidden border border-border-base">
+                      <div
+                        className="bg-gradient-to-r from-developer-500 to-emerald-400 h-full rounded-full transition-all duration-300"
+                        style={{ width: `${dynamicProgress}%` }}
+                      />
+                    </div>
+
+                    <div className="flex items-center justify-between text-[11px] text-text-faint pt-1">
+                      <span className="flex items-center gap-1">
+                        <Flag className="w-3 h-3 text-amber-400" />
+                        {p.completed_milestone_count || 0}/{p.milestone_count || 0} milestones
+                      </span>
+                      <span className="text-3xs font-mono">
+                        {totalCount > 0
+                          ? `${completedCount}/${totalCount} tasks`
+                          : `${p.task_count || 0} tasks`}
+                      </span>
+                    </div>
+                  </div>
+                );
+              })()}
             </Card>
           ))
         )}
@@ -271,9 +293,7 @@ export default function DevProjectsPage() {
           </div>
 
           <div className="space-y-1">
-            <label className="text-xs font-semibold text-text-secondary block">
-              Description
-            </label>
+            <label className="text-xs font-semibold text-text-secondary block">Description</label>
             <textarea
               rows={3}
               value={newDesc}
@@ -285,9 +305,7 @@ export default function DevProjectsPage() {
 
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1">
-              <label className="text-xs font-semibold text-text-secondary block">
-                Priority
-              </label>
+              <label className="text-xs font-semibold text-text-secondary block">Priority</label>
               <select
                 value={newPriority}
                 onChange={(e) => setNewPriority(e.target.value as ProjectPriority)}
@@ -301,9 +319,7 @@ export default function DevProjectsPage() {
             </div>
 
             <div className="space-y-1">
-              <label className="text-xs font-semibold text-text-secondary block">
-                Target Date
-              </label>
+              <label className="text-xs font-semibold text-text-secondary block">Target Date</label>
               <input
                 type="date"
                 value={newTargetDate}

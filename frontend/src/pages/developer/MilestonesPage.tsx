@@ -19,6 +19,7 @@ import {
   deleteMilestone,
   fetchProjects,
 } from '../../services/projectService';
+import { fetchTasks } from '../../services/taskService';
 import { Card } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
 import { Badge } from '../../components/ui/Badge';
@@ -49,6 +50,11 @@ export default function MilestonesPage() {
     queryFn: () => fetchProjects(),
   });
 
+  const { data: tasks = [] } = useQuery({
+    queryKey: ['tasks', 'developer'],
+    queryFn: () => fetchTasks(),
+  });
+
   const createMutation = useMutation({
     mutationFn: async () => {
       return createMilestone({
@@ -64,6 +70,8 @@ export default function MilestonesPage() {
       setDescription('');
       queryClient.invalidateQueries({ queryKey: ['milestones'] });
       queryClient.invalidateQueries({ queryKey: ['projects'] });
+      queryClient.invalidateQueries({ queryKey: ['tasks'] });
+      queryClient.invalidateQueries({ queryKey: ['dashboard'] });
       showToast('Milestone created!', 'success');
     },
   });
@@ -75,6 +83,8 @@ export default function MilestonesPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['milestones'] });
       queryClient.invalidateQueries({ queryKey: ['projects'] });
+      queryClient.invalidateQueries({ queryKey: ['tasks'] });
+      queryClient.invalidateQueries({ queryKey: ['dashboard'] });
       showToast('Milestone updated', 'success');
     },
   });
@@ -86,6 +96,8 @@ export default function MilestonesPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['milestones'] });
       queryClient.invalidateQueries({ queryKey: ['projects'] });
+      queryClient.invalidateQueries({ queryKey: ['tasks'] });
+      queryClient.invalidateQueries({ queryKey: ['dashboard'] });
       showToast('Milestone deleted', 'info');
     },
   });
@@ -113,9 +125,7 @@ export default function MilestonesPage() {
             <span className="p-1.5 rounded-lg bg-amber-500/20 text-amber-400">
               <Flag className="w-5 h-5" />
             </span>
-            <span className="text-xs font-mono font-semibold text-amber-400">
-              KEY DELIVERABLES
-            </span>
+            <span className="text-xs font-mono font-semibold text-amber-400">KEY DELIVERABLES</span>
           </div>
           <h1 className="text-2xl md:text-3xl font-extrabold text-text-primary mt-1">
             Sprint Milestones
@@ -131,7 +141,7 @@ export default function MilestonesPage() {
             size="sm"
             onClick={() =>
               openAIDrawer(
-                'Generate 3 milestone targets with target delivery dates for our software architecture sprint',
+                'Generate 3 milestone targets with target delivery dates for our software architecture sprint'
               )
             }
             icon={<Sparkles className="w-4 h-4 text-emerald-400" />}
@@ -186,83 +196,118 @@ export default function MilestonesPage() {
                     isCompleted
                       ? 'border-emerald-400 bg-emerald-400'
                       : isInProgress
-                      ? 'border-amber-400 bg-amber-400 animate-pulse'
-                      : 'border-border-hover'
+                        ? 'border-amber-400 bg-amber-400 animate-pulse'
+                        : 'border-border-hover'
                   }`}
                 />
 
-                <Card className="p-4 border border-border-base hover:border-amber-500/40 transition-all flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                  <div className="flex items-start gap-3 min-w-0">
-                    <button
-                      type="button"
-                      onClick={() =>
-                        toggleMutation.mutate({
-                          id: m.id,
-                          status: isCompleted ? 'pending' : 'completed',
-                        })
-                      }
-                      className="mt-1 text-text-muted hover:text-emerald-400 transition-colors"
-                    >
-                      <CheckCircle2
-                        className={`w-5 h-5 ${
-                          isCompleted
-                            ? 'text-emerald-400 fill-emerald-400/20'
-                            : 'text-text-muted'
-                        }`}
-                      />
-                    </button>
+                {(() => {
+                  const projectMilestones = milestones.filter(
+                    (ms) => ms.project_id === m.project_id
+                  );
+                  const mIdx = projectMilestones.findIndex((ms) => ms.id === m.id);
+                  const projTasks = tasks.filter((t) => t.project_id === m.project_id);
+                  const phaseTasks = projTasks.filter((t, tIdx) => {
+                    const desc = (t.description || '').toLowerCase();
+                    const title = (t.title || '').toLowerCase();
+                    const mTitle = (m.title || '').toLowerCase();
+                    if (desc.includes(`phase ${mIdx + 1}`) || title.includes(`phase ${mIdx + 1}`))
+                      return true;
+                    if (mTitle && (desc.includes(mTitle) || title.includes(mTitle))) return true;
+                    return tIdx % Math.max(projectMilestones.length, 1) === (mIdx >= 0 ? mIdx : 0);
+                  });
+                  const phaseCompleted = phaseTasks.filter((t) => t.status === 'completed').length;
+                  const phaseProgress =
+                    phaseTasks.length > 0
+                      ? Math.round((phaseCompleted / phaseTasks.length) * 100)
+                      : isCompleted
+                        ? 100
+                        : 0;
 
-                    <div className="min-w-0 space-y-1">
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <h3
-                          className={`text-sm font-bold ${
-                            isCompleted
-                              ? 'line-through text-text-muted'
-                              : 'text-text-primary'
-                          }`}
-                        >
-                          {m.title}
-                        </h3>
-                        <Badge
-                          variant={
-                            isCompleted
-                              ? 'success'
-                              : isInProgress
-                              ? 'warning'
-                              : 'neutral'
-                          }
-                          size="sm"
-                        >
-                          {m.status.replace('_', ' ')}
-                        </Badge>
+                  return (
+                    <Card className="p-4 border border-border-base hover:border-amber-500/40 transition-all flex flex-col gap-3">
+                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                        <div className="flex items-start gap-3 min-w-0">
+                          <button
+                            type="button"
+                            onClick={() =>
+                              toggleMutation.mutate({
+                                id: m.id,
+                                status: isCompleted ? 'pending' : 'completed',
+                              })
+                            }
+                            className="mt-1 text-text-muted hover:text-emerald-400 transition-colors"
+                          >
+                            <CheckCircle2
+                              className={`w-5 h-5 ${
+                                isCompleted
+                                  ? 'text-emerald-400 fill-emerald-400/20'
+                                  : 'text-text-muted'
+                              }`}
+                            />
+                          </button>
+
+                          <div className="min-w-0 space-y-1">
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <h3
+                                className={`text-sm font-bold ${
+                                  isCompleted ? 'line-through text-text-muted' : 'text-text-primary'
+                                }`}
+                              >
+                                {m.title}
+                              </h3>
+                              <Badge
+                                variant={
+                                  isCompleted ? 'success' : isInProgress ? 'warning' : 'neutral'
+                                }
+                                size="sm"
+                              >
+                                {m.status.replace('_', ' ')}
+                              </Badge>
+                            </div>
+
+                            {m.description && (
+                              <p className="text-xs text-text-muted">{m.description}</p>
+                            )}
+                          </div>
+                        </div>
+
+                        <div className="flex items-center gap-3 shrink-0 self-end sm:self-center">
+                          {m.target_date && (
+                            <span className="flex items-center gap-1 text-xs font-mono text-text-faint">
+                              <Calendar className="w-3.5 h-3.5 text-amber-400" />
+                              {new Date(m.target_date).toLocaleDateString()}
+                            </span>
+                          )}
+
+                          <button
+                            type="button"
+                            onClick={() => deleteMutation.mutate(m.id)}
+                            className="p-1.5 text-text-faint hover:text-danger rounded-lg transition-colors opacity-0 group-hover:opacity-100"
+                            title="Delete milestone"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
                       </div>
 
-                      {m.description && (
-                        <p className="text-xs text-text-muted">
-                          {m.description}
-                        </p>
+                      {/* Milestone Subtask Progress Bar */}
+                      {phaseTasks.length > 0 && (
+                        <div className="pt-2 border-t border-border-subtle flex items-center justify-between gap-3 text-3xs text-text-muted font-mono">
+                          <div className="flex-1 bg-bg-base h-1.5 rounded-full overflow-hidden border border-border-subtle">
+                            <div
+                              className="bg-gradient-to-r from-amber-500 to-emerald-400 h-full rounded-full transition-all duration-300"
+                              style={{ width: `${phaseProgress}%` }}
+                            />
+                          </div>
+                          <span className="shrink-0 font-semibold text-amber-400">
+                            {phaseCompleted}/{phaseTasks.length} tasks ({phaseProgress}%)
+                          </span>
+                        </div>
                       )}
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-3 shrink-0 self-end sm:self-center">
-                    {m.target_date && (
-                      <span className="flex items-center gap-1 text-xs font-mono text-text-faint">
-                        <Calendar className="w-3.5 h-3.5 text-amber-400" />
-                        {new Date(m.target_date).toLocaleDateString()}
-                      </span>
-                    )}
-
-                    <button
-                      type="button"
-                      onClick={() => deleteMutation.mutate(m.id)}
-                      className="p-1.5 text-text-faint hover:text-danger rounded-lg transition-colors opacity-0 group-hover:opacity-100"
-                      title="Delete milestone"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  </div>
-                </Card>
+                    </Card>
+                  );
+                })()}
               </div>
             );
           })
@@ -316,9 +361,7 @@ export default function MilestonesPage() {
           </div>
 
           <div className="space-y-1">
-            <label className="text-xs font-semibold text-text-secondary block">
-              Description
-            </label>
+            <label className="text-xs font-semibold text-text-secondary block">Description</label>
             <textarea
               rows={3}
               value={description}
@@ -341,12 +384,7 @@ export default function MilestonesPage() {
           </div>
 
           <div className="pt-4 flex items-center justify-end gap-2 border-t border-border-base">
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              onClick={() => setIsModalOpen(false)}
-            >
+            <Button type="button" variant="ghost" size="sm" onClick={() => setIsModalOpen(false)}>
               Cancel
             </Button>
             <Button

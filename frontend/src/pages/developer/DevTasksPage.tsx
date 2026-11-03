@@ -66,6 +66,8 @@ export default function DevTasksPage() {
       setDescription('');
       queryClient.invalidateQueries({ queryKey: ['tasks'] });
       queryClient.invalidateQueries({ queryKey: ['dashboard'] });
+      queryClient.invalidateQueries({ queryKey: ['projects'] });
+      queryClient.invalidateQueries({ queryKey: ['milestones'] });
       showToast('Task added to sprint queue!', 'success');
     },
   });
@@ -77,6 +79,8 @@ export default function DevTasksPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tasks'] });
       queryClient.invalidateQueries({ queryKey: ['dashboard'] });
+      queryClient.invalidateQueries({ queryKey: ['projects'] });
+      queryClient.invalidateQueries({ queryKey: ['milestones'] });
       showToast('Task status updated', 'success');
     },
   });
@@ -88,6 +92,8 @@ export default function DevTasksPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tasks'] });
       queryClient.invalidateQueries({ queryKey: ['dashboard'] });
+      queryClient.invalidateQueries({ queryKey: ['projects'] });
+      queryClient.invalidateQueries({ queryKey: ['milestones'] });
       showToast('Task removed', 'info');
     },
   });
@@ -137,7 +143,7 @@ export default function DevTasksPage() {
             size="sm"
             onClick={() =>
               openAIDrawer(
-                'Generate 5 technical developer tasks with acceptance criteria and time estimates for user authentication',
+                'Generate 5 technical developer tasks with acceptance criteria and time estimates for user authentication'
               )
             }
             icon={<Sparkles className="w-4 h-4 text-emerald-400" />}
@@ -233,9 +239,7 @@ export default function DevTasksPage() {
                   >
                     <CheckCircle2
                       className={`w-5 h-5 ${
-                        isCompleted
-                          ? 'text-developer-400 fill-developer-400/20'
-                          : 'text-text-muted'
+                        isCompleted ? 'text-developer-400 fill-developer-400/20' : 'text-text-muted'
                       }`}
                     />
                   </button>
@@ -243,18 +247,14 @@ export default function DevTasksPage() {
                   <div className="min-w-0 space-y-1">
                     <h3
                       className={`text-sm font-bold ${
-                        isCompleted
-                          ? 'line-through text-text-muted'
-                          : 'text-text-primary'
+                        isCompleted ? 'line-through text-text-muted' : 'text-text-primary'
                       }`}
                     >
                       {task.title}
                     </h3>
 
                     {task.description && (
-                      <p className="text-xs text-text-muted line-clamp-1">
-                        {task.description}
-                      </p>
+                      <p className="text-xs text-text-muted line-clamp-1">{task.description}</p>
                     )}
 
                     <div className="flex items-center gap-3 text-[11px] text-text-faint pt-0.5 flex-wrap">
@@ -317,9 +317,7 @@ export default function DevTasksPage() {
           className="space-y-4 pt-2"
         >
           <div className="space-y-1">
-            <label className="text-xs font-semibold text-text-secondary block">
-              Task Title *
-            </label>
+            <label className="text-xs font-semibold text-text-secondary block">Task Title *</label>
             <input
               type="text"
               required
@@ -350,9 +348,7 @@ export default function DevTasksPage() {
               </label>
               <select
                 value={projectId || ''}
-                onChange={(e) =>
-                  setProjectId(e.target.value ? Number(e.target.value) : undefined)
-                }
+                onChange={(e) => setProjectId(e.target.value ? Number(e.target.value) : undefined)}
                 className="w-full bg-bg-base border border-border-base rounded-xl px-3 py-2 text-xs text-text-primary focus:outline-none"
               >
                 <option value="">No Project</option>
@@ -365,9 +361,7 @@ export default function DevTasksPage() {
             </div>
 
             <div className="space-y-1">
-              <label className="text-xs font-semibold text-text-secondary block">
-                Priority
-              </label>
+              <label className="text-xs font-semibold text-text-secondary block">Priority</label>
               <select
                 value={priority}
                 onChange={(e) => setPriority(e.target.value as TaskPriority)}
@@ -383,9 +377,7 @@ export default function DevTasksPage() {
 
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1">
-              <label className="text-xs font-semibold text-text-secondary block">
-                Due Date
-              </label>
+              <label className="text-xs font-semibold text-text-secondary block">Due Date</label>
               <input
                 type="date"
                 value={dueDate}
@@ -410,12 +402,7 @@ export default function DevTasksPage() {
           </div>
 
           <div className="pt-4 flex items-center justify-end gap-2 border-t border-border-base">
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              onClick={() => setIsModalOpen(false)}
-            >
+            <Button type="button" variant="ghost" size="sm" onClick={() => setIsModalOpen(false)}>
               Cancel
             </Button>
             <Button

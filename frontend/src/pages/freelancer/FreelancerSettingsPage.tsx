@@ -56,9 +56,7 @@ export default function FreelancerSettingsPage() {
           <div className="flex items-center gap-2.5 pb-2 border-b border-border-base">
             <Palette className="w-5 h-5 text-freelancer-500" />
             <div>
-              <h3 className="text-sm font-bold text-text-primary">
-                Appearance &amp; Theme Mode
-              </h3>
+              <h3 className="text-sm font-bold text-text-primary">Appearance &amp; Theme Mode</h3>
               <p className="text-xs text-text-muted">
                 Choose between dark obsidian neon or clean modern studio light mode
               </p>
@@ -74,7 +72,7 @@ export default function FreelancerSettingsPage() {
                 'flex items-center gap-3 p-4 rounded-xl border text-left transition-all',
                 theme === 'dark'
                   ? 'border-freelancer-500 bg-freelancer-500/10 shadow-sm ring-1 ring-freelancer-500'
-                  : 'border-border-base bg-bg-surface hover:border-border-hover hover:bg-bg-elevated',
+                  : 'border-border-base bg-bg-surface hover:border-border-hover hover:bg-bg-elevated'
               )}
             >
               <div className="w-10 h-10 rounded-xl bg-slate-900 border border-slate-700 flex items-center justify-center text-indigo-400 shadow-sm">
@@ -85,7 +83,9 @@ export default function FreelancerSettingsPage() {
                   <span className="text-xs font-bold text-text-primary">Dark Mode</span>
                   {theme === 'dark' && <CheckCircle2 className="w-4 h-4 text-freelancer-500" />}
                 </div>
-                <p className="text-2xs text-text-muted mt-0.5">Obsidian glass &amp; radiant role accents</p>
+                <p className="text-2xs text-text-muted mt-0.5">
+                  Obsidian glass &amp; radiant role accents
+                </p>
               </div>
             </button>
 
@@ -97,7 +97,7 @@ export default function FreelancerSettingsPage() {
                 'flex items-center gap-3 p-4 rounded-xl border text-left transition-all',
                 theme === 'light'
                   ? 'border-freelancer-500 bg-freelancer-500/10 shadow-sm ring-1 ring-freelancer-500'
-                  : 'border-border-base bg-bg-surface hover:border-border-hover hover:bg-bg-elevated',
+                  : 'border-border-base bg-bg-surface hover:border-border-hover hover:bg-bg-elevated'
               )}
             >
               <div className="w-10 h-10 rounded-xl bg-slate-100 border border-slate-300 flex items-center justify-center text-amber-500 shadow-sm">
@@ -108,7 +108,9 @@ export default function FreelancerSettingsPage() {
                   <span className="text-xs font-bold text-text-primary">Light Mode</span>
                   {theme === 'light' && <CheckCircle2 className="w-4 h-4 text-freelancer-500" />}
                 </div>
-                <p className="text-2xs text-text-muted mt-0.5">Pristine studio slate &amp; clean contrast</p>
+                <p className="text-2xs text-text-muted mt-0.5">
+                  Pristine studio slate &amp; clean contrast
+                </p>
               </div>
             </button>
           </div>
@@ -119,9 +121,7 @@ export default function FreelancerSettingsPage() {
           <div className="flex items-center gap-2.5 pb-2 border-b border-border-base">
             <DollarSign className="w-5 h-5 text-freelancer-500" />
             <div>
-              <h3 className="text-sm font-bold text-text-primary">
-                Billing &amp; Target Rates
-              </h3>
+              <h3 className="text-sm font-bold text-text-primary">Billing &amp; Target Rates</h3>
               <p className="text-xs text-text-muted">
                 Used for time scoping estimates and project revenue forecasts
               </p>
@@ -164,9 +164,7 @@ export default function FreelancerSettingsPage() {
           <div className="flex items-center gap-2.5 pb-2 border-b border-border-base">
             <Bell className="w-5 h-5 text-amber-500" />
             <div>
-              <h3 className="text-sm font-bold text-text-primary">
-                Client &amp; Milestone Alerts
-              </h3>
+              <h3 className="text-sm font-bold text-text-primary">Client &amp; Milestone Alerts</h3>
               <p className="text-xs text-text-muted">
                 Keep client deliveries on track and get notified of pending reviews
               </p>

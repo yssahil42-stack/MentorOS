@@ -55,7 +55,12 @@ export interface AIProposalItem {
   id: number;
   proposal_id: number;
   item_type: AIProposalItemType;
-  payload: AIProposedProject | AIProposedMilestone | AIProposedTask | AIProposedCalendarEvent | AIProposedNote;
+  payload:
+    | AIProposedProject
+    | AIProposedMilestone
+    | AIProposedTask
+    | AIProposedCalendarEvent
+    | AIProposedNote;
   // UI-only state (not from API, managed locally during review)
   selected?: boolean;
   // Overrides the user can edit before approving
@@ -85,12 +90,21 @@ export interface ApproveProposalRequest {
   item_overrides?: Record<number, Record<string, unknown>>;
 }
 
+export interface ApprovalItemResult {
+  id: number;
+  item_type: AIProposalItemType;
+  title: string;
+  status: 'success' | 'failed';
+  reason?: string;
+}
+
 export interface ApprovalResult {
   created_tasks: import('./task').Task[];
   created_projects: import('./project').Project[];
   created_milestones: import('./project').Milestone[];
   created_events: import('./calendar').CalendarEvent[];
   created_notes: Note[];
+  results?: ApprovalItemResult[];
 }
 
 export interface Note {

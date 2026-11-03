@@ -11,7 +11,9 @@ import {
   Flag,
   Code2,
   Rocket,
+  Download,
 } from 'lucide-react';
+import { downloadICSFile } from '../../utils/icsExport';
 import { useWorkspace } from '../../contexts/WorkspaceContext';
 import {
   fetchCalendarEvents,
@@ -148,12 +150,31 @@ export default function DevCalendarPage() {
             size="sm"
             onClick={() =>
               openAIDrawer(
-                'Plan 3 dedicated 2-hour deep work build blocks this week leading to our next milestone release',
+                'Plan 3 dedicated 2-hour deep work build blocks this week leading to our next milestone release'
               )
             }
             icon={<Sparkles className="w-4 h-4 text-emerald-400" />}
           >
             AI Schedule
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => {
+              if (events.length === 0) {
+                showToast('No sprint events to export', 'info');
+                return;
+              }
+              downloadICSFile(
+                events,
+                'dev-sprint-calendar.ics',
+                'MentorOS Developer Sprint Calendar'
+              );
+              showToast(`Exported ${events.length} sprint events to .ics file!`, 'success');
+            }}
+            icon={<Download className="w-4 h-4 text-purple-400" />}
+          >
+            Export (.ics)
           </Button>
           <Button
             variant="primary"
@@ -233,8 +254,7 @@ export default function DevCalendarPage() {
             {days.map((d) => {
               const dayStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
               const dayEvents = events.filter((e) => e.start_at.startsWith(dayStr));
-              const isToday =
-                new Date().toDateString() === new Date(year, month, d).toDateString();
+              const isToday = new Date().toDateString() === new Date(year, month, d).toDateString();
 
               return (
                 <div
@@ -293,9 +313,7 @@ export default function DevCalendarPage() {
                 </div>
                 <div className="min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <h3 className="text-sm font-bold text-text-primary truncate">
-                      {e.title}
-                    </h3>
+                    <h3 className="text-sm font-bold text-text-primary truncate">{e.title}</h3>
                     {getEventBadge(e.event_type)}
                   </div>
                   <p className="text-xs text-text-muted mt-0.5">
@@ -344,9 +362,7 @@ export default function DevCalendarPage() {
           className="space-y-4 pt-2"
         >
           <div className="space-y-1">
-            <label className="text-xs font-semibold text-text-secondary block">
-              Event Title *
-            </label>
+            <label className="text-xs font-semibold text-text-secondary block">Event Title *</label>
             <input
               type="text"
               required
@@ -358,9 +374,7 @@ export default function DevCalendarPage() {
           </div>
 
           <div className="space-y-1">
-            <label className="text-xs font-semibold text-text-secondary block">
-              Event Type
-            </label>
+            <label className="text-xs font-semibold text-text-secondary block">Event Type</label>
             <select
               value={eventType}
               onChange={(e) => setEventType(e.target.value as CalendarEventType)}
@@ -375,9 +389,7 @@ export default function DevCalendarPage() {
 
           <div className="grid grid-cols-3 gap-3">
             <div className="space-y-1">
-              <label className="text-xs font-semibold text-text-secondary block">
-                Date
-              </label>
+              <label className="text-xs font-semibold text-text-secondary block">Date</label>
               <input
                 type="date"
                 required
@@ -387,9 +399,7 @@ export default function DevCalendarPage() {
               />
             </div>
             <div className="space-y-1">
-              <label className="text-xs font-semibold text-text-secondary block">
-                Start Time
-              </label>
+              <label className="text-xs font-semibold text-text-secondary block">Start Time</label>
               <input
                 type="time"
                 value={startTime}
@@ -398,9 +408,7 @@ export default function DevCalendarPage() {
               />
             </div>
             <div className="space-y-1">
-              <label className="text-xs font-semibold text-text-secondary block">
-                End Time
-              </label>
+              <label className="text-xs font-semibold text-text-secondary block">End Time</label>
               <input
                 type="time"
                 value={endTime}
@@ -411,12 +419,7 @@ export default function DevCalendarPage() {
           </div>
 
           <div className="pt-4 flex items-center justify-end gap-2 border-t border-border-base">
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              onClick={() => setIsModalOpen(false)}
-            >
+            <Button type="button" variant="ghost" size="sm" onClick={() => setIsModalOpen(false)}>
               Cancel
             </Button>
             <Button

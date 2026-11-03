@@ -1,5 +1,14 @@
 import React from 'react';
-import { CheckSquare, Square, FolderGit2, Flag, CheckCircle2, Calendar, FileText, Clock } from 'lucide-react';
+import {
+  CheckSquare,
+  Square,
+  FolderGit2,
+  Flag,
+  CheckCircle2,
+  Calendar,
+  FileText,
+  Clock,
+} from 'lucide-react';
 import type { AIProposalItem, AIProposalItemType } from '../../types/aiProposal';
 import { Badge } from '../ui/Badge';
 import { cn } from '../../utils/cn';
@@ -41,15 +50,35 @@ export function ProposalReviewPanel({
   const getItemTypeBadge = (type: AIProposalItemType) => {
     switch (type) {
       case 'project':
-        return <Badge variant="success" size="sm">Roadmap Project</Badge>;
+        return (
+          <Badge variant="success" size="sm">
+            Roadmap Project
+          </Badge>
+        );
       case 'milestone':
-        return <Badge variant="warning" size="sm">Roadmap Phase</Badge>;
+        return (
+          <Badge variant="warning" size="sm">
+            Roadmap Phase
+          </Badge>
+        );
       case 'task':
-        return <Badge variant="info" size="sm">Actionable Task</Badge>;
+        return (
+          <Badge variant="info" size="sm">
+            Actionable Task
+          </Badge>
+        );
       case 'calendar_event':
-        return <Badge variant="neutral" size="sm">Scheduled Session</Badge>;
+        return (
+          <Badge variant="neutral" size="sm">
+            Scheduled Session
+          </Badge>
+        );
       case 'note':
-        return <Badge variant="neutral" size="sm">Guidance &amp; Strategy</Badge>;
+        return (
+          <Badge variant="neutral" size="sm">
+            Guidance &amp; Strategy
+          </Badge>
+        );
     }
   };
 
@@ -57,7 +86,8 @@ export function ProposalReviewPanel({
     <div className="space-y-3">
       <div className="flex items-center justify-between text-xs text-text-muted px-1">
         <span>
-          Selected <strong className="text-text-primary">{selectedIds.length}</strong> of {items.length} items
+          Selected <strong className="text-text-primary">{selectedIds.length}</strong> of{' '}
+          {items.length} items
         </span>
         <div className="flex items-center gap-2">
           <button
@@ -91,7 +121,7 @@ export function ProposalReviewPanel({
                 'group relative p-3 rounded-xl border transition-all cursor-pointer select-none',
                 isSelected
                   ? 'bg-bg-elevated/90 border-border-hover shadow-sm'
-                  : 'bg-bg-surface/40 border-border-base/50 opacity-60 hover:opacity-100 hover:bg-bg-surface/80',
+                  : 'bg-bg-surface/40 border-border-base/50 opacity-60 hover:opacity-100 hover:bg-bg-surface/80'
               )}
             >
               <div className="flex items-start gap-3">

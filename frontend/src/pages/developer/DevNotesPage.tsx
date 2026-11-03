@@ -1,15 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import {
-  FileText,
-  Plus,
-  Search,
-  Sparkles,
-  Pin,
-  Trash2,
-  BookOpen,
-  Calendar,
-} from 'lucide-react';
+import { FileText, Plus, Search, Sparkles, Pin, Trash2, BookOpen, Calendar } from 'lucide-react';
 import { useWorkspace } from '../../contexts/WorkspaceContext';
 import { fetchNotes, createNote, deleteNote, updateNote } from '../../services/noteService';
 import { Card } from '../../components/ui/Card';
@@ -75,7 +66,7 @@ export default function DevNotesPage() {
   const filtered = notes.filter(
     (n) =>
       n.title.toLowerCase().includes(search.toLowerCase()) ||
-      n.content.toLowerCase().includes(search.toLowerCase()),
+      n.content.toLowerCase().includes(search.toLowerCase())
   );
 
   const activeNote = selectedNote || filtered[0] || null;
@@ -109,7 +100,8 @@ export default function DevNotesPage() {
             Developer Notes
           </h1>
           <p className="text-xs md:text-sm text-text-muted">
-            Architecture decision records, tech specifications, code snippets, and sprint documentation.
+            Architecture decision records, tech specifications, code snippets, and sprint
+            documentation.
           </p>
         </div>
 
@@ -119,7 +111,7 @@ export default function DevNotesPage() {
             size="sm"
             onClick={() =>
               openAIDrawer(
-                'Draft an Architectural Decision Record (ADR) for caching with Redis vs in-memory LRU',
+                'Draft an Architectural Decision Record (ADR) for caching with Redis vs in-memory LRU'
               )
             }
             icon={<Sparkles className="w-4 h-4 text-emerald-400" />}
@@ -155,9 +147,7 @@ export default function DevNotesPage() {
 
           <div className="space-y-2 max-h-[600px] overflow-y-auto pr-1">
             {filtered.length === 0 ? (
-              <Card className="p-8 text-center text-xs text-text-muted">
-                No notes found.
-              </Card>
+              <Card className="p-8 text-center text-xs text-text-muted">No notes found.</Card>
             ) : (
               filtered.map((note) => {
                 const isSelected = activeNote?.id === note.id;
@@ -232,9 +222,7 @@ export default function DevNotesPage() {
               <div className="flex items-start justify-between gap-4 pb-4 border-b border-border-base">
                 <div>
                   <div className="flex items-center gap-2">
-                    <h2 className="text-lg font-bold text-text-primary">
-                      {activeNote.title}
-                    </h2>
+                    <h2 className="text-lg font-bold text-text-primary">{activeNote.title}</h2>
                     {activeNote.is_pinned && (
                       <Badge variant="warning" size="sm">
                         Pinned
@@ -301,9 +289,7 @@ export default function DevNotesPage() {
           className="space-y-4 pt-2"
         >
           <div className="space-y-1">
-            <label className="text-xs font-semibold text-text-secondary block">
-              Note Title *
-            </label>
+            <label className="text-xs font-semibold text-text-secondary block">Note Title *</label>
             <input
               type="text"
               required
@@ -342,12 +328,7 @@ export default function DevNotesPage() {
           </div>
 
           <div className="pt-4 flex items-center justify-end gap-2 border-t border-border-base">
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              onClick={() => setIsModalOpen(false)}
-            >
+            <Button type="button" variant="ghost" size="sm" onClick={() => setIsModalOpen(false)}>
               Cancel
             </Button>
             <Button

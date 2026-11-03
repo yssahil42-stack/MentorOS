@@ -7,10 +7,5 @@ export function AICaptureModal() {
 
   if (!isCaptureModalOpen) return null;
 
-  return (
-    <RoadmapWorkspace
-      isOpen={isCaptureModalOpen}
-      onClose={closeCaptureModal}
-    />
-  );
+  return <RoadmapWorkspace isOpen={isCaptureModalOpen} onClose={closeCaptureModal} />;
 }

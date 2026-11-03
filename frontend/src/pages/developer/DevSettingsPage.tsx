@@ -50,7 +50,8 @@ export default function DevSettingsPage() {
           Developer Settings
         </h1>
         <p className="text-xs md:text-sm text-text-muted">
-          Configure Appearance, Git integration, Local AI engine endpoint, sprint alerts, and environment preferences.
+          Configure Appearance, Git integration, Local AI engine endpoint, sprint alerts, and
+          environment preferences.
         </p>
       </div>
 
@@ -60,9 +61,7 @@ export default function DevSettingsPage() {
           <div className="flex items-center gap-2.5 pb-2 border-b border-border-base">
             <Palette className="w-5 h-5 text-developer-400" />
             <div>
-              <h3 className="text-sm font-bold text-text-primary">
-                Appearance &amp; Theme Mode
-              </h3>
+              <h3 className="text-sm font-bold text-text-primary">Appearance &amp; Theme Mode</h3>
               <p className="text-xs text-text-muted">
                 Choose between dark obsidian neon or clean modern studio light mode
               </p>
@@ -78,7 +77,7 @@ export default function DevSettingsPage() {
                 'flex items-center gap-3 p-4 rounded-xl border text-left transition-all',
                 theme === 'dark'
                   ? 'border-developer-500 bg-developer-500/10 shadow-sm ring-1 ring-developer-500'
-                  : 'border-border-base bg-bg-surface hover:border-border-hover hover:bg-bg-elevated',
+                  : 'border-border-base bg-bg-surface hover:border-border-hover hover:bg-bg-elevated'
               )}
             >
               <div className="w-10 h-10 rounded-xl bg-slate-900 border border-slate-700 flex items-center justify-center text-indigo-400 shadow-sm">
@@ -89,7 +88,9 @@ export default function DevSettingsPage() {
                   <span className="text-xs font-bold text-text-primary">Dark Mode</span>
                   {theme === 'dark' && <CheckCircle2 className="w-4 h-4 text-developer-400" />}
                 </div>
-                <p className="text-2xs text-text-muted mt-0.5">Obsidian glass &amp; radiant role accents</p>
+                <p className="text-2xs text-text-muted mt-0.5">
+                  Obsidian glass &amp; radiant role accents
+                </p>
               </div>
             </button>
 
@@ -101,7 +102,7 @@ export default function DevSettingsPage() {
                 'flex items-center gap-3 p-4 rounded-xl border text-left transition-all',
                 theme === 'light'
                   ? 'border-developer-500 bg-developer-500/10 shadow-sm ring-1 ring-developer-500'
-                  : 'border-border-base bg-bg-surface hover:border-border-hover hover:bg-bg-elevated',
+                  : 'border-border-base bg-bg-surface hover:border-border-hover hover:bg-bg-elevated'
               )}
             >
               <div className="w-10 h-10 rounded-xl bg-slate-100 border border-slate-300 flex items-center justify-center text-amber-500 shadow-sm">
@@ -112,7 +113,9 @@ export default function DevSettingsPage() {
                   <span className="text-xs font-bold text-text-primary">Light Mode</span>
                   {theme === 'light' && <CheckCircle2 className="w-4 h-4 text-developer-400" />}
                 </div>
-                <p className="text-2xs text-text-muted mt-0.5">Pristine studio slate &amp; clean contrast</p>
+                <p className="text-2xs text-text-muted mt-0.5">
+                  Pristine studio slate &amp; clean contrast
+                </p>
               </div>
             </button>
 
@@ -124,7 +127,7 @@ export default function DevSettingsPage() {
                 'flex items-center gap-3 p-4 rounded-xl border text-left transition-all',
                 theme === 'system'
                   ? 'border-developer-500 bg-developer-500/10 shadow-sm ring-1 ring-developer-500'
-                  : 'border-border-base bg-bg-surface hover:border-border-hover hover:bg-bg-elevated',
+                  : 'border-border-base bg-bg-surface hover:border-border-hover hover:bg-bg-elevated'
               )}
             >
               <div className="w-10 h-10 rounded-xl bg-bg-elevated border border-border-base flex items-center justify-center text-cyan-400 shadow-sm">
@@ -195,9 +198,7 @@ export default function DevSettingsPage() {
             </div>
 
             <div className="space-y-1">
-              <label className="text-xs font-semibold text-text-secondary block">
-                Model Name
-              </label>
+              <label className="text-xs font-semibold text-text-secondary block">Model Name</label>
               <select
                 value={aiModel}
                 onChange={(e) => setAiModel(e.target.value)}
@@ -205,7 +206,9 @@ export default function DevSettingsPage() {
               >
                 <option value="smollm2:1.7b">SmolLM2-1.7B-Instruct (Recommended - Fast)</option>
                 <option value="smollm2">SmolLM2:latest</option>
-                <option value="hf.co/HuggingFaceTB/SmolLM2-1.7B-Instruct-GGUF">SmolLM2-1.7B-Instruct (HF GGUF)</option>
+                <option value="hf.co/HuggingFaceTB/SmolLM2-1.7B-Instruct-GGUF">
+                  SmolLM2-1.7B-Instruct (HF GGUF)
+                </option>
                 <option value="llama3.2:1b">Llama3.2:1B</option>
               </select>
             </div>

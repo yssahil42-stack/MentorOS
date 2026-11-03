@@ -12,33 +12,6 @@ from ..auth import get_current_user
 
 router = APIRouter(prefix="/ai", tags=["ai"])
 
-async def get_ollama_model(client: httpx.AsyncClient) -> str:
-    """Detect available local Ollama models with preference for installed SmolLM2 models."""
-    try:
-        res = await client.get(f"{settings.OLLAMA_HOST}/api/tags", timeout=3.0)
-        if res.status_code == 200:
-            models_list = [m.get("name", "") for m in res.json().get("models", [])]
-            # Preference: configured model -> smollm2:1.7b -> smollm2
-            if settings.OLLAMA_MODEL in models_list:
-                return settings.OLLAMA_MODEL
-            for candidate in [
-                "smollm2:1.7b",
-                "smollm2",
-                "smollm2:latest",
-                "hf.co/HuggingFaceTB/SmolLM2-1.7B-Instruct-GGUF",
-                "HuggingFaceTB/SmolLM2-1.7B-Instruct",
-            ]:
-                if candidate in models_list:
-                    return candidate
-            for m in models_list:
-                if "smollm2" in m.lower():
-                    return m
-            if models_list:
-                return models_list[0]
-    except Exception:
-        pass
-    return settings.OLLAMA_MODEL
-
 def synthesize_smart_roadmap(prompt: str, role: str) -> Dict[str, Any]:
     """Domain-aware intelligent roadmap generator that creates detailed multi-phase mentor-grade curriculums."""
     p_lower = prompt.lower()
@@ -237,7 +210,7 @@ Store expenses in a JSON/CSV file and provide:
 - REST APIs
 - JSON
 - requests
-- SQLite
+- Databases & SQL
 - SQL basics
 - CRUD
 - Python + database
@@ -289,7 +262,7 @@ FastAPI
    ↓
 Python Business Logic
    ↓
-PostgreSQL / SQLite
+Database Layer
    ↓
 AI Model / API
 ```
@@ -375,7 +348,7 @@ If you follow this consistently, 3 months is enough to reach a solid practical P
             {
                 "project_title": proj_title,
                 "title": "Month 3: Advanced Python, FastAPI & AI Backend Capstone (Weeks 9–12)",
-                "description": "Master comprehensions, SQLite databases, FastAPI REST endpoints, and build the AI Workspace Backend.",
+                "description": "Master comprehensions, databases, FastAPI REST endpoints, and build the AI Workspace Backend.",
                 "target_date": m3_dt,
             }
         ]
@@ -455,8 +428,8 @@ If you follow this consistently, 3 months is enough to reach a solid practical P
             },
             {
                 "project_title": proj_title,
-                "title": "Week 10: Build SQLite CRUD Database Service with requests API",
-                "description": "HTTP basics, REST APIs, JSON, SQLite integration, SQL CRUD operations for Users & Tasks.",
+                "title": "Week 10: Build CRUD Database Service with requests API",
+                "description": "HTTP basics, REST APIs, JSON, database integration, SQL CRUD operations for Users & Tasks.",
                 "priority": "high",
                 "estimated_minutes": 90,
                 "due_date": (now + timedelta(days=70)).strftime("%Y-%m-%d"),
@@ -472,7 +445,7 @@ If you follow this consistently, 3 months is enough to reach a solid practical P
             {
                 "project_title": proj_title,
                 "title": "Week 12 Capstone: Build AI Productivity Workspace Backend",
-                "description": "Multi-entity backend (Users, Tasks, Projects, Notes, AI integrations) connecting SQLite/PostgreSQL.",
+                "description": "Multi-entity backend (Users, Tasks, Projects, Notes, AI integrations) connecting relational database.",
                 "priority": "urgent",
                 "estimated_minutes": 120,
                 "due_date": (now + timedelta(days=85)).strftime("%Y-%m-%d"),
@@ -857,48 +830,18 @@ PHASE 3: Advanced Architecture → Real Capstone Deliverable
 
 @router.get("/health")
 async def ai_health():
-    # 0. Check Custom OpenAI / Ngrok Remote Endpoint if configured
-    if settings.CUSTOM_OPENAI_URL:
+    if settings.GROQ_API_KEY:
         return {
             "status": "ok",
-            "model": f"Remote Endpoint ({settings.CUSTOM_OPENAI_MODEL})",
-            "provider": "custom_openai",
-            "url": settings.CUSTOM_OPENAI_URL,
-            "ollama": False,
+            "model": f"Groq LPU Engine ({settings.GROQ_MODEL})",
+            "provider": "groq",
+            "speed": "ultra-fast",
         }
-
-    # 1. If AI_PROVIDER is ollama (default), check local Ollama first
-    if settings.AI_PROVIDER == "ollama":
-        try:
-            async with httpx.AsyncClient(timeout=2.0) as client:
-                res = await client.get(f"{settings.OLLAMA_HOST}/api/version")
-                if res.status_code == 200:
-                    active_model = await get_ollama_model(client)
-                    return {"status": "ok", "model": f"Local Ollama ({active_model})", "provider": "ollama", "ollama": True}
-        except Exception:
-            pass
-
-    # 2. Check if Free Cloud GPU is configured
-    if settings.GROQ_API_KEY:
-        return {"status": "ok", "model": f"Groq Free GPU ({settings.GROQ_MODEL})", "provider": "groq", "ollama": False}
-    if settings.OPENROUTER_API_KEY:
-        return {"status": "ok", "model": f"OpenRouter Free GPU ({settings.OPENROUTER_MODEL})", "provider": "openrouter", "ollama": False}
-
-    # 3. Check local Ollama
-    try:
-        async with httpx.AsyncClient(timeout=2.0) as client:
-            res = await client.get(f"{settings.OLLAMA_HOST}/api/version")
-            if res.status_code == 200:
-                active_model = await get_ollama_model(client)
-                return {"status": "ok", "model": f"Local Ollama ({active_model})", "provider": "ollama", "ollama": True}
-    except Exception:
-        pass
-
     return {
         "status": "degraded",
-        "model": "Built-in roadmap fallback (LLM unavailable)",
+        "model": "Built-in curriculum generator (Offline)",
         "provider": "local_fallback",
-        "ollama": False,
+        "speed": "instant",
     }
 
 @router.post("/propose", response_model=schemas.AIProposalOut)
@@ -920,6 +863,39 @@ async def generate_ai_proposal(
         .first()
     )
     if existing_proposal:
+        # Check if existing proposal is missing calendar events
+        has_events = any(item.item_type == "calendar_event" for item in existing_proposal.items)
+        if not has_events and existing_proposal.status != "approved":
+            first_proj = next((i for i in existing_proposal.items if i.item_type == "project"), None)
+            proj_title = first_proj.payload.get("title", f"Roadmap: {prompt[:35]}") if first_proj else f"Roadmap: {prompt[:35]}"
+            ev_type = "study_block" if role == "student" else "build_block"
+            now_dt = datetime.utcnow()
+            ev1 = models.AIProposalItem(
+                proposal_id=existing_proposal.id,
+                item_type="calendar_event",
+                payload={
+                    "title": f"Study Session: {proj_title[:35]} Kickoff",
+                    "description": f"Scheduled study session for: {prompt[:60]}",
+                    "start_at": (now_dt + timedelta(days=1)).replace(hour=10, minute=0, second=0).isoformat(),
+                    "end_at": (now_dt + timedelta(days=1)).replace(hour=11, minute=30, second=0).isoformat(),
+                    "event_type": ev_type,
+                }
+            )
+            ev2 = models.AIProposalItem(
+                proposal_id=existing_proposal.id,
+                item_type="calendar_event",
+                payload={
+                    "title": f"Deep Work: {proj_title[:35]} Practice",
+                    "description": f"Hands-on practice exercises for: {prompt[:60]}",
+                    "start_at": (now_dt + timedelta(days=3)).replace(hour=14, minute=0, second=0).isoformat(),
+                    "end_at": (now_dt + timedelta(days=3)).replace(hour=16, minute=0, second=0).isoformat(),
+                    "event_type": ev_type,
+                }
+            )
+            db.add(ev1)
+            db.add(ev2)
+            db.commit()
+            db.refresh(existing_proposal)
         return existing_proposal
 
     structured_data = None
@@ -944,79 +920,12 @@ Make sure to include:
 Output raw JSON only. Do not include markdown code block backticks around the JSON.
 """
 
-    # Helper function for Custom Remote / Ngrok OpenAI-compatible invocation
-    async def try_custom_openai() -> Dict[str, Any] | None:
-        if not settings.CUSTOM_OPENAI_URL:
-            return None
-        url = settings.CUSTOM_OPENAI_URL.strip()
-        if not url.endswith("/chat/completions"):
-            url = url.rstrip("/") + "/v1/chat/completions" if not url.endswith("/v1") else url.rstrip("/") + "/chat/completions"
-        headers = {
-            "Content-Type": "application/json",
-            "ngrok-skip-browser-warning": "true",
-        }
-        if settings.CUSTOM_OPENAI_API_KEY:
-            headers["Authorization"] = f"Bearer {settings.CUSTOM_OPENAI_API_KEY}"
-        try:
-            async with httpx.AsyncClient(timeout=settings.AI_TIMEOUT) as client:
-                res = await client.post(
-                    url,
-                    headers=headers,
-                    json={
-                        "model": settings.CUSTOM_OPENAI_MODEL,
-                        "messages": [
-                            {"role": "system", "content": system_prompt},
-                            {"role": "user", "content": f"User Request: {prompt}"},
-                        ],
-                        "temperature": 0.2,
-                    },
-                )
-                if res.status_code == 200:
-                    content = res.json()["choices"][0]["message"]["content"].strip()
-                    if content.startswith("```"):
-                        content = re.sub(r"^```(?:json)?\s*", "", content)
-                        content = re.sub(r"\s*```$", "", content)
-                    return json.loads(content)
-        except Exception:
-            pass
-        return None
-
-    # Helper function for local Ollama invocation
-    async def try_ollama() -> Dict[str, Any] | None:
-        try:
-            async with httpx.AsyncClient(timeout=settings.AI_TIMEOUT) as client:
-                active_model = await get_ollama_model(client)
-                resp = await client.post(
-                    f"{settings.OLLAMA_HOST}/api/generate",
-                    json={
-                        "model": active_model,
-                        "prompt": f"{system_prompt}\n\nUser Request: {prompt}",
-                        "stream": False,
-                        "think": False,
-                        "format": "json",
-                        "options": {
-                            "temperature": 0.2,
-                            "num_predict": 1000,
-                        },
-                    },
-                )
-                if resp.status_code == 200:
-                    raw_text = resp.json().get("response", "").strip()
-                    if raw_text.startswith("```"):
-                        raw_text = re.sub(r"^```(?:json)?\s*", "", raw_text)
-                        raw_text = re.sub(r"\s*```$", "", raw_text)
-                    if raw_text:
-                        return json.loads(raw_text)
-        except Exception:
-            pass
-        return None
-
-    # Helper function for Groq invocation
+    # Fast Groq LPU invocation
     async def try_groq() -> Dict[str, Any] | None:
         if not settings.GROQ_API_KEY:
             return None
         try:
-            async with httpx.AsyncClient(timeout=15.0) as client:
+            async with httpx.AsyncClient(timeout=settings.AI_TIMEOUT) as client:
                 res = await client.post(
                     "https://api.groq.com/openai/v1/chat/completions",
                     headers={"Authorization": f"Bearer {settings.GROQ_API_KEY}"},
@@ -1037,45 +946,8 @@ Output raw JSON only. Do not include markdown code block backticks around the JS
             pass
         return None
 
-    # Helper function for OpenRouter invocation
-    async def try_openrouter() -> Dict[str, Any] | None:
-        if not settings.OPENROUTER_API_KEY:
-            return None
-        try:
-            async with httpx.AsyncClient(timeout=20.0) as client:
-                res = await client.post(
-                    "https://openrouter.ai/api/v1/chat/completions",
-                    headers={"Authorization": f"Bearer {settings.OPENROUTER_API_KEY}"},
-                    json={
-                        "model": settings.OPENROUTER_MODEL,
-                        "messages": [
-                            {"role": "system", "content": system_prompt},
-                            {"role": "user", "content": f"User Request: {prompt}"},
-                        ],
-                        "response_format": {"type": "json_object"},
-                        "temperature": 0.2,
-                    },
-                )
-                if res.status_code == 200:
-                    content = res.json()["choices"][0]["message"]["content"]
-                    return json.loads(content)
-        except Exception:
-            pass
-        return None
-
-    # Order of attempt based on configured endpoints
-    if settings.CUSTOM_OPENAI_URL:
-        structured_data = await try_custom_openai()
-        if not structured_data:
-            structured_data = await try_ollama() if settings.AI_PROVIDER == "ollama" else (await try_groq() or await try_openrouter())
-    elif settings.AI_PROVIDER == "ollama":
-        structured_data = await try_ollama()
-        if not structured_data:
-            structured_data = await try_groq() or await try_openrouter()
-    else:
-        structured_data = await try_groq() or await try_openrouter()
-        if not structured_data:
-            structured_data = await try_ollama()
+    # Exclusively query Groq for fastest response
+    structured_data = await try_groq()
 
     # For learning/roadmap requests, guarantee a comprehensive mentor-grade syllabus
     p_check = prompt.lower()
@@ -1133,6 +1005,39 @@ Output raw JSON only. Do not include markdown code block backticks around the JS
                 "content": f"# Guidance & Execution Roadmap for: {prompt}\n\n## Strategy & Approach\nFollow a paced schedule and focus on high-priority deliverables first.\n\n## Action Plan\n1. Review project milestones.\n2. Complete daily tasks on the task board.\n3. Verify progress at each phase check-in.",
             }
         ]
+
+    if not structured_data.get("calendar_events"):
+        ev_type = "study_block" if role == "student" else "build_block"
+        structured_data["calendar_events"] = [
+            {
+                "title": f"Study Session: {first_proj_title[:35]} Kickoff & Core Concepts",
+                "description": f"Focused learning and practical exercises for {prompt[:70]}",
+                "start_at": (now + timedelta(days=1)).replace(hour=10, minute=0, second=0).isoformat(),
+                "end_at": (now + timedelta(days=1)).replace(hour=11, minute=30, second=0).isoformat(),
+                "event_type": ev_type,
+            },
+            {
+                "title": f"Deep Work: {first_proj_title[:35]} Hands-on Practice",
+                "description": f"Implement practice tasks and review progress for {prompt[:70]}",
+                "start_at": (now + timedelta(days=3)).replace(hour=14, minute=0, second=0).isoformat(),
+                "end_at": (now + timedelta(days=3)).replace(hour=16, minute=0, second=0).isoformat(),
+                "event_type": ev_type,
+            },
+        ]
+        if structured_data.get("milestones"):
+            m0 = structured_data["milestones"][0]
+            target_str = m0.get("target_date")
+            try:
+                m_date = datetime.strptime(target_str, "%Y-%m-%d")
+            except Exception:
+                m_date = now + timedelta(days=7)
+            structured_data["calendar_events"].append({
+                "title": f"Milestone Review: {m0.get('title', 'Phase 1 Review')[:35]}",
+                "description": f"Milestone deliverable evaluation: {m0.get('description', '')[:90]}",
+                "start_at": m_date.replace(hour=16, minute=0, second=0).isoformat(),
+                "end_at": m_date.replace(hour=17, minute=30, second=0).isoformat(),
+                "event_type": "assignment_deadline" if role == "student" else "milestone_target",
+            })
 
     # Persist proposal into DB
     proposal = models.AIProposal(
@@ -1217,9 +1122,19 @@ def approve_proposal(
     if not set(req.approved_item_ids).issubset(proposal_item_ids):
         raise HTTPException(status_code=400, detail="One or more proposal items are invalid")
 
+    should_approve_all_events = any(
+        i.item_type in ("project", "milestone") and i.id in req.approved_item_ids
+        for i in proposal.items
+    )
+
     for item in proposal.items:
-        if item.id not in req.approved_item_ids or item.approved:
+        if item.approved:
             continue
+        if item.id not in req.approved_item_ids:
+            if item.item_type == "calendar_event" and should_approve_all_events:
+                pass
+            else:
+                continue
 
         payload = item.payload.copy()
         if req.item_overrides and item.id in req.item_overrides:
@@ -1283,15 +1198,24 @@ def approve_proposal(
             result["created_tasks"].append(out)
 
         elif item.item_type == "calendar_event":
+            default_ev_type = "study_block" if proposal.role == "student" else "build_block"
+            p_title = payload.get("project_title")
+            p_id = project_title_map.get(p_title) if p_title else (list(project_title_map.values())[0] if project_title_map else None)
+
+            start_at_val = payload.get("start_at") or datetime.utcnow().isoformat()
+            end_at_val = payload.get("end_at") or (datetime.utcnow() + timedelta(hours=1)).isoformat()
+            ev_type_val = payload.get("event_type") or default_ev_type
+
             ev = models.CalendarEvent(
                 user_id=current_user.id,
                 role=proposal.role,
+                project_id=p_id,
                 title=payload.get("title", "Scheduled Session"),
                 description=payload.get("description"),
-                start_at=payload.get("start_at", datetime.utcnow().isoformat()),
-                end_at=payload.get("end_at", (datetime.utcnow() + timedelta(hours=1)).isoformat()),
+                start_at=start_at_val,
+                end_at=end_at_val,
                 all_day=payload.get("all_day", False),
-                event_type=payload.get("event_type", "build_block"),
+                event_type=ev_type_val,
             )
             db.add(ev)
             db.flush()

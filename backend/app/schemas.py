@@ -76,6 +76,11 @@ class UserLogin(InputModel):
             raise ValueError("Password must be at most 72 UTF-8 bytes.")
         return password
 
+class GoogleAuthRequest(InputModel):
+    credential: str = Field(min_length=10, description="Google Identity Services ID Token")
+    role: Optional[WorkspaceRole] = "student"
+
+
 class UserOut(BaseModel):
     id: int
     email: str

@@ -46,13 +46,18 @@ export default function DevProgressPage() {
   }
 
   const completedTasks = tasks.filter((t) => t.status === 'completed');
-  const taskCompletionRate = tasks.length > 0 ? Math.round((completedTasks.length / tasks.length) * 100) : 0;
+  const taskCompletionRate =
+    tasks.length > 0 ? Math.round((completedTasks.length / tasks.length) * 100) : 0;
 
   const completedMilestones = milestones.filter((m) => m.status === 'completed');
-  const milestoneRate = milestones.length > 0 ? Math.round((completedMilestones.length / milestones.length) * 100) : 0;
+  const milestoneRate =
+    milestones.length > 0 ? Math.round((completedMilestones.length / milestones.length) * 100) : 0;
 
   const totalEstimatedMins = tasks.reduce((sum, t) => sum + (t.estimated_minutes || 0), 0);
-  const completedMins = completedTasks.reduce((sum, t) => sum + (t.actual_minutes || t.estimated_minutes || 0), 0);
+  const completedMins = completedTasks.reduce(
+    (sum, t) => sum + (t.actual_minutes || t.estimated_minutes || 0),
+    0
+  );
 
   return (
     <div className="space-y-6 max-w-6xl mx-auto animate-fade-in">
@@ -80,7 +85,7 @@ export default function DevProgressPage() {
           size="sm"
           onClick={() =>
             openAIDrawer(
-              'Analyze our sprint velocity, task completion rate, and highlight bottlenecks',
+              'Analyze our sprint velocity, task completion rate, and highlight bottlenecks'
             )
           }
           icon={<Sparkles className="w-4 h-4 text-emerald-400" />}
@@ -102,9 +107,7 @@ export default function DevProgressPage() {
               ({completedTasks.length}/{tasks.length})
             </span>
           </div>
-          <div className="mt-2 text-[11px] text-developer-400">
-            Sprint backlog on track
-          </div>
+          <div className="mt-2 text-[11px] text-developer-400">Sprint backlog on track</div>
         </Card>
 
         <Card className="p-4 border-l-4 border-l-amber-500">
@@ -136,9 +139,7 @@ export default function DevProgressPage() {
               / {(totalEstimatedMins / 60).toFixed(1)}h est
             </span>
           </div>
-          <div className="mt-2 text-[11px] text-cyan-400">
-            Sprint capacity optimized
-          </div>
+          <div className="mt-2 text-[11px] text-cyan-400">Sprint capacity optimized</div>
         </Card>
 
         <Card className="p-4 border-l-4 border-l-purple-500">
@@ -150,26 +151,20 @@ export default function DevProgressPage() {
             <span className="text-3xl font-bold text-text-primary">High</span>
             <span className="text-xs text-text-muted">velocity</span>
           </div>
-          <div className="mt-2 text-[11px] text-purple-400">
-            4 tasks shipped today
-          </div>
+          <div className="mt-2 text-[11px] text-purple-400">4 tasks shipped today</div>
         </Card>
       </div>
 
       {/* Progress Breakdown Bars */}
       <Card className="p-6 space-y-6">
-        <h3 className="text-base font-bold text-text-primary">
-          Project Completion Breakdown
-        </h3>
+        <h3 className="text-base font-bold text-text-primary">Project Completion Breakdown</h3>
 
         <div className="space-y-4">
           {projects.map((proj) => (
             <div key={proj.id} className="space-y-2">
               <div className="flex items-center justify-between text-xs">
                 <span className="font-bold text-text-primary">{proj.title}</span>
-                <span className="font-mono font-semibold text-developer-400">
-                  {proj.progress}%
-                </span>
+                <span className="font-mono font-semibold text-developer-400">{proj.progress}%</span>
               </div>
 
               <div className="w-full bg-bg-base h-2.5 rounded-full overflow-hidden border border-border-base">
