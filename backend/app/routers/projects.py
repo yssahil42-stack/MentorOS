@@ -277,3 +277,45 @@ def delete_milestone(
         recalculate_project_progress(db, project_id, current_user.id)
 
     return None
+
+
+# ─── Public Client Portal (No auth required) ──────────────────────────────────
+
+@router.get("/client-portal/{project_id}")
+def get_public_client_portal(
+    project_id: int,
+    token: Optional[str] = None,
+    db: Session = Depends(get_db),
+):
+    project = db.query(models.Project).filter(models.Project.id == project_id).first()
+    if not project:
+        raise HTTPException(status_code=404, detail="Project not found")
+
+    if token and not (token == f"public-{project_id}" or token.startswith("public-")):
+        raise HTTPException(status_code=403, detail="Invalid client portal share token")
+
+    milestones = [
+        schemas.MilestoneOut.from_orm(m)
+        for m in (project.milestones or [])
+    ]
+    tasks = [
+        schemas.TaskOut.from_orm(t)
+        for t in (project.tasks or [])
+    ]
+
+    total_tasks = len(tasks)
+    completed_tasks = sum(1 for t in tasks if t.status == "completed")
+    progress = int(round((completed_tasks / total_tasks) * 100)) if total_tasks > 0 else project.progress
+
+    project_out = schemas.ProjectOut.from_orm(project)
+    project_out.progress = progress
+    project_out.milestone_count = len(milestones)
+    project_out.completed_milestone_count = sum(1 for m in milestones if m.status == "completed")
+    project_out.task_count = total_tasks
+
+    return {
+        "project": project_out,
+        "milestones": milestones,
+        "tasks": tasks,
+    }
+

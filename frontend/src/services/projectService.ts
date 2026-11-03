@@ -1,3 +1,4 @@
+import { api } from './api';
 import { projectsApi, milestonesApi } from './apiClient';
 import type {
   Project,
@@ -54,4 +55,15 @@ export function updateMilestone(id: number, data: UpdateMilestoneRequest): Promi
 
 export function deleteMilestone(id: number): Promise<void> {
   return milestonesApi.delete(id);
+}
+
+export function fetchPublicClientPortal(
+  projectId: number,
+  token?: string,
+  signal?: AbortSignal
+): Promise<{ project: Project; milestones: Milestone[]; tasks: any[] }> {
+  return api.get(`/client-portal/${projectId}`, {
+    params: token ? { token } : undefined,
+    signal,
+  });
 }

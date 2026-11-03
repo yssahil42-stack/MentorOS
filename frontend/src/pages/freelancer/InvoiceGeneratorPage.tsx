@@ -192,19 +192,47 @@ export default function InvoiceGeneratorPage() {
   const handleDownloadPdf = useCallback(async () => {
     if (!preview) return;
     try {
-      const blob = await downloadInvoicePdf(preview.invoice.project_id); // Would need invoice ID
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `invoice-${preview.invoice.invoice_number || 'draft'}.pdf`;
-      a.click();
-      window.URL.revokeObjectURL(url);
-      showToast('PDF downloaded', 'success');
+      let invoiceId = (preview.invoice as any).id;
+      if (!invoiceId && selectedProjectId) {
+        const invoiceData: CreateInvoiceRequest = {
+          project_id: selectedProjectId,
+          issue_date: invoiceForm.issue_date,
+          due_date: invoiceForm.due_date,
+          payment_terms: invoiceForm.payment_terms,
+          tax_rate: invoiceForm.tax_rate,
+          currency: invoiceForm.currency,
+          notes: invoiceForm.notes,
+          client_name: invoiceForm.client_name,
+          client_email: invoiceForm.client_email,
+          client_address: invoiceForm.client_address,
+          line_items: editingLineItems.map((item) => ({
+            description: item.description,
+            quantity: item.quantity,
+            unit_price: item.unit_price,
+            source_type: item.source_type,
+            source_id: item.source_id,
+          })),
+        };
+        const created = await createInvoice(invoiceData);
+        invoiceId = created.id;
+        queryClient.invalidateQueries({ queryKey: ['invoices'] });
+      }
+
+      if (invoiceId) {
+        const blob = await downloadInvoicePdf(invoiceId);
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `invoice-${preview.invoice.invoice_number || 'draft'}.pdf`;
+        a.click();
+        window.URL.revokeObjectURL(url);
+        showToast('PDF downloaded', 'success');
+      }
     } catch (error) {
       console.error('Failed to download PDF:', error);
       showToast('Failed to download PDF', 'error');
     }
-  }, [preview, showToast]);
+  }, [preview, selectedProjectId, invoiceForm, editingLineItems, showToast, queryClient]);
 
   const handleSendInvoice = useCallback(
     async (invoiceId: number) => {

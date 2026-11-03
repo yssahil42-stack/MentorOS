@@ -19,8 +19,11 @@ import { Card3D } from '../../components/ui/Card3D';
 import { Button } from '../../components/ui/Button';
 import { Badge } from '../../components/ui/Badge';
 import { LoadingSkeleton } from '../../components/ui/LoadingSkeleton';
-import { fetchProjects } from '../../services/projectService';
-import { fetchMilestones } from '../../services/projectService';
+import {
+  fetchProjects,
+  fetchMilestones,
+  fetchPublicClientPortal,
+} from '../../services/projectService';
 import { fetchTasks } from '../../services/taskService';
 import { formatDate, formatMinutes } from '../../utils/dateUtils';
 import { cn } from '../../utils/cn';
@@ -33,31 +36,45 @@ export default function ClientPortalPage({ projectId: propProjectId }: ClientPor
   const params = useParams();
   const [searchParams] = useSearchParams();
   const projectId = propProjectId || params.projectId || searchParams.get('project');
-  const [isPublicView, setIsPublicView] = useState(false);
   const [copied, setCopied] = useState(false);
 
-  // In a real app, this would be a public token-based access
-  // For now, we'll use the project ID directly
-  const { data: projects = [], isLoading: projectsLoading } = useQuery({
+  const token = searchParams.get('token');
+  const isPublicView = !!token && token.startsWith('public-');
+
+  const { data: publicData, isLoading: publicLoading } = useQuery({
+    queryKey: ['public-portal', projectId, token],
+    queryFn: () => fetchPublicClientPortal(parseInt(projectId || '0', 10), token || undefined),
+    enabled: isPublicView && !!projectId,
+  });
+
+  const { data: projects = [], isLoading: authProjectsLoading } = useQuery({
     queryKey: ['projects', 'freelancer'],
     queryFn: () => fetchProjects(),
+    enabled: !isPublicView,
   });
 
-  const { data: allMilestones = [], isLoading: milestonesLoading } = useQuery({
+  const { data: allMilestones = [] } = useQuery({
     queryKey: ['milestones', 'freelancer'],
     queryFn: () => fetchMilestones(),
-    enabled: !!projectId,
+    enabled: !isPublicView && !!projectId,
   });
 
-  const { data: allTasks = [], isLoading: tasksLoading } = useQuery({
+  const { data: allTasks = [] } = useQuery({
     queryKey: ['tasks', 'freelancer'],
     queryFn: () => fetchTasks({ role: 'freelancer' }),
-    enabled: !!projectId,
+    enabled: !isPublicView && !!projectId,
   });
 
-  const project = projects.find((p) => p.id === parseInt(projectId || '0', 10));
-  const projectMilestones = allMilestones.filter((m) => m.project_id === project?.id);
-  const projectTasks = allTasks.filter((t) => t.project_id === project?.id);
+  const project = isPublicView
+    ? publicData?.project
+    : projects.find((p) => p.id === parseInt(projectId || '0', 10));
+  const projectMilestones = isPublicView
+    ? publicData?.milestones || []
+    : allMilestones.filter((m) => m.project_id === project?.id);
+  const projectTasks = isPublicView
+    ? publicData?.tasks || []
+    : allTasks.filter((t) => t.project_id === project?.id);
+  const projectsLoading = isPublicView ? publicLoading : authProjectsLoading;
 
   const completedMilestones = projectMilestones.filter((m) => m.status === 'completed');
   const inProgressMilestones = projectMilestones.filter((m) => m.status === 'in_progress');
@@ -82,14 +99,6 @@ export default function ClientPortalPage({ projectId: propProjectId }: ClientPor
       console.error('Failed to copy:', err);
     }
   };
-
-  // ─── Public View Detection ──────────────────────────────────────────────────
-  useEffect(() => {
-    const token = searchParams.get('token');
-    if (token && token.startsWith('public-')) {
-      setIsPublicView(true);
-    }
-  }, [searchParams]);
 
   if (projectsLoading || (!project && projectId)) {
     return (
