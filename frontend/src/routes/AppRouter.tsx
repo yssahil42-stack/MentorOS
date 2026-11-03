@@ -77,6 +77,7 @@ const JobCalendarPage = lazy(() => import('../pages/jobSeeker/JobCalendarPage'))
 const JobNotesPage = lazy(() => import('../pages/jobSeeker/JobNotesPage'));
 const JobProgressPage = lazy(() => import('../pages/jobSeeker/JobProgressPage'));
 const JobSettingsPage = lazy(() => import('../pages/jobSeeker/JobSettingsPage'));
+const ResumeGeneratorPage = lazy(() => import('../pages/job_seeker/ResumeGeneratorPage'));
 
 // ─── Router ──────────────────────────────────────────────────────────────────
 
@@ -217,6 +218,7 @@ export function AppRouter() {
               <Route path="notes" element={<JobNotesPage />} />
               <Route path="progress" element={<JobProgressPage />} />
               <Route path="settings" element={<JobSettingsPage />} />
+              <Route path="resume-generator" element={<ResumeGeneratorPage />} />
             </Route>
 
             {/* Quick Capture (accessible within app) */}
