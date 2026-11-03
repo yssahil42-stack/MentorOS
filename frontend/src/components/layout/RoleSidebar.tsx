@@ -29,9 +29,11 @@ import {
   Key,
   Users,
   Sparkles,
+  User,
 } from 'lucide-react';
 import { cn } from '../../utils/cn';
 import { useAuth } from '../../contexts/AuthContext';
+import { useWorkspace } from '../../contexts/WorkspaceContext';
 import { ROLE_CONFIGS } from '../../config/roles';
 import { ThemeToggle } from '../ui/ThemeToggle';
 import type { UserRole } from '../../types/user';
@@ -84,6 +86,7 @@ interface RoleSidebarProps {
 
 export function RoleSidebar({ expanded, onToggle }: RoleSidebarProps) {
   const { user, logout } = useAuth();
+  const { openProfileModal } = useWorkspace();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -216,8 +219,28 @@ export function RoleSidebar({ expanded, onToggle }: RoleSidebarProps) {
         </ul>
       </nav>
 
-      {/* ─── Bottom: Theme switch + Logout ─────────────────────── */}
+      {/* ─── Bottom: Profile + Theme switch + Logout ─────────── */}
       <div className="border-t border-border-base p-2 space-y-1.5 shrink-0 bg-bg-surface/50">
+        {/* Profile button */}
+        <button
+          onClick={openProfileModal}
+          className={cn(
+            'flex rounded-xl font-medium text-text-muted hover:text-text-primary hover:bg-bg-elevated',
+            'transition-colors duration-150 active:translate-y-[1px]',
+            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus w-full',
+            expanded
+              ? 'items-center gap-2.5 h-10 px-3 text-xs'
+              : 'flex-col items-center justify-center py-2 px-1 text-center min-h-[50px] gap-1'
+          )}
+          aria-label="View user profile"
+          title="User profile"
+        >
+          <User className="h-4 w-4 shrink-0" aria-hidden="true" />
+          <span className={expanded ? 'text-xs' : 'text-[10px] font-medium leading-tight'}>
+            Profile
+          </span>
+        </button>
+
         {/* Theme switcher toggle */}
         <div
           className={cn(

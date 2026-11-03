@@ -16,7 +16,7 @@ interface TopBarProps {
 
 export function TopBar({ onMenuClick }: TopBarProps) {
   const { user } = useAuth();
-  const { openCaptureModal } = useWorkspace();
+  const { openCaptureModal, openProfileModal } = useWorkspace();
   const location = useLocation();
 
   const activeRole = user ? getWorkspaceRole(location.pathname, user.role as UserRole) : 'student';
@@ -104,14 +104,16 @@ export function TopBar({ onMenuClick }: TopBarProps) {
           <span className="hidden sm:inline">Capture Work</span>
         </button>
 
-        {/* User Profile Avatar */}
-        <div
-          className="w-8 h-8 rounded-full bg-bg-elevated border border-border-base flex items-center justify-center text-xs font-bold text-text-primary shadow-2xs hover:border-border-hover transition-colors shrink-0 cursor-default"
-          aria-label={`Signed in as ${user?.full_name ?? 'user'}`}
-          title={user?.full_name}
+        {/* User Profile Avatar / Icon */}
+        <button
+          type="button"
+          onClick={openProfileModal}
+          className="w-8 h-8 rounded-full bg-bg-elevated border border-border-base flex items-center justify-center text-xs font-bold text-text-primary shadow-2xs hover:border-orange-500/50 hover:bg-orange-500/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus transition-all shrink-0 cursor-pointer"
+          aria-label={`Open profile window for ${user?.full_name ?? 'user'}`}
+          title={`Profile - ${user?.full_name ?? 'User'}`}
         >
           {user?.full_name?.[0]?.toUpperCase() ?? 'U'}
-        </div>
+        </button>
       </div>
     </div>
   );

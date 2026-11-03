@@ -125,6 +125,23 @@ describe('WorkspaceContext and useWorkspace', () => {
     expect(result.current.isMobileSidebarOpen).toBe(false);
   });
 
+  it('controls Profile Modal open and close states', async () => {
+    const { result } = renderHook(() => useWorkspace(), {
+      wrapper: ({ children }) => React.createElement(WorkspaceProvider, null, children),
+    });
+
+    expect(result.current.isProfileModalOpen).toBe(false);
+    await act(async () => {
+      result.current.openProfileModal();
+    });
+    expect(result.current.isProfileModalOpen).toBe(true);
+
+    await act(async () => {
+      result.current.closeProfileModal();
+    });
+    expect(result.current.isProfileModalOpen).toBe(false);
+  });
+
   it('controls Capture Modal and switches to AI tab or manual modal', async () => {
     const { result } = renderHook(() => useWorkspace(), {
       wrapper: ({ children }) => React.createElement(WorkspaceProvider, null, children),

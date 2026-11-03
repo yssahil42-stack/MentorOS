@@ -6,6 +6,7 @@ import { Breadcrumb } from '../ui/Breadcrumb';
 import { CommandPalette } from './CommandPalette';
 import { AIDrawer } from '../ai/AIDrawer';
 import { AICaptureModal } from '../ai/AICaptureModal';
+import { ProfileModal } from '../profile/ProfileModal';
 import { Spatial3DCanvas } from '../ui/Spatial3DCanvas';
 import { useWorkspace } from '../../contexts/WorkspaceContext';
 import { useAuth } from '../../contexts/AuthContext';
@@ -35,7 +36,8 @@ export default function AppShell() {
     });
   };
 
-  const { isMobileSidebarOpen, closeMobileSidebar } = useWorkspace();
+  const { isMobileSidebarOpen, closeMobileSidebar, isProfileModalOpen, closeProfileModal } =
+    useWorkspace();
   const { user } = useAuth();
   const location = useLocation();
 
@@ -106,6 +108,9 @@ export default function AppShell() {
 
       {/* Global AI Capture Work Modal (Manual + AI Assistant) */}
       <AICaptureModal />
+
+      {/* Global User Profile Window */}
+      <ProfileModal isOpen={isProfileModalOpen} onClose={closeProfileModal} />
 
       {/* Global Command Palette (Ctrl+K) */}
       <CommandPalette />

@@ -53,6 +53,11 @@ interface WorkspaceContextValue {
   openCaptureModal: (tab?: 'manual' | 'ai', promptStarter?: string) => void;
   closeCaptureModal: () => void;
 
+  // Profile Modal
+  isProfileModalOpen: boolean;
+  openProfileModal: () => void;
+  closeProfileModal: () => void;
+
   // AI status
   aiOnline: boolean;
   setAiOnline: (online: boolean) => void;
@@ -72,6 +77,7 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const [isCaptureModalOpen, setIsCaptureModalOpen] = useState(false);
   const [captureDefaultTab, setCaptureDefaultTab] = useState<'manual' | 'ai'>('ai');
+  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [aiOnline, setAiOnline] = useState(true);
   const [aiStatus, setAiStatus] = useState<'online' | 'slow' | 'offline'>('online');
   const [aiLatency, setAiLatency] = useState<number | null>(null);
@@ -124,6 +130,7 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
         setIsAIDrawerOpen(false);
         setIsMobileSidebarOpen(false);
         setIsCaptureModalOpen(false);
+        setIsProfileModalOpen(false);
       }
     };
     window.addEventListener('keydown', handler);
@@ -196,6 +203,10 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
     setIsCaptureModalOpen(false);
   }, []);
 
+  // ─── Profile Modal ──────────────────────────────────────────
+  const openProfileModal = useCallback(() => setIsProfileModalOpen(true), []);
+  const closeProfileModal = useCallback(() => setIsProfileModalOpen(false), []);
+
   // ─── Command Palette ─────────────────────────────────────────
   const openCommandPalette = useCallback(() => setIsCommandPaletteOpen(true), []);
   const closeCommandPalette = useCallback(() => setIsCommandPaletteOpen(false), []);
@@ -218,6 +229,9 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
         captureDefaultTab,
         openCaptureModal,
         closeCaptureModal,
+        isProfileModalOpen,
+        openProfileModal,
+        closeProfileModal,
         isCommandPaletteOpen,
         openCommandPalette,
         closeCommandPalette,

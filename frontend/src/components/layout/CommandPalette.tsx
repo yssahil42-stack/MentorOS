@@ -15,6 +15,7 @@ import {
   Sun,
   Moon,
   Laptop,
+  User,
 } from 'lucide-react';
 import { useWorkspace } from '../../contexts/WorkspaceContext';
 import { useAuth } from '../../contexts/AuthContext';
@@ -33,7 +34,8 @@ interface CommandItem {
 }
 
 export function CommandPalette() {
-  const { isCommandPaletteOpen, closeCommandPalette, openAIDrawer } = useWorkspace();
+  const { isCommandPaletteOpen, closeCommandPalette, openAIDrawer, openProfileModal } =
+    useWorkspace();
   const { user } = useAuth();
   const { resolvedTheme, setTheme, toggleTheme } = useTheme();
   const navigate = useNavigate();
@@ -124,6 +126,17 @@ export function CommandPalette() {
       action: () => {
         closeCommandPalette();
         navigate(`/app/${role}/notes`);
+      },
+    },
+    {
+      id: 'act-profile',
+      category: 'Actions',
+      title: 'Open User Profile',
+      subtitle: 'View account details, session status, and workspace context',
+      icon: <User className="w-4 h-4 text-orange-500" />,
+      action: () => {
+        closeCommandPalette();
+        openProfileModal();
       },
     },
 
