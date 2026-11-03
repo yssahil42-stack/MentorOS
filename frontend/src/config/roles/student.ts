@@ -15,7 +15,11 @@ export const studentConfig: RoleConfig = {
   navigation: [
     { to: '/app/student/dashboard', label: 'Dashboard', icon: 'LayoutDashboard' },
     { to: '/app/student/projects', label: 'My Courses', icon: 'BookOpen' },
+    { to: '/app/student/tasks', label: 'Assignments', icon: 'ClipboardList' },
+    { to: '/app/student/study-plan', label: 'Study Plan', icon: 'Sparkles', badge: 'AI' },
     { to: '/app/student/calendar', label: 'Timetable', icon: 'Calendar' },
+    { to: '/app/student/notes', label: 'Notes', icon: 'FileText' },
+    { to: '/app/student/progress', label: 'Progress', icon: 'TrendingUp' },
     { to: '/app/student/settings', label: 'Settings', icon: 'Settings' },
   ],
 

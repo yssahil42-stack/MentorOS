@@ -15,7 +15,8 @@ export const jobSeekerConfig: RoleConfig = {
   navigation: [
     { to: '/app/job-seeker/dashboard', label: 'Dashboard', icon: 'LayoutDashboard' },
     { to: '/app/job-seeker/applications', label: 'Applications', icon: 'Send' },
-    { to: '/app/job-seeker/portfolio', label: 'Skill Development', icon: 'Sparkles' },
+    { to: '/app/job-seeker/search-plan', label: 'Job Strategy', icon: 'Sparkles', badge: 'AI' },
+    { to: '/app/job-seeker/portfolio', label: 'Skills & Portfolio', icon: 'Layers' },
     { to: '/app/job-seeker/interview-prep', label: 'Mock Interviews', icon: 'MessageSquare' },
     { to: '/app/job-seeker/calendar', label: 'Calendar', icon: 'Calendar' },
     { to: '/app/job-seeker/notes', label: 'Notes', icon: 'FileText' },

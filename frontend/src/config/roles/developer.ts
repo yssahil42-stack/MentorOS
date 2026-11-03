@@ -15,9 +15,10 @@ export const developerConfig: RoleConfig = {
   navigation: [
     { to: '/app/developer/dashboard', label: 'Dashboard', icon: 'LayoutDashboard' },
     { to: '/app/developer/projects', label: 'Repositories', icon: 'FolderGit2' },
+    { to: '/app/developer/build-plan', label: 'Build Plan', icon: 'Sparkles', badge: 'AI' },
+    { to: '/app/developer/tasks', label: 'Issue Tracker', icon: 'CheckSquare' },
     { to: '/app/developer/notes', label: 'Documentation', icon: 'FileText' },
     { to: '/app/developer/api-keys', label: 'API Keys', icon: 'Key' },
-    { to: '/app/developer/tasks', label: 'Issue Tracker', icon: 'CheckSquare' },
     { to: '/app/developer/calendar', label: 'Calendar', icon: 'Calendar' },
     { to: '/app/developer/settings', label: 'Settings', icon: 'Settings' },
   ],

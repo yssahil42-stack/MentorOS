@@ -14,9 +14,10 @@ export const freelancerConfig: RoleConfig = {
 
   navigation: [
     { to: '/app/freelancer/dashboard', label: 'Dashboard', icon: 'LayoutDashboard' },
-    { to: '/app/freelancer/projects', label: 'Clients', icon: 'Briefcase' },
-    { to: '/app/freelancer/deliverables', label: 'Time Tracking', icon: 'Clock' },
-    { to: '/app/freelancer/work-plans', label: 'Invoices', icon: 'Receipt' },
+    { to: '/app/freelancer/projects', label: 'Client Projects', icon: 'Briefcase' },
+    { to: '/app/freelancer/work-plans', label: 'Work Proposals', icon: 'Sparkles', badge: 'AI' },
+    { to: '/app/freelancer/deliverables', label: 'Deliverables', icon: 'Clock' },
+    { to: '/app/freelancer/tasks', label: 'Tasks', icon: 'CheckSquare' },
     { to: '/app/freelancer/calendar', label: 'Calendar', icon: 'Calendar' },
     { to: '/app/freelancer/notes', label: 'Work Notes', icon: 'FileText' },
     { to: '/app/freelancer/settings', label: 'Settings', icon: 'Settings' },

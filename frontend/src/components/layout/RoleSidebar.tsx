@@ -103,9 +103,9 @@ export function RoleSidebar({ expanded, onToggle }: RoleSidebarProps) {
       className={cn(
         'fixed left-0 top-0 bottom-0 z-30 flex flex-col',
         'bg-bg-surface border-r border-border-base',
-        'transition-all duration-400 ease-out-expo',
+        'transition-all duration-300 ease-out-expo',
         'overflow-hidden shadow-sm',
-        expanded ? 'w-60' : 'w-16'
+        expanded ? 'w-64' : 'w-[76px]'
       )}
       aria-label={`${roleConfig.label} navigation`}
     >
@@ -113,7 +113,10 @@ export function RoleSidebar({ expanded, onToggle }: RoleSidebarProps) {
       <Link
         to={getRoleDashboardRoute(activeRole)}
         id="sidebar-brand-mentoros"
-        className="h-14 flex items-center px-3 border-b border-border-base shrink-0 hover:bg-bg-elevated transition-colors group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus"
+        className={cn(
+          'border-b border-border-base shrink-0 hover:bg-bg-elevated transition-colors group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus flex items-center',
+          expanded ? 'h-16 px-4' : 'h-16 flex-col justify-center px-1 py-1.5 text-center'
+        )}
         title="MentorOS - Go to dashboard"
         aria-label="MentorOS Home"
       >
@@ -121,37 +124,51 @@ export function RoleSidebar({ expanded, onToggle }: RoleSidebarProps) {
           className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 shadow-sm transition-transform group-hover:scale-105"
           style={{ backgroundColor: `${roleColor}20`, border: `1px solid ${roleColor}40` }}
         >
-          <Layers className="h-4 w-4" style={{ color: roleColor }} aria-hidden="true" />
+          <Layers className="h-4.5 w-4.5" style={{ color: roleColor }} aria-hidden="true" />
         </div>
-        {expanded && (
+        {expanded ? (
           <div className="ml-3 overflow-hidden">
-            <span className="text-sm font-bold text-text-primary tracking-tight whitespace-nowrap">
+            <span className="text-sm font-extrabold text-text-primary tracking-tight whitespace-nowrap block">
               MentorOS
             </span>
             <span
               className="block text-2xs font-semibold tracking-wide uppercase whitespace-nowrap truncate"
               style={{ color: roleColor }}
             >
-              {roleConfig.label}
+              {roleConfig.label} Workspace
             </span>
           </div>
+        ) : (
+          <span className="text-[10px] font-bold text-text-primary tracking-tight mt-1 leading-none truncate max-w-[68px]">
+            MentorOS
+          </span>
         )}
       </Link>
 
       {/* ─── Navigation ───────────────────────────────────────── */}
-      <nav className="flex-1 overflow-y-auto overflow-x-hidden py-3 no-scrollbar">
-        <ul className="space-y-1 px-2" role="list">
+      <nav
+        className="flex-1 overflow-y-auto overflow-x-hidden py-3 no-scrollbar"
+        aria-label="Sidebar Sections"
+      >
+        {expanded && (
+          <div className="px-3 pb-1.5 pt-0.5">
+            <span className="text-[10px] font-bold text-text-muted uppercase tracking-wider">
+              Navigation
+            </span>
+          </div>
+        )}
+        <ul className={cn('space-y-1', expanded ? 'px-2' : 'px-1')} role="list">
           {roleConfig.navigation.map((item) => (
             <li key={item.to}>
               <NavLink
                 to={item.to}
                 className={({ isActive }) =>
                   cn(
-                    'flex items-center gap-2.5 h-9 rounded-xl text-xs font-medium',
-                    'transition-all duration-150 ease-smooth relative group',
-                    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus',
-                    'active:translate-y-[1px]',
-                    expanded ? 'px-2.5' : 'px-2.5 justify-center',
+                    'flex rounded-xl font-medium transition-all duration-150 ease-smooth relative group',
+                    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus active:translate-y-[1px]',
+                    expanded
+                      ? 'items-center gap-3 h-10 px-3 text-xs'
+                      : 'flex-col items-center justify-center py-2 px-1 text-center min-h-[54px] gap-1',
                     isActive
                       ? 'border font-semibold shadow-2xs'
                       : 'border-transparent text-text-muted hover:text-text-primary hover:bg-bg-elevated'
@@ -166,23 +183,33 @@ export function RoleSidebar({ expanded, onToggle }: RoleSidebarProps) {
                       }
                     : {}
                 }
-                aria-label={!expanded ? item.label : undefined}
-                title={!expanded ? item.label : undefined}
+                aria-label={item.label}
+                title={item.label}
               >
                 <NavIcon
                   name={item.icon}
                   className="shrink-0 transition-transform group-hover:scale-110"
                 />
-                {expanded && (
-                  <span className="whitespace-nowrap overflow-hidden text-ellipsis flex-1">
-                    {item.label}
-                  </span>
-                )}
-                {expanded && item.badge === 'AI' && (
-                  <span className="ml-auto text-[9px] font-extrabold px-1.5 py-0.5 rounded-md bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-2xs shrink-0">
-                    AI
-                  </span>
-                )}
+                <span
+                  className={cn(
+                    'truncate transition-all',
+                    expanded
+                      ? 'whitespace-nowrap flex-1 text-xs'
+                      : 'text-[10px] leading-tight font-medium max-w-[68px] text-center block'
+                  )}
+                >
+                  {item.label}
+                </span>
+                {item.badge === 'AI' &&
+                  (expanded ? (
+                    <span className="ml-auto text-[9px] font-extrabold px-1.5 py-0.5 rounded-md bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-2xs shrink-0">
+                      AI
+                    </span>
+                  ) : (
+                    <span className="absolute top-1 right-1 text-[8px] font-black px-1 py-0.2 rounded bg-blue-600 text-white">
+                      AI
+                    </span>
+                  ))}
               </NavLink>
             </li>
           ))}
@@ -190,39 +217,47 @@ export function RoleSidebar({ expanded, onToggle }: RoleSidebarProps) {
       </nav>
 
       {/* ─── Bottom: Theme switch + Logout ─────────────────────── */}
-      <div className="border-t border-border-base p-2 space-y-1 shrink-0">
+      <div className="border-t border-border-base p-2 space-y-1.5 shrink-0 bg-bg-surface/50">
         {/* Theme switcher toggle */}
         <div
-          className={cn('flex items-center', expanded ? 'justify-between px-1' : 'justify-center')}
+          className={cn(
+            'flex items-center w-full',
+            expanded ? 'justify-between px-1' : 'justify-center'
+          )}
         >
           {expanded && (
             <span className="text-2xs font-semibold text-text-muted uppercase tracking-wider">
               Theme
             </span>
           )}
-          <ThemeToggle
-            size="sm"
-            variant={expanded ? 'expanded' : 'icon'}
-            showLabel={expanded}
-            className="w-full justify-start"
-          />
+          {expanded ? (
+            <ThemeToggle size="sm" variant="expanded" showLabel className="w-full justify-start" />
+          ) : (
+            <div className="flex flex-col items-center justify-center py-1">
+              <ThemeToggle size="sm" variant="icon" />
+              <span className="text-[10px] text-text-muted font-medium mt-1">Theme</span>
+            </div>
+          )}
         </div>
 
         {/* Logout button */}
         <button
           onClick={handleLogout}
           className={cn(
-            'flex items-center gap-2.5 h-9 w-full rounded-xl px-2.5 text-sm font-medium',
-            'text-text-muted hover:text-danger hover:bg-danger/10',
+            'flex rounded-xl font-medium text-text-muted hover:text-danger hover:bg-danger/10',
             'transition-colors duration-150 active:translate-y-[1px]',
-            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus',
-            !expanded && 'justify-center'
+            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus w-full',
+            expanded
+              ? 'items-center gap-2.5 h-10 px-3 text-xs'
+              : 'flex-col items-center justify-center py-2 px-1 text-center min-h-[50px] gap-1'
           )}
-          aria-label={!expanded ? 'Sign out' : undefined}
-          title={!expanded ? 'Sign out' : undefined}
+          aria-label="Sign out"
+          title="Sign out"
         >
           <LogOut className="h-4 w-4 shrink-0" aria-hidden="true" />
-          {expanded && <span>Sign out</span>}
+          <span className={expanded ? 'text-xs' : 'text-[10px] font-medium leading-tight'}>
+            Sign out
+          </span>
         </button>
       </div>
 
@@ -235,9 +270,10 @@ export function RoleSidebar({ expanded, onToggle }: RoleSidebarProps) {
           'flex items-center justify-center text-text-muted hover:text-text-primary hover:bg-bg-elevated',
           'transition-all duration-200 active:translate-y-[1px]',
           'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus',
-          'shadow-sm'
+          'shadow-sm cursor-pointer'
         )}
         aria-label={expanded ? 'Collapse sidebar' : 'Expand sidebar'}
+        title={expanded ? 'Collapse sidebar' : 'Expand sidebar'}
         aria-expanded={expanded}
       >
         <ChevronRight

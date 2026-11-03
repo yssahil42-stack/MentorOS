@@ -14,7 +14,27 @@ import type { UserRole } from '../../types/user';
 import { getWorkspaceRole } from '../../utils/roleUtils';
 
 export default function AppShell() {
-  const [sidebarExpanded, setSidebarExpanded] = useState(false);
+  const [sidebarExpanded, setSidebarExpanded] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('mentoros_sidebar_expanded');
+      if (saved !== null) return saved === 'true';
+      return window.innerWidth >= 1024;
+    }
+    return true;
+  });
+
+  const handleToggleSidebar = () => {
+    setSidebarExpanded((prev) => {
+      const next = !prev;
+      try {
+        localStorage.setItem('mentoros_sidebar_expanded', String(next));
+      } catch {
+        // ignore storage errors
+      }
+      return next;
+    });
+  };
+
   const { isMobileSidebarOpen, closeMobileSidebar } = useWorkspace();
   const { user } = useAuth();
   const location = useLocation();
@@ -49,16 +69,16 @@ export default function AppShell() {
 
       {/* Sidebar Navigation */}
       <nav role="navigation" aria-label="Main Navigation">
-        <RoleSidebar expanded={sidebarExpanded} onToggle={() => setSidebarExpanded((v) => !v)} />
+        <RoleSidebar expanded={sidebarExpanded} onToggle={handleToggleSidebar} />
       </nav>
 
       {/* Main content area */}
       <div
-        className="flex-1 flex flex-col min-w-0 transition-all duration-400 ease-out-expo relative z-10"
-        style={{ marginLeft: sidebarExpanded ? '240px' : '64px' }}
+        className="flex-1 flex flex-col min-w-0 transition-all duration-300 ease-out-expo relative z-10"
+        style={{ marginLeft: sidebarExpanded ? '256px' : '76px' }}
       >
         <header role="banner">
-          <TopBar onMenuClick={() => setSidebarExpanded((v) => !v)} />
+          <TopBar onMenuClick={handleToggleSidebar} />
         </header>
 
         {/* Workspace Breadcrumb Navigation */}
