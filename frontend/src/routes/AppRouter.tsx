@@ -60,6 +60,7 @@ const DevProgressPage = lazy(() => import('../pages/developer/DevProgressPage'))
 const DevSettingsPage = lazy(() => import('../pages/developer/DevSettingsPage'));
 const GitHubSyncPage = lazy(() => import('../pages/developer/GitHubSyncPage'));
 const DeployPreviewPage = lazy(() => import('../pages/developer/DeployPreviewPage'));
+const PortfolioGeneratorPage = lazy(() => import('../pages/developer/PortfolioGeneratorPage'));
 
 // ── Public Sharing Pages ──
 const PublicTemplatePage = lazy(() => import('../pages/public/PublicTemplatePage'));
@@ -201,6 +202,8 @@ export function AppRouter() {
               <Route path="progress" element={<DevProgressPage />} />
               <Route path="settings" element={<DevSettingsPage />} />
               <Route path="github-sync" element={<GitHubSyncPage />} />
+              <Route path="deploy-preview" element={<DeployPreviewPage />} />
+              <Route path="portfolio-generator" element={<PortfolioGeneratorPage />} />
             </Route>
 
             {/* Job Seeker */}
