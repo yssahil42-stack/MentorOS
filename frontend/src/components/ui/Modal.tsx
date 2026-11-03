@@ -158,36 +158,43 @@ export function Modal({
 
 interface ConfirmDialogProps {
   isOpen: boolean;
-  onClose: () => void;
+  onClose?: () => void;
+  onCancel?: () => void;
   onConfirm: () => void;
   title: string;
   message: string;
   confirmLabel?: string;
   cancelLabel?: string;
   destructive?: boolean;
+  variant?: 'danger' | 'default';
   loading?: boolean;
 }
 
 export function ConfirmDialog({
   isOpen,
   onClose,
+  onCancel,
   onConfirm,
   title,
   message,
   confirmLabel = 'Confirm',
   cancelLabel = 'Cancel',
   destructive = false,
+  variant,
   loading = false,
 }: ConfirmDialogProps) {
+  const handleDismiss = onCancel ?? onClose ?? (() => {});
+  const isDestructive = destructive || variant === 'danger';
+
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title={title} size="sm">
+    <Modal isOpen={isOpen} onClose={handleDismiss} title={title} size="sm">
       <p className="text-sm text-text-secondary">{message}</p>
       <div className="flex items-center justify-end gap-2 mt-6">
-        <Button variant="ghost" size="sm" onClick={onClose} disabled={loading}>
+        <Button variant="ghost" size="sm" onClick={handleDismiss} disabled={loading}>
           {cancelLabel}
         </Button>
         <Button
-          variant={confirmButtonVariant(destructive)}
+          variant={confirmButtonVariant(isDestructive)}
           size="sm"
           onClick={onConfirm}
           loading={loading}
