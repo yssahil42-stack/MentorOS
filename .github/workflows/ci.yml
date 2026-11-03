@@ -13,14 +13,14 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  NODE_VERSION: '20'
+  NODE_VERSION: "20"
 
 jobs:
   # ─────────────────────────────────────────────────────────────
-  # 1. Lint
+  # 1. Lint & Format Check
   # ─────────────────────────────────────────────────────────────
   lint:
-    name: Lint
+    name: Lint & Format
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -46,6 +46,10 @@ jobs:
       - name: Run ESLint
         working-directory: frontend
         run: npm run lint
+
+      - name: Check Prettier formatting
+        working-directory: frontend
+        run: npm run format:check
 
   # ─────────────────────────────────────────────────────────────
   # 2. Typecheck
@@ -77,7 +81,7 @@ jobs:
 
       - name: Run TypeScript compiler check
         working-directory: frontend
-        run: npx tsc --noEmit
+        run: npm run typecheck
 
   # ─────────────────────────────────────────────────────────────
   # 3. Unit Tests
@@ -205,7 +209,7 @@ jobs:
         working-directory: frontend
         run: npm run test:e2e
         env:
-          CI: 'true'
+          CI: "true"
 
       - name: Upload Playwright test report
         if: always()

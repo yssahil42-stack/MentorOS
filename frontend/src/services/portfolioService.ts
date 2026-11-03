@@ -252,7 +252,7 @@ export function exportPdf(title: string, markdown: string, filename: string): vo
     )
     .replace(/^### (.*$)/gim, '<h3 class="text-xl font-semibold my-2">$1</h3>')
     .replace(
-      /^\> (.*$)/gim,
+      /^> (.*$)/gim,
       '<blockquote class="border-l-4 border-orange-500 pl-4 italic text-gray-600 my-2">$1</blockquote>'
     )
     .replace(/\*\*(.*?)\*\*/gim, '<strong>$1</strong>')
