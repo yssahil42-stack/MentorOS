@@ -38,6 +38,9 @@ export default function StudentCalendarPage() {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [viewMode, setViewMode] = useState<'month' | 'agenda'>('month');
   const [filterType, setFilterType] = useState<string>('all');
+  const [selectedDateStr, setSelectedDateStr] = useState<string>(
+    () => new Date().toISOString().split('T')[0]
+  );
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(null);
 
@@ -391,26 +394,36 @@ export default function StudentCalendarPage() {
             {days.map((item, idx) => {
               const dayEvents = filteredEvents.filter((e) => e.start_at.startsWith(item.dateStr));
               const isToday = new Date().toISOString().split('T')[0] === item.dateStr;
+              const isSelected = selectedDateStr === item.dateStr;
 
               return (
                 <div
                   key={idx}
-                  className={`bg-bg-surface p-2 flex flex-col justify-between transition-colors overflow-hidden ${
+                  onClick={() => setSelectedDateStr(item.dateStr)}
+                  className={`bg-bg-surface p-2 flex flex-col justify-between transition-all overflow-hidden cursor-pointer ${
                     !item.isCurrentMonth ? 'opacity-35 bg-bg-base/50' : 'hover:bg-bg-elevated'
-                  } ${isToday ? 'ring-1 ring-student-500' : ''}`}
+                  } ${
+                    isSelected
+                      ? 'ring-2 ring-student-500 bg-student-500/10 z-10'
+                      : isToday
+                        ? 'ring-1 ring-student-500/70'
+                        : ''
+                  }`}
                 >
                   <div className="flex items-center justify-between">
                     <span
                       className={`text-xs font-bold w-6 h-6 flex items-center justify-center rounded-full ${
-                        isToday
-                          ? 'bg-student-500 text-black shadow-glow-solar'
-                          : 'text-text-secondary'
+                        isSelected
+                          ? 'bg-student-500 text-stone-950 shadow-glow-solar'
+                          : isToday
+                            ? 'bg-student-500/80 text-white shadow-glow-solar'
+                            : 'text-text-secondary'
                       }`}
                     >
                       {item.day}
                     </span>
                     {dayEvents.length > 0 && (
-                      <span className="text-[10px] text-text-faint font-mono">
+                      <span className="text-[10px] text-text-faint font-mono font-bold">
                         {dayEvents.length} ev
                       </span>
                     )}
@@ -420,7 +433,10 @@ export default function StudentCalendarPage() {
                     {dayEvents.map((ev) => (
                       <button
                         key={ev.id}
-                        onClick={() => setSelectedEvent(ev)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSelectedEvent(ev);
+                        }}
                         className={`w-full text-left text-2xs px-1.5 py-0.5 rounded border truncate flex items-center gap-1 font-medium transition-transform hover:scale-[1.02] ${getEventBadgeClass(
                           ev.event_type
                         )}`}
@@ -437,6 +453,124 @@ export default function StudentCalendarPage() {
                 </div>
               );
             })}
+          </div>
+
+          {/* Day Agenda List Panel inside Month Calendar */}
+          <div className="mt-5 pt-4 border-t border-border-base bg-bg-surface/50 rounded-xl p-4 space-y-3">
+            <div className="flex items-center justify-between pb-2 border-b border-border-base">
+              <div className="flex items-center gap-2">
+                <span className="p-1.5 rounded-lg bg-student-500/15 text-student-400 border border-student-500/25">
+                  <CalendarIcon className="w-4 h-4" />
+                </span>
+                <div>
+                  <h3 className="text-sm font-bold text-text-primary">
+                    Day Agenda: {selectedDateStr}
+                  </h3>
+                  <p className="text-2xs text-text-muted">
+                    {filteredEvents.filter((e) => e.start_at.startsWith(selectedDateStr)).length}{' '}
+                    events scheduled
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <Button
+                  size="xs"
+                  variant="secondary"
+                  onClick={() => setSelectedDateStr(new Date().toISOString().split('T')[0])}
+                >
+                  Today
+                </Button>
+                <Button
+                  size="xs"
+                  onClick={() => {
+                    setEventDate(selectedDateStr);
+                    setIsAddModalOpen(true);
+                  }}
+                  icon={<Plus className="w-3.5 h-3.5" />}
+                >
+                  Add Event
+                </Button>
+              </div>
+            </div>
+
+            {/* List of day events */}
+            <div className="space-y-2">
+              {filteredEvents.filter((e) => e.start_at.startsWith(selectedDateStr)).length === 0 ? (
+                <div className="py-6 text-center rounded-xl border border-dashed border-border-base bg-bg-base/30">
+                  <p className="text-xs text-text-muted">
+                    No scheduled academic events for {selectedDateStr}.
+                  </p>
+                  <Button
+                    size="xs"
+                    variant="ghost"
+                    onClick={() => {
+                      setEventDate(selectedDateStr);
+                      setIsAddModalOpen(true);
+                    }}
+                    className="mt-2 text-student-400 hover:text-student-300"
+                  >
+                    + Schedule lecture, exam, or study block
+                  </Button>
+                </div>
+              ) : (
+                filteredEvents
+                  .filter((e) => e.start_at.startsWith(selectedDateStr))
+                  .map((ev) => {
+                    const start = new Date(ev.start_at);
+                    const end = new Date(ev.end_at);
+                    return (
+                      <div
+                        key={ev.id}
+                        className="p-3 rounded-xl bg-bg-surface border border-border-base hover:border-student-500/40 transition-all flex items-center justify-between gap-3 group"
+                      >
+                        <div className="min-w-0 flex-1 space-y-1">
+                          <div className="flex items-center gap-2">
+                            <span
+                              className={`text-[9px] uppercase font-mono font-bold px-1.5 py-0.5 rounded border ${getEventBadgeClass(
+                                ev.event_type
+                              )}`}
+                            >
+                              {ev.event_type.replace('_', ' ')}
+                            </span>
+                            <span className="text-xs text-text-muted font-mono flex items-center gap-1">
+                              <Clock className="w-3 h-3 text-student-400" />
+                              {start.toLocaleTimeString([], {
+                                hour: '2-digit',
+                                minute: '2-digit',
+                              })}{' '}
+                              - {end.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                            </span>
+                          </div>
+                          <h4 className="text-xs font-bold text-text-primary">{ev.title}</h4>
+                          {ev.description && (
+                            <p className="text-2xs text-text-muted">{ev.description}</p>
+                          )}
+                        </div>
+
+                        <div className="flex items-center gap-1.5">
+                          <Button
+                            size="xs"
+                            variant="ghost"
+                            onClick={() => setSelectedEvent(ev)}
+                            className="text-2xs"
+                          >
+                            Details
+                          </Button>
+                          <button
+                            type="button"
+                            onClick={() => deleteEventMutation.mutate(ev.id)}
+                            className="p-1.5 text-text-muted hover:text-red-400 rounded-lg transition-colors opacity-0 group-hover:opacity-100"
+                            title="Delete"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })
+              )}
+            </div>
           </div>
         </Card>
       ) : (

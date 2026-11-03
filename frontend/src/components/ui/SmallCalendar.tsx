@@ -34,6 +34,61 @@ interface SmallCalendarProps {
   role?: string;
 }
 
+function getEventTypeBadge(type: CalendarEventType) {
+  switch (type) {
+    case 'exam':
+    case 'release':
+    case 'delivery_deadline':
+      return {
+        bg: 'bg-red-500/15',
+        text: 'text-red-400',
+        border: 'border-red-500/30',
+        label: type.replace(/_/g, ' '),
+      };
+    case 'assignment_deadline':
+    case 'application_deadline':
+      return {
+        bg: 'bg-amber-500/15',
+        text: 'text-amber-400',
+        border: 'border-amber-500/30',
+        label: type.replace(/_/g, ' '),
+      };
+    case 'interview':
+    case 'client_review':
+    case 'meeting':
+      return {
+        bg: 'bg-emerald-500/15',
+        text: 'text-emerald-400',
+        border: 'border-emerald-500/30',
+        label: type.replace(/_/g, ' '),
+      };
+    case 'study_block':
+    case 'build_block':
+    case 'work_block':
+    case 'prep_session':
+      return {
+        bg: 'bg-blue-500/15',
+        text: 'text-blue-400',
+        border: 'border-blue-500/30',
+        label: type.replace(/_/g, ' '),
+      };
+    case 'lecture':
+      return {
+        bg: 'bg-indigo-500/15',
+        text: 'text-indigo-400',
+        border: 'border-indigo-500/30',
+        label: 'lecture',
+      };
+    default:
+      return {
+        bg: 'bg-solar-500/15',
+        text: 'text-solar-400',
+        border: 'border-solar-500/30',
+        label: type.replace(/_/g, ' '),
+      };
+  }
+}
+
 export function SmallCalendar({ role }: SmallCalendarProps) {
   const { showToast } = useWorkspace();
   const queryClient = useQueryClient();
@@ -152,26 +207,38 @@ export function SmallCalendar({ role }: SmallCalendarProps) {
     );
   });
 
+  // Selected day's events for active agenda list
+  const activeSelectedDate = selectedDay || today;
+  const selectedDayEvents = events
+    .filter((ev) => {
+      const d = new Date(ev.start_at);
+      return (
+        d.getFullYear() === activeSelectedDate.getFullYear() &&
+        d.getMonth() === activeSelectedDate.getMonth() &&
+        d.getDate() === activeSelectedDate.getDate()
+      );
+    })
+    .sort((a, b) => new Date(a.start_at).getTime() - new Date(b.start_at).getTime());
+
   return (
     <>
       {/* ─── Compact Mini Calendar Card on Dashboard ─────────────────────────── */}
       <Card3D
-        maxTilt={5}
-        depth={30}
+        maxTilt={3}
+        depth={25}
         variant="default"
-        onClick={() => setIsFullScreen(true)}
-        className="p-4 sm:p-5 border border-border-base hover:border-solar-500/40 transition-all shadow-card backdrop-blur-md cursor-pointer group select-none"
+        className="p-4 sm:p-5 border border-border-base hover:border-solar-500/40 transition-all shadow-card backdrop-blur-md select-none flex flex-col"
       >
         <div className="flex items-center justify-between pb-3 border-b border-border-base">
           <div className="flex items-center gap-2">
-            <span className="p-1.5 rounded-xl bg-gradient-to-br from-solar-500/20 to-orange-500/10 text-solar-500 border border-solar-500/25 shadow-sm group-hover:scale-105 transition-transform">
+            <span className="p-1.5 rounded-xl bg-gradient-to-br from-solar-500/20 to-orange-500/10 text-solar-500 border border-solar-500/25 shadow-sm">
               <CalendarIcon className="w-4 h-4" />
             </span>
             <div>
-              <h3 className="text-xs sm:text-sm font-bold text-text-primary group-hover:text-solar-500 transition-colors">
-                My Schedule
-              </h3>
-              <p className="text-3xs text-text-muted">Click anywhere to open full screen</p>
+              <h3 className="text-xs sm:text-sm font-bold text-text-primary">My Schedule</h3>
+              <p className="text-3xs text-text-muted">
+                {selectedDay ? 'Date selected' : 'Click a date to view agenda'}
+              </p>
             </div>
           </div>
 
@@ -197,10 +264,7 @@ export function SmallCalendar({ role }: SmallCalendarProps) {
             </button>
             <button
               type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                setIsFullScreen(true);
-              }}
+              onClick={() => setIsFullScreen(true)}
               className="ml-1 p-1.5 rounded-lg bg-solar-500/10 text-solar-500 hover:bg-solar-500/20 border border-solar-500/25 transition-all active:translate-y-[1px]"
               title="Open Full Screen"
             >
@@ -209,17 +273,8 @@ export function SmallCalendar({ role }: SmallCalendarProps) {
           </div>
         </div>
 
-        {/* Mini Grid (Clickable to open full screen) */}
-        <div
-          onClick={() => setIsFullScreen(true)}
-          className="mt-3 cursor-pointer group"
-          role="button"
-          tabIndex={0}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter' || e.key === ' ') setIsFullScreen(true);
-          }}
-          title="Click to view full calendar"
-        >
+        {/* Mini Grid (Click date to view Agenda) */}
+        <div className="mt-3">
           {/* Weekday headers */}
           <div className="grid grid-cols-7 gap-1 text-center mb-1">
             {weekdayShort.map((day) => (
@@ -243,52 +298,157 @@ export function SmallCalendar({ role }: SmallCalendarProps) {
                 day === today.getDate() &&
                 month === today.getMonth() &&
                 year === today.getFullYear();
+              const isSelected = selectedDay
+                ? day === selectedDay.getDate() &&
+                  month === selectedDay.getMonth() &&
+                  year === selectedDay.getFullYear()
+                : false;
               const hasEvents = !!eventsByDay[day];
 
               return (
-                <div
+                <button
                   key={day}
-                  className={`h-6 rounded-md flex flex-col items-center justify-center text-3xs font-medium relative transition-all duration-150 active:translate-y-[1px] ${
-                    isToday
-                      ? 'bg-gradient-to-br from-solar-400 to-solar-600 text-stone-950 font-bold shadow-glow-solar ring-2 ring-solar-400/40 translate-y-[1px]'
-                      : 'text-text-secondary hover:bg-amber-500/15 hover:text-amber-300'
+                  type="button"
+                  onClick={() => {
+                    const picked = new Date(year, month, day);
+                    setSelectedDay(isSelected ? null : picked);
+                  }}
+                  className={`h-7 rounded-lg flex flex-col items-center justify-center text-3xs font-medium relative transition-all duration-150 active:translate-y-[1px] cursor-pointer ${
+                    isSelected
+                      ? 'bg-solar-500 text-stone-950 font-bold ring-2 ring-solar-400 shadow-glow-solar scale-105 z-10'
+                      : isToday
+                        ? 'bg-gradient-to-br from-solar-400/30 to-solar-600/20 text-solar-400 font-bold border border-solar-500/40'
+                        : 'text-text-secondary hover:bg-amber-500/15 hover:text-amber-300'
                   }`}
+                  title={`${monthNames[month]} ${day}${hasEvents ? ` (${eventsByDay[day].length} events)` : ''}`}
                 >
                   <span>{day}</span>
-                  {hasEvents && !isToday && (
+                  {hasEvents && !isSelected && (
                     <span className="w-1 h-1 rounded-full bg-solar-500 absolute bottom-0.5 shadow-[0_0_6px_rgba(245,158,11,0.8)]" />
                   )}
-                </div>
+                </button>
               );
             })}
           </div>
         </div>
 
-        {/* Today's upcoming item preview */}
-        <div className="mt-3.5 pt-3 border-t border-border-base flex items-center justify-between text-2xs">
-          <div className="flex items-center gap-1.5 text-text-muted truncate max-w-[200px]">
-            <Clock className="w-3 h-3 text-solar-500 shrink-0" />
-            {todayEvents.length > 0 ? (
-              <span className="truncate text-text-primary font-medium">
-                {new Date(todayEvents[0].start_at).toLocaleTimeString([], {
-                  hour: '2-digit',
-                  minute: '2-digit',
-                })}{' '}
-                • {todayEvents[0].title}
+        {/* ─── Agenda List View Inside the Calendar Card ─── */}
+        <div className="mt-3.5 pt-3 border-t border-border-base flex-1 flex flex-col space-y-2">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-1.5">
+              <CalendarDays className="w-3.5 h-3.5 text-solar-500" />
+              <h4 className="text-xs font-bold text-text-primary">
+                {selectedDay
+                  ? `${monthNames[selectedDay.getMonth()]} ${selectedDay.getDate()} Agenda`
+                  : "Today's Agenda"}
+              </h4>
+              <span className="text-3xs font-mono font-bold px-1.5 py-0.2 rounded-full bg-solar-500/15 text-solar-500 border border-solar-500/25">
+                {selectedDayEvents.length}
               </span>
-            ) : (
-              <span>No more events scheduled today</span>
-            )}
+            </div>
+
+            <div className="flex items-center gap-1">
+              {selectedDay && (
+                <button
+                  type="button"
+                  onClick={() => setSelectedDay(null)}
+                  className="text-3xs text-text-muted hover:text-text-primary px-1.5 py-0.5 rounded transition-colors"
+                >
+                  Show Today
+                </button>
+              )}
+              <button
+                type="button"
+                onClick={() => {
+                  const target = selectedDay || today;
+                  const y = target.getFullYear();
+                  const m = String(target.getMonth() + 1).padStart(2, '0');
+                  const d = String(target.getDate()).padStart(2, '0');
+                  setEventDateStr(`${y}-${m}-${d}`);
+                  setIsAddOpen(true);
+                }}
+                className="text-3xs font-bold text-solar-500 hover:text-solar-400 bg-solar-500/10 hover:bg-solar-500/20 px-2 py-0.5 rounded-lg border border-solar-500/25 flex items-center gap-1 transition-all"
+                title="Add Event"
+              >
+                <Plus className="w-2.5 h-2.5" />
+                <span>Add</span>
+              </button>
+            </div>
           </div>
 
-          <button
-            type="button"
-            onClick={() => setIsFullScreen(true)}
-            className="text-solar-500 hover:text-solar-400 font-bold text-3xs flex items-center gap-1 shrink-0 ml-2 hover:underline"
-          >
-            <span>Full Screen</span>
-            <Maximize2 className="w-2.5 h-2.5" />
-          </button>
+          {/* Agenda List Items Container */}
+          <div className="space-y-1.5 max-h-44 overflow-y-auto pr-0.5 no-scrollbar flex-1">
+            {selectedDayEvents.length === 0 ? (
+              <div className="py-3 px-2 rounded-xl bg-bg-surface/60 border border-dashed border-border-base text-center">
+                <p className="text-2xs text-text-muted">
+                  {selectedDay
+                    ? `No events scheduled for ${monthNames[selectedDay.getMonth()]} ${selectedDay.getDate()}.`
+                    : 'No events scheduled for today.'}
+                </p>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const target = selectedDay || today;
+                    const y = target.getFullYear();
+                    const m = String(target.getMonth() + 1).padStart(2, '0');
+                    const d = String(target.getDate()).padStart(2, '0');
+                    setEventDateStr(`${y}-${m}-${d}`);
+                    setIsAddOpen(true);
+                  }}
+                  className="mt-1 text-3xs font-semibold text-solar-500 hover:underline block mx-auto"
+                >
+                  + Add an event for this date
+                </button>
+              </div>
+            ) : (
+              selectedDayEvents.map((ev) => {
+                const badge = getEventTypeBadge(ev.event_type);
+                const start = new Date(ev.start_at);
+                const end = new Date(ev.end_at);
+                return (
+                  <div
+                    key={ev.id}
+                    onClick={() => setActiveEventDetail(ev)}
+                    className="p-2 rounded-xl bg-bg-surface hover:bg-bg-elevated border border-border-base hover:border-solar-500/35 transition-all cursor-pointer flex items-center justify-between gap-2 group"
+                  >
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-1.5">
+                        <span
+                          className={`text-[9px] uppercase font-mono font-bold px-1.5 py-0.2 rounded ${badge.bg} ${badge.text} border ${badge.border}`}
+                        >
+                          {badge.label}
+                        </span>
+                        <span className="text-[10px] text-text-muted font-mono flex items-center gap-0.5">
+                          <Clock className="w-2.5 h-2.5" />
+                          {start.toLocaleTimeString([], {
+                            hour: '2-digit',
+                            minute: '2-digit',
+                          })}{' '}
+                          - {end.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        </span>
+                      </div>
+                      <h5 className="text-xs font-semibold text-text-primary truncate group-hover:text-solar-500 transition-colors mt-0.5">
+                        {ev.title}
+                      </h5>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          deleteMutation.mutate(ev.id);
+                        }}
+                        className="p-1 text-text-muted hover:text-red-400 rounded-md transition-colors opacity-0 group-hover:opacity-100"
+                        title="Delete event"
+                      >
+                        <Trash2 className="w-3 h-3" />
+                      </button>
+                    </div>
+                  </div>
+                );
+              })
+            )}
+          </div>
         </div>
       </Card3D>
 
@@ -434,90 +594,215 @@ export function SmallCalendar({ role }: SmallCalendarProps) {
           {/* Full Screen Content Body */}
           <div className="flex-1 min-h-0 overflow-y-auto">
             {viewMode === 'month' ? (
-              <div className="h-full flex flex-col border border-border-base rounded-2xl overflow-x-auto bg-bg-surface">
-                <div className="min-w-[560px] sm:min-w-0 flex-1 flex flex-col">
-                  {/* 7 Weekday Headers */}
-                  <div className="grid grid-cols-7 border-b border-border-base bg-bg-elevated text-center py-2.5">
-                    {[
-                      'Sunday',
-                      'Monday',
-                      'Tuesday',
-                      'Wednesday',
-                      'Thursday',
-                      'Friday',
-                      'Saturday',
-                    ].map((d) => (
-                      <span
-                        key={d}
-                        className="text-xs font-bold text-text-secondary uppercase tracking-wider"
-                      >
-                        {d.slice(0, 3)}
-                      </span>
-                    ))}
+              <div className="h-full flex flex-col lg:flex-row gap-4">
+                {/* Left: Full Month Grid */}
+                <div className="h-full flex-1 flex flex-col border border-border-base rounded-2xl overflow-x-auto bg-bg-surface">
+                  <div className="min-w-[560px] sm:min-w-0 flex-1 flex flex-col">
+                    {/* 7 Weekday Headers */}
+                    <div className="grid grid-cols-7 border-b border-border-base bg-bg-elevated text-center py-2.5">
+                      {[
+                        'Sunday',
+                        'Monday',
+                        'Tuesday',
+                        'Wednesday',
+                        'Thursday',
+                        'Friday',
+                        'Saturday',
+                      ].map((d) => (
+                        <span
+                          key={d}
+                          className="text-xs font-bold text-text-secondary uppercase tracking-wider"
+                        >
+                          {d.slice(0, 3)}
+                        </span>
+                      ))}
+                    </div>
+
+                    {/* Month Grid Cells */}
+                    <div className="grid grid-cols-7 flex-1 auto-rows-fr divide-x divide-y divide-border-base">
+                      {/* Empty Offset Days */}
+                      {Array.from({ length: firstDayIndex }).map((_, idx) => (
+                        <div key={`fs-empty-${idx}`} className="bg-bg-base/30 p-2 min-h-[90px]" />
+                      ))}
+
+                      {/* Day Cells */}
+                      {Array.from({ length: daysInMonth }).map((_, idx) => {
+                        const day = idx + 1;
+                        const isToday =
+                          day === today.getDate() &&
+                          month === today.getMonth() &&
+                          year === today.getFullYear();
+                        const isSelected = selectedDay
+                          ? day === selectedDay.getDate() &&
+                            month === selectedDay.getMonth() &&
+                            year === selectedDay.getFullYear()
+                          : false;
+                        const dayEvents = eventsByDay[day] || [];
+
+                        return (
+                          <div
+                            key={`fs-day-${day}`}
+                            onClick={() => setSelectedDay(new Date(year, month, day))}
+                            className={`p-2 min-h-[90px] flex flex-col justify-between transition-colors cursor-pointer ${
+                              isSelected
+                                ? 'bg-solar-500/15 ring-2 ring-solar-500 z-10'
+                                : isToday
+                                  ? 'bg-solar-500/5 hover:bg-solar-500/10'
+                                  : 'bg-bg-surface hover:bg-bg-elevated/40'
+                            }`}
+                          >
+                            <div className="flex items-center justify-between">
+                              <span
+                                className={`w-6 h-6 flex items-center justify-center rounded-full text-xs font-bold ${
+                                  isSelected
+                                    ? 'bg-solar-500 text-stone-950 shadow-glow-solar'
+                                    : isToday
+                                      ? 'bg-solar-500 text-white shadow-glow-solar'
+                                      : 'text-text-primary'
+                                }`}
+                              >
+                                {day}
+                              </span>
+                              {dayEvents.length > 0 && (
+                                <span className="text-3xs font-mono text-solar-500 font-bold">
+                                  {dayEvents.length} {dayEvents.length === 1 ? 'event' : 'events'}
+                                </span>
+                              )}
+                            </div>
+
+                            {/* Event Pills */}
+                            <div className="mt-1 space-y-1 overflow-y-auto max-h-[85px] pr-0.5">
+                              {dayEvents.map((ev) => (
+                                <button
+                                  key={ev.id}
+                                  type="button"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setActiveEventDetail(ev);
+                                  }}
+                                  className="w-full text-left p-1 rounded-md bg-solar-500/15 border border-solar-500/30 text-solar-400 hover:bg-solar-500/25 transition-colors truncate block"
+                                >
+                                  <div className="text-3xs font-bold truncate">
+                                    {new Date(ev.start_at).toLocaleTimeString([], {
+                                      hour: '2-digit',
+                                      minute: '2-digit',
+                                    })}{' '}
+                                    {ev.title}
+                                  </div>
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Right: Integrated Agenda List Panel Inside Calendar Modal */}
+                <div className="w-full lg:w-80 shrink-0 border border-border-base rounded-2xl bg-bg-elevated p-4 flex flex-col space-y-3 overflow-y-auto shadow-sm">
+                  <div className="flex items-center justify-between pb-2.5 border-b border-border-base shrink-0">
+                    <div>
+                      <h4 className="text-sm font-bold text-text-primary flex items-center gap-1.5">
+                        <CalendarDays className="w-4 h-4 text-solar-500" />
+                        <span>
+                          {selectedDay
+                            ? `${monthNames[selectedDay.getMonth()]} ${selectedDay.getDate()} Agenda`
+                            : "Today's Agenda"}
+                        </span>
+                      </h4>
+                      <p className="text-3xs text-text-muted mt-0.5">
+                        {selectedDayEvents.length} scheduled{' '}
+                        {selectedDayEvents.length === 1 ? 'event' : 'events'}
+                      </p>
+                    </div>
+
+                    <Button
+                      size="xs"
+                      onClick={() => {
+                        const target = selectedDay || today;
+                        const y = target.getFullYear();
+                        const m = String(target.getMonth() + 1).padStart(2, '0');
+                        const d = String(target.getDate()).padStart(2, '0');
+                        setEventDateStr(`${y}-${m}-${d}`);
+                        setIsAddOpen(true);
+                      }}
+                      icon={<Plus className="w-3 h-3" />}
+                    >
+                      Add
+                    </Button>
                   </div>
 
-                  {/* Month Grid Cells */}
-                  <div className="grid grid-cols-7 flex-1 auto-rows-fr divide-x divide-y divide-border-base">
-                    {/* Empty Offset Days */}
-                    {Array.from({ length: firstDayIndex }).map((_, idx) => (
-                      <div key={`fs-empty-${idx}`} className="bg-bg-base/30 p-2 min-h-[90px]" />
-                    ))}
-
-                    {/* Day Cells */}
-                    {Array.from({ length: daysInMonth }).map((_, idx) => {
-                      const day = idx + 1;
-                      const isToday =
-                        day === today.getDate() &&
-                        month === today.getMonth() &&
-                        year === today.getFullYear();
-                      const dayEvents = eventsByDay[day] || [];
-
-                      return (
-                        <div
-                          key={`fs-day-${day}`}
-                          className={`p-2 min-h-[90px] flex flex-col justify-between transition-colors ${
-                            isToday ? 'bg-solar-500/5' : 'bg-bg-surface hover:bg-bg-elevated/40'
-                          }`}
+                  {/* Day Agenda List Items */}
+                  <div className="space-y-2 flex-1 overflow-y-auto pr-0.5">
+                    {selectedDayEvents.length === 0 ? (
+                      <div className="py-8 px-3 text-center space-y-2.5 rounded-xl border border-dashed border-border-base bg-bg-surface/50">
+                        <CalendarDays className="w-8 h-8 text-text-faint mx-auto" />
+                        <p className="text-xs text-text-muted">
+                          {selectedDay
+                            ? `No events on ${monthNames[selectedDay.getMonth()]} ${selectedDay.getDate()}`
+                            : 'No events scheduled for today.'}
+                        </p>
+                        <Button
+                          size="xs"
+                          variant="secondary"
+                          onClick={() => {
+                            const target = selectedDay || today;
+                            const y = target.getFullYear();
+                            const m = String(target.getMonth() + 1).padStart(2, '0');
+                            const d = String(target.getDate()).padStart(2, '0');
+                            setEventDateStr(`${y}-${m}-${d}`);
+                            setIsAddOpen(true);
+                          }}
                         >
-                          <div className="flex items-center justify-between">
-                            <span
-                              className={`w-6 h-6 flex items-center justify-center rounded-full text-xs font-bold ${
-                                isToday
-                                  ? 'bg-solar-500 text-white shadow-glow-solar'
-                                  : 'text-text-primary'
-                              }`}
-                            >
-                              {day}
-                            </span>
-                            {dayEvents.length > 0 && (
-                              <span className="text-3xs font-mono text-solar-500 font-bold">
-                                {dayEvents.length} {dayEvents.length === 1 ? 'event' : 'events'}
+                          + New Event
+                        </Button>
+                      </div>
+                    ) : (
+                      selectedDayEvents.map((ev) => {
+                        const badge = getEventTypeBadge(ev.event_type);
+                        const start = new Date(ev.start_at);
+                        const end = new Date(ev.end_at);
+                        return (
+                          <div
+                            key={ev.id}
+                            className="p-3 rounded-xl bg-bg-surface border border-border-base hover:border-solar-500/40 transition-all flex flex-col space-y-1.5 group shadow-xs"
+                          >
+                            <div className="flex items-center justify-between gap-2">
+                              <span
+                                className={`text-[9px] uppercase font-mono font-bold px-1.5 py-0.5 rounded ${badge.bg} ${badge.text} border ${badge.border}`}
+                              >
+                                {badge.label}
                               </span>
+                              <button
+                                type="button"
+                                onClick={() => deleteMutation.mutate(ev.id)}
+                                className="p-1 text-text-muted hover:text-red-400 rounded transition-colors opacity-0 group-hover:opacity-100"
+                                title="Delete event"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
+                            <h5 className="text-xs font-bold text-text-primary leading-snug">
+                              {ev.title}
+                            </h5>
+                            <span className="text-3xs text-text-muted font-mono flex items-center gap-1">
+                              <Clock className="w-3 h-3 text-solar-500" />
+                              {start.toLocaleTimeString([], {
+                                hour: '2-digit',
+                                minute: '2-digit',
+                              })}{' '}
+                              - {end.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                            </span>
+                            {ev.description && (
+                              <p className="text-3xs text-text-muted line-clamp-2 mt-0.5">
+                                {ev.description}
+                              </p>
                             )}
                           </div>
-
-                          {/* Event Pills */}
-                          <div className="mt-1 space-y-1 overflow-y-auto max-h-[85px] pr-0.5">
-                            {dayEvents.map((ev) => (
-                              <button
-                                key={ev.id}
-                                type="button"
-                                onClick={() => setActiveEventDetail(ev)}
-                                className="w-full text-left p-1 rounded-md bg-solar-500/15 border border-solar-500/30 text-solar-400 hover:bg-solar-500/25 transition-colors truncate block"
-                              >
-                                <div className="text-3xs font-bold truncate">
-                                  {new Date(ev.start_at).toLocaleTimeString([], {
-                                    hour: '2-digit',
-                                    minute: '2-digit',
-                                  })}{' '}
-                                  {ev.title}
-                                </div>
-                              </button>
-                            ))}
-                          </div>
-                        </div>
-                      );
-                    })}
+                        );
+                      })
+                    )}
                   </div>
                 </div>
               </div>
