@@ -53,6 +53,7 @@ import { Input } from '../../components/ui/Input';
 import { Select } from '../../components/ui/Select';
 import { Modal } from '../../components/ui/Modal';
 import { LoadingSkeleton } from '../../components/ui/LoadingSkeleton';
+import { useDebounce } from '../../hooks/useDebounce';
 import { cn } from '../../utils/cn';
 import { formatDate } from '../../utils/dateUtils';
 import type {
@@ -105,6 +106,7 @@ export default function DeployPreviewPage() {
     status?: DebtStatus[];
     category?: string[];
   }>({});
+  const debouncedDebtFilters = useDebounce(debtFilters, 300);
 
   // ─── Data Fetching ──────────────────────────────────────────────────────────
   const { data: projects = [] } = useQuery({
@@ -127,8 +129,8 @@ export default function DeployPreviewPage() {
     isLoading: debtLoading,
     refetch: refetchDebt,
   } = useQuery({
-    queryKey: ['deploy', 'tech-debt', selectedProject, debtFilters],
-    queryFn: () => fetchTechDebt(selectedProject!, debtFilters),
+    queryKey: ['deploy', 'tech-debt', selectedProject, debouncedDebtFilters],
+    queryFn: () => fetchTechDebt(selectedProject!, debouncedDebtFilters),
     enabled: !!selectedProject,
   });
 

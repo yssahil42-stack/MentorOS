@@ -55,6 +55,7 @@ import { Select } from '../../components/ui/Select';
 import { Modal } from '../../components/ui/Modal';
 import { LoadingSkeleton } from '../../components/ui/LoadingSkeleton';
 import { ToastContainer } from '../../components/ui/ToastContainer';
+import { useDebounce } from '../../hooks/useDebounce';
 import { cn } from '../../utils/cn';
 import type {
   GitRepository,
@@ -105,6 +106,8 @@ export default function GitHubSyncPage() {
   const [prsFilter, setPrsFilter] = useState<{ state?: 'open' | 'closed' | 'merged' | 'all' }>({
     state: 'open',
   });
+  const debouncedIssuesFilter = useDebounce(issuesFilter, 300);
+  const debouncedPrsFilter = useDebounce(prsFilter, 300);
 
   // ─── Data Fetching ──────────────────────────────────────────────────────────
   const {
@@ -137,8 +140,8 @@ export default function GitHubSyncPage() {
     isLoading: issuesLoading,
     refetch: refetchIssues,
   } = useQuery({
-    queryKey: ['git', 'issues', selectedRepo?.id, issuesFilter],
-    queryFn: () => fetchIssues(selectedRepo!.id, issuesFilter),
+    queryKey: ['git', 'issues', selectedRepo?.id, debouncedIssuesFilter],
+    queryFn: () => fetchIssues(selectedRepo!.id, debouncedIssuesFilter),
     enabled: !!selectedRepo,
   });
 
@@ -147,8 +150,8 @@ export default function GitHubSyncPage() {
     isLoading: prsLoading,
     refetch: refetchPRs,
   } = useQuery({
-    queryKey: ['git', 'prs', selectedRepo?.id, prsFilter],
-    queryFn: () => fetchPullRequests(selectedRepo!.id, prsFilter),
+    queryKey: ['git', 'prs', selectedRepo?.id, debouncedPrsFilter],
+    queryFn: () => fetchPullRequests(selectedRepo!.id, debouncedPrsFilter),
     enabled: !!selectedRepo,
   });
 

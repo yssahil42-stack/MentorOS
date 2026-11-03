@@ -33,6 +33,7 @@ import { Card } from '../../components/ui/Card';
 import { Card3D } from '../../components/ui/Card3D';
 import { Button } from '../../components/ui/Button';
 import { Badge } from '../../components/ui/Badge';
+import { useDebounce } from '../../hooks/useDebounce';
 import { LoadingSkeleton } from '../../components/ui/LoadingSkeleton';
 import { Input } from '../../components/ui/Input';
 import { Select } from '../../components/ui/Select';
@@ -45,6 +46,7 @@ export default function FreelancerProjectsPage() {
   const queryClient = useQueryClient();
 
   const [searchQuery, setSearchQuery] = useState('');
+  const debouncedSearchQuery = useDebounce(searchQuery, 300);
   const [statusFilter, setStatusFilter] = useState<ProjectStatus | 'all'>('all');
   const [priorityFilter, setPriorityFilter] = useState<ProjectPriority | 'all'>('all');
   const [sortBy, setSortBy] = useState<'updated' | 'created' | 'progress' | 'target_date'>(
@@ -70,7 +72,7 @@ export default function FreelancerProjectsPage() {
 
   useEffect(() => {
     setPage(1);
-  }, [searchQuery, statusFilter, priorityFilter, sortBy, showArchived]);
+  }, [debouncedSearchQuery, statusFilter, priorityFilter, sortBy, showArchived]);
 
   const createProjectMutation = useMutation({
     mutationFn: async (data: Partial<Project>) => {
@@ -165,8 +167,8 @@ export default function FreelancerProjectsPage() {
       if (!showArchived && p.status === 'completed') return false;
       if (statusFilter !== 'all' && p.status !== statusFilter) return false;
       if (priorityFilter !== 'all' && p.priority !== priorityFilter) return false;
-      if (searchQuery) {
-        const query = searchQuery.toLowerCase();
+      if (debouncedSearchQuery) {
+        const query = debouncedSearchQuery.toLowerCase();
         return (
           p.title.toLowerCase().includes(query) ||
           (p.description || '').toLowerCase().includes(query)
