@@ -5,8 +5,6 @@ import { cn } from '../../utils/cn';
 import { useAuth } from '../../contexts/AuthContext';
 import { useWorkspace } from '../../contexts/WorkspaceContext';
 import { ROLE_CONFIGS } from '../../config/roles';
-import { ThemeToggle } from '../ui/ThemeToggle';
-import { AiStatusIndicator } from '../ui/AiStatusIndicator';
 import type { UserRole } from '../../types/user';
 import { getWorkspaceRole, getRoleDashboardRoute } from '../../utils/roleUtils';
 
@@ -72,9 +70,6 @@ export function TopBar({ onMenuClick }: TopBarProps) {
 
       {/* ─── Right actions ─────────────────────────────────── */}
       <div className="flex items-center gap-2">
-        {/* AI Status Indicator */}
-        <AiStatusIndicator />
-
         {/* Notifications Icon with dot */}
         <button
           type="button"
@@ -86,17 +81,14 @@ export function TopBar({ onMenuClick }: TopBarProps) {
           <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-red-500 ring-2 ring-bg-surface" />
         </button>
 
-        {/* Theme Toggle Button */}
-        <ThemeToggle size="sm" variant="icon" />
-
-        {/* Primary Action: Capture Work (Manual Form Entry) */}
+        {/* Primary Action: Capture Work (Orange) */}
         <button
           onClick={() => openCaptureModal('manual')}
           className={cn(
-            'flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold text-white shadow-2xs',
-            'transition-all duration-200 active:translate-y-[1px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus hover:opacity-95'
+            'flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-semibold text-white shadow-2xs',
+            'bg-orange-500 hover:bg-orange-600 active:bg-orange-700 border border-orange-600/30',
+            'transition-all duration-200 active:translate-y-[1px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500/50 cursor-pointer'
           )}
-          style={{ backgroundColor: roleConfig?.color ?? '#F97316' }}
           title="Capture Work - Manual form entry (Ctrl+J)"
           aria-label="Capture Work"
         >
@@ -108,7 +100,7 @@ export function TopBar({ onMenuClick }: TopBarProps) {
         <button
           type="button"
           onClick={openProfileModal}
-          className="w-8 h-8 rounded-full bg-bg-elevated border border-border-base flex items-center justify-center text-xs font-bold text-text-primary shadow-2xs hover:border-orange-500/50 hover:bg-orange-500/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus transition-all shrink-0 cursor-pointer"
+          className="w-8 h-8 rounded-full bg-orange-500/10 border border-orange-500/30 flex items-center justify-center text-xs font-bold text-orange-600 dark:text-orange-400 shadow-2xs hover:bg-orange-500/20 hover:border-orange-500/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500/50 transition-all shrink-0 cursor-pointer"
           aria-label={`Open profile window for ${user?.full_name ?? 'user'}`}
           title={`Profile - ${user?.full_name ?? 'User'}`}
         >

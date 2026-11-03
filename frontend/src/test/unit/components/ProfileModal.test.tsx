@@ -1,10 +1,16 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import React from 'react';
 import { MemoryRouter } from 'react-router-dom';
 import { ProfileModal } from '../../../components/profile/ProfileModal';
 import { useAuth } from '../../../contexts/AuthContext';
 import { useWorkspace } from '../../../contexts/WorkspaceContext';
+
+vi.mock('../../../services/api', () => ({
+  api: {
+    patch: vi.fn().mockResolvedValue({}),
+  },
+}));
 
 vi.mock('../../../contexts/AuthContext', () => ({
   useAuth: vi.fn(),
@@ -115,5 +121,38 @@ describe('ProfileModal Component', () => {
     );
 
     expect(screen.queryByText('User Profile')).not.toBeInTheDocument();
+  });
+
+  it('renders module information and switches fields by module tab', async () => {
+    render(
+      <MemoryRouter initialEntries={['/app/student/dashboard']}>
+        <ProfileModal isOpen={true} onClose={mockOnClose} />
+      </MemoryRouter>
+    );
+
+    expect(screen.getByText('Module Profile Information')).toBeInTheDocument();
+    expect(screen.getByText('University / Institution')).toBeInTheDocument();
+
+    // Click Developer tab
+    const devTab = screen.getByRole('button', { name: /Developer/i });
+    fireEvent.click(devTab);
+    expect(screen.getByText('Primary Tech Stack')).toBeInTheDocument();
+
+    // Click Freelancer tab
+    const freelancerTab = screen.getByRole('button', { name: /Freelancer/i });
+    fireEvent.click(freelancerTab);
+    expect(screen.getByText('Hourly Billing Rate')).toBeInTheDocument();
+
+    // Click Job Seeker tab
+    const jobTab = screen.getByRole('button', { name: /Job Seeker/i });
+    fireEvent.click(jobTab);
+    expect(screen.getByText('Target Job Title(s)')).toBeInTheDocument();
+
+    // Click Save
+    const saveBtn = screen.getByRole('button', { name: /Save Job Seeker Information/i });
+    fireEvent.click(saveBtn);
+    await waitFor(() => {
+      expect(mockShowToast).toHaveBeenCalledWith(expect.stringContaining('saved'), 'success');
+    });
   });
 });
