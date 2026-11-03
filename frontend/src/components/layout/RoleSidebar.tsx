@@ -29,13 +29,10 @@ import {
   Key,
   Users,
   Sparkles,
-  User,
 } from 'lucide-react';
 import { cn } from '../../utils/cn';
 import { useAuth } from '../../contexts/AuthContext';
-import { useWorkspace } from '../../contexts/WorkspaceContext';
 import { ROLE_CONFIGS } from '../../config/roles';
-import { ThemeToggle } from '../ui/ThemeToggle';
 import type { UserRole } from '../../types/user';
 import { getRoleDashboardRoute, getWorkspaceRole } from '../../utils/roleUtils';
 
@@ -86,7 +83,6 @@ interface RoleSidebarProps {
 
 export function RoleSidebar({ expanded, onToggle }: RoleSidebarProps) {
   const { user, logout } = useAuth();
-  const { openProfileModal } = useWorkspace();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -219,57 +215,14 @@ export function RoleSidebar({ expanded, onToggle }: RoleSidebarProps) {
         </ul>
       </nav>
 
-      {/* ─── Bottom: Profile + Theme switch + Logout ─────────── */}
-      <div className="border-t border-border-base p-2 space-y-1.5 shrink-0 bg-bg-surface/50">
-        {/* Profile button */}
-        <button
-          onClick={openProfileModal}
-          className={cn(
-            'flex rounded-xl font-medium text-text-muted hover:text-text-primary hover:bg-bg-elevated',
-            'transition-colors duration-150 active:translate-y-[1px]',
-            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus w-full',
-            expanded
-              ? 'items-center gap-2.5 h-10 px-3 text-xs'
-              : 'flex-col items-center justify-center py-2 px-1 text-center min-h-[50px] gap-1'
-          )}
-          aria-label="View user profile"
-          title="User profile"
-        >
-          <User className="h-4 w-4 shrink-0" aria-hidden="true" />
-          <span className={expanded ? 'text-xs' : 'text-[10px] font-medium leading-tight'}>
-            Profile
-          </span>
-        </button>
-
-        {/* Theme switcher toggle */}
-        <div
-          className={cn(
-            'flex items-center w-full',
-            expanded ? 'justify-between px-1' : 'justify-center'
-          )}
-        >
-          {expanded && (
-            <span className="text-2xs font-semibold text-text-muted uppercase tracking-wider">
-              Theme
-            </span>
-          )}
-          {expanded ? (
-            <ThemeToggle size="sm" variant="expanded" showLabel className="w-full justify-start" />
-          ) : (
-            <div className="flex flex-col items-center justify-center py-1">
-              <ThemeToggle size="sm" variant="icon" />
-              <span className="text-[10px] text-text-muted font-medium mt-1">Theme</span>
-            </div>
-          )}
-        </div>
-
-        {/* Logout button */}
+      {/* ─── Bottom: Sign out ─────────────────────────────────── */}
+      <div className="border-t border-border-base p-2 shrink-0 bg-bg-surface/50">
         <button
           onClick={handleLogout}
           className={cn(
             'flex rounded-xl font-medium text-text-muted hover:text-danger hover:bg-danger/10',
             'transition-colors duration-150 active:translate-y-[1px]',
-            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus w-full',
+            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus w-full cursor-pointer',
             expanded
               ? 'items-center gap-2.5 h-10 px-3 text-xs'
               : 'flex-col items-center justify-center py-2 px-1 text-center min-h-[50px] gap-1'
