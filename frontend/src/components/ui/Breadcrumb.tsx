@@ -10,6 +10,7 @@ import { cn } from '../../utils/cn';
 export interface BreadcrumbProps {
   roleConfig?: RoleConfig;
   className?: string;
+  variant?: 'default' | 'outline';
 }
 
 function formatSegmentLabel(segment: string): string {
@@ -20,7 +21,7 @@ function formatSegmentLabel(segment: string): string {
     .join(' ');
 }
 
-export function Breadcrumb({ roleConfig, className }: BreadcrumbProps) {
+export function Breadcrumb({ roleConfig, className, variant = 'default' }: BreadcrumbProps) {
   const location = useLocation();
   const { user } = useAuth();
 
@@ -57,6 +58,8 @@ export function Breadcrumb({ roleConfig, className }: BreadcrumbProps) {
       aria-label="Breadcrumb"
       className={cn(
         'flex items-center text-xs text-text-muted select-none overflow-x-auto no-scrollbar',
+        variant === 'outline' &&
+          'border border-border-base bg-bg-surface/80 rounded-xl px-2.5 py-1 shadow-2xs w-fit',
         className
       )}
     >

@@ -130,7 +130,7 @@ export default function StudentDashboard() {
           <Card3D
             maxTilt={4}
             depth={35}
-            variant="default"
+            variant="secondary"
             className="p-5 border border-border-base hover:border-orange-500/35 transition-all shadow-card backdrop-blur-md"
           >
             <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3.5 border-b border-border-base gap-3">

@@ -60,7 +60,7 @@ export function ErrorState({
       </div>
       <p className="text-sm text-text-muted mb-4 max-w-xs">{message}</p>
       {onRetry && (
-        <Button variant="secondary" size="sm" onClick={onRetry}>
+        <Button variant="outline" size="sm" onClick={onRetry}>
           Try again
         </Button>
       )}

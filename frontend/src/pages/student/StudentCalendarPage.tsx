@@ -859,7 +859,7 @@ export default function StudentCalendarPage() {
               >
                 Delete Event
               </Button>
-              <Button variant="secondary" size="sm" onClick={() => setSelectedEvent(null)}>
+              <Button variant="outline" size="sm" onClick={() => setSelectedEvent(null)}>
                 Close
               </Button>
             </div>

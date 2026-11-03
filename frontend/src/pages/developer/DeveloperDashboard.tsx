@@ -303,7 +303,7 @@ export default function DeveloperDashboard() {
             <Card3D
               maxTilt={4}
               depth={35}
-              variant="default"
+              variant="secondary"
               className="p-5 border border-border-base hover:border-amber-500/35 transition-all shadow-card backdrop-blur-md"
             >
               <div className="flex items-center justify-between pb-3 border-b border-border-base">
@@ -477,7 +477,7 @@ export default function DeveloperDashboard() {
         <Card3D
           maxTilt={2}
           depth={25}
-          variant="default"
+          variant="secondary"
           className="p-5 sm:p-6 border border-border-base shadow-card backdrop-blur-md"
         >
           <div className="flex items-center justify-between pb-3.5 border-b border-border-base">

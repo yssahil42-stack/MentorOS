@@ -684,7 +684,7 @@ export default function InvoiceGeneratorPage() {
                 <div className="text-right md:text-left">
                   <div className="flex items-center gap-2 justify-end md:justify-start mb-2">
                     <Badge
-                      variant="default"
+                      variant="outline"
                       className={cn(
                         'capitalize',
                         INVOICE_STATUS_COLORS[preview.invoice.status as InvoiceStatus] || ''

@@ -397,7 +397,7 @@ export default function RateCalculatorPage() {
             className={cn(
               'px-4 py-2 rounded-lg text-sm font-medium transition-all',
               activeTab === tab
-                ? 'bg-amber-500 text-stone-950 shadow-sm'
+                ? 'bg-orange-500 text-white shadow-sm font-semibold'
                 : 'text-text-muted hover:text-text-primary'
             )}
           >
@@ -580,7 +580,7 @@ export default function RateCalculatorPage() {
             <Card3D
               maxTilt={2}
               depth={15}
-              variant="default"
+              variant="secondary"
               className="p-5 border border-border-base shadow-card"
             >
               <h3 className="text-sm font-bold text-text-primary flex items-center gap-2 mb-4">
@@ -725,7 +725,7 @@ export default function RateCalculatorPage() {
           <p className="text-sm text-text-muted mb-6">
             Your rate calculations and generated contracts will appear here.
           </p>
-          <Button variant="secondary" size="sm" icon={<Plus className="w-4 h-4" />}>
+          <Button variant="outline" size="sm" icon={<Plus className="w-4 h-4" />}>
             Start New Calculation
           </Button>
         </Card>
@@ -1013,7 +1013,7 @@ function TemplateCard({
     <Card3D
       maxTilt={5}
       depth={15}
-      variant="default"
+      variant="secondary"
       className="p-5 border border-border-base/90 hover:border-amber-500/40 transition-all shadow-card flex flex-col"
     >
       <div className="flex items-start justify-between mb-3">
@@ -1034,7 +1034,7 @@ function TemplateCard({
           </div>
         </div>
         {isCustom && (
-          <Badge variant="default" size="sm">
+          <Badge variant="outline" size="sm">
             Custom
           </Badge>
         )}

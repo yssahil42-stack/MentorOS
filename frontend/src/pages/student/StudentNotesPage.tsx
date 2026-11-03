@@ -477,7 +477,7 @@ export default function StudentNotesPage() {
                 >
                   Delete
                 </Button>
-                <Button variant="secondary" size="sm" onClick={() => setSelectedNote(null)}>
+                <Button variant="outline" size="sm" onClick={() => setSelectedNote(null)}>
                   Close
                 </Button>
               </div>

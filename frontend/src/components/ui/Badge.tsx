@@ -2,7 +2,7 @@ import React from 'react';
 import { cn } from '../../utils/cn';
 
 export type BadgeVariant =
-  'default' | 'success' | 'warning' | 'danger' | 'info' | 'muted' | 'neutral';
+  'default' | 'success' | 'warning' | 'danger' | 'info' | 'muted' | 'neutral' | 'outline';
 export type BadgeSize = 'sm' | 'md';
 
 export interface BadgeProps {
@@ -22,6 +22,7 @@ export const variantStyles: Record<BadgeVariant, string> = {
   info: 'bg-developer-500/15 text-cyan-700 dark:text-developer-300 border-developer-500/30',
   muted: 'bg-bg-elevated text-text-muted border-border-base',
   neutral: 'bg-bg-elevated text-text-secondary border-border-base',
+  outline: 'bg-transparent text-text-primary border-border-base hover:border-border-hover',
 };
 
 export const dotStyles: Record<BadgeVariant, string> = {
@@ -32,6 +33,7 @@ export const dotStyles: Record<BadgeVariant, string> = {
   info: 'bg-developer-400',
   muted: 'bg-text-muted',
   neutral: 'bg-text-muted',
+  outline: 'bg-text-muted',
 };
 
 export function badgeVariants({

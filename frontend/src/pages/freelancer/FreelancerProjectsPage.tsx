@@ -490,7 +490,7 @@ export default function FreelancerProjectsPage() {
               key={project.id}
               maxTilt={6}
               depth={20}
-              variant="default"
+              variant="secondary"
               className="p-5 border border-border-base hover:border-amber-500/35 transition-all shadow-card flex flex-col"
             >
               <div className="flex items-start justify-between gap-2 mb-3">
@@ -679,7 +679,7 @@ export default function FreelancerProjectsPage() {
           <Card3D
             maxTilt={0}
             depth={0}
-            variant="default"
+            variant="secondary"
             className="w-full max-w-md p-6 border border-border-base shadow-xl animate-slide-up"
           >
             <div className="flex items-center justify-between mb-4">

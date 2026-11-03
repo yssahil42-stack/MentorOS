@@ -226,7 +226,7 @@ export default function FreelancerTasksPage() {
       key={task.id}
       maxTilt={5}
       depth={15}
-      variant="default"
+      variant="secondary"
       className="p-4 border border-border-base hover:border-amber-500/35 transition-all shadow-card"
     >
       <div className="flex items-start justify-between gap-2 mb-2">
@@ -616,7 +616,7 @@ export default function FreelancerTasksPage() {
         <Card3D
           maxTilt={2}
           depth={20}
-          variant="default"
+          variant="secondary"
           className="p-0 border border-border-base shadow-card overflow-hidden"
         >
           <div className="overflow-x-auto">
@@ -740,7 +740,7 @@ export default function FreelancerTasksPage() {
           <Card3D
             maxTilt={0}
             depth={0}
-            variant="default"
+            variant="secondary"
             className="w-full max-w-md p-6 border border-border-base shadow-xl animate-slide-up"
           >
             <div className="flex items-center justify-between mb-4">
