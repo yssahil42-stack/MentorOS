@@ -256,7 +256,12 @@ export default function InboxPage() {
             <h1 className="text-2xl font-extrabold text-text-primary">Inbox</h1>
             <p className="text-sm text-text-muted mt-1">Captured items waiting to be organized</p>
           </div>
-          <Button onClick={() => openCaptureModal('ai')} icon={<Plus className="w-4 h-4" />}>
+          <Button
+            onClick={() => openCaptureModal('ai')}
+            keyboardShortcut="⌘K"
+            tooltip="Quick capture (⌘K)"
+            icon={<Plus className="w-4 h-4" />}
+          >
             Capture
           </Button>
         </div>
@@ -290,6 +295,8 @@ export default function InboxPage() {
             variant="ghost"
             size="sm"
             onClick={() => openCaptureModal('ai')}
+            keyboardShortcut="⌘K"
+            tooltip="Quick capture (⌘K)"
             icon={<Plus className="w-4 h-4" />}
           >
             Capture

@@ -331,6 +331,8 @@ export default function DeployPreviewPage() {
             variant="primary"
             size="sm"
             onClick={() => openCaptureModal('ai')}
+            keyboardShortcut="⌘K"
+            tooltip="Quick capture (⌘K)"
             className="!bg-gradient-to-r !from-indigo-500 !to-purple-500 hover:!from-indigo-600 hover:!to-purple-600 shadow-glow-solar font-bold px-5 h-10 text-white transition-all active:translate-y-[1px]"
             icon={<Plus className="w-4 h-4 text-white" />}
           >
@@ -392,6 +394,8 @@ export default function DeployPreviewPage() {
             variant="primary"
             size="sm"
             onClick={() => openCaptureModal('ai')}
+            keyboardShortcut="⌘K"
+            tooltip="Quick capture (⌘K)"
             className="!bg-gradient-to-r !from-indigo-500 !to-purple-500 hover:!from-indigo-600 hover:!to-purple-600 shadow-glow-solar font-bold px-5 h-10 text-white transition-all active:translate-y-[1px]"
             icon={<Plus className="w-4 h-4 text-white" />}
           >

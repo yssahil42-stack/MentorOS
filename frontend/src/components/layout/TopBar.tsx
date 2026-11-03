@@ -7,6 +7,7 @@ import { useWorkspace } from '../../contexts/WorkspaceContext';
 import { ROLE_CONFIGS } from '../../config/roles';
 import type { UserRole } from '../../types/user';
 import { getWorkspaceRole, getRoleDashboardRoute } from '../../utils/roleUtils';
+import { Button } from '../ui/Button';
 
 interface TopBarProps {
   onMenuClick: () => void;
@@ -82,19 +83,22 @@ export function TopBar({ onMenuClick }: TopBarProps) {
         </button>
 
         {/* Primary Action: Capture Work (Orange) */}
-        <button
+        <Button
           onClick={() => openCaptureModal('manual')}
+          variant="primary"
+          size="sm"
+          keyboardShortcut="⌘K"
+          tooltip="Quick capture (⌘K)"
+          aria-label="Capture Work"
           className={cn(
-            'flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-semibold text-white shadow-2xs',
+            'px-3.5 py-1.5 rounded-xl text-xs font-semibold text-white shadow-2xs',
             'bg-orange-500 hover:bg-orange-600 active:bg-orange-700 border border-orange-600/30',
             'transition-all duration-200 active:translate-y-[1px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500/50 cursor-pointer'
           )}
-          title="Capture Work - Manual form entry (Ctrl+J)"
-          aria-label="Capture Work"
+          leftIcon={<Plus className="h-3.5 w-3.5" aria-hidden="true" />}
         >
-          <Plus className="h-3.5 w-3.5" aria-hidden="true" />
           <span className="hidden sm:inline">Capture Work</span>
-        </button>
+        </Button>
 
         {/* User Profile Avatar / Icon */}
         <button

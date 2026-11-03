@@ -152,6 +152,8 @@ export const FreelancerMetrics: React.FC<FreelancerMetricsProps> = ({
               variant="primary"
               size="sm"
               onClick={onOpenCapture}
+              keyboardShortcut="⌘K"
+              tooltip="Quick capture (⌘K)"
               className="font-semibold text-xs h-9 shadow-2xs"
               leftIcon={<Plus className="w-3.5 h-3.5" />}
             >

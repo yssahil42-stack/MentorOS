@@ -139,6 +139,8 @@ export default function JobSeekerDashboard() {
                 variant="primary"
                 size="sm"
                 onClick={() => openCaptureModal('ai')}
+                keyboardShortcut="⌘K"
+                tooltip="Quick capture (⌘K)"
                 className="!bg-gradient-to-r !from-amber-500 !to-orange-500 hover:!from-amber-600 hover:!to-orange-600 shadow-glow-solar font-bold px-5 h-10 text-stone-950 transition-all active:translate-y-[1px]"
                 icon={<Plus className="w-4 h-4 text-stone-950" />}
               >

@@ -289,6 +289,8 @@ export default function AssignmentsPage() {
               variant="outline"
               size="sm"
               onClick={() => openCaptureModal('manual')}
+              keyboardShortcut="⌘K"
+              tooltip="Quick capture (⌘K)"
               className="border-border-base hover:border-solar-500/50"
             >
               <Plus className="w-4 h-4 mr-1.5" />

@@ -305,6 +305,8 @@ export default function StudentTasksPage() {
               variant="primary"
               size="sm"
               onClick={() => setIsCreateModalOpen(true)}
+              keyboardShortcut="⌘K"
+              tooltip="Quick capture (⌘K)"
               className="!bg-solar-500 hover:!bg-solar-600 shadow-glow-solar"
               icon={<Plus className="w-4 h-4" />}
             >
