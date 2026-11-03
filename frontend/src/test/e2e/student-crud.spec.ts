@@ -199,7 +199,7 @@ test.describe('Student CRUD & Dashboard Workflow', () => {
     const taskInput = page.locator('input[placeholder*="Add assignment"]');
     await expect(taskInput).toBeVisible();
     await taskInput.fill('Read Chapter 4 Graph Algorithms');
-    await page.locator('button:has-text("Add")').click();
+    await page.locator('form').getByRole('button', { name: 'Add' }).click();
 
     // Verify task appears in the course list
     await expect(page.locator('text=Read Chapter 4 Graph Algorithms')).toBeVisible();

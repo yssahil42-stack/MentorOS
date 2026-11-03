@@ -186,7 +186,7 @@ test.describe('Job Seeker Applications & Interview Prep Workflow', () => {
     const taskInput = page.locator('input[placeholder*="Add interview prep"]').first();
     if (await taskInput.isVisible()) {
       await taskInput.fill('Prepare Behavioral Answers - STAR Method');
-      await page.locator('button:has-text("Add")').click();
+      await page.locator('form').getByRole('button', { name: 'Add' }).click();
       await expect(
         page
           .locator('text=Prepare Behavioral Answers - STAR Method')

@@ -1,8 +1,11 @@
 import { test, expect } from '@playwright/test';
 
 test.describe('Landing Page', () => {
-  test.beforeEach(async ({ page }) => {
+  test.beforeEach(async ({ page, context }) => {
+    await context.clearCookies();
     await page.goto('/');
+    await page.evaluate(() => localStorage.clear());
+    await page.reload();
   });
 
   test('should load landing page successfully', async ({ page }) => {

@@ -159,9 +159,9 @@ export function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
 
   const activeRoleConfig = ROLE_CONFIGS[selectedRole] || ROLE_CONFIGS.student;
   const userPrimaryConfig =
-    ROLE_CONFIGS[(user.role as UserRole) || 'student'] || ROLE_CONFIGS.student;
+    ROLE_CONFIGS[(user?.role as UserRole) || 'student'] || ROLE_CONFIGS.student;
 
-  const memberSince = user.created_at
+  const memberSince = user?.created_at
     ? new Date(user.created_at).toLocaleDateString(undefined, {
         month: 'short',
         year: 'numeric',
@@ -183,10 +183,12 @@ export function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
     const currentData = profiles[selectedRole];
 
     try {
-      localStorage.setItem(
-        `mentoros_module_profile_${user.id}_${selectedRole}`,
-        JSON.stringify(currentData)
-      );
+      if (user?.id) {
+        localStorage.setItem(
+          `mentoros_module_profile_${user.id}_${selectedRole}`,
+          JSON.stringify(currentData)
+        );
+      }
 
       const updatedProfileData = {
         ...profileData,
