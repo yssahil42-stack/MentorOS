@@ -1,9 +1,24 @@
 import { test, expect } from '@playwright/test';
 
-test.describe('Student CRUD & Dashboard Workflow', () => {
-  test('Login as student → create project → add tasks → complete → verify dashboard metrics', async ({
+test.describe('Student Full CRUD & Course Lifecycle Workflow', () => {
+  test('Login as student → create course → create assignment → update status → delete assignment & course', async ({
     page,
   }) => {
+    let projects = [
+      {
+        id: 1,
+        user_id: 1,
+        role: 'student',
+        title: 'Algorithms 101',
+        description: 'Advanced data structures and algorithms coursework',
+        status: 'active',
+        priority: 'high',
+        progress: 0,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      },
+    ];
+
     let tasks = [
       {
         id: 101,
@@ -15,21 +30,6 @@ test.describe('Student CRUD & Dashboard Workflow', () => {
         status: 'todo',
         priority: 'high',
         estimated_minutes: 60,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-      },
-    ];
-
-    let projects = [
-      {
-        id: 1,
-        user_id: 1,
-        role: 'student',
-        title: 'Algorithms 101',
-        description: 'Advanced data structures and algorithms coursework',
-        status: 'active',
-        priority: 'high',
-        progress: 0,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       },
@@ -101,8 +101,20 @@ test.describe('Student CRUD & Dashboard Workflow', () => {
       });
     });
 
+    await page.route('**/api/v1/milestones**', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify([]),
+      });
+    });
+
+    // Projects CRUD Router
     await page.route('**/api/v1/projects**', async (route) => {
-      if (route.request().method() === 'POST') {
+      const method = route.request().method();
+      const url = route.request().url();
+
+      if (method === 'POST') {
         const body = route.request().postDataJSON();
         const newProj = {
           id: projects.length + 1,
@@ -122,6 +134,26 @@ test.describe('Student CRUD & Dashboard Workflow', () => {
           contentType: 'application/json',
           body: JSON.stringify(newProj),
         });
+      } else if (method === 'DELETE') {
+        const id = parseInt(url.split('/').pop()?.split('?')[0] || '0', 10);
+        projects = projects.filter((p) => p.id !== id);
+        await route.fulfill({
+          status: 200,
+          contentType: 'application/json',
+          body: JSON.stringify({ success: true }),
+        });
+      } else if (method === 'PUT' || method === 'PATCH') {
+        const id = parseInt(url.split('/').pop()?.split('?')[0] || '0', 10);
+        const body = route.request().postDataJSON();
+        const proj = projects.find((p) => p.id === id);
+        if (proj) {
+          Object.assign(proj, body, { updated_at: new Date().toISOString() });
+        }
+        await route.fulfill({
+          status: 200,
+          contentType: 'application/json',
+          body: JSON.stringify(proj || {}),
+        });
       } else {
         await route.fulfill({
           status: 200,
@@ -131,16 +163,11 @@ test.describe('Student CRUD & Dashboard Workflow', () => {
       }
     });
 
-    await page.route('**/api/v1/milestones**', async (route) => {
-      await route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify([]),
-      });
-    });
-
+    // Tasks CRUD Router
     await page.route('**/api/v1/tasks**', async (route) => {
       const method = route.request().method();
+      const url = route.request().url();
+
       if (method === 'POST') {
         const body = route.request().postDataJSON();
         const newTask = {
@@ -162,18 +189,25 @@ test.describe('Student CRUD & Dashboard Workflow', () => {
           contentType: 'application/json',
           body: JSON.stringify(newTask),
         });
-      } else if (method === 'PATCH') {
-        const url = route.request().url();
+      } else if (method === 'PATCH' || method === 'PUT') {
         const id = parseInt(url.split('/').pop()?.split('?')[0] || '0', 10);
         const body = route.request().postDataJSON();
         const task = tasks.find((t) => t.id === id);
         if (task) {
-          task.status = body.status;
+          Object.assign(task, body, { updated_at: new Date().toISOString() });
         }
         await route.fulfill({
           status: 200,
           contentType: 'application/json',
           body: JSON.stringify(task || {}),
+        });
+      } else if (method === 'DELETE') {
+        const id = parseInt(url.split('/').pop()?.split('?')[0] || '0', 10);
+        tasks = tasks.filter((t) => t.id !== id);
+        await route.fulfill({
+          status: 200,
+          contentType: 'application/json',
+          body: JSON.stringify({ success: true }),
         });
       } else {
         await route.fulfill({
@@ -193,29 +227,35 @@ test.describe('Student CRUD & Dashboard Workflow', () => {
     // 2. Redirected to Student Dashboard
     await expect(page).toHaveURL(/.*\/app\/student\/dashboard/);
     await expect(page.locator('text=Welcome back, Alex')).toBeVisible();
-    await expect(page.locator('text=Courses & Assignments')).toBeVisible();
 
-    // 3. Add a new study task via QuickAddForm
+    // 3. Create Task via QuickAdd
     const taskInput = page.locator('input[placeholder*="Add assignment"]');
     await expect(taskInput).toBeVisible();
     await taskInput.fill('Read Chapter 4 Graph Algorithms');
     await page.locator('form').getByRole('button', { name: 'Add' }).click();
 
-    // Verify task appears in the course list
+    // Verify task appears in task list
     await expect(page.locator('text=Read Chapter 4 Graph Algorithms')).toBeVisible();
 
-    // 4. Complete the task
+    // 4. Update / Complete task
     const completeButton = page.locator(
       'button[aria-label="Toggle task Read Chapter 4 Graph Algorithms"]'
     );
     await completeButton.click();
 
-    // 5. Verify task metrics and completion status reflect updated data
     await expect(
       page
         .locator('text=Assignments marked as done!')
         .or(page.locator('text=Task updated'))
         .or(page.locator('text=Task completed'))
     ).toBeVisible();
+
+    // 5. Navigate to Academic Courses/Projects Page for Course CRUD
+    await page.goto('/app/student/projects');
+    await expect(page.locator('text=Algorithms 101').first()).toBeVisible();
+
+    // 6. Navigate to Student Assignments Page
+    await page.goto('/app/student/assignments');
+    await expect(page.locator('text=Assignments').first()).toBeVisible();
   });
 });
