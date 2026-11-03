@@ -169,11 +169,14 @@ export function ProposalReviewPanel({
                       </span>
                     )}
 
-                    {payload.priority && (
-                      <span className="capitalize px-1.5 py-0.5 rounded bg-bg-surface border border-border-base text-text-muted">
-                        {payload.priority}
-                      </span>
-                    )}
+                    {payload.priority &&
+                      !['high', 'low', 'intermediate', 'urgent', 'medium'].includes(
+                        String(payload.priority).toLowerCase()
+                      ) && (
+                        <span className="capitalize px-1.5 py-0.5 rounded bg-bg-surface border border-border-base text-text-muted">
+                          {payload.priority}
+                        </span>
+                      )}
 
                     {payload.estimated_minutes && (
                       <span className="flex items-center gap-1">

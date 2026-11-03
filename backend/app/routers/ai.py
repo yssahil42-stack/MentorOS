@@ -57,7 +57,7 @@ Since you’re a {role_ctx}, I’d recommend a path that eventually leads into b
 | Month | Focus | What you'll be able to do |
 | :--- | :--- | :--- |
 | **Month 1** | Python Fundamentals | Write programs confidently |
-| **Month 2** | Intermediate Python | Build useful applications |
+| **Month 2** | Core Application Development | Build useful applications |
 | **Month 3** | Advanced + Projects | Build real-world Python projects |
 
 ---
@@ -124,7 +124,7 @@ Since you’re a {role_ctx}, I’d recommend a path that eventually leads into b
 
 ---
 
-### Month 2 — Intermediate Python
+### Month 2 — Core Application Development
 #### Week 5: Functions
 - Creating functions
 - Parameters
@@ -341,7 +341,7 @@ If you follow this consistently, 3 months is enough to reach a solid practical P
             },
             {
                 "project_title": proj_title,
-                "title": "Month 2: Intermediate Python, OOP & File Systems (Weeks 5–8)",
+                "title": "Month 2: Core Applications, OOP & File Systems (Weeks 5–8)",
                 "description": "Deep dive into reusable functions, JSON/CSV file handling, OOP class hierarchies, and virtualenv/Git.",
                 "target_date": m2_dt,
             },
@@ -684,7 +684,7 @@ Since you’re a {role_ctx}, I’d recommend a progression moving systematically
 | Phase | Focus | What you'll be able to do |
 | :--- | :--- | :--- |
 | **Phase 1** | Core Fundamentals & Tooling | Execute foundational tasks with confidence |
-| **Phase 2** | Intermediate Architecture & Practice | Build structured, functional applications |
+| **Phase 2** | Core Architecture & Practical Applications | Build structured, functional applications |
 | **Phase 3** | Advanced Mastery & Capstone | Deliver a complete production-grade deliverable |
 
 ---
@@ -700,7 +700,7 @@ Since you’re a {role_ctx}, I’d recommend a progression moving systematically
 
 ---
 
-### Phase 2 — Intermediate Execution & Architecture (Weeks 5–8)
+### Phase 2 — Core Architecture & Application Execution (Weeks 5–8)
 #### Concepts & Tooling:
 - Reusable modular architecture, separation of concerns
 - Data persistence, API integrations, and external services
@@ -828,6 +828,77 @@ PHASE 3: Advanced Architecture → Real Capstone Deliverable
         ]
     }
 
+
+def sanitize_roadmap_topic_labels(data: Dict[str, Any]) -> Dict[str, Any]:
+    """Ensures roadmap generation never classifies or labels topics as high, low, or intermediate."""
+    if not isinstance(data, dict):
+        return data
+
+    def clean_text(text: str) -> str:
+        if not isinstance(text, str):
+            return text
+        text = re.sub(r'(?i)\bintermediate python\b', 'Core Application Python', text)
+        text = re.sub(r'(?i)\bintermediate architecture\b', 'Core Architecture', text)
+        text = re.sub(r'(?i)\bintermediate execution\b', 'Applied Execution', text)
+        text = re.sub(r'(?i)\bintermediate logic\b', 'Application Logic', text)
+        text = re.sub(r'(?i)\bintermediate paradigms\b', 'Modular paradigms', text)
+        text = re.sub(r'(?i)\bintermediate level\b', 'Applied stage', text)
+        text = re.sub(r'(?i)\bintermediate\b', 'Applied', text)
+        text = re.sub(
+            r'(?i)\b(topic|subject|phase|module)\s+(?:should be|is)\s+(?:high|low|intermediate)\b',
+            r'\1 is core',
+            text,
+        )
+        text = re.sub(r'(?i)\b(?:high|low|intermediate)[ -]priority topic\b', 'Core topic', text)
+        text = re.sub(r'(?i)\b(?:high|low|intermediate) topic\b', 'Topic', text)
+        text = re.sub(
+            r'(?i)\bfocus on high-priority deliverables first\b',
+            'focus on milestone deliverables in sequence',
+            text,
+        )
+        return text
+
+    if "summary" in data and isinstance(data["summary"], str):
+        data["summary"] = clean_text(data["summary"])
+
+    for proj in data.get("projects", []):
+        if isinstance(proj, dict):
+            if "title" in proj:
+                proj["title"] = clean_text(proj["title"])
+            if "description" in proj:
+                proj["description"] = clean_text(proj["description"])
+
+    for m in data.get("milestones", []):
+        if isinstance(m, dict):
+            if "title" in m:
+                m["title"] = clean_text(m["title"])
+            if "description" in m:
+                m["description"] = clean_text(m["description"])
+
+    for t in data.get("tasks", []):
+        if isinstance(t, dict):
+            if "title" in t:
+                t["title"] = clean_text(t["title"])
+            if "description" in t:
+                t["description"] = clean_text(t["description"])
+
+    for n in data.get("notes", []):
+        if isinstance(n, dict):
+            if "title" in n:
+                n["title"] = clean_text(n["title"])
+            if "content" in n:
+                n["content"] = clean_text(n["content"])
+
+    for ev in data.get("calendar_events", []):
+        if isinstance(ev, dict):
+            if "title" in ev:
+                ev["title"] = clean_text(ev["title"])
+            if "description" in ev:
+                ev["description"] = clean_text(ev["description"])
+
+    return data
+
+
 @router.get("/health")
 async def ai_health():
     if settings.GROQ_API_KEY:
@@ -902,18 +973,19 @@ async def generate_ai_proposal(
 
     system_prompt = f"""You are MentorOS AI Copilot for the {role} role.
 Your task is to analyze the user request and generate comprehensive mentor-grade guidance and a clear sequential roadmap.
+CRITICAL CONSTRAINT: In roadmap generation, never tell or classify any topic, module, task, or phase as 'high', 'low', or 'intermediate' (neither in difficulty, complexity, nor priority). Do not use the words 'high', 'low', or 'intermediate' to qualify topics or learning stages. Present all topics with descriptive domain concepts, actionable skills, and practical project deliverables.
 Output ONLY valid JSON matching this schema:
 {{
-  "summary": "Full comprehensive roadmap in rich Markdown: an encouraging personal mentor introduction tailored to a student/developer, a clean overview table (Month | Focus | What you will be able to do), detailed week-by-week breakdown with core concepts and hands-on practice problems, real-world mini-projects & capstone with architecture, a daily 1.5-2h study schedule with the golden active practice rule, and progression flowchart",
-  "projects": [{{"title": "...", "description": "...", "priority": "high", "target_date": "YYYY-MM-DD"}}],
+  "summary": "Full comprehensive roadmap in rich Markdown: an encouraging personal mentor introduction tailored to a student/developer, a clean overview table (Month | Focus | What you will be able to do), detailed week-by-week breakdown with core concepts and hands-on practice problems (without classifying topics as high, low, or intermediate), real-world mini-projects & capstone with architecture, a daily 1.5-2h study schedule with the golden active practice rule, and progression flowchart",
+  "projects": [{{"title": "...", "description": "...", "priority": "medium", "target_date": "YYYY-MM-DD"}}],
   "milestones": [{{"project_title": "...", "title": "...", "description": "...", "target_date": "YYYY-MM-DD"}}],
-  "tasks": [{{"project_title": "...", "title": "...", "description": "...", "priority": "high", "estimated_minutes": 60, "due_date": "YYYY-MM-DD"}}],
+  "tasks": [{{"project_title": "...", "title": "...", "description": "...", "priority": "medium", "estimated_minutes": 60, "due_date": "YYYY-MM-DD"}}],
   "calendar_events": [{{"title": "...", "start_at": "YYYY-MM-DDTHH:MM:SS", "end_at": "YYYY-MM-DDTHH:MM:SS", "event_type": "study_block"}}],
   "notes": [{{"title": "...", "content": "..."}}]
 }}
 Make sure to include:
 1. Exactly 1 overarching roadmap project in "projects".
-2. 3 progressive roadmap milestones/phases in "milestones" covering each phase or month.
+2. 3 progressive roadmap milestones/phases in "milestones" covering each phase or month without using 'high', 'low', or 'intermediate' labels.
 3. Actionable focus tasks in "tasks" for weekly practice drills and milestone projects.
 4. 1-2 scheduled study/work sessions in "calendar_events".
 5. 1 strategic guidance note in "notes" with the complete roadmap guide.
@@ -1002,7 +1074,7 @@ Output raw JSON only. Do not include markdown code block backticks around the JS
         structured_data["notes"] = [
             {
                 "title": f"Strategic Guidance & Roadmap: {prompt[:30]}",
-                "content": f"# Guidance & Execution Roadmap for: {prompt}\n\n## Strategy & Approach\nFollow a paced schedule and focus on high-priority deliverables first.\n\n## Action Plan\n1. Review project milestones.\n2. Complete daily tasks on the task board.\n3. Verify progress at each phase check-in.",
+                "content": f"# Guidance & Execution Roadmap for: {prompt}\n\n## Strategy & Approach\nFollow a paced schedule and focus on milestone deliverables in sequence.\n\n## Action Plan\n1. Review project milestones.\n2. Complete daily tasks on the task board.\n3. Verify progress at each phase check-in.",
             }
         ]
 
@@ -1038,6 +1110,9 @@ Output raw JSON only. Do not include markdown code block backticks around the JS
                 "end_at": m_date.replace(hour=17, minute=30, second=0).isoformat(),
                 "event_type": "assignment_deadline" if role == "student" else "milestone_target",
             })
+
+    # Sanitize roadmap topic labels to ensure no high, low, or intermediate labels are present
+    structured_data = sanitize_roadmap_topic_labels(structured_data)
 
     # Persist proposal into DB
     proposal = models.AIProposal(

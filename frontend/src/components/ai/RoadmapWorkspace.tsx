@@ -186,7 +186,7 @@ export function RoadmapWorkspace({ isOpen, onClose, initialPrompt = '' }: Roadma
         if (idx === 0) {
           description = `Establish core foundations, master essential syntax, configure the development environment, and build confidence through daily hands-on practice routines.`;
         } else if (idx === 1) {
-          description = `Progress into intermediate paradigms, design patterns, modular architecture, and structured problem-solving with milestone mini-projects.`;
+          description = `Progress into core software patterns, modular architecture, and structured problem-solving with milestone mini-projects.`;
         } else {
           description = `Advance to real-world integration, testing, performance optimization, and capstone deployment ready for portfolio review.`;
         }
@@ -245,7 +245,7 @@ export function RoadmapWorkspace({ isOpen, onClose, initialPrompt = '' }: Roadma
         },
         {
           id: 102,
-          title: 'Phase 2: Modular Architecture & Intermediate Logic',
+          title: 'Phase 2: Modular Architecture & Application Logic',
           duration: 'Weeks 5-8 • Month 2',
           description: `Apply data structures, function composition, error handling, and file I/O to construct modular components and practical domain utilities.`,
           tasks: [
@@ -985,11 +985,14 @@ export function RoadmapWorkspace({ isOpen, onClose, initialPrompt = '' }: Roadma
 
                                 <div className="flex items-center gap-2 shrink-0 text-3xs font-mono text-text-muted">
                                   {task.estimatedMinutes && <span>{task.estimatedMinutes}m</span>}
-                                  {task.priority && (
-                                    <span className="capitalize px-1.5 py-0.5 rounded bg-bg-surface border border-border-base">
-                                      {task.priority}
-                                    </span>
-                                  )}
+                                  {task.priority &&
+                                    !['high', 'low', 'intermediate', 'urgent', 'medium'].includes(
+                                      task.priority.toLowerCase()
+                                    ) && (
+                                      <span className="capitalize px-1.5 py-0.5 rounded bg-bg-surface border border-border-base">
+                                        {task.priority}
+                                      </span>
+                                    )}
                                 </div>
                               </div>
                             ))}
