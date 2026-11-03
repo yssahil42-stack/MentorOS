@@ -61,6 +61,11 @@ const DevSettingsPage = lazy(() => import('../pages/developer/DevSettingsPage'))
 const GitHubSyncPage = lazy(() => import('../pages/developer/GitHubSyncPage'));
 const DeployPreviewPage = lazy(() => import('../pages/developer/DeployPreviewPage'));
 
+// ── Public Sharing Pages ──
+const PublicTemplatePage = lazy(() => import('../pages/public/PublicTemplatePage'));
+const DeveloperPortfolioPage = lazy(() => import('../pages/public/DeveloperPortfolioPage'));
+const PublicCaseStudyPage = lazy(() => import('../pages/public/PublicCaseStudyPage'));
+
 // ── Job Seeker ──
 const JobSeekerDashboard = lazy(() => import('../pages/job_seeker/JobSeekerDashboard'));
 const SearchPlanPage = lazy(() => import('../pages/jobSeeker/SearchPlanPage'));
@@ -134,6 +139,11 @@ export function AppRouter() {
 
           {/* Public Client Portal (no auth required) */}
           <Route path="/client/:projectId" element={<ClientPortalPage />} />
+
+          {/* Public Sharing routes */}
+          <Route path="/templates/:id" element={<PublicTemplatePage />} />
+          <Route path="/portfolio/:username" element={<DeveloperPortfolioPage />} />
+          <Route path="/case-study/:id" element={<PublicCaseStudyPage />} />
 
           {/* ── Protected workspace ── */}
           <Route

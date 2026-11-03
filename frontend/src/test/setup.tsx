@@ -8,7 +8,13 @@ vi.mock('react-router-dom', async () => {
   return {
     ...actual,
     useNavigate: () => vi.fn(),
-    useParams: () => ({}),
+    useParams: () => {
+      try {
+        return (actual as any).useParams();
+      } catch {
+        return {};
+      }
+    },
     useSearchParams: () => [new URLSearchParams(), vi.fn()],
     Link: ({ children, to, ...props }: any) => (
       <a href={typeof to === 'string' ? to : (to?.pathname ?? '')} {...props}>
@@ -486,6 +492,13 @@ vi.mock('lucide-react', () => {
     'MapPinCheck',
     'MapPinMinus',
     'MapPinPlus',
+    'ShieldCheck',
+    'Building',
+    'Quote',
+    'Github',
+    'GitBranch',
+    'Terminal',
+    'Globe',
   ];
 
   const mockedIcons: Record<string, React.ComponentType<React.SVGProps<SVGSVGElement>>> = {};
