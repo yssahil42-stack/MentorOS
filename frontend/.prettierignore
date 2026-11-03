@@ -1,0 +1,70 @@
+# Dependencies
+node_modules/
+
+# Build outputs
+dist/
+build/
+.vite/
+
+# Configuration files
+*.config.*
+*.config.ts
+*.config.js
+vitest.config.ts
+playwright.config.ts
+tailwind.config.ts
+postcss.config.js
+tsconfig.json
+tsconfig.node.json
+vite.config.ts
+
+# Generated files
+*.d.ts
+*.map
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Test coverage
+coverage/
+
+# Lock files
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Misc
+*.local
+.env
+.env.*
+!.env.example
+
+# SVG
+*.svg
+
+# Images
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.webp
+*.ico
+
+# Fonts
+*.woff
+*.woff2
+*.ttf
+*.eot
