@@ -45,11 +45,9 @@ export function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
   const navigate = useNavigate();
   const location = useLocation();
 
-  if (!user) return null;
-
   const currentWorkspaceRole = getWorkspaceRole(
     location.pathname,
-    (user.role as UserRole) || 'student'
+    (user?.role as UserRole) || 'student'
   );
 
   const [selectedRole, setSelectedRole] = useState<UserRole>(currentWorkspaceRole);
@@ -59,11 +57,11 @@ export function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
     setSelectedRole(currentWorkspaceRole);
   }, [currentWorkspaceRole, isOpen]);
 
-  const profileData = (user.profile_data as Record<string, unknown>) || {};
+  const profileData = (user?.profile_data as Record<string, unknown>) || {};
 
   const getInitialData = (r: UserRole) => {
     try {
-      const saved = localStorage.getItem(`mentoros_module_profile_${user.id}_${r}`);
+      const saved = user ? localStorage.getItem(`mentoros_module_profile_${user.id}_${r}`) : null;
       if (saved) return JSON.parse(saved);
     } catch {
       // fallback
@@ -224,6 +222,8 @@ export function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
   };
 
   const currentFields = profiles[selectedRole];
+
+  if (!user) return null;
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="User Profile" size="lg">
