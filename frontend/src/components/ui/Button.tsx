@@ -23,6 +23,12 @@ export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
   leftIcon?: React.ReactNode;
   iconRight?: React.ReactNode;
   fullWidth?: boolean;
+  dropdown?: React.ReactNode; // For SplitButton
+  tooltip?: string; // Native tooltip
+  keyboardShortcut?: string; // Show hint (e.g., "⌘K")
+  analyticsEvent?: string; // Auto-track clicks
+  confirm?: string; // Native confirm dialog
+  debounceMs?: number; // Prevent double-click
 }
 
 // ─── Component ────────────────────────────────────────────────────────────────
@@ -38,22 +44,64 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       leftIcon,
       iconRight,
       fullWidth = false,
+      dropdown,
+      tooltip,
+      keyboardShortcut,
+      analyticsEvent,
+      confirm,
+      debounceMs,
       children,
       className,
       disabled,
+      title,
+      onClick,
       ...props
     },
     ref
   ) => {
+    const lastClickRef = React.useRef<number>(0);
     const isDisabled = disabled || loading;
     const leadIcon = icon ?? leftIcon;
     const isSelected = selected || props['aria-pressed'] === true;
+
+    const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+      if (confirm && typeof window !== 'undefined' && !window.confirm(confirm)) {
+        e.preventDefault();
+        e.stopPropagation();
+        return;
+      }
+
+      if (debounceMs && debounceMs > 0) {
+        const now = Date.now();
+        if (now - lastClickRef.current < debounceMs) {
+          e.preventDefault();
+          return;
+        }
+        lastClickRef.current = now;
+      }
+
+      if (analyticsEvent && typeof window !== 'undefined') {
+        try {
+          window.dispatchEvent(
+            new CustomEvent('mentoros:analytics', {
+              detail: { event: analyticsEvent, timestamp: Date.now() },
+            })
+          );
+        } catch {
+          // ignore
+        }
+      }
+
+      onClick?.(e);
+    };
 
     return (
       <button
         ref={ref}
         disabled={isDisabled}
         aria-disabled={isDisabled}
+        title={tooltip ?? title}
+        onClick={handleClick}
         className={cn(
           // Base
           'inline-flex items-center justify-center font-medium rounded-xl border',
@@ -84,9 +132,19 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
           )
         )}
         {children && <span>{children}</span>}
+        {keyboardShortcut && (
+          <kbd className="ml-1.5 inline-flex items-center px-1.5 py-0.5 text-[10px] font-mono font-medium text-text-muted bg-bg-surface/80 border border-border-base rounded shadow-2xs select-none">
+            {keyboardShortcut}
+          </kbd>
+        )}
         {!loading && iconRight && (
           <span className="shrink-0 ml-auto" aria-hidden="true">
             {iconRight}
+          </span>
+        )}
+        {dropdown && (
+          <span className="shrink-0 ml-1" aria-hidden="true">
+            {dropdown}
           </span>
         )}
       </button>

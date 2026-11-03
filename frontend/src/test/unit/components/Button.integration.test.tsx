@@ -232,4 +232,73 @@ describe('Button Integration Tests', () => {
       });
     });
   });
+
+  describe('Extended Props Integration', () => {
+    it('sets tooltip as button title', () => {
+      render(<Button tooltip="Save your changes">Save</Button>);
+      const btn = screen.getByRole('button', { name: 'Save' });
+      expect(btn).toHaveAttribute('title', 'Save your changes');
+    });
+
+    it('renders keyboardShortcut hint', () => {
+      render(<Button keyboardShortcut="⌘K">Quick Search</Button>);
+      expect(screen.getByText('⌘K')).toBeInTheDocument();
+    });
+
+    it('handles confirm dialog when user accepts and rejects', () => {
+      const handleClick = vi.fn();
+      const confirmSpy = vi.spyOn(window, 'confirm');
+
+      // User rejects
+      confirmSpy.mockReturnValueOnce(false);
+      render(
+        <Button confirm="Are you sure you want to delete this project?" onClick={handleClick}>
+          Delete
+        </Button>
+      );
+      const btn = screen.getByRole('button', { name: 'Delete' });
+      fireEvent.click(btn);
+      expect(confirmSpy).toHaveBeenCalledWith('Are you sure you want to delete this project?');
+      expect(handleClick).not.toHaveBeenCalled();
+
+      // User accepts
+      confirmSpy.mockReturnValueOnce(true);
+      fireEvent.click(btn);
+      expect(handleClick).toHaveBeenCalledTimes(1);
+      confirmSpy.mockRestore();
+    });
+
+    it('dispatches analyticsEvent on click', () => {
+      const handleAnalytics = vi.fn();
+      window.addEventListener('mentoros:analytics', handleAnalytics);
+
+      render(<Button analyticsEvent="cta_capture_work_clicked">Capture</Button>);
+      const btn = screen.getByRole('button', { name: 'Capture' });
+      fireEvent.click(btn);
+
+      expect(handleAnalytics).toHaveBeenCalled();
+      window.removeEventListener('mentoros:analytics', handleAnalytics);
+    });
+
+    it('debounces rapid double clicks when debounceMs is specified', () => {
+      const handleClick = vi.fn();
+      render(
+        <Button debounceMs={500} onClick={handleClick}>
+          Submit Order
+        </Button>
+      );
+
+      const btn = screen.getByRole('button', { name: 'Submit Order' });
+      fireEvent.click(btn);
+      fireEvent.click(btn);
+      fireEvent.click(btn);
+
+      expect(handleClick).toHaveBeenCalledTimes(1);
+    });
+
+    it('renders attached dropdown node', () => {
+      render(<Button dropdown={<span data-testid="attached-dropdown">▼</span>}>Actions</Button>);
+      expect(screen.getByTestId('attached-dropdown')).toBeInTheDocument();
+    });
+  });
 });
