@@ -146,14 +146,6 @@ export function QuickCaptureFab({
           <Plus className="w-6 h-6" aria-hidden="true" />
         )}
       </Button>
-
-      {/* Keyboard Hint Tooltip */}
-      <div className="hidden md:block absolute bottom-full right-0 mb-2 px-2.5 py-1.5 bg-bg-surface border border-border-base rounded-lg shadow-lg text-xs whitespace-nowrap animate-fade-in">
-        <kbd className="px-1.5 py-0.5 bg-bg-base border border-border-base rounded font-semibold text-text-primary">
-          {navigator.platform.includes('Mac') ? '⌘' : 'Ctrl'}+K
-        </kbd>{' '}
-        <span className="text-text-secondary font-medium">Quick capture</span>
-      </div>
     </div>
   );
 }
