@@ -1,5 +1,7 @@
 import React, { forwardRef } from 'react';
-import { cn } from '../../utils/cn';
+import { selectVariants, InputVariant, InputSize } from '../../utils/inputVariants';
+
+export * from '../../utils/inputVariants';
 
 export interface SelectOption {
   value: string | number;
@@ -8,18 +10,33 @@ export interface SelectOption {
 
 export interface SelectProps extends Omit<
   React.SelectHTMLAttributes<HTMLSelectElement>,
-  'onChange'
+  'onChange' | 'size'
 > {
   label?: string;
   error?: string;
   options: SelectOption[];
+  variant?: InputVariant;
+  size?: InputSize;
   onValueChange?: (value: any) => void;
   onChange?: ((value: string) => void) | React.ChangeEventHandler<HTMLSelectElement>;
 }
 
 export const Select = forwardRef<HTMLSelectElement, SelectProps>(
   (
-    { className, label, error, options, onValueChange, onChange, id, required, value, ...props },
+    {
+      className,
+      label,
+      error,
+      options,
+      variant = 'default',
+      size = 'md',
+      onValueChange,
+      onChange,
+      id,
+      required,
+      value,
+      ...props
+    },
     ref
   ) => {
     const selectId = id || (label ? label.toLowerCase().replace(/\s+/g, '-') : undefined);
@@ -54,13 +71,12 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
           value={value}
           onChange={handleChange}
           required={required}
-          className={cn(
-            'w-full h-9 rounded-xl text-xs bg-bg-surface border border-border-base px-3 py-1.5 text-text-primary transition-all',
-            'focus:outline-none focus:border-solar-500 focus:ring-1 focus:ring-solar-500/50',
-            'disabled:opacity-50 disabled:cursor-not-allowed',
-            error && 'border-danger focus:border-danger focus:ring-danger/30',
-            className
-          )}
+          className={selectVariants({
+            variant,
+            size,
+            hasError: !!error,
+            className,
+          })}
           {...props}
         >
           {options.map((opt) => (

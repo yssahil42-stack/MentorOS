@@ -1,15 +1,33 @@
 import React, { forwardRef } from 'react';
-import { cn } from '../../utils/cn';
+import { inputVariants, InputVariant, InputSize } from '../../utils/inputVariants';
 
-export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
+export * from '../../utils/inputVariants';
+
+export interface InputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size'> {
   label?: string;
   error?: string;
   helperText?: string;
   icon?: React.ReactNode;
+  variant?: InputVariant;
+  size?: InputSize;
 }
 
 export const Input = forwardRef<HTMLInputElement, InputProps>(
-  ({ className, label, error, helperText, icon, id, required, ...props }, ref) => {
+  (
+    {
+      className,
+      label,
+      error,
+      helperText,
+      icon,
+      id,
+      required,
+      variant = 'default',
+      size = 'md',
+      ...props
+    },
+    ref
+  ) => {
     const inputId = id || (label ? label.toLowerCase().replace(/\s+/g, '-') : undefined);
 
     return (
@@ -29,14 +47,13 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             id={inputId}
             ref={ref}
             required={required}
-            className={cn(
-              'w-full h-9 rounded-xl text-xs bg-bg-surface border border-border-base px-3 py-2 text-text-primary placeholder:text-text-faint transition-all',
-              'focus:outline-none focus:border-solar-500 focus:ring-1 focus:ring-solar-500/50',
-              'disabled:opacity-50 disabled:cursor-not-allowed',
-              icon && 'pl-9',
-              error && 'border-danger focus:border-danger focus:ring-danger/30',
-              className
-            )}
+            className={inputVariants({
+              variant,
+              size,
+              hasError: !!error,
+              hasIcon: !!icon,
+              className,
+            })}
             {...props}
           />
         </div>

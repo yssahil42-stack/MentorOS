@@ -1,31 +1,7 @@
 import React, { useRef, useState, useCallback } from 'react';
-import { cn } from '../../utils/cn';
+import { Card3DVariant, cardVariants, cardVariantStyles } from '../../utils/cardVariants';
 
-export type Card3DVariant = 'default' | 'secondary' | 'elevated' | 'glass';
-
-export const cardVariantStyles: Record<Card3DVariant, string> = {
-  default:
-    'bg-bg-surface/90 border-border-base/90 shadow-card hover:border-border-hover backdrop-blur-md',
-  secondary:
-    'bg-bg-surface/90 border-border-base/90 shadow-card hover:border-border-hover backdrop-blur-md',
-  elevated:
-    'bg-bg-elevated/90 border-border-base shadow-card hover:border-border-hover backdrop-blur-md',
-  glass: 'glass border-glass-border/70 shadow-glass hover:border-border-hover backdrop-blur-xl',
-};
-
-export function cardVariants({
-  variant = 'secondary',
-  className,
-}: {
-  variant?: Card3DVariant;
-  className?: string;
-} = {}) {
-  return cn(
-    'relative rounded-2xl border transition-colors duration-200 group/card3d overflow-hidden',
-    cardVariantStyles[variant] || cardVariantStyles.secondary,
-    className
-  );
-}
+export * from '../../utils/cardVariants';
 
 export interface Card3DProps extends React.HTMLAttributes<HTMLDivElement> {
   children: React.ReactNode;

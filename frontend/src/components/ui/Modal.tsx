@@ -3,26 +3,26 @@ import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
 import { cn } from '../../utils/cn';
 import { Button } from './Button';
+import {
+  ModalSize,
+  modalSizes,
+  modalDialogVariants,
+  modalOverlayVariants,
+  modalBackdropVariants,
+} from '../../utils/modalVariants';
+
+export * from '../../utils/modalVariants';
 
 interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
   title?: string;
   description?: string;
-  size?: 'sm' | 'md' | 'lg' | 'xl' | 'full' | 'fullscreen';
+  size?: ModalSize;
   children: React.ReactNode;
   footer?: React.ReactNode;
   closeOnBackdrop?: boolean;
 }
-
-const sizeClasses: Record<NonNullable<ModalProps['size']>, string> = {
-  sm: 'max-w-sm',
-  md: 'max-w-md',
-  lg: 'max-w-lg',
-  xl: 'max-w-2xl',
-  full: 'max-w-[95vw]',
-  fullscreen: 'w-full h-full max-w-none max-h-none',
-};
 
 export function Modal({
   isOpen,
@@ -90,10 +90,7 @@ export function Modal({
 
   return createPortal(
     <div
-      className={cn(
-        'fixed inset-0 z-50 flex items-center justify-center',
-        size === 'fullscreen' ? 'p-0' : 'p-4'
-      )}
+      className={modalOverlayVariants({ size })}
       role="dialog"
       aria-modal="true"
       aria-labelledby={title ? 'modal-title' : undefined}
@@ -101,23 +98,13 @@ export function Modal({
     >
       {/* Backdrop */}
       <div
-        className="absolute inset-0 bg-black/60 backdrop-blur-sm animate-fade-in"
+        className={modalBackdropVariants}
         onClick={closeOnBackdrop ? onClose : undefined}
         aria-hidden="true"
       />
 
       {/* Dialog */}
-      <div
-        ref={dialogRef}
-        className={cn(
-          'relative w-full bg-bg-surface border border-border-subtle shadow-glass-lg',
-          'animate-scale-in flex flex-col',
-          size === 'fullscreen'
-            ? 'h-screen max-h-screen rounded-none border-0'
-            : 'rounded-2xl max-h-[90vh]',
-          sizeClasses[size]
-        )}
-      >
+      <div ref={dialogRef} className={modalDialogVariants({ size })}>
         {/* Header */}
         {(title || description) && (
           <div className="flex items-start justify-between p-6 pb-4 border-b border-border-subtle">
