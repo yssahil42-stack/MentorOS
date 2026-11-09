@@ -22,6 +22,7 @@ htmlcov/
 *.sqlite
 *.sqlite3
 !backend/mentoros.db.example
+!backend/mentoros_seed.db
 
 # Node / Frontend
 node_modules/

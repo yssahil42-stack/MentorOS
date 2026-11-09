@@ -24,7 +24,7 @@ const BASE_URL =
 
 export function createClient(): AxiosInstance {
   // Default timeout: 8000ms for GET, 30000ms for POST/PATCH/DELETE
-  const client = axios.create({ baseURL: BASE_URL, timeout: 8_000 });
+  const client = axios.create({ baseURL: BASE_URL, timeout: 30_000 });
 
   // ─── Request: inject JWT & Dynamic Timeouts ─────────────────
   client.interceptors.request.use((config) => {
@@ -34,8 +34,8 @@ export function createClient(): AxiosInstance {
     // Default: 8000ms for GET, 30000ms for POST/PATCH/DELETE (90000ms for /ai/propose)
     if (endpoint === '/ai/propose') {
       config.timeout = 90_000;
-    } else if (!config.timeout || config.timeout === 8_000 || config.timeout === 15_000) {
-      config.timeout = method === 'get' ? 8_000 : 30_000;
+    } else if (!config.timeout || config.timeout === 8_000 || config.timeout === 30_000 || config.timeout === 15_000) {
+      config.timeout = 30_000;
     }
 
     const token = localStorage.getItem('mentor_token');

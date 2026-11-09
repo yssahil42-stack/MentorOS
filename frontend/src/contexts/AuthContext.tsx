@@ -1,5 +1,5 @@
 import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
-import type { User } from '../types/user';
+import type { User, UserRole } from '../types/user';
 import type { LoginRequest, RegisterRequest, AuthResponse } from '../types/user';
 import { api } from '../services/api';
 import { queryClient } from '../store/queryClient';
@@ -25,6 +25,40 @@ const TOKEN_KEY = 'mentor_token';
 const USER_KEY = 'mentor_user';
 
 // ─── Provider ────────────────────────────────────────────────────────────────
+
+function resolveRoleForUser(email: string, requestedRole?: string): UserRole {
+  if (requestedRole && ['student', 'developer', 'freelancer', 'job_seeker'].includes(requestedRole)) {
+    return requestedRole as UserRole;
+  }
+  const lower = (email || '').toLowerCase().trim();
+  if (
+    lower.includes('student') ||
+    lower.includes('study') ||
+    lower.includes('academic') ||
+    lower.includes('college') ||
+    lower === 'yssahil42@gmail.com'
+  ) {
+    return 'student';
+  }
+  if (lower.includes('dev') || lower === 'yssahil422@gmail.com' || lower === 'yssahil2@gmail.com') {
+    return 'developer';
+  }
+  if (lower.includes('freelance') || lower === 'yssahil412@gmail.com' || lower === 'yssahil421@gmail.com' || lower === 'yssahil1@gmail.com') {
+    return 'freelancer';
+  }
+  if (lower.includes('job') || lower.includes('seek') || lower === 'yssahil424@gmail.com' || lower === 'yssahil3@gmail.com') {
+    return 'job_seeker';
+  }
+  try {
+    const saved = localStorage.getItem('mentor_workspace_role') as UserRole;
+    if (saved && ['student', 'developer', 'freelancer', 'job_seeker'].includes(saved)) {
+      return saved;
+    }
+  } catch {
+    // ignore
+  }
+  return 'student';
+}
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(() => {
@@ -91,13 +125,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         err?.message?.includes('Unable to reach the server') ||
         err?.message?.includes('Network Error');
       if (isNetworkError) {
-        const demoRole = req.email.includes('student')
-          ? 'student'
-          : req.email.includes('dev')
-            ? 'developer'
-            : req.email.includes('freelance')
-              ? 'freelancer'
-              : 'job_seeker';
+        const demoRole = resolveRoleForUser(req.email);
         const rawName = req.email.split('@')[0].replace(/[._-]/g, ' ') || 'Demo User';
         const demoName = rawName.charAt(0).toUpperCase() + rawName.slice(1);
         const demoUser: User = {
@@ -130,7 +158,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           id: Date.now(),
           email: req.email,
           full_name: req.full_name || 'New Member',
-          role: req.role || 'job_seeker',
+          role: resolveRoleForUser(req.email, req.role),
           created_at: new Date().toISOString(),
         };
         return persistSession({
@@ -156,7 +184,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           id: 1,
           email: 'google.user@mentoros.dev',
           full_name: 'Google User',
-          role: (role as any) || 'job_seeker',
+          role: resolveRoleForUser('google.user@mentoros.dev', role),
           created_at: new Date().toISOString(),
         };
         return persistSession({
