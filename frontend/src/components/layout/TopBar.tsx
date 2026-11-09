@@ -5,8 +5,7 @@ import { cn } from '../../utils/cn';
 import { useAuth } from '../../contexts/AuthContext';
 import { useWorkspace } from '../../contexts/WorkspaceContext';
 import { NotificationDropdown } from './NotificationDropdown';
-import type { UserRole } from '../../types/user';
-import { getWorkspaceRole } from '../../utils/roleUtils';
+import { WorkspaceSwitcher } from './WorkspaceSwitcher';
 
 interface TopBarProps {
   onMenuClick: () => void;
@@ -51,7 +50,7 @@ export function TopBar({ onMenuClick }: TopBarProps) {
         <h1 className="text-xs md:text-sm font-bold text-text-primary truncate">{pageTitle}</h1>
       </div>
 
-      {/* Center: Search pill bar (as featured in reference screenshot) */}
+      {/* Center: Search pill bar */}
       <div className="hidden md:flex items-center flex-1 max-w-sm mx-4">
         <div className="relative w-full">
           <Search
@@ -67,7 +66,10 @@ export function TopBar({ onMenuClick }: TopBarProps) {
       </div>
 
       {/* ─── Right actions ─────────────────────────────────── */}
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 shrink-0">
+        {/* Module / Workspace Switcher */}
+        <WorkspaceSwitcher />
+
         {/* Notifications Dropdown */}
         <NotificationDropdown />
 

@@ -16,6 +16,10 @@ import {
   Moon,
   Laptop,
   User,
+  GraduationCap,
+  Code2,
+  Briefcase,
+  Target,
 } from 'lucide-react';
 import { useWorkspace } from '../../contexts/WorkspaceContext';
 import { useAuth } from '../../contexts/AuthContext';
@@ -188,6 +192,55 @@ export function CommandPalette() {
       action: () => {
         closeCommandPalette();
         setTheme('system');
+      },
+    },
+    // Switch Workspaces
+    {
+      id: 'switch-student',
+      category: 'Switch Role',
+      title: 'Switch to Student Workspace',
+      subtitle: 'Study plans, courses & academic projects',
+      icon: <GraduationCap className="w-4 h-4 text-blue-400" />,
+      action: () => {
+        closeCommandPalette();
+        localStorage.setItem('mentor_workspace_role', 'student');
+        navigate('/app/student/dashboard');
+      },
+    },
+    {
+      id: 'switch-developer',
+      category: 'Switch Role',
+      title: 'Switch to Developer Workspace',
+      subtitle: 'Build roadmaps, milestones & Git repos',
+      icon: <Code2 className="w-4 h-4 text-emerald-400" />,
+      action: () => {
+        closeCommandPalette();
+        localStorage.setItem('mentor_workspace_role', 'developer');
+        navigate('/app/developer/dashboard');
+      },
+    },
+    {
+      id: 'switch-freelancer',
+      category: 'Switch Role',
+      title: 'Switch to Freelancer Workspace',
+      subtitle: 'Client deliverables, invoicing & contracts',
+      icon: <Briefcase className="w-4 h-4 text-purple-400" />,
+      action: () => {
+        closeCommandPalette();
+        localStorage.setItem('mentor_workspace_role', 'freelancer');
+        navigate('/app/freelancer/dashboard');
+      },
+    },
+    {
+      id: 'switch-job-seeker',
+      category: 'Switch Role',
+      title: 'Switch to Job Seeker Workspace',
+      subtitle: 'Applications, resume builder & interview prep',
+      icon: <Target className="w-4 h-4 text-amber-400" />,
+      action: () => {
+        closeCommandPalette();
+        localStorage.setItem('mentor_workspace_role', 'job_seeker');
+        navigate('/app/job-seeker/dashboard');
       },
     },
   ];
