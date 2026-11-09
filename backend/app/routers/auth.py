@@ -94,7 +94,13 @@ async def google_login(payload: schemas.GoogleAuthRequest, db: Session = Depends
 
     # Verify audience matches client_id
     token_aud = id_info.get("aud")
-    if token_aud != settings.GOOGLE_CLIENT_ID:
+    valid_client_ids = [
+        cid for cid in [
+            settings.GOOGLE_CLIENT_ID,
+            "787072444746-7cp6uis2gfde9ifat86il4rsk34q55a8.apps.googleusercontent.com",
+        ] if cid
+    ]
+    if token_aud not in valid_client_ids:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Google token was not issued for this application.",

@@ -13,24 +13,28 @@ def seed_initial_data(db: Session) -> None:
     """Seeds baseline accounts and demo workspace data if the database is unpopulated."""
     try:
         user_count = db.query(models.User).count()
+        default_pwd = get_password_hash("password123")
+        core_accounts = [
+            ("student@mentoros.dev", "Alex Student", "student", {"program": "BSc Computer Science", "semester": "Year 3"}),
+            ("yssahil42@gmail.com", "Sahil yadav", "student", {"program": "BSc Computer Science", "semester": "Year 3", "main_subjects": "Data Structures, Operating Systems, Cloud Computing"}),
+            ("developer@mentoros.dev", "Alex Developer", "developer", {"tech_stack": "TypeScript, Python, FastAPI, React"}),
+            ("freelancer@mentoros.dev", "Alex Freelancer", "freelancer", {"hourly_rate": 85, "currency": "USD"}),
+            ("jobseeker@mentoros.dev", "Alex JobSeeker", "job_seeker", {"target_role": "Full Stack Engineer", "experience_level": "Senior"}),
+        ]
         if user_count > 0:
-            # Ensure student@mentoros.dev and yssahil42@gmail.com exist even if DB was partially initialized
-            existing_student = db.query(models.User).filter(models.User.email == "yssahil42@gmail.com").first()
-            if not existing_student:
-                student_user = models.User(
-                    email="yssahil42@gmail.com",
-                    hashed_password=get_password_hash("password123"),
-                    full_name="Sahil yadav",
-                    role="student",
-                    onboarding_completed=True,
-                    profile_data={
-                        "program": "BSc Computer Science",
-                        "semester": "Year 3",
-                        "main_subjects": "Data Structures, Operating Systems, Cloud Computing",
-                    },
-                )
-                db.add(student_user)
-                db.commit()
+            for email, name, role, profile in core_accounts:
+                existing = db.query(models.User).filter(models.User.email == email).first()
+                if not existing:
+                    u = models.User(
+                        email=email,
+                        hashed_password=default_pwd,
+                        full_name=name,
+                        role=role,
+                        onboarding_completed=True,
+                        profile_data=profile,
+                    )
+                    db.add(u)
+            db.commit()
             return
 
         now = datetime.datetime.utcnow()

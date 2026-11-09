@@ -39,7 +39,7 @@ declare global {
 
 const GOOGLE_CLIENT_ID =
   import.meta.env.VITE_GOOGLE_CLIENT_ID ||
-  '';
+  '787072444746-7cp6uis2gfde9ifat86il4rsk34q55a8.apps.googleusercontent.com';
 
 export function GoogleSignInButton({
   onSuccess,

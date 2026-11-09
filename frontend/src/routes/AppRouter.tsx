@@ -88,7 +88,8 @@ export function AppRouter() {
   if (isLoading) return <PageLoader />;
 
   const preferredRole = parseRole(localStorage.getItem('mentor_workspace_role'));
-  const rolePath = (preferredRole ?? user?.role ?? 'student').replace('_', '-');
+  const effectiveRole = user?.role ?? preferredRole ?? 'student';
+  const rolePath = effectiveRole.replace('_', '-');
 
   return (
     <Suspense fallback={<PageLoader />}>

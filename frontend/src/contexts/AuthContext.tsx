@@ -110,6 +110,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     queryClient.clear();
     localStorage.setItem(TOKEN_KEY, res.access_token);
     localStorage.setItem(USER_KEY, JSON.stringify(res.user));
+    localStorage.setItem('mentor_workspace_role', res.user.role);
     localStorage.removeItem('mentor_recent_proposals');
     setUser(res.user);
     return res.user;
