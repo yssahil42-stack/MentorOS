@@ -18,9 +18,22 @@ export class ApiError extends Error {
 
 export const API_ERROR_EVENT = 'mentor:api-error';
 
-const BASE_URL =
-  import.meta.env.VITE_API_URL ||
-  (import.meta.env.PROD ? '/api/v1' : 'http://127.0.0.1:8000/api/v1');
+export function getBaseUrl(): string {
+  const envUrl = import.meta.env.VITE_API_URL;
+  if (
+    typeof window !== 'undefined' &&
+    window.location.hostname !== 'localhost' &&
+    window.location.hostname !== '127.0.0.1'
+  ) {
+    if (!envUrl || envUrl.includes('localhost') || envUrl.includes('127.0.0.1')) {
+      return '/api/v1';
+    }
+  }
+  if (envUrl) return envUrl;
+  return import.meta.env.PROD ? '/api/v1' : 'http://127.0.0.1:8000/api/v1';
+}
+
+const BASE_URL = getBaseUrl();
 
 export function createClient(): AxiosInstance {
   // Default timeout: 8000ms for GET, 30000ms for POST/PATCH/DELETE

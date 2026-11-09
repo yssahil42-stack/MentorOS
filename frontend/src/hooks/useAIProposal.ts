@@ -77,9 +77,11 @@ export function useAIProposal() {
 
       try {
         const token = localStorage.getItem('mentor_token');
-        const baseUrl =
-          import.meta.env.VITE_API_URL ||
-          (import.meta.env.PROD ? '/api/v1' : 'http://127.0.0.1:8000/api/v1');
+        const envUrl = import.meta.env.VITE_API_URL;
+        const isNotLocalhost = typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1';
+        const baseUrl = (isNotLocalhost && (!envUrl || envUrl.includes('localhost') || envUrl.includes('127.0.0.1')))
+          ? '/api/v1'
+          : (envUrl || (import.meta.env.PROD ? '/api/v1' : 'http://127.0.0.1:8000/api/v1'));
         const role = options?.role || 'developer';
 
         const response = await fetch(`${baseUrl}/ai/propose`, {
