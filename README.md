@@ -1,4 +1,4 @@
-# MentorOS Pro
+# MentorOS 
 
 > **AI-Powered Personal Workspace for Career Growth**
 
