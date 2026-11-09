@@ -27,6 +27,11 @@ export function Badge({
   dot = false,
   className,
 }: BadgeProps) {
+  const textContent = typeof children === 'string' ? children : typeof label === 'string' ? label : null;
+  if (textContent && textContent.trim().toLowerCase() === 'medium') {
+    return null;
+  }
+
   return (
     <span className={badgeVariants({ variant, size, className })}>
       {dot && (
@@ -46,11 +51,15 @@ export const priorityVariant: Record<Priority, BadgeVariant> = {
   urgent: 'danger',
 };
 
-export function PriorityBadge({ priority }: { priority: Priority }) {
+export function PriorityBadge({ priority }: { priority?: Priority | string | null }) {
+  if (!priority) return null;
+  const normalized = String(priority).trim().toLowerCase();
+  if (normalized === 'medium') return null;
+  const p = normalized as Priority;
   return (
     <Badge
-      label={priority.charAt(0).toUpperCase() + priority.slice(1)}
-      variant={priorityVariant[priority]}
+      label={p.charAt(0).toUpperCase() + p.slice(1)}
+      variant={priorityVariant[p] || 'default'}
       dot
     />
   );

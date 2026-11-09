@@ -113,6 +113,6 @@ describe('ApplicationTrackerPage', () => {
     // Modal should open
     expect(screen.getByText(/Follow-Up Email Draft/i)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /Copy Email/i })).toBeInTheDocument();
-    expect(screen.getByText(/Open in Mail App/i)).toBeInTheDocument();
+    expect(screen.getByText(/Open in Gmail/i)).toBeInTheDocument();
   });
 });

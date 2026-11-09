@@ -28,7 +28,7 @@ describe('ResumeGeneratorPage', () => {
       screen.getByRole('heading', { name: /AI Resume Tailor & Keyword Optimizer/i })
     ).toBeInTheDocument();
     expect(screen.getByText('Target Job Specification')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /Tailor Resume with AI/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Format & Tailor Resume/i })).toBeInTheDocument();
 
     // Verify Tab buttons
     expect(screen.getByRole('button', { name: /Formatted ATS Resume/i })).toBeInTheDocument();
@@ -78,6 +78,10 @@ describe('ResumeGeneratorPage', () => {
     const formatted = screen.getByTestId('formatted-resume-preview');
     expect(formatted).toHaveTextContent(/MentorOS Productivity Engine/i);
 
+    // Switch to Projects input tab
+    const projectsTab = screen.getByRole('button', { name: /Projects/i });
+    fireEvent.click(projectsTab);
+
     // Uncheck/toggle MentorOS project
     const projectToggle = screen.getByText('MentorOS Productivity Engine');
     fireEvent.click(projectToggle);
@@ -88,19 +92,113 @@ describe('ResumeGeneratorPage', () => {
     );
   });
 
-  it('allows loading preset frontend profile', () => {
+  it('allows updating target role and regenerating preview', () => {
     render(
       <MemoryRouter>
         <ResumeGeneratorPage />
       </MemoryRouter>
     );
 
-    const loadFrontendBtn = screen.getByRole('button', { name: /Load Frontend Sample/i });
-    fireEvent.click(loadFrontendBtn);
+    const targetRoleInput = screen.getByPlaceholderText('e.g. Senior Full-Stack Engineer');
+    fireEvent.change(targetRoleInput, { target: { value: 'Staff Platform Engineer' } });
+    expect(targetRoleInput).toHaveValue('Staff Platform Engineer');
+  });
 
-    expect(
-      screen.getByDisplayValue('Senior Frontend Engineer (UI/UX & Design Systems)')
-    ).toBeInTheDocument();
-    expect(screen.getByTestId('formatted-resume-preview')).toHaveTextContent(/Jordan Lee/i);
+  it('allows switching to Fresher / Student mode and selecting templates', () => {
+    render(
+      <MemoryRouter>
+        <ResumeGeneratorPage />
+      </MemoryRouter>
+    );
+
+    // Switch to Fresher mode
+    const fresherBtn = screen.getByRole('button', { name: /Fresher \/ Student/i });
+    fireEvent.click(fresherBtn);
+
+    // Verify preview reflects entry-level summary
+    const formatted = screen.getByTestId('formatted-resume-preview');
+    expect(formatted).toHaveTextContent(/graduate and aspiring/i);
+
+    // Switch to Classic Corporate template
+    const classicTemplateBtn = screen.getByRole('button', { name: /Classic Corporate/i });
+    fireEvent.click(classicTemplateBtn);
+
+    // Verify template active indicator
+    expect(screen.getByText(/Classic Corporate active/i)).toBeInTheDocument();
+  });
+
+  it('renders customizer on left and resume preview on right with clear structure', () => {
+    render(
+      <MemoryRouter>
+        <ResumeGeneratorPage />
+      </MemoryRouter>
+    );
+
+    expect(screen.getByText(/Resume Editor & Customizer/i)).toBeInTheDocument();
+    expect(screen.getByText(/Resume Preview & Export/i)).toBeInTheDocument();
+  });
+
+  it('manages 10th and 12th board, percentage, and renders them in resume preview', () => {
+    render(
+      <MemoryRouter>
+        <ResumeGeneratorPage />
+      </MemoryRouter>
+    );
+
+    // Switch to Education tab in Customizer
+    const educationTab = screen.getByRole('button', { name: /^Education$/i });
+    fireEvent.click(educationTab);
+
+    expect(screen.getByText(/12th Standard \/ Higher Secondary \/ Diploma/i)).toBeInTheDocument();
+    expect(screen.getByText(/10th Standard \/ Secondary School/i)).toBeInTheDocument();
+
+    // Verify board and percentage inputs are present
+    const boardInputs = screen.getAllByPlaceholderText(/e.g. CBSE, ISC, State Board|e.g. CBSE, ICSE, State Board/i);
+    expect(boardInputs.length).toBeGreaterThanOrEqual(2);
+
+    // Update 12th Board
+    fireEvent.change(boardInputs[0], { target: { value: 'ICSE Council' } });
+    expect(boardInputs[0]).toHaveValue('ICSE Council');
+
+    // Verify live preview shows updated board/percentage
+    const preview = screen.getByTestId('formatted-resume-preview');
+    expect(preview).toHaveTextContent(/ICSE Council/i);
+  });
+
+  it('automatically tags degree as pursuing when passing year is in the future', () => {
+    render(
+      <MemoryRouter>
+        <ResumeGeneratorPage />
+      </MemoryRouter>
+    );
+
+    // Switch to Education tab
+    const educationTab = screen.getByRole('button', { name: /^Education$/i });
+    fireEvent.click(educationTab);
+
+    // Open Add Degree
+    const addDegreeBtn = screen.getByRole('button', { name: /Add Degree/i });
+    fireEvent.click(addDegreeBtn);
+
+    const degreeInput = screen.getByPlaceholderText(/e.g. B.Tech in Computer Science/i);
+    const instInput = screen.getByPlaceholderText(/College \/ University/i);
+    const yearInput = screen.getByPlaceholderText(/Passing Year \(e.g. 2027\)/i);
+
+    fireEvent.change(degreeInput, { target: { value: 'B.Tech in Artificial Intelligence' } });
+    fireEvent.change(instInput, { target: { value: 'IIT Delhi' } });
+    // Enter future year
+    fireEvent.change(yearInput, { target: { value: '2028' } });
+
+    // Should detect future year and show pursuing indicator
+    expect(screen.getByText(/Future Year: Automatically tagged as Pursuing/i)).toBeInTheDocument();
+
+    // Save Degree
+    const saveBtn = screen.getByRole('button', { name: /Save Degree/i });
+    fireEvent.click(saveBtn);
+
+    // Verify Pursuing badge appears in education list and formatted preview
+    const preview = screen.getByTestId('formatted-resume-preview');
+    expect(preview).toHaveTextContent(/B.Tech in Artificial Intelligence/i);
+    expect(preview).toHaveTextContent(/Pursuing/i);
   });
 });

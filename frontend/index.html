@@ -4,8 +4,13 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="canonical" href="https://mentoros.app" />
     <meta name="robots" content="index, follow" />
     <meta name="color-scheme" content="light dark" />
+    <meta
+      name="keywords"
+      content="MentorOS, productivity, AI workspace, project management, local AI, task tracker, student workspace, developer roadmap, freelancer portal"
+    />
     <meta
       name="description"
       content="MentorOS — AI powered productivity and workspace management tool where users organize project goals, projects, tasks, schedules, and content."
@@ -22,17 +27,40 @@
     <meta property="og:url" content="https://mentoros.app" />
     <meta property="og:image" content="/og-image.png" />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="theme-color" content="#2563EB" />
+    <meta name="twitter:title" content="MentorOS — AI Powered Productivity &amp; Workspace Management" />
+    <meta name="twitter:description" content="Organize projects, tasks, and schedules with local AI assistance." />
+    <meta name="twitter:image" content="/og-image.png" />
+    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#FAFAFC" />
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0A0D14" />
+    <meta name="theme-color" content="#F97316" />
 
-    <!-- JSON-LD Schema: -->
+    <!-- JSON-LD Schema: Structured Data for SEO -->
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
-        "@type": "SoftwareApplication",
-        "name": "MentorOS",
-        "applicationCategory": "ProductivityApplication",
-        "operatingSystem": "Web",
-        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
+        "@graph": [
+          {
+            "@type": "SoftwareApplication",
+            "@id": "https://mentoros.app/#software",
+            "name": "MentorOS",
+            "applicationCategory": "ProductivityApplication",
+            "operatingSystem": "Web",
+            "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+            "description": "MentorOS — AI powered productivity and workspace management tool where users organize project goals, projects, tasks, schedules, and content."
+          },
+          {
+            "@type": "WebSite",
+            "@id": "https://mentoros.app/#website",
+            "url": "https://mentoros.app",
+            "name": "MentorOS",
+            "description": "AI Powered Productivity & Workspace Management",
+            "publisher": {
+              "@type": "Organization",
+              "name": "MentorOS",
+              "url": "https://mentoros.app"
+            }
+          }
+        ]
       }
     </script>
     <title>MentorOS — AI Powered Productivity &amp; Workspace Management</title>

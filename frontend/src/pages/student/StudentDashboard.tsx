@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
-import { BookOpen, ArrowRight } from 'lucide-react';
+import { BookOpen, ArrowRight, Sparkles } from 'lucide-react';
 import { useWorkspace } from '../../contexts/WorkspaceContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { fetchDashboardSummary } from '../../services/dashboardService';
@@ -15,9 +15,10 @@ import { DashboardMetrics } from './DashboardMetrics';
 import { CourseAccordion } from './CourseAccordion';
 import { QuickAddForm } from './QuickAddForm';
 import { CalendarSidebar } from './CalendarSidebar';
+import { StudentProgressSection } from './StudentProgressSection';
 
 export default function StudentDashboard() {
-  const { openCaptureModal, showToast } = useWorkspace();
+  const { openCaptureModal, openAIDrawer, showToast } = useWorkspace();
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const [quickTaskTitle, setQuickTaskTitle] = useState('');
@@ -123,6 +124,7 @@ export default function StudentDashboard() {
         totalTaskCount={tasks.length}
         taskCompletionRate={compRate}
         nextDeadlineTitle={(summary?.role_summary as any)?.next_deadline_title}
+        onPlanWithAI={() => openAIDrawer()}
       />
       <DailyStandupWidget role="student" standupData={summary?.daily_standup} />
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
@@ -233,22 +235,30 @@ export default function StudentDashboard() {
                 onAiPromptClick={() => openCaptureModal('ai', ROLE_CONFIGS.student.firstAiPrompt)}
               />
             </div>
-            <div className="mt-4 pt-3 border-t border-border-base flex items-center justify-between text-xs">
+            <div className="mt-4 pt-3 border-t border-border-base flex items-center justify-between text-xs flex-wrap gap-2">
               <span className="text-text-faint text-2xs">
                 {pending.length} total assignments remaining
               </span>
               <Link
                 to="/app/student/projects"
-                className="text-orange-600 dark:text-orange-400 hover:underline flex items-center gap-1 font-semibold text-xs"
+                className="text-orange-600 dark:text-orange-400 hover:underline flex items-center gap-1.5 font-semibold text-xs group"
               >
-                <span>Manage Courses &amp; Milestones</span>
-                <ArrowRight className="w-3.5 h-3.5" />
+                <BookOpen className="w-3.5 h-3.5 text-orange-500 group-hover:scale-110 transition-transform" />
+                <span>My Courses &amp; Assignments</span>
+                <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
               </Link>
             </div>
           </Card3D>
         </div>
         <CalendarSidebar />
       </div>
+
+      {/* Systematic Academic Progress & Performance Section */}
+      <StudentProgressSection
+        projects={projects}
+        tasks={tasks}
+        roleSummary={summary?.role_summary}
+      />
     </div>
   );
 }

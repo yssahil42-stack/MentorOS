@@ -1,13 +1,12 @@
 import React from 'react';
-import { useLocation, Link } from 'react-router-dom';
-import { Menu, Plus, Search, Bell } from 'lucide-react';
+import { useLocation } from 'react-router-dom';
+import { Menu, Search } from 'lucide-react';
 import { cn } from '../../utils/cn';
 import { useAuth } from '../../contexts/AuthContext';
 import { useWorkspace } from '../../contexts/WorkspaceContext';
-import { ROLE_CONFIGS } from '../../config/roles';
+import { NotificationDropdown } from './NotificationDropdown';
 import type { UserRole } from '../../types/user';
-import { getWorkspaceRole, getRoleDashboardRoute } from '../../utils/roleUtils';
-import { Button } from '../ui/Button';
+import { getWorkspaceRole } from '../../utils/roleUtils';
 
 interface TopBarProps {
   onMenuClick: () => void;
@@ -15,11 +14,8 @@ interface TopBarProps {
 
 export function TopBar({ onMenuClick }: TopBarProps) {
   const { user } = useAuth();
-  const { openCaptureModal, openProfileModal } = useWorkspace();
+  const { openProfileModal } = useWorkspace();
   const location = useLocation();
-
-  const activeRole = user ? getWorkspaceRole(location.pathname, user.role as UserRole) : 'student';
-  const roleConfig = ROLE_CONFIGS[activeRole];
 
   // Derive page title from last path segment
   const segments = location.pathname.split('/').filter(Boolean);
@@ -44,6 +40,7 @@ export function TopBar({ onMenuClick }: TopBarProps) {
       {/* Left: Mobile menu toggle + page title */}
       <div className="flex items-center gap-2.5 min-w-0">
         <button
+          type="button"
           onClick={onMenuClick}
           className="p-1.5 rounded-xl text-text-muted hover:text-text-primary hover:bg-bg-elevated transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus md:hidden"
           aria-label="Toggle navigation"
@@ -71,34 +68,8 @@ export function TopBar({ onMenuClick }: TopBarProps) {
 
       {/* ─── Right actions ─────────────────────────────────── */}
       <div className="flex items-center gap-2">
-        {/* Notifications Icon with dot */}
-        <button
-          type="button"
-          className="relative p-1.5 rounded-xl text-text-muted hover:text-text-primary hover:bg-bg-elevated transition-colors"
-          aria-label="View notifications"
-          title="Notifications"
-        >
-          <Bell className="w-4 h-4" />
-          <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-red-500 ring-2 ring-bg-surface" />
-        </button>
-
-        {/* Primary Action: Capture Work (Orange) */}
-        <Button
-          onClick={() => openCaptureModal('manual')}
-          variant="primary"
-          size="sm"
-          keyboardShortcut="⌘K"
-          tooltip="Quick capture (⌘K)"
-          aria-label="Capture Work"
-          className={cn(
-            'px-3.5 py-1.5 rounded-xl text-xs font-semibold text-white shadow-2xs',
-            'bg-orange-500 hover:bg-orange-600 active:bg-orange-700 border border-orange-600/30',
-            'transition-all duration-200 active:translate-y-[1px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500/50 cursor-pointer'
-          )}
-          leftIcon={<Plus className="h-3.5 w-3.5" aria-hidden="true" />}
-        >
-          <span className="hidden sm:inline">Capture Work</span>
-        </Button>
+        {/* Notifications Dropdown */}
+        <NotificationDropdown />
 
         {/* User Profile Avatar / Icon */}
         <button

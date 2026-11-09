@@ -15,11 +15,9 @@ export const developerConfig: RoleConfig = {
   navigation: [
     { to: '/app/developer/dashboard', label: 'Dashboard', icon: 'LayoutDashboard' },
     { to: '/app/developer/projects', label: 'Repositories', icon: 'FolderGit2' },
-    { to: '/app/developer/build-plan', label: 'Build Plan', icon: 'Sparkles', badge: 'AI' },
-    { to: '/app/developer/tasks', label: 'Issue Tracker', icon: 'CheckSquare' },
+    { to: '/app/developer/build-plan', label: 'Build Plan', icon: 'GitPullRequest' },
     { to: '/app/developer/notes', label: 'Documentation', icon: 'FileText' },
     { to: '/app/developer/api-keys', label: 'API Keys', icon: 'Key' },
-    { to: '/app/developer/calendar', label: 'Calendar', icon: 'Calendar' },
     { to: '/app/developer/settings', label: 'Settings', icon: 'Settings' },
   ],
 
@@ -171,8 +169,8 @@ export const developerConfig: RoleConfig = {
     tasks: {
       icon: 'CheckSquare',
       title: 'No implementation tasks yet',
-      description: 'Add tasks or let AI break your goal into a build plan.',
-      actionLabel: 'Generate Build Plan',
+      description: 'Add your first implementation task to get started.',
+      actionLabel: 'New Task',
     },
     projects: {
       icon: 'FolderKanban',

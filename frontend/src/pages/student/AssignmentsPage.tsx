@@ -248,7 +248,7 @@ export default function AssignmentsPage() {
     setExpandedRoadmaps((prev) => {
       const next = {
         ...prev,
-        [key]: prev[key] === undefined ? false : !prev[key],
+        [key]: !prev[key],
       };
       try {
         localStorage.setItem('mentoros_expanded_roadmaps_assignments', JSON.stringify(next));
@@ -295,14 +295,6 @@ export default function AssignmentsPage() {
             >
               <Plus className="w-4 h-4 mr-1.5" />
               New Assignment
-            </Button>
-            <Button
-              size="sm"
-              onClick={() => openAIDrawer()}
-              className="bg-solar-500 hover:bg-solar-600 text-white shadow-glow-solar"
-            >
-              <Sparkles className="w-4 h-4 mr-1.5" />
-              Plan Coursework via AI
             </Button>
           </div>
         </div>
@@ -427,8 +419,7 @@ export default function AssignmentsPage() {
             <ClipboardList className="w-10 h-10 text-text-muted mx-auto opacity-50" />
             <h3 className="text-base font-bold text-text-primary">No matching roadmaps found</h3>
             <p className="text-xs text-text-muted max-w-sm mx-auto">
-              No roadmaps or subtasks match your query. Clear your filters or generate a new roadmap
-              using the AI Assistant.
+              No roadmaps or subtasks match your query. Clear your filters or create a new assignment task.
             </p>
             <div className="flex items-center justify-center gap-3 pt-2">
               {hasActiveFilters && (
@@ -444,17 +435,17 @@ export default function AssignmentsPage() {
               )}
               <Button
                 size="sm"
-                onClick={() => openAIDrawer()}
+                onClick={() => openCaptureModal('manual')}
                 className="bg-solar-500 hover:bg-solar-600 text-white shadow-glow-solar"
               >
-                <Sparkles className="w-4 h-4 mr-1.5" />
-                Plan Coursework
+                <Plus className="w-4 h-4 mr-1.5" />
+                New Assignment
               </Button>
             </div>
           </Card>
         ) : (
           filteredRoadmaps.map((group) => {
-            const isExpanded = expandedRoadmaps[group.key] !== false;
+            const isExpanded = Boolean(expandedRoadmaps[group.key]);
             const quickAddTitle = quickAddTitles[group.key] || '';
             const subtaskId = `roadmap-subtasks-${group.key}`;
 

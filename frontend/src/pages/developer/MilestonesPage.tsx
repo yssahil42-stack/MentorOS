@@ -137,18 +137,6 @@ export default function MilestonesPage() {
 
         <div className="flex items-center gap-2">
           <Button
-            variant="secondary"
-            size="sm"
-            onClick={() =>
-              openAIDrawer(
-                'Generate 3 milestone targets with target delivery dates for our software architecture sprint'
-              )
-            }
-            icon={<Sparkles className="w-4 h-4 text-emerald-400" />}
-          >
-            AI Milestones
-          </Button>
-          <Button
             variant="primary"
             size="sm"
             className="!bg-amber-500 hover:!bg-amber-600 text-black font-semibold shadow-glow-amber"

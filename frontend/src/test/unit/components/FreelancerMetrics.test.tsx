@@ -26,20 +26,8 @@ describe('FreelancerMetrics Component', () => {
 
     expect(screen.getByText('Welcome back, Elena')).toBeInTheDocument();
     expect(screen.getByText('Rate Calculator')).toBeInTheDocument();
-    expect(screen.getByText('Generate Invoice')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /\+ Capture Work/i })).toBeInTheDocument();
-  });
-
-  it('calls onOpenCapture when Capture Work is clicked', () => {
-    render(
-      <MemoryRouter>
-        <FreelancerMetrics {...defaultProps} />
-      </MemoryRouter>
-    );
-
-    const captureBtn = screen.getByRole('button', { name: /\+ Capture Work/i });
-    fireEvent.click(captureBtn);
-    expect(defaultProps.onOpenCapture).toHaveBeenCalledTimes(1);
+    expect(screen.getByText('Add Deliverable')).toBeInTheDocument();
+    expect(screen.getByText('Plan with AI Assistant')).toBeInTheDocument();
   });
 
   it('renders all 4 systematic metric cards with accurate values and progress', () => {

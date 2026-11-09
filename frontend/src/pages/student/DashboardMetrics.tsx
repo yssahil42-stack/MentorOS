@@ -1,6 +1,8 @@
 import React from 'react';
-import { BookOpen, ListTodo, CheckCircle2, Calendar } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { BookOpen, ListTodo, CheckCircle2, Calendar, Sparkles, ArrowRight } from 'lucide-react';
 import { Card3D } from '../../components/ui/Card3D';
+import { Button } from '../../components/ui/Button';
 
 interface DashboardMetricsProps {
   displayName: string;
@@ -11,6 +13,7 @@ interface DashboardMetricsProps {
   totalTaskCount: number;
   taskCompletionRate: number;
   nextDeadlineTitle?: string;
+  onPlanWithAI?: () => void;
 }
 
 export const DashboardMetrics: React.FC<DashboardMetricsProps> = ({
@@ -22,6 +25,7 @@ export const DashboardMetrics: React.FC<DashboardMetricsProps> = ({
   totalTaskCount,
   taskCompletionRate,
   nextDeadlineTitle = 'Semester Review',
+  onPlanWithAI,
 }) => {
   const leftPercent =
     totalTaskCount > 0 ? Math.round((pendingTaskCount / totalTaskCount) * 100) : 0;
@@ -103,13 +107,33 @@ export const DashboardMetrics: React.FC<DashboardMetricsProps> = ({
         depth={20}
         className="p-6 md:p-7 border border-border-base/80 bg-gradient-to-r from-bg-surface/90 via-bg-elevated/70 to-bg-surface/90 shadow-card backdrop-blur-xl"
       >
-        <div className="space-y-1">
-          <h2 className="text-2xl md:text-3xl font-extrabold text-text-primary tracking-tight">
-            Welcome back, {displayName}
-          </h2>
-          <p className="text-xs sm:text-sm text-text-secondary">
-            Here is your daily study schedule, active coursework, and upcoming assignments.
-          </p>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="space-y-1">
+            <h2 className="text-2xl md:text-3xl font-extrabold text-text-primary tracking-tight">
+              Welcome back, {displayName}
+            </h2>
+            <p className="text-xs sm:text-sm text-text-secondary">
+              Here is your daily study schedule, active coursework, and upcoming assignments.
+            </p>
+          </div>
+          <div className="flex items-center gap-2.5 flex-wrap shrink-0 self-start sm:self-auto">
+            <Link
+              to="/app/student/projects"
+              className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-bg-elevated hover:bg-slate-200 dark:hover:bg-bg-surface border border-border-base text-text-primary font-semibold text-xs transition-colors shrink-0"
+            >
+              <BookOpen className="w-3.5 h-3.5 text-solar-500" />
+              <span>My Courses</span>
+            </Link>
+            <Button
+              variant="primary"
+              size="sm"
+              onClick={onPlanWithAI}
+              className="font-semibold text-xs h-9.5 px-4 !bg-solar-500 hover:!bg-solar-600 text-white shadow-sm hover:shadow transition-all"
+              icon={<Sparkles className="w-3.5 h-3.5" />}
+            >
+              Plan with AI Assistant
+            </Button>
+          </div>
         </div>
       </Card3D>
 

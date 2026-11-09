@@ -254,7 +254,7 @@ export default function StudentTasksPage() {
     setExpandedRoadmaps((prev) => {
       const next = {
         ...prev,
-        [key]: prev[key] === undefined ? false : !prev[key],
+        [key]: !prev[key],
       };
       try {
         localStorage.setItem('mentoros_expanded_roadmaps_tasks', JSON.stringify(next));
@@ -428,7 +428,6 @@ export default function StudentTasksPage() {
             <option value="all">All Priorities</option>
             <option value="urgent">Urgent</option>
             <option value="high">High</option>
-            <option value="medium">Medium</option>
             <option value="low">Low</option>
           </select>
 
@@ -738,8 +737,7 @@ export default function StudentTasksPage() {
               <BookOpen className="w-10 h-10 text-text-muted mx-auto opacity-50" />
               <h3 className="text-base font-bold text-text-primary">No study roadmaps found</h3>
               <p className="text-xs text-text-muted max-w-sm mx-auto">
-                No study roadmaps or subtasks available. Clear your filters or generate a new
-                roadmap using the AI Assistant.
+                No study roadmaps or subtasks available. Clear your filters or create a new study task.
               </p>
               <div className="flex items-center justify-center gap-3 pt-2">
                 {hasActiveFilters && (
@@ -755,17 +753,17 @@ export default function StudentTasksPage() {
                 )}
                 <Button
                   size="sm"
-                  onClick={() => openAIDrawer()}
+                  onClick={() => setIsCreateModalOpen(true)}
                   className="bg-student-500 hover:bg-student-600 text-white"
                 >
-                  <Sparkles className="w-4 h-4 mr-1.5" />
-                  Generate Roadmap via AI
+                  <Plus className="w-4 h-4 mr-1.5" />
+                  New Study Task
                 </Button>
               </div>
             </Card>
           ) : (
             roadmapGroups.map((group) => {
-              const isExpanded = expandedRoadmaps[group.key] !== false;
+              const isExpanded = Boolean(expandedRoadmaps[group.key]);
               const quickAddTitle = quickAddTitles[group.key] || '';
               const subtaskId = `roadmap-task-subtasks-${group.key}`;
 
@@ -1065,7 +1063,6 @@ export default function StudentTasksPage() {
                 className="w-full bg-bg-surface border border-border-base rounded-xl px-3 py-2 text-xs text-text-primary focus:outline-none focus:border-student-500"
               >
                 <option value="low">Low</option>
-                <option value="medium">Medium</option>
                 <option value="high">High</option>
                 <option value="urgent">Urgent</option>
               </select>
@@ -1098,40 +1095,24 @@ export default function StudentTasksPage() {
             </div>
           </div>
 
-          <div className="pt-2 flex justify-between items-center">
+          <div className="pt-2 flex justify-end items-center gap-2">
             <Button
               type="button"
-              variant="ghost"
+              variant="secondary"
               size="sm"
-              onClick={() => {
-                setIsCreateModalOpen(false);
-                openCaptureModal('ai');
-              }}
-              icon={<Sparkles className="w-3.5 h-3.5 text-student-400" />}
-              className="text-student-400"
+              onClick={() => setIsCreateModalOpen(false)}
             >
-              Ask AI to decompose
+              Cancel
             </Button>
-
-            <div className="flex gap-2">
-              <Button
-                type="button"
-                variant="secondary"
-                size="sm"
-                onClick={() => setIsCreateModalOpen(false)}
-              >
-                Cancel
-              </Button>
-              <Button
-                type="submit"
-                variant="primary"
-                size="sm"
-                className="!bg-student-500 hover:!bg-student-600 shadow-glow-solar"
-                disabled={!newTitle.trim() || createTaskMutation.isPending}
-              >
-                {createTaskMutation.isPending ? 'Saving...' : 'Add Task'}
-              </Button>
-            </div>
+            <Button
+              type="submit"
+              variant="primary"
+              size="sm"
+              className="!bg-student-500 hover:!bg-student-600 shadow-glow-solar"
+              disabled={!newTitle.trim() || createTaskMutation.isPending}
+            >
+              {createTaskMutation.isPending ? 'Saving...' : 'Add Task'}
+            </Button>
           </div>
         </form>
       </Modal>

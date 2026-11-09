@@ -35,7 +35,9 @@ export function Breadcrumb({ roleConfig, className, variant = 'default' }: Bread
     : '/app';
 
   const moduleLabel = resolvedRoleConfig?.label ?? 'Workspace';
-  const moduleRoute = homeRoute;
+  const moduleRoute = resolvedRoleConfig?.routePrefix
+    ? `${resolvedRoleConfig.routePrefix}/dashboard`
+    : '/app';
 
   // Determine current Page title by checking roleConfig.navigation items
   const matchedNav = resolvedRoleConfig?.navigation.find((item) => item.to === location.pathname);

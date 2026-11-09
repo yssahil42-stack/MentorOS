@@ -10,6 +10,7 @@ import {
   ArrowRight,
   UserCheck,
   Sparkles,
+  TrendingUp,
 } from 'lucide-react';
 import { useWorkspace } from '../../contexts/WorkspaceContext';
 import { useAuth } from '../../contexts/AuthContext';
@@ -26,7 +27,7 @@ import { ROLE_CONFIGS } from '../../config/roles';
 import type { TaskStatus } from '../../types/task';
 
 export default function JobSeekerDashboard() {
-  const { openCaptureModal, showToast } = useWorkspace();
+  const { openCaptureModal, openAIDrawer, showToast } = useWorkspace();
   const { user } = useAuth();
   const queryClient = useQueryClient();
 
@@ -134,17 +135,15 @@ export default function JobSeekerDashboard() {
               </p>
             </div>
 
-            <div className="shrink-0">
+            <div className="shrink-0 flex items-center gap-2.5 flex-wrap">
               <Button
                 variant="primary"
                 size="sm"
-                onClick={() => openCaptureModal('ai')}
-                keyboardShortcut="⌘K"
-                tooltip="Quick capture (⌘K)"
-                className="!bg-gradient-to-r !from-amber-500 !to-orange-500 hover:!from-amber-600 hover:!to-orange-600 shadow-glow-solar font-bold px-5 h-10 text-stone-950 transition-all active:translate-y-[1px]"
-                icon={<Plus className="w-4 h-4 text-stone-950" />}
+                onClick={() => openAIDrawer()}
+                className="font-semibold text-xs h-9.5 px-4 !bg-emerald-600 hover:!bg-emerald-700 text-white shadow-sm hover:shadow transition-all"
+                icon={<Sparkles className="w-3.5 h-3.5" />}
               >
-                + Capture Work
+                Plan with AI Assistant
               </Button>
             </div>
           </div>
@@ -359,10 +358,10 @@ export default function JobSeekerDashboard() {
                       <Button
                         size="xs"
                         variant="secondary"
-                        onClick={() => openCaptureModal('ai', promptStarter)}
+                        onClick={() => openCaptureModal('manual')}
                         className="inline-flex items-center gap-1.5"
                       >
-                        <Sparkles className="w-3.5 h-3.5 text-solar-500" />
+                        <Plus className="w-3.5 h-3.5 text-solar-500" />
                         {emptyStateConfig.actionLabel}
                       </Button>
                     )}
@@ -470,7 +469,7 @@ export default function JobSeekerDashboard() {
                 Application pipelines and interview round milestones
               </p>
             </div>
-            <Link to="/app/job_seeker/projects">
+            <Link to="/app/job-seeker/progress">
               <Button variant="ghost" size="xs">
                 Manage All Tracks
               </Button>
@@ -484,11 +483,11 @@ export default function JobSeekerDashboard() {
                 <Button
                   size="xs"
                   variant="secondary"
-                  onClick={() => openCaptureModal('ai', promptStarter)}
+                  onClick={() => openCaptureModal('manual')}
                   className="inline-flex items-center gap-1.5"
                 >
-                  <Sparkles className="w-3.5 h-3.5 text-solar-500" />
-                  {roleConfig.emptyStates.projects.actionLabel ?? 'Create with AI'}
+                  <Plus className="w-3.5 h-3.5 text-solar-500" />
+                  {roleConfig.emptyStates.projects.actionLabel ?? 'New Goal'}
                 </Button>
               </div>
             ) : (
@@ -504,7 +503,7 @@ export default function JobSeekerDashboard() {
                     <div className="space-y-1.5">
                       <div className="flex items-start justify-between gap-2">
                         <h4 className="text-xs font-bold text-text-primary group-hover:text-solar-500 transition-colors">
-                          <Link to="/app/job_seeker/projects">{proj.title}</Link>
+                          <Link to={`/app/job-seeker/progress?projectId=${proj.id}`}>{proj.title}</Link>
                         </h4>
                         <span className="text-xs font-mono font-bold text-solar-500 bg-amber-500/10 px-2 py-0.5 rounded-full border border-amber-500/25">
                           {proj.progress}%
@@ -531,6 +530,15 @@ export default function JobSeekerDashboard() {
                         </span>
                         <span>{proj.task_count || 0} tasks</span>
                       </div>
+
+                      <Link
+                        to={`/app/job-seeker/progress?projectId=${proj.id}`}
+                        className="flex items-center justify-center gap-1.5 w-full py-1.5 rounded-lg text-2xs font-semibold text-teal-500 border border-teal-500/25 bg-teal-500/5 hover:bg-teal-500/15 hover:border-teal-500/50 transition-all"
+                      >
+                        <TrendingUp className="w-3 h-3" />
+                        View Progress
+                        <ArrowRight className="w-3 h-3" />
+                      </Link>
                     </div>
                   </Card3D>
                 ))}

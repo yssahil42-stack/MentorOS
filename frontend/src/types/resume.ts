@@ -1,4 +1,6 @@
 export type SeniorityLevel = 'intern' | 'junior' | 'mid' | 'senior' | 'lead' | 'principal';
+export type ResumeTemplateId = 'modern' | 'classic' | 'minimal' | 'academic';
+export type SummaryStyle = 'metrics' | 'technical' | 'growth';
 
 export interface ResumeCandidateProfile {
   name: string;
@@ -32,6 +34,14 @@ export interface ResumeProjectItem {
   selected: boolean;
 }
 
+export interface SchoolEducationItem {
+  board: string;
+  percentage: string;
+  school: string;
+  year: string;
+  stream?: string;
+}
+
 export interface ResumeEducationItem {
   id: string;
   degree: string;
@@ -39,6 +49,11 @@ export interface ResumeEducationItem {
   location?: string;
   graduationYear: string;
   details?: string;
+  percentage?: string;
+  board?: string;
+  stream?: string;
+  educationLevel?: 'degree' | '12th' | '10th' | 'other';
+  isPursuing?: boolean;
 }
 
 export interface ResumeTailorInput {
@@ -56,6 +71,13 @@ export interface ResumeTailorInput {
   experiences: ResumeExperienceItem[];
   projects: ResumeProjectItem[];
   education: ResumeEducationItem[];
+  tenthEducation?: SchoolEducationItem;
+  twelfthEducation?: SchoolEducationItem;
+  templateId?: ResumeTemplateId;
+  summaryStyle?: SummaryStyle;
+  isFresher?: boolean;
+  omitExperience?: boolean;
+  customSummary?: string;
 }
 
 export interface ResumeKeywordReport {
@@ -71,6 +93,13 @@ export interface ResumeKeywordReport {
 
 export interface TailoredResumeResult {
   summary: string;
+  summaryVariations?: {
+    metrics: string;
+    technical: string;
+    growth: string;
+  };
+  templateId?: ResumeTemplateId;
+  isFresher?: boolean;
   markdown: string;
   plainText: string;
   keywordReport: ResumeKeywordReport;
@@ -98,6 +127,13 @@ export interface TailoredResumeResult {
     institution: string;
     year: string;
     details?: string;
+    percentage?: string;
+    board?: string;
+    stream?: string;
+    educationLevel?: 'degree' | '12th' | '10th' | 'other';
+    isPursuing?: boolean;
   }[];
+  tenthEducation?: SchoolEducationItem;
+  twelfthEducation?: SchoolEducationItem;
   generatedAt: string;
 }

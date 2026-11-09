@@ -257,7 +257,7 @@ export default function InboxPage() {
             <p className="text-sm text-text-muted mt-1">Captured items waiting to be organized</p>
           </div>
           <Button
-            onClick={() => openCaptureModal('ai')}
+            onClick={() => openCaptureModal('manual')}
             keyboardShortcut="⌘K"
             tooltip="Quick capture (⌘K)"
             icon={<Plus className="w-4 h-4" />}
@@ -272,7 +272,7 @@ export default function InboxPage() {
           description="Use the Quick Capture button (⌘K) or the floating action button to capture thoughts, tasks, and ideas on the fly."
           action={{
             label: 'Try Quick Capture',
-            onClick: () => openCaptureModal('ai'),
+            onClick: () => openCaptureModal('manual'),
           }}
         />
       </div>
@@ -294,7 +294,7 @@ export default function InboxPage() {
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => openCaptureModal('ai')}
+            onClick={() => openCaptureModal('manual')}
             keyboardShortcut="⌘K"
             tooltip="Quick capture (⌘K)"
             icon={<Plus className="w-4 h-4" />}

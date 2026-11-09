@@ -15,8 +15,7 @@ export const jobSeekerConfig: RoleConfig = {
   navigation: [
     { to: '/app/job-seeker/dashboard', label: 'Dashboard', icon: 'LayoutDashboard' },
     { to: '/app/job-seeker/applications', label: 'Applications', icon: 'Send' },
-    { to: '/app/job-seeker/search-plan', label: 'Job Strategy', icon: 'Sparkles', badge: 'AI' },
-    { to: '/app/job-seeker/portfolio', label: 'Skills & Portfolio', icon: 'Layers' },
+    { to: '/app/job-seeker/search-plan', label: 'Job Analyzer', icon: 'Sparkles', badge: 'AI' },
     {
       to: '/app/job-seeker/resume-generator',
       label: 'Resume Tailor',
@@ -24,7 +23,6 @@ export const jobSeekerConfig: RoleConfig = {
       badge: 'AI',
     },
     { to: '/app/job-seeker/interview-prep', label: 'Mock Interviews', icon: 'MessageSquare' },
-    { to: '/app/job-seeker/calendar', label: 'Calendar', icon: 'Calendar' },
     { to: '/app/job-seeker/notes', label: 'Notes', icon: 'FileText' },
     { to: '/app/job-seeker/settings', label: 'Settings', icon: 'Settings' },
   ],
@@ -195,8 +193,8 @@ export const jobSeekerConfig: RoleConfig = {
     tasks: {
       icon: 'CheckSquare',
       title: 'No tasks yet',
-      description: 'Add a task or let AI create a focused job search plan.',
-      actionLabel: 'Generate Search Plan',
+      description: 'Add your first task to get started.',
+      actionLabel: 'New Task',
     },
     projects: {
       icon: 'Send',

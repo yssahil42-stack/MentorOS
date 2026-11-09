@@ -408,17 +408,6 @@ export default function GitHubSyncPage() {
           >
             Connect Repository
           </Button>
-          <Button
-            variant="primary"
-            size="sm"
-            onClick={() => openCaptureModal('ai')}
-            keyboardShortcut="⌘K"
-            tooltip="Quick capture (⌘K)"
-            className="!bg-gradient-to-r !from-purple-500 !to-indigo-500 hover:!from-purple-600 hover:!to-indigo-600 shadow-glow-solar font-bold px-5 h-10 text-white transition-all active:translate-y-[1px]"
-            icon={<Plus className="w-4 h-4 text-white" />}
-          >
-            + Capture Work
-          </Button>
         </div>
       </div>
 

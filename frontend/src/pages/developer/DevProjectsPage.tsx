@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   FolderGit2,
@@ -122,18 +123,6 @@ export default function DevProjectsPage() {
 
         <div className="flex items-center gap-2">
           <Button
-            variant="secondary"
-            size="sm"
-            onClick={() =>
-              openAIDrawer(
-                'Generate a new software project specification with milestones and technical tasks'
-              )
-            }
-            icon={<Sparkles className="w-4 h-4 text-emerald-400" />}
-          >
-            AI Generator
-          </Button>
-          <Button
             variant="primary"
             size="sm"
             className="!bg-developer-500 hover:!bg-developer-600 shadow-glow-emerald"
@@ -255,6 +244,15 @@ export default function DevProjectsPage() {
                           : `${p.task_count || 0} tasks`}
                       </span>
                     </div>
+
+                    <Link
+                      to={`/app/developer/progress?projectId=${p.id}`}
+                      className="mt-2 flex items-center justify-center gap-1.5 w-full py-1.5 rounded-lg text-2xs font-semibold text-developer-400 border border-developer-500/25 bg-developer-500/5 hover:bg-developer-500/15 hover:border-developer-500/50 transition-all"
+                    >
+                      <CheckCircle2 className="w-3 h-3" />
+                      View Progress
+                      <ArrowRight className="w-3 h-3" />
+                    </Link>
                   </div>
                 );
               })()}
@@ -312,7 +310,6 @@ export default function DevProjectsPage() {
                 className="w-full bg-bg-base border border-border-base rounded-xl px-3 py-2 text-xs text-text-primary focus:outline-none"
               >
                 <option value="low">Low</option>
-                <option value="medium">Medium</option>
                 <option value="high">High</option>
                 <option value="urgent">Urgent</option>
               </select>

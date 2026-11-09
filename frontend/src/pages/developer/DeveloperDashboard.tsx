@@ -10,6 +10,7 @@ import {
   ArrowRight,
   Clock,
   Sparkles,
+  TrendingUp,
 } from 'lucide-react';
 import { useWorkspace } from '../../contexts/WorkspaceContext';
 import { useAuth } from '../../contexts/AuthContext';
@@ -26,7 +27,7 @@ import { ROLE_CONFIGS } from '../../config/roles';
 import type { TaskStatus } from '../../types/task';
 
 export default function DeveloperDashboard() {
-  const { openCaptureModal, showToast } = useWorkspace();
+  const { openCaptureModal, openAIDrawer, showToast } = useWorkspace();
   const { user } = useAuth();
   const queryClient = useQueryClient();
 
@@ -150,13 +151,13 @@ export default function DeveloperDashboard() {
               </p>
             </div>
 
-            <div className="shrink-0 flex items-center gap-2">
+            <div className="shrink-0 flex items-center gap-2.5 flex-wrap">
               <Link to="/app/developer/github-sync">
                 <Button
                   variant="secondary"
                   size="sm"
-                  className="font-medium px-4 h-10 transition-all active:translate-y-[1px]"
-                  icon={<FolderGit2 className="w-4 h-4" />}
+                  className="font-medium px-3.5 h-9.5 transition-all active:translate-y-[1px] text-xs"
+                  icon={<FolderGit2 className="w-3.5 h-3.5" />}
                 >
                   GitHub Sync
                 </Button>
@@ -164,13 +165,11 @@ export default function DeveloperDashboard() {
               <Button
                 variant="primary"
                 size="sm"
-                onClick={() => openCaptureModal('ai')}
-                keyboardShortcut="⌘K"
-                tooltip="Quick capture (⌘K)"
-                className="!bg-gradient-to-r !from-amber-500 !to-orange-500 hover:!from-amber-600 hover:!to-orange-600 shadow-glow-solar font-bold px-5 h-10 text-stone-950 transition-all active:translate-y-[1px]"
-                icon={<Plus className="w-4 h-4 text-stone-950" />}
+                onClick={() => openAIDrawer()}
+                className="font-semibold text-xs h-9.5 px-4 !bg-indigo-600 hover:!bg-indigo-700 text-white shadow-sm hover:shadow transition-all"
+                icon={<Sparkles className="w-3.5 h-3.5" />}
               >
-                + Capture Work
+                Plan with AI Assistant
               </Button>
             </div>
           </div>
@@ -385,10 +384,10 @@ export default function DeveloperDashboard() {
                       <Button
                         size="xs"
                         variant="secondary"
-                        onClick={() => openCaptureModal('ai', promptStarter)}
+                        onClick={() => openCaptureModal('manual')}
                         className="inline-flex items-center gap-1.5"
                       >
-                        <Sparkles className="w-3.5 h-3.5 text-solar-500" />
+                        <Plus className="w-3.5 h-3.5 text-solar-500" />
                         {emptyStateConfig.actionLabel}
                       </Button>
                     )}
@@ -508,11 +507,11 @@ export default function DeveloperDashboard() {
                 <Button
                   size="xs"
                   variant="secondary"
-                  onClick={() => openCaptureModal('ai', promptStarter)}
+                  onClick={() => openCaptureModal('manual')}
                   className="inline-flex items-center gap-1.5"
                 >
-                  <Sparkles className="w-3.5 h-3.5 text-solar-500" />
-                  {roleConfig.emptyStates.projects.actionLabel ?? 'Create with AI'}
+                  <Plus className="w-3.5 h-3.5 text-solar-500" />
+                  {roleConfig.emptyStates.projects.actionLabel ?? 'New Project'}
                 </Button>
               </div>
             ) : (
@@ -575,6 +574,15 @@ export default function DeveloperDashboard() {
                               : `${proj.task_count || 0} tasks`}
                           </span>
                         </div>
+
+                        <Link
+                          to={`/app/developer/progress?projectId=${proj.id}`}
+                          className="flex items-center justify-center gap-1.5 w-full py-1.5 rounded-lg text-2xs font-semibold text-solar-500 border border-solar-500/25 bg-solar-500/5 hover:bg-solar-500/15 hover:border-solar-500/50 transition-all"
+                        >
+                          <TrendingUp className="w-3 h-3" />
+                          View Progress
+                          <ArrowRight className="w-3 h-3" />
+                        </Link>
                       </div>
                     </Card3D>
                   );

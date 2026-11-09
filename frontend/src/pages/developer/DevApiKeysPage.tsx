@@ -42,12 +42,12 @@ const INITIAL_KEYS: ApiKeyItem[] = [
   },
   {
     id: 'key-2',
-    name: 'GitHub Action Deployment Token',
-    service: 'GitHub CI/CD',
-    prefix: 'ghp_•••••••••••••••••7b02',
-    secret: 'ghp_88f9x0LKMbvd2984180x07b02',
-    created: '2026-10-22',
-    lastUsed: '1 hour ago',
+    name: 'OpenAI GPT-4o API Key',
+    service: 'OpenAI (ChatGPT / GPT-4o)',
+    prefix: 'sk-proj-•••••••••••••a1B2',
+    secret: 'sk-proj-99xLK3920xLm99mKa1B2',
+    created: '2026-11-07',
+    lastUsed: 'Just now',
     status: 'active',
   },
   {
@@ -72,6 +72,7 @@ export default function DevApiKeysPage() {
   const [isCreating, setIsCreating] = useState(false);
   const [newKeyName, setNewKeyName] = useState('');
   const [newKeyService, setNewKeyService] = useState('Google Gemini AI');
+  const [newKeySecret, setNewKeySecret] = useState('');
 
   const toggleShowSecret = (id: string) => {
     setShowSecretMap((prev) => ({ ...prev, [id]: !prev[id] }));
@@ -89,12 +90,18 @@ export default function DevApiKeysPage() {
     if (!newKeyName.trim()) return;
 
     const randomSuffix = Math.random().toString(36).substring(2, 10).toUpperCase();
+    const finalSecret = newKeySecret.trim() || `mos_live_${randomSuffix}_${Date.now()}`;
+    const prefixVal =
+      finalSecret.length > 10
+        ? `${finalSecret.slice(0, 7)}••••••••${finalSecret.slice(-4)}`
+        : '••••••••';
+
     const createdKey: ApiKeyItem = {
       id: `key-${Date.now()}`,
       name: newKeyName.trim(),
       service: newKeyService,
-      prefix: `mos_live_••••••••••••${randomSuffix.slice(-4)}`,
-      secret: `mos_live_${randomSuffix}_${Date.now()}`,
+      prefix: prefixVal,
+      secret: finalSecret,
       created: new Date().toISOString().split('T')[0],
       lastUsed: 'Never',
       status: 'active',
@@ -102,8 +109,9 @@ export default function DevApiKeysPage() {
 
     setKeys([createdKey, ...keys]);
     setNewKeyName('');
+    setNewKeySecret('');
     setIsCreating(false);
-    showToast(`Created API Key "${createdKey.name}"`, 'success');
+    showToast(`Added API Key "${createdKey.name}"`, 'success');
   };
 
   const handleRevoke = (id: string) => {
@@ -138,7 +146,7 @@ export default function DevApiKeysPage() {
           className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs shadow-sm self-start sm:self-auto"
         >
           <Plus className="w-4 h-4" />
-          <span>Generate New Key</span>
+          <span>Add API Key</span>
         </Button>
       </div>
 
@@ -149,7 +157,7 @@ export default function DevApiKeysPage() {
             <div className="flex items-center justify-between">
               <h3 className="text-sm font-bold text-text-primary flex items-center gap-2">
                 <Sparkles className="w-4 h-4 text-indigo-600" />
-                Generate Developer Access Token
+                Add API Key
               </h3>
               <button
                 type="button"
@@ -160,7 +168,7 @@ export default function DevApiKeysPage() {
               </button>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
                 <label className="block text-xs font-semibold text-text-secondary mb-1">
                   Key Name / Description
@@ -168,7 +176,7 @@ export default function DevApiKeysPage() {
                 <input
                   type="text"
                   required
-                  placeholder="e.g. Staging LLM Bridge"
+                  placeholder="e.g. Production Key"
                   value={newKeyName}
                   onChange={(e) => setNewKeyName(e.target.value)}
                   className="w-full h-9 rounded-lg border border-border-base bg-bg-surface px-3 text-xs text-text-primary placeholder:text-text-faint focus:outline-none focus:ring-2 focus:ring-indigo-500"
@@ -184,11 +192,40 @@ export default function DevApiKeysPage() {
                   onChange={(e) => setNewKeyService(e.target.value)}
                   className="w-full h-9 rounded-lg border border-border-base bg-bg-surface px-3 text-xs text-text-primary focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 >
-                  <option value="Google Gemini AI">Google Gemini AI</option>
-                  <option value="GitHub CI/CD">GitHub CI/CD</option>
-                  <option value="Ollama Local LLM">Ollama Local LLM</option>
-                  <option value="MentorOS CLI Runner">MentorOS CLI Runner</option>
+                  <optgroup label="AI & LLM Services">
+                    <option value="Google Gemini AI">Google Gemini AI</option>
+                    <option value="OpenAI (ChatGPT / GPT-4o)">OpenAI (ChatGPT / GPT-4o)</option>
+                    <option value="Anthropic Claude">Anthropic Claude</option>
+                    <option value="DeepSeek AI">DeepSeek AI</option>
+                    <option value="Groq Cloud">Groq Cloud</option>
+                    <option value="Mistral AI">Mistral AI</option>
+                    <option value="Perplexity AI">Perplexity AI</option>
+                    <option value="OpenRouter">OpenRouter</option>
+                    <option value="Hugging Face">Hugging Face</option>
+                    <option value="Ollama Local LLM">Ollama Local LLM</option>
+                  </optgroup>
+                  <optgroup label="Developer Tools & CI/CD">
+                    <option value="GitHub CI/CD & PAT">GitHub CI/CD &amp; PAT</option>
+                    <option value="GitLab CI/CD">GitLab CI/CD</option>
+                    <option value="Vercel Deployment">Vercel Deployment</option>
+                    <option value="Supabase / Backend">Supabase / Backend</option>
+                    <option value="MentorOS CLI Runner">MentorOS CLI Runner</option>
+                    <option value="Custom API / Webhook">Custom API / Webhook</option>
+                  </optgroup>
                 </select>
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-text-secondary mb-1">
+                  API Key Secret <span className="text-text-muted font-normal">(optional)</span>
+                </label>
+                <input
+                  type="password"
+                  placeholder="Paste key or auto-generate"
+                  value={newKeySecret}
+                  onChange={(e) => setNewKeySecret(e.target.value)}
+                  className="w-full h-9 rounded-lg border border-border-base bg-bg-surface px-3 text-xs text-text-primary placeholder:text-text-faint focus:outline-none focus:ring-2 focus:ring-indigo-500 font-mono"
+                />
               </div>
             </div>
 
@@ -204,9 +241,10 @@ export default function DevApiKeysPage() {
               <Button
                 type="submit"
                 size="sm"
-                className="bg-indigo-600 hover:bg-indigo-700 text-white font-medium text-xs"
+                className="bg-indigo-600 hover:bg-indigo-700 text-white font-medium text-xs flex items-center gap-1.5"
               >
-                Create & Display Secret
+                <Plus className="w-3.5 h-3.5" />
+                Add API Key
               </Button>
             </div>
           </form>
@@ -310,19 +348,45 @@ export default function DevApiKeysPage() {
       {/* ─── Integration Instructions Card ─────────────────── */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
         <Card className="p-5 space-y-3">
-          <div className="flex items-center gap-2">
-            <Code2 className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
-            <h3 className="text-sm font-bold text-text-primary">Local .env.local Configuration</h3>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Code2 className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+              <h3 className="text-sm font-bold text-text-primary">Local .env.local Configuration</h3>
+            </div>
+            <button
+              type="button"
+              onClick={() => {
+                const snippet = `# MentorOS Local Developer Pipeline
+AI_PROVIDER="gemini"
+GEMINI_API_KEY="${keys.find((k) => k.service.includes('Gemini'))?.secret || 'AIzaSy...'}"
+OPENAI_API_KEY="${keys.find((k) => k.service.includes('OpenAI'))?.secret || 'sk-proj-...'}"
+LOCAL_LLM_ENDPOINT="http://localhost:11434"`;
+                copyToClipboard('env-snippet', snippet);
+              }}
+              className="flex items-center gap-1 text-2xs font-semibold text-indigo-600 dark:text-indigo-400 hover:underline"
+            >
+              {copiedId === 'env-snippet' ? (
+                <>
+                  <Check className="w-3.5 h-3.5 text-emerald-500" />
+                  <span>Copied</span>
+                </>
+              ) : (
+                <>
+                  <Copy className="w-3.5 h-3.5" />
+                  <span>Copy .env</span>
+                </>
+              )}
+            </button>
           </div>
           <p className="text-xs text-text-muted">
             Add these environment variables to your root development folder to enable local AI
             synthesis and repository analysis:
           </p>
-          <pre className="p-3 rounded-xl bg-slate-900 text-slate-100 font-mono text-2xs overflow-x-auto leading-relaxed">
+          <pre className="p-3.5 rounded-xl bg-slate-900 text-slate-100 font-mono text-2xs overflow-x-auto leading-relaxed border border-slate-800 shadow-inner">
             {`# MentorOS Local Developer Pipeline
-VITE_AI_PROVIDER="gemini"
-GEMINI_API_KEY="${keys[0]?.secret || 'AIzaSy...'}"
-GITHUB_PERSONAL_ACCESS_TOKEN="${keys[1]?.secret || 'ghp_...'}"
+AI_PROVIDER="gemini"
+GEMINI_API_KEY="${keys.find((k) => k.service.includes('Gemini'))?.secret || 'AIzaSyD-99xLK3920xLm99mK88201'}"
+OPENAI_API_KEY="${keys.find((k) => k.service.includes('OpenAI'))?.secret || 'sk-proj-99xLK3920xLm99mKa1B2'}"
 LOCAL_LLM_ENDPOINT="http://localhost:11434"`}
           </pre>
         </Card>

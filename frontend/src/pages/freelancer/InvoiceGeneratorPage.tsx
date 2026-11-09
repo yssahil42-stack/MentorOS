@@ -324,15 +324,6 @@ export default function InvoiceGeneratorPage() {
           </p>
         </div>
 
-        <Button
-          variant="primary"
-          size="sm"
-          onClick={() => openCaptureModal('ai')}
-          className="bg-orange-500 hover:bg-orange-600 font-bold px-5 h-10 text-white shadow-sm"
-          icon={<Plus className="w-4 h-4 text-white" />}
-        >
-          AI Invoice Assist
-        </Button>
       </div>
 
       {/* ─── STEP 1: SELECT PROJECT ───────────────────────────────────────────── */}
@@ -446,10 +437,10 @@ export default function InvoiceGeneratorPage() {
               <Button
                 variant="primary"
                 size="sm"
-                onClick={() => openCaptureModal('ai')}
-                icon={<Sparkles className="w-4 h-4" />}
+                onClick={() => openCaptureModal('manual')}
+                icon={<Plus className="w-4 h-4" />}
               >
-                Create with AI
+                Create Project
               </Button>
             </div>
           )}

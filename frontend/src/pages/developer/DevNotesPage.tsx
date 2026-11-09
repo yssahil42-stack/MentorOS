@@ -107,18 +107,6 @@ export default function DevNotesPage() {
 
         <div className="flex items-center gap-2">
           <Button
-            variant="secondary"
-            size="sm"
-            onClick={() =>
-              openAIDrawer(
-                'Draft an Architectural Decision Record (ADR) for caching with Redis vs in-memory LRU'
-              )
-            }
-            icon={<Sparkles className="w-4 h-4 text-emerald-400" />}
-          >
-            AI Draft ADR
-          </Button>
-          <Button
             variant="primary"
             size="sm"
             className="!bg-blue-600 hover:!bg-blue-700 text-white"

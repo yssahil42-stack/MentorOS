@@ -29,6 +29,7 @@ import {
   Key,
   Users,
   Sparkles,
+  UserCog,
 } from 'lucide-react';
 import { cn } from '../../utils/cn';
 import { useAuth } from '../../contexts/AuthContext';
@@ -65,6 +66,7 @@ const ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
   Key,
   Users,
   Sparkles,
+  UserCog,
 };
 
 function NavIcon({ name, className }: { name: string; className?: string }) {
@@ -218,6 +220,7 @@ export function RoleSidebar({ expanded, onToggle }: RoleSidebarProps) {
       {/* ─── Bottom: Sign out ─────────────────────────────────── */}
       <div className="border-t border-border-base p-2 shrink-0 bg-bg-surface/50">
         <button
+          type="button"
           onClick={handleLogout}
           className={cn(
             'flex rounded-xl font-medium text-text-muted hover:text-danger hover:bg-danger/10',
@@ -239,6 +242,7 @@ export function RoleSidebar({ expanded, onToggle }: RoleSidebarProps) {
 
       {/* ─── Expand / collapse toggle button ──────────────────── */}
       <button
+        type="button"
         onClick={onToggle}
         className={cn(
           'absolute top-1/2 -translate-y-1/2 -right-3 z-40',

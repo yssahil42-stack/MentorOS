@@ -14,12 +14,8 @@ export const studentConfig: RoleConfig = {
 
   navigation: [
     { to: '/app/student/dashboard', label: 'Dashboard', icon: 'LayoutDashboard' },
-    { to: '/app/student/projects', label: 'My Courses', icon: 'BookOpen' },
-    { to: '/app/student/tasks', label: 'Assignments', icon: 'ClipboardList' },
-    { to: '/app/student/study-plan', label: 'Study Plan', icon: 'Sparkles', badge: 'AI' },
-    { to: '/app/student/calendar', label: 'Timetable', icon: 'Calendar' },
+    { to: '/app/student/projects', label: 'Courses & Assignments', icon: 'BookOpen' },
     { to: '/app/student/notes', label: 'Notes', icon: 'FileText' },
-    { to: '/app/student/progress', label: 'Progress', icon: 'TrendingUp' },
     { to: '/app/student/settings', label: 'Settings', icon: 'Settings' },
   ],
 
@@ -111,7 +107,7 @@ export const studentConfig: RoleConfig = {
       icon: 'Sparkles',
       promptStarter: 'Create a realistic study and project plan from my current priorities.',
     },
-    { id: 'add-deadline', label: 'Add Deadline', icon: 'Calendar', href: '/app/student/calendar' },
+    { id: 'add-deadline', label: 'Add Deadline', icon: 'Calendar', href: '/app/student/dashboard#my-schedule' },
   ],
 
   aiTemplates: [
@@ -172,8 +168,8 @@ export const studentConfig: RoleConfig = {
     tasks: {
       icon: 'CheckSquare',
       title: 'No study tasks yet',
-      description: 'Add your first study task or let AI generate a study plan.',
-      actionLabel: 'Generate Study Plan',
+      description: 'Add your first study task to get started.',
+      actionLabel: 'New Task',
     },
     projects: {
       icon: 'FolderKanban',

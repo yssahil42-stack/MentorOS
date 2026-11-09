@@ -13,7 +13,6 @@ import {
   Target,
   TrendingUp,
   Building2,
-  Sparkles,
   Plus,
   Minus,
   Edit,
@@ -231,7 +230,7 @@ _________________________ _________________________
 // ─── Rate Calculator Component ────────────────────────────────────────────────
 
 export default function RateCalculatorPage() {
-  const { showToast, openCaptureModal } = useWorkspace();
+  const { showToast } = useWorkspace();
   const { data: projects = [] } = useQuery({
     queryKey: ['projects', 'freelancer'],
     queryFn: () => fetchProjects(),
@@ -375,17 +374,6 @@ export default function RateCalculatorPage() {
           </p>
         </div>
 
-        <div className="flex items-center gap-2">
-          <Button
-            variant="primary"
-            size="sm"
-            onClick={() => openCaptureModal('ai')}
-            className="bg-orange-500 hover:bg-orange-600 font-bold px-5 h-10 text-white shadow-sm"
-            icon={<Sparkles className="w-4 h-4 text-white" />}
-          >
-            AI Assist
-          </Button>
-        </div>
       </div>
 
       {/* ─── TABS ─────────────────────────────────────────────────────────────── */}

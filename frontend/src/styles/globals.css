@@ -8,41 +8,41 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ─── Light Mode Tokens (Crisp Modern Orange & White Palette) ─── */
+/* ─── Light Mode Tokens (Crisp Modern High-End Clean Studio Palette) ─── */
 :root {
   color-scheme: light;
 
-  /* Warm Orange 50 Canvas & Crisp White Surface Cards */
-  --bg-base-rgb: 255 247 237; /* #FFF7ED - Soft Warm Orange 50 Canvas */
+  /* Crisp Neutral Canvas & Pure White Surface Cards */
+  --bg-base-rgb: 250 250 252; /* #FAFAFC - Clean Modern Studio Canvas */
   --bg-surface-rgb: 255 255 255; /* #FFFFFF - Pure White Surface Cards */
-  --bg-elevated-rgb: 255 251 247; /* #FFFBF7 - Soft Warm Tinted Elevation */
-  --bg-overlay-rgb: 255 237 213; /* #FFEDD5 - Warm Orange 100 Overlay */
+  --bg-elevated-rgb: 244 246 250; /* #F4F6FA - Clean Crisp Elevation */
+  --bg-overlay-rgb: 238 242 248; /* #EEF2F8 - Crisp Subtle Overlay */
 
-  /* Sleek Modern Warm Orange Border RGB triplets */
-  --border-subtle-rgb: 255 241 229; /* #FFF1E5 */
-  --border-base-rgb: 254 215 170; /* #FED7AA - Clean Warm Orange Card Borders */
-  --border-rgb: 254 215 170; /* #FED7AA */
-  --border-hover-rgb: 253 186 116; /* #FDBA74 - Orange 300 */
-  --border-strong-rgb: 249 115 22; /* #F97316 - Radiant Brand Orange 500 */
+  /* Sleek Modern Neutral Slate Hairline Borders */
+  --border-subtle-rgb: 241 245 249; /* #F1F5F9 - Ultra Subtle */
+  --border-base-rgb: 226 232 240; /* #E2E8F0 - Clean Modern Slate Borders */
+  --border-rgb: 203 213 225; /* #CBD5E1 */
+  --border-hover-rgb: 148 163 184; /* #94A3B8 - Slate 400 */
+  --border-strong-rgb: 249 115 22; /* #F97316 - Radiant Accent Orange */
 
   /* High-Contrast Crisp Typography RGB triplets */
   --text-primary-rgb: 15 23 42; /* #0F172A - Deep Slate 900 */
-  --text-secondary-rgb: 51 65 85; /* #334155 - Slate 700 */
+  --text-secondary-rgb: 71 85 105; /* #475569 - Slate 600 */
   --text-muted-rgb: 100 116 139; /* #64748B - Slate 500 */
   --text-faint-rgb: 148 163 184; /* #94A3B8 - Slate 400 */
 
-  /* Solar/Brand Palette RGB in Light Mode (Warm Radiant Orange & Pure White) */
-  --solar-50-rgb: 255 247 237; /* #FFF7ED - Orange 50 */
-  --solar-100-rgb: 255 237 213; /* #FFEDD5 - Orange 100 */
-  --solar-200-rgb: 254 215 170; /* #FED7AA - Orange 200 */
-  --solar-300-rgb: 253 186 116; /* #FDBA74 - Orange 300 */
-  --solar-400-rgb: 251 146 60; /* #FB923C - Orange 400 */
-  --solar-500-rgb: 249 115 22; /* #F97316 - Radiant Brand Orange 500 */
-  --solar-600-rgb: 234 88 12; /* #EA580C - Orange 600 */
-  --solar-700-rgb: 194 65 12; /* #C2410C - Orange 700 */
-  --solar-800-rgb: 154 52 18; /* #9A3412 - Orange 800 */
-  --solar-900-rgb: 124 45 18; /* #7C2D12 - Orange 900 */
-  --solar-950-rgb: 67 20 7; /* #431407 - Orange 950 */
+  /* Solar/Brand Palette RGB in Light Mode */
+  --solar-50-rgb: 255 247 237; /* #FFF7ED */
+  --solar-100-rgb: 255 237 213; /* #FFEDD5 */
+  --solar-200-rgb: 254 215 170; /* #FED7AA */
+  --solar-300-rgb: 253 186 116; /* #FDBA74 */
+  --solar-400-rgb: 251 146 60; /* #FB923C */
+  --solar-500-rgb: 249 115 22; /* #F97316 - Radiant Brand Solar */
+  --solar-600-rgb: 234 88 12; /* #EA580C */
+  --solar-700-rgb: 194 65 12; /* #C2410C */
+  --solar-800-rgb: 154 52 18; /* #9A3412 */
+  --solar-900-rgb: 124 45 18; /* #7C2D12 */
+  --solar-950-rgb: 67 20 7; /* #431407 */
 
   /* CSS Variable shortcuts */
   --bg-base: rgb(var(--bg-base-rgb));
@@ -77,18 +77,18 @@
   --focus: #ea580c;
 
   /* Glassmorphism */
-  --glass-bg: rgba(255, 255, 255, 0.92);
-  --glass-border: rgba(254, 215, 170, 0.8);
+  --glass-bg: rgba(255, 255, 255, 0.85);
+  --glass-border: rgba(226, 232, 240, 0.8);
   --glass-blur: 16px;
 
-  /* Subtle Premium Shadows */
-  --shadow-card: 0 1px 3px 0 rgba(15, 23, 42, 0.05), 0 1px 2px -1px rgba(15, 23, 42, 0.03);
+  /* Refined High-End Multi-Layer Shadows */
+  --shadow-card: 0 1px 3px 0 rgba(15, 23, 42, 0.04), 0 1px 2px -1px rgba(15, 23, 42, 0.02);
   --shadow-card-hover:
-    0 10px 25px -4px rgba(249, 115, 22, 0.12), 0 4px 6px -2px rgba(15, 23, 42, 0.04);
-  --shadow-glass: 0 4px 20px -2px rgba(249, 115, 22, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.95);
+    0 12px 28px -4px rgba(15, 23, 42, 0.08), 0 4px 6px -2px rgba(15, 23, 42, 0.03);
+  --shadow-glass: 0 4px 20px -2px rgba(15, 23, 42, 0.04), inset 0 1px 0 rgba(255, 255, 255, 0.95);
   --shadow-glass-lg:
-    0 14px 40px -4px rgba(249, 115, 22, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.98);
-  --shadow-glow-solar: 0 0 28px rgba(249, 115, 22, 0.35);
+    0 14px 40px -4px rgba(15, 23, 42, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.98);
+  --shadow-glow-solar: 0 0 24px rgba(249, 115, 22, 0.25);
 
   /* Sidebar */
   --sidebar-width-collapsed: 64px;
@@ -107,37 +107,37 @@
 html.dark {
   color-scheme: dark;
 
-  /* Solar Dark Background RGB triplets (Deep Solar Obsidian) */
-  --bg-base-rgb: 15 13 10; /* #0F0D0A - Solar Obsidian Deep Space */
-  --bg-surface-rgb: 24 20 15; /* #18140F - Solar Dark Hearth */
-  --bg-elevated-rgb: 36 30 22; /* #241E16 - Solar Warm Bronze */
-  --bg-overlay-rgb: 52 43 31; /* #342B1F - Solar Amber Tint */
+  /* Clean Deep Obsidian Dark Canvas */
+  --bg-base-rgb: 10 13 20; /* #0A0D14 - Deep Modern Dark Canvas */
+  --bg-surface-rgb: 17 21 32; /* #111520 - Clean Dark Surface Cards */
+  --bg-elevated-rgb: 24 30 46; /* #181E2E - Clean Dark Elevation */
+  --bg-overlay-rgb: 33 42 63; /* #212A3F */
 
-  /* Solar Dark Border RGB triplets */
-  --border-subtle-rgb: 42 34 24; /* #2A2218 */
-  --border-base-rgb: 68 54 36; /* #443624 */
-  --border-rgb: 105 82 50; /* #695232 */
-  --border-hover-rgb: 180 133 53; /* #B48535 */
-  --border-strong-rgb: 245 158 11; /* #F59E0B Solar Amber */
+  /* Sleek Modern Dark Borders */
+  --border-subtle-rgb: 24 30 46; /* #181E2E */
+  --border-base-rgb: 36 45 68; /* #242D44 */
+  --border-rgb: 51 63 92; /* #333F5C */
+  --border-hover-rgb: 86 103 143; /* #56678F */
+  --border-strong-rgb: 249 115 22; /* #F97316 Solar Amber */
 
   /* Solar Dark Text RGB triplets (All >= 4.5:1 WCAG AA across all dark backgrounds) */
-  --text-primary-rgb: 255 248 238; /* #FFF8EE - Radiant Sunlit White (13.2:1 to 18.4:1) */
-  --text-secondary-rgb: 234 218 196; /* #EADAC4 - Warm Sun Gold Cream (10.1:1 to 14.2:1) */
-  --text-muted-rgb: 182 163 138; /* #B6A38A - Muted Solar Bronze (5.7:1 to 8.0:1) */
-  --text-faint-rgb: 168 150 126; /* #A8967E - Solar Bronze Faint (4.85:1 to 6.77:1) */
+  --text-primary-rgb: 248 250 252; /* #F8FAFC - Pure Crisp Text */
+  --text-secondary-rgb: 203 213 225; /* #CBD5E1 - Slate 300 */
+  --text-muted-rgb: 148 163 184; /* #94A3B8 - Slate 400 */
+  --text-faint-rgb: 100 116 139; /* #64748B - Slate 500 */
 
-  /* Solar Dark Palette (Warm Amber/Bronze) */
+  /* Solar Dark Palette */
   --solar-50-rgb: 255 251 235;
   --solar-100-rgb: 254 243 199;
   --solar-200-rgb: 253 230 138;
   --solar-300-rgb: 252 211 77;
   --solar-400-rgb: 251 191 36;
-  --solar-500-rgb: 245 158 11;
-  --solar-600-rgb: 217 119 6;
-  --solar-700-rgb: 180 83 9;
-  --solar-800-rgb: 146 64 14;
-  --solar-900-rgb: 120 53 15;
-  --solar-950-rgb: 69 26 3;
+  --solar-500-rgb: 249 115 22;
+  --solar-600-rgb: 234 88 12;
+  --solar-700-rgb: 194 65 12;
+  --solar-800-rgb: 154 52 18;
+  --solar-900-rgb: 124 45 18;
+  --solar-950-rgb: 67 20 7;
 
   --solar-amber: #f59e0b;
   --solar-flare: #d97706;
@@ -156,16 +156,16 @@ html.dark {
   --focus: #f59e0b;
 
   /* Glassmorphism */
-  --glass-bg: rgba(24, 20, 15, 0.82);
-  --glass-border: rgba(245, 158, 11, 0.15);
+  --glass-bg: rgba(17, 21, 32, 0.85);
+  --glass-border: rgba(255, 255, 255, 0.08);
   --glass-blur: 18px;
 
   /* Shadows with Solar Glow */
-  --shadow-card: 0 2px 18px rgba(0, 0, 0, 0.55), 0 0 1px rgba(245, 158, 11, 0.15);
-  --shadow-card-hover: 0 10px 36px rgba(0, 0, 0, 0.75), 0 0 24px rgba(245, 158, 11, 0.25);
-  --shadow-glass: 0 4px 32px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(245, 158, 11, 0.15);
-  --shadow-glass-lg: 0 12px 64px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(245, 158, 11, 0.25);
-  --shadow-glow-solar: 0 0 28px rgba(245, 158, 11, 0.45);
+  --shadow-card: 0 2px 14px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.06);
+  --shadow-card-hover: 0 12px 36px rgba(0, 0, 0, 0.7), 0 0 24px rgba(249, 115, 22, 0.2);
+  --shadow-glass: 0 4px 28px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  --shadow-glass-lg: 0 12px 54px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  --shadow-glow-solar: 0 0 28px rgba(249, 115, 22, 0.35);
 }
 
 /* ─── Base Reset ────────────────────────────────────────── */
@@ -238,6 +238,14 @@ html.dark {
   ::selection {
     background: rgba(245, 158, 11, 0.2);
     color: var(--text-primary);
+  }
+
+  /* Hide browser-native password reveal and clear buttons (e.g. Microsoft Edge, IE) */
+  input::-ms-reveal,
+  input::-ms-clear {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
   }
 }
 
@@ -380,26 +388,26 @@ html.dark {
     background: radial-gradient(circle at 50% 50%, rgba(16, 185, 129, 0.15) 0%, transparent 60%);
   }
 
-  /* Framer-grade Canvas & Grid styling */
+  /* Modern High-End Canvas & Grid styling */
   .bg-dot-grid {
-    background-image: radial-gradient(rgba(245, 158, 11, 0.18) 1.25px, transparent 1.25px);
+    background-image: radial-gradient(rgba(15, 23, 42, 0.08) 1.25px, transparent 1.25px);
     background-size: 20px 20px;
   }
   .dark .bg-dot-grid {
-    background-image: radial-gradient(rgba(245, 158, 11, 0.14) 1.25px, transparent 1.25px);
+    background-image: radial-gradient(rgba(255, 255, 255, 0.07) 1.25px, transparent 1.25px);
     background-size: 20px 20px;
   }
   .framer-window-shadow {
     box-shadow:
-      0 0 0 1px rgba(249, 115, 22, 0.14),
-      0 20px 50px -12px rgba(249, 115, 22, 0.18),
-      0 4px 16px -2px rgba(15, 23, 42, 0.05);
+      0 0 0 1px rgba(226, 232, 240, 0.9),
+      0 20px 50px -12px rgba(15, 23, 42, 0.08),
+      0 4px 16px -2px rgba(15, 23, 42, 0.03);
   }
   .dark .framer-window-shadow {
     box-shadow:
-      0 0 0 1px rgba(245, 158, 11, 0.2),
-      0 25px 60px -15px rgba(0, 0, 0, 0.6),
-      0 0 80px -20px rgba(245, 158, 11, 0.2);
+      0 0 0 1px rgba(255, 255, 255, 0.08),
+      0 25px 60px -15px rgba(0, 0, 0, 0.7),
+      0 0 50px -10px rgba(249, 115, 22, 0.15);
   }
 }
 

@@ -148,7 +148,7 @@ export default function StudentNotesPage() {
 
         <Card className="p-4 border-l-4 border-l-amber-500">
           <div className="flex items-center justify-between text-xs text-text-muted font-semibold uppercase">
-            <span>Pinned Cheat Sheets</span>
+            <span>Priority Revision Sheets</span>
             <Pin className="w-4 h-4 text-amber-400" />
           </div>
           <div className="mt-2 text-2xl font-extrabold text-text-primary">{pinnedNotes.length}</div>
@@ -166,12 +166,14 @@ export default function StudentNotesPage() {
 
         <Card className="p-4 border-l-4 border-l-orange-500">
           <div className="flex items-center justify-between text-xs text-text-muted font-semibold uppercase">
-            <span>AI Summarization</span>
-            <Sparkles className="w-4 h-4 text-orange-500 dark:text-orange-400" />
+            <span>Recent Notes</span>
+            <FileText className="w-4 h-4 text-orange-500 dark:text-orange-400" />
           </div>
-          <div className="mt-2 text-sm font-bold text-text-primary">1-Click Available</div>
+          <div className="mt-2 text-2xl font-extrabold text-text-primary">
+            {notes.length}
+          </div>
           <p className="text-2xs text-orange-500 dark:text-orange-400 mt-1">
-            Extract core exam takeaways
+            Across study subjects
           </p>
         </Card>
       </div>
@@ -208,7 +210,7 @@ export default function StudentNotesPage() {
                 : 'bg-bg-base text-text-muted hover:text-text-primary border border-border-base'
             }`}
           >
-            <Pin className="w-3.5 h-3.5" /> Pinned Cheat Sheets ({pinnedNotes.length})
+            <Pin className="w-3.5 h-3.5" /> Priority Revision Sheets ({pinnedNotes.length})
           </button>
         </div>
       </div>
@@ -224,14 +226,6 @@ export default function StudentNotesPage() {
             Record lecture summaries, formula cheat sheets, or create study guides with AI.
           </p>
           <div className="flex items-center justify-center gap-2">
-            <Button
-              variant="secondary"
-              size="sm"
-              onClick={() => openCaptureModal('ai')}
-              icon={<Sparkles className="w-4 h-4 text-student-400" />}
-            >
-              Ask AI to Create Notes
-            </Button>
             <Button
               variant="primary"
               size="sm"
@@ -270,7 +264,7 @@ export default function StudentNotesPage() {
                           ? 'text-amber-400 bg-amber-500/10'
                           : 'text-text-faint hover:text-amber-400'
                       }`}
-                      title={note.is_pinned ? 'Unpin note' : 'Pin cheat sheet'}
+                      title={note.is_pinned ? 'Unpin note' : 'Pin priority revision sheet'}
                     >
                       <Pin className="w-3.5 h-3.5" />
                     </button>
@@ -313,19 +307,6 @@ export default function StudentNotesPage() {
                   >
                     <Copy className="w-3.5 h-3.5" />
                   </button>
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    className="text-2xs text-student-400 hover:text-student-300 p-1"
-                    onClick={() =>
-                      openAIDrawer(
-                        `Explain and generate exam practice questions based on note: "${note.title}". Content: ${note.content}`
-                      )
-                    }
-                    icon={<Sparkles className="w-3 h-3" />}
-                  >
-                    AI Quiz
-                  </Button>
                 </div>
               </div>
             </Card>
@@ -337,7 +318,7 @@ export default function StudentNotesPage() {
       <Modal
         isOpen={isCreateModalOpen}
         onClose={() => setIsCreateModalOpen(false)}
-        title="Add Learning Note / Cheat Sheet"
+        title="Add Learning Note / Priority Revision Sheet"
       >
         <form
           onSubmit={(e) => {
@@ -388,46 +369,28 @@ export default function StudentNotesPage() {
               className="rounded text-student-500 bg-bg-surface border-border-base"
             />
             <label htmlFor="pinNote" className="text-xs text-text-secondary cursor-pointer">
-              Pin to Top as Quick Revision Cheat Sheet
+              Pin to Top as Priority Revision Sheet
             </label>
           </div>
 
-          <div className="pt-2 flex justify-between items-center">
+          <div className="pt-2 flex justify-end items-center gap-2">
             <Button
               type="button"
-              variant="ghost"
+              variant="secondary"
               size="sm"
-              onClick={() => {
-                setIsCreateModalOpen(false);
-                openAIDrawer(
-                  'Generate a comprehensive study note outline for a computer science or engineering topic'
-                );
-              }}
-              icon={<Sparkles className="w-3.5 h-3.5 text-student-400" />}
-              className="text-student-400"
+              onClick={() => setIsCreateModalOpen(false)}
             >
-              Ask AI for Outline
+              Cancel
             </Button>
-
-            <div className="flex gap-2">
-              <Button
-                type="button"
-                variant="secondary"
-                size="sm"
-                onClick={() => setIsCreateModalOpen(false)}
-              >
-                Cancel
-              </Button>
-              <Button
-                type="submit"
-                variant="primary"
-                size="sm"
-                className="!bg-student-500 hover:!bg-student-600 shadow-glow-solar"
-                disabled={!newTitle.trim() || !newContent.trim() || createNoteMutation.isPending}
-              >
-                {createNoteMutation.isPending ? 'Saving...' : 'Save Note'}
-              </Button>
-            </div>
+            <Button
+              type="submit"
+              variant="primary"
+              size="sm"
+              className="!bg-student-500 hover:!bg-student-600 shadow-glow-solar"
+              disabled={!newTitle.trim() || !newContent.trim() || createNoteMutation.isPending}
+            >
+              {createNoteMutation.isPending ? 'Saving...' : 'Save Note'}
+            </Button>
           </div>
         </form>
       </Modal>
@@ -444,7 +407,7 @@ export default function StudentNotesPage() {
               <span>Added: {new Date(selectedNote.created_at).toLocaleString()}</span>
               {selectedNote.is_pinned && (
                 <span className="text-amber-400 font-semibold flex items-center gap-1">
-                  <Pin className="w-3 h-3" /> Pinned Cheat Sheet
+                  <Pin className="w-3 h-3" /> Priority Revision Sheet
                 </span>
               )}
             </div>
@@ -453,34 +416,19 @@ export default function StudentNotesPage() {
               {selectedNote.content}
             </div>
 
-            <div className="flex items-center justify-between pt-2">
+            <div className="flex items-center justify-end gap-2 pt-2">
               <Button
-                variant="secondary"
+                variant="ghost"
                 size="sm"
-                onClick={() =>
-                  openAIDrawer(
-                    `Generate 3 practice exam questions and detailed answers based on: "${selectedNote.title}"`
-                  )
-                }
-                icon={<Sparkles className="w-3.5 h-3.5 text-student-400" />}
+                onClick={() => deleteNoteMutation.mutate(selectedNote.id)}
+                className="text-red-400 hover:text-red-300"
+                icon={<Trash2 className="w-3.5 h-3.5" />}
               >
-                AI Practice Quiz
+                Delete
               </Button>
-
-              <div className="flex gap-2">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => deleteNoteMutation.mutate(selectedNote.id)}
-                  className="text-red-400 hover:text-red-300"
-                  icon={<Trash2 className="w-3.5 h-3.5" />}
-                >
-                  Delete
-                </Button>
-                <Button variant="outline" size="sm" onClick={() => setSelectedNote(null)}>
-                  Close
-                </Button>
-              </div>
+              <Button variant="outline" size="sm" onClick={() => setSelectedNote(null)}>
+                Close
+              </Button>
             </div>
           </div>
         </Modal>

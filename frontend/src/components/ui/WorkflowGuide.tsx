@@ -18,8 +18,8 @@ interface WorkflowGuideProps {
 }
 
 export function WorkflowGuide({ role = 'all' }: WorkflowGuideProps) {
-  const { openCaptureModal } = useWorkspace();
-  const [isExpanded, setIsExpanded] = useState(true);
+  const { openCaptureModal, openAIDrawer } = useWorkspace();
+  const [isExpanded, setIsExpanded] = useState(false);
 
   const steps = [
     {
@@ -35,8 +35,8 @@ export function WorkflowGuide({ role = 'all' }: WorkflowGuideProps) {
       title: '2. Generate Roadmap',
       desc: 'AI builds milestone phases, focus subtasks, and study/build sessions.',
       icon: Zap,
-      action: () => openCaptureModal('ai'),
-      actionLabel: 'AI Roadmap',
+      action: () => openAIDrawer(),
+      actionLabel: 'Plan with AI',
     },
     {
       num: '03',

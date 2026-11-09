@@ -139,18 +139,6 @@ export default function DevTasksPage() {
 
         <div className="flex items-center gap-2">
           <Button
-            variant="secondary"
-            size="sm"
-            onClick={() =>
-              openAIDrawer(
-                'Generate 5 technical developer tasks with acceptance criteria and time estimates for user authentication'
-              )
-            }
-            icon={<Sparkles className="w-4 h-4 text-emerald-400" />}
-          >
-            AI Tasks
-          </Button>
-          <Button
             variant="primary"
             size="sm"
             className="!bg-developer-500 hover:!bg-developer-600 shadow-glow-emerald"
@@ -202,7 +190,6 @@ export default function DevTasksPage() {
             <option value="all">All Priorities</option>
             <option value="urgent">Urgent</option>
             <option value="high">High</option>
-            <option value="medium">Medium</option>
             <option value="low">Low</option>
           </select>
         </div>
@@ -368,7 +355,6 @@ export default function DevTasksPage() {
                 className="w-full bg-bg-base border border-border-base rounded-xl px-3 py-2 text-xs text-text-primary focus:outline-none"
               >
                 <option value="low">Low</option>
-                <option value="medium">Medium</option>
                 <option value="high">High</option>
                 <option value="urgent">Urgent</option>
               </select>

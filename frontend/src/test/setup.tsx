@@ -111,6 +111,7 @@ vi.mock('lucide-react', () => {
     'ChevronRight',
     'ChevronLeft',
     'CheckCircle2',
+    'CheckCheck',
     'ShieldAlert',
     'Sun',
     'Moon',

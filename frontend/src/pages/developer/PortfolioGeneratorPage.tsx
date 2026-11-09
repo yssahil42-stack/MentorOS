@@ -511,10 +511,10 @@ export default function PortfolioGeneratorPage() {
                 onClick={handleGenerate}
                 keyboardShortcut="⌘G"
                 tooltip="Generate README & Case Study (⌘G)"
-                className="bg-orange-500 hover:bg-orange-600 text-white font-bold shadow-2xs"
-                icon={<Sparkles className="w-4 h-4" />}
+                className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold shadow-2xs"
+                icon={<Code2 className="w-4 h-4" />}
               >
-                <span>{isGenerating ? 'Synthesizing with AI...' : 'Generate with AI'}</span>
+                <span>{isGenerating ? 'Building Portfolio...' : 'Build Portfolio'}</span>
               </Button>
             </div>
           </Card3D>

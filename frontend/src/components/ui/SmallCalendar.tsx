@@ -214,10 +214,11 @@ export function SmallCalendar({ role }: SmallCalendarProps) {
     <>
       {/* ─── Compact Mini Calendar Card on Dashboard ─────────────────────────── */}
       <Card3D
+        id="my-schedule"
         maxTilt={3}
         depth={25}
         variant="secondary"
-        className="p-4 sm:p-5 border border-border-base hover:border-solar-500/40 transition-all shadow-card backdrop-blur-md select-none flex flex-col"
+        className="p-4 sm:p-5 border border-border-base hover:border-solar-500/40 transition-all shadow-card backdrop-blur-md select-none flex flex-col scroll-mt-20"
       >
         <div className="flex items-center justify-between pb-3 border-b border-border-base">
           <div className="flex items-center gap-2">
@@ -225,7 +226,14 @@ export function SmallCalendar({ role }: SmallCalendarProps) {
               <CalendarIcon className="w-4 h-4" />
             </span>
             <div>
-              <h3 className="text-xs sm:text-sm font-bold text-text-primary">My Schedule</h3>
+              <div className="flex items-center gap-1.5">
+                <h3 className="text-xs sm:text-sm font-bold text-text-primary">My Schedule</h3>
+                {role === 'student' && (
+                  <span className="text-[10px] font-semibold text-solar-600 dark:text-solar-400 bg-solar-500/10 px-2 py-0.2 rounded-md border border-solar-500/20">
+                    Timetable
+                  </span>
+                )}
+              </div>
               <p className="text-3xs text-text-muted">
                 {selectedDay ? 'Date selected' : 'Click a date to view agenda'}
               </p>

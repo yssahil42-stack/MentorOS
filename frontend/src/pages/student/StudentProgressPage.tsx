@@ -132,19 +132,6 @@ export default function StudentProgressPage() {
           </div>
 
           <div className="flex items-center gap-2.5 flex-wrap">
-            <Button
-              variant="secondary"
-              size="sm"
-              onClick={() =>
-                openAIDrawer(
-                  `My current GPA is ${currentGpa} with target ${targetGpa}. I am taking CS-480, CS-401, MATH-320, and PHYS-210. Suggest an optimized revision schedule for final exams to maintain Dean's List standing.`
-                )
-              }
-              icon={<Sparkles className="w-4 h-4 text-student-400" />}
-              className="border-student-500/30 text-student-300 hover:text-white"
-            >
-              AI Grade Optimizer
-            </Button>
             <Link to="/app/student/study-plan">
               <Button
                 variant="primary"

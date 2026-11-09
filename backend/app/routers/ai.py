@@ -929,6 +929,7 @@ async def generate_ai_proposal(
             models.AIProposal.user_id == current_user.id,
             models.AIProposal.role == role,
             models.AIProposal.request_text == prompt,
+            models.AIProposal.status == "pending",
         )
         .order_by(models.AIProposal.created_at.desc())
         .first()

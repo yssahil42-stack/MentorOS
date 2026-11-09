@@ -329,7 +329,7 @@ export function generateFollowUpEmail(
   app: JobApplication,
   type: 'follow_up_7d' | 'follow_up_14d',
   candidateName = 'Candidate'
-): { subject: string; body: string; mailtoUrl: string } {
+): { subject: string; body: string; mailtoUrl: string; gmailUrl: string } {
   const recipientName = app.contactName ? app.contactName.split(' ')[0] : 'Hiring Team';
 
   let subject = '';
@@ -369,8 +369,9 @@ ${candidateName}`;
   const encodedBody = encodeURIComponent(body);
   const toAddress = app.contactEmail ? encodeURIComponent(app.contactEmail) : '';
   const mailtoUrl = `mailto:${toAddress}?subject=${encodedSubject}&body=${encodedBody}`;
+  const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${toAddress}&su=${encodedSubject}&body=${encodedBody}`;
 
-  return { subject, body, mailtoUrl };
+  return { subject, body, mailtoUrl, gmailUrl };
 }
 
 /**

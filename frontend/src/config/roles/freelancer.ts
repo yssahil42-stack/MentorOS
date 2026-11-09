@@ -13,12 +13,8 @@ export const freelancerConfig: RoleConfig = {
   allowedRoutes: ['/app/freelancer'],
 
   navigation: [
-    { to: '/app/freelancer/dashboard', label: 'Dashboard', icon: 'LayoutDashboard' },
-    { to: '/app/freelancer/projects', label: 'Client Projects', icon: 'Briefcase' },
-    { to: '/app/freelancer/work-plans', label: 'Work Proposals', icon: 'Sparkles', badge: 'AI' },
-    { to: '/app/freelancer/deliverables', label: 'Deliverables', icon: 'Clock' },
-    { to: '/app/freelancer/tasks', label: 'Tasks', icon: 'CheckSquare' },
-    { to: '/app/freelancer/calendar', label: 'Calendar', icon: 'Calendar' },
+    { to: '/app/freelancer/dashboard', label: 'Dashboard & Proposals', icon: 'LayoutDashboard' },
+    { to: '/app/freelancer/projects', label: 'Project Tasks', icon: 'Briefcase' },
     { to: '/app/freelancer/notes', label: 'Work Notes', icon: 'FileText' },
     { to: '/app/freelancer/settings', label: 'Settings', icon: 'Settings' },
   ],
@@ -174,8 +170,8 @@ export const freelancerConfig: RoleConfig = {
     tasks: {
       icon: 'CheckSquare',
       title: 'No tasks yet',
-      description: 'Add your first task or let AI create a weekly plan.',
-      actionLabel: 'Generate Weekly Plan',
+      description: 'Add your first task to get started.',
+      actionLabel: 'New Task',
     },
     projects: {
       icon: 'FolderKanban',

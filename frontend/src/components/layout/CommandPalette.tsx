@@ -62,7 +62,7 @@ export function CommandPalette() {
       id: 'ai-open',
       category: 'AI Prompts',
       title: 'Open AI Assistant Drawer',
-      subtitle: 'Ask AI to generate tasks, milestones, or roadmaps',
+      subtitle: 'Plan tasks, milestones, or roadmaps with AI',
       icon: <Sparkles className="w-4 h-4 text-emerald-400" />,
       action: () => {
         closeCommandPalette();

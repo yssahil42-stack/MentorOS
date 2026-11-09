@@ -146,18 +146,6 @@ export default function DevCalendarPage() {
 
         <div className="flex items-center gap-2">
           <Button
-            variant="secondary"
-            size="sm"
-            onClick={() =>
-              openAIDrawer(
-                'Plan 3 dedicated 2-hour deep work build blocks this week leading to our next milestone release'
-              )
-            }
-            icon={<Sparkles className="w-4 h-4 text-emerald-400" />}
-          >
-            AI Schedule
-          </Button>
-          <Button
             variant="outline"
             size="sm"
             onClick={() => {

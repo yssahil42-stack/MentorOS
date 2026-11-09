@@ -38,9 +38,9 @@ describe('Breadcrumb Component', () => {
 
     expect(screen.getByText('Home')).toBeInTheDocument();
     expect(screen.getByText('Student')).toBeInTheDocument();
-    expect(screen.getByText('My Courses')).toBeInTheDocument();
+    expect(screen.getByText('Courses & Assignments')).toBeInTheDocument();
 
-    const currentPageItem = screen.getByText('My Courses').closest('li');
+    const currentPageItem = screen.getByText('Courses & Assignments').closest('li');
     expect(currentPageItem).toHaveAttribute('aria-current', 'page');
   });
 
@@ -70,14 +70,14 @@ describe('Breadcrumb Component', () => {
 
   it('infers roleConfig automatically from user context and route when not passed as prop', () => {
     render(
-      <MemoryRouter initialEntries={['/app/student/calendar']}>
+      <MemoryRouter initialEntries={['/app/student/projects']}>
         <Breadcrumb />
       </MemoryRouter>
     );
 
     expect(screen.getByText('Home')).toBeInTheDocument();
     expect(screen.getByText('Student')).toBeInTheDocument();
-    expect(screen.getByText('Timetable')).toBeInTheDocument();
+    expect(screen.getByText('Courses & Assignments')).toBeInTheDocument();
   });
 
   it('adapts to different role configurations such as developer', () => {

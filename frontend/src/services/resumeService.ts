@@ -121,6 +121,14 @@ const ACTION_VERBS = [
   'Refactored',
 ];
 
+export function isEducationPursuing(yearStr?: string, explicitPursuing?: boolean): boolean {
+  if (explicitPursuing) return true;
+  if (!yearStr) return false;
+  const currentYear = new Date().getFullYear();
+  const yr = parseInt(yearStr.trim(), 10);
+  return !isNaN(yr) && yr > currentYear;
+}
+
 export const SAMPLE_RESUME_INPUTS: Record<string, ResumeTailorInput> = {
   fullstack: {
     profile: {
@@ -142,6 +150,19 @@ export const SAMPLE_RESUME_INPUTS: Record<string, ResumeTailorInput> = {
       frameworks: ['React', 'Next.js', 'Node.js', 'Express', 'TailwindCSS', 'TanStack Query'],
       tools: ['Docker', 'Git', 'Vite', 'Vitest', 'Jest', 'Postman'],
       cloud: ['AWS (ECS, S3, RDS)', 'PostgreSQL', 'Redis', 'GitHub Actions'],
+    },
+    tenthEducation: {
+      board: 'CBSE',
+      percentage: '94.5%',
+      school: 'St. Xavier Senior Secondary School',
+      year: '2017',
+    },
+    twelfthEducation: {
+      board: 'CBSE',
+      percentage: '91.2%',
+      school: 'Delhi Public School',
+      year: '2019',
+      stream: 'Science (PCM)',
     },
     experiences: [
       {
@@ -216,11 +237,13 @@ export const SAMPLE_RESUME_INPUTS: Record<string, ResumeTailorInput> = {
     education: [
       {
         id: 'edu-1',
-        degree: 'B.S. in Computer Science',
+        degree: 'B.Tech in Computer Science and Engineering',
         institution: 'University of California, Berkeley',
         location: 'Berkeley, CA',
-        graduationYear: '2021',
+        graduationYear: '2023',
+        percentage: '3.9 GPA / 92%',
         details: 'Honors in Computer Engineering, Coursework in Distributed Systems & Compilers',
+        isPursuing: false,
       },
     ],
   },
@@ -244,6 +267,19 @@ export const SAMPLE_RESUME_INPUTS: Record<string, ResumeTailorInput> = {
       frameworks: ['React', 'Next.js', 'TailwindCSS', 'Radix UI', 'Framer Motion'],
       tools: ['Storybook', 'Vite', 'Figma', 'Vitest', 'Testing Library', 'Playwright'],
       cloud: ['Vercel', 'AWS CloudFront', 'GitHub Actions', 'Node.js'],
+    },
+    tenthEducation: {
+      board: 'ICSE',
+      percentage: '93.0%',
+      school: 'St. Mary High School',
+      year: '2020',
+    },
+    twelfthEducation: {
+      board: 'ISC',
+      percentage: '89.5%',
+      school: 'National Junior College',
+      year: '2022',
+      stream: 'Science',
     },
     experiences: [
       {
@@ -279,9 +315,12 @@ export const SAMPLE_RESUME_INPUTS: Record<string, ResumeTailorInput> = {
     education: [
       {
         id: 'fe-edu-1',
-        degree: 'B.S. in Software Engineering',
+        degree: 'B.Tech in Software Engineering',
         institution: 'Georgia Institute of Technology',
-        graduationYear: '2020',
+        graduationYear: '2027',
+        percentage: '3.8 GPA',
+        details: "Dean's List for Academic Excellence",
+        isPursuing: true,
       },
     ],
   },
@@ -398,19 +437,31 @@ export function synthesizeTailoredResume(input: ResumeTailorInput): TailoredResu
   const keywordReport = analyzeKeywords(input);
   const selectedProjects = input.projects.filter((p) => p.selected);
 
-  // Synthesize tailored summary
-  const topMatched = keywordReport.matchedKeywords.slice(0, 4).join(', ');
-  const seniorityLabel = input.seniority.charAt(0).toUpperCase() + input.seniority.slice(1);
-  const summary = `${seniorityLabel} ${input.targetRole} with proven expertise in engineering robust, high-performance systems utilizing ${topMatched}. Demonstrated track record of delivering scalable architectures, accelerating deployment velocity, and optimizing end-user experiences across ${input.targetIndustry || 'modern digital platforms'}. Adept at collaborating in agile cross-functional environments to solve complex technical bottlenecks and drive measurable business impact.`;
+  // Synthesize tailored summary variations
+  const topMatched = keywordReport.matchedKeywords.slice(0, 4).join(', ') || 'modern full-stack tooling';
+  const seniorityLabel = input.isFresher
+    ? 'Entry-Level'
+    : input.seniority.charAt(0).toUpperCase() + input.seniority.slice(1);
 
-  // Tailored Experiences
-  const tailoredExperiences = input.experiences.map((exp) => ({
-    company: exp.company,
-    role: exp.role,
-    location: exp.location,
-    period: `${exp.startDate} - ${exp.current ? 'Present' : exp.endDate}`,
-    bullets: exp.bullets,
-  }));
+  const summaryVariations = {
+    metrics: `${seniorityLabel} ${input.targetRole} specializing in ${topMatched}. Proven record of engineering high-efficiency systems and optimizing end-user delivery pipelines across ${input.targetIndustry || 'modern digital platforms'}, consistently driving measurable performance gains and reliable milestone execution.`,
+    technical: `Dedicated ${seniorityLabel} ${input.targetRole} with in-depth technical proficiency in ${topMatched}. Focused on building clean, maintainable architectures, enforcing type-safe patterns, and implementing robust software engineering standards across ${input.targetIndustry || 'distributed ecosystems'}.`,
+    growth: `Motivated ${input.isFresher ? 'graduate and aspiring' : ''} ${input.targetRole} with strong foundational command of ${topMatched}. Adept at rapid skill acquisition, hands-on project delivery, and collaborative problem-solving to build reliable applications and create immediate value across ${input.targetIndustry || 'agile engineering teams'}.`,
+  };
+
+  const chosenStyle = input.summaryStyle || (input.isFresher ? 'growth' : 'metrics');
+  const summary = input.customSummary || summaryVariations[chosenStyle];
+
+  // Tailored Experiences (omitted if fresher with no formal corporate experience)
+  const tailoredExperiences = input.omitExperience
+    ? []
+    : input.experiences.map((exp) => ({
+        company: exp.company,
+        role: exp.role,
+        location: exp.location,
+        period: `${exp.startDate} - ${exp.current ? 'Present' : exp.endDate}`,
+        bullets: exp.bullets,
+      }));
 
   // Tailored Projects
   const tailoredProjects = selectedProjects.map((p) => ({
@@ -432,12 +483,81 @@ export function synthesizeTailoredResume(input: ResumeTailorInput): TailoredResu
   };
 
   // Education
-  const education = input.education.map((edu) => ({
-    degree: edu.degree,
-    institution: edu.institution,
-    year: edu.graduationYear,
-    details: edu.details,
-  }));
+  const degreeEntries = input.education.map((edu) => {
+    const isPursuing = isEducationPursuing(edu.graduationYear, edu.isPursuing);
+    return {
+      degree: edu.degree,
+      institution: edu.institution,
+      year: isPursuing ? `${edu.graduationYear} (Pursuing)` : edu.graduationYear,
+      details: edu.details,
+      percentage: edu.percentage,
+      board: edu.board,
+      stream: edu.stream,
+      educationLevel: 'degree' as const,
+      isPursuing,
+    };
+  });
+
+  const twelfthEntry =
+    input.twelfthEducation &&
+    (input.twelfthEducation.board ||
+      input.twelfthEducation.percentage ||
+      input.twelfthEducation.school)
+      ? [
+          {
+            degree: `Class XII (Higher Secondary)${
+              input.twelfthEducation.board ? ` — ${input.twelfthEducation.board}` : ''
+            }`,
+            institution: input.twelfthEducation.school || 'Junior College / School',
+            year: input.twelfthEducation.year,
+            percentage: input.twelfthEducation.percentage,
+            board: input.twelfthEducation.board,
+            stream: input.twelfthEducation.stream,
+            educationLevel: '12th' as const,
+            isPursuing: isEducationPursuing(input.twelfthEducation.year),
+            details: [
+              input.twelfthEducation.board ? `Board: ${input.twelfthEducation.board}` : '',
+              input.twelfthEducation.percentage
+                ? `Percentage: ${input.twelfthEducation.percentage}`
+                : '',
+              input.twelfthEducation.stream ? `Stream: ${input.twelfthEducation.stream}` : '',
+            ]
+              .filter(Boolean)
+              .join(' • '),
+          },
+        ]
+      : [];
+
+  const tenthEntry =
+    input.tenthEducation &&
+    (input.tenthEducation.board || input.tenthEducation.percentage || input.tenthEducation.school)
+      ? [
+          {
+            degree: `Class X (Secondary)${
+              input.tenthEducation.board ? ` — ${input.tenthEducation.board}` : ''
+            }`,
+            institution: input.tenthEducation.school || 'Secondary School',
+            year: input.tenthEducation.year,
+            percentage: input.tenthEducation.percentage,
+            board: input.tenthEducation.board,
+            educationLevel: '10th' as const,
+            isPursuing: false,
+            details: [
+              input.tenthEducation.board ? `Board: ${input.tenthEducation.board}` : '',
+              input.tenthEducation.percentage
+                ? `Percentage: ${input.tenthEducation.percentage}`
+                : '',
+            ]
+              .filter(Boolean)
+              .join(' • '),
+          },
+        ]
+      : [];
+
+  const education = [...degreeEntries, ...twelfthEntry, ...tenthEntry];
+
+  const templateId = input.templateId || 'modern';
+  const isFresher = Boolean(input.isFresher);
 
   // Markdown representation
   const markdown = generateMarkdownResume(input.profile, {
@@ -447,6 +567,7 @@ export function synthesizeTailoredResume(input: ResumeTailorInput): TailoredResu
     tailoredExperiences,
     tailoredProjects,
     education,
+    isFresher,
   });
 
   // Plain text representation for ATS paste
@@ -457,10 +578,14 @@ export function synthesizeTailoredResume(input: ResumeTailorInput): TailoredResu
     tailoredExperiences,
     tailoredProjects,
     education,
+    isFresher,
   });
 
   return {
     summary,
+    summaryVariations,
+    templateId,
+    isFresher,
     markdown,
     plainText,
     keywordReport,
@@ -468,6 +593,8 @@ export function synthesizeTailoredResume(input: ResumeTailorInput): TailoredResu
     tailoredExperiences,
     tailoredProjects,
     education,
+    tenthEducation: input.tenthEducation,
+    twelfthEducation: input.twelfthEducation,
     generatedAt: new Date().toISOString(),
   };
 }
@@ -522,7 +649,13 @@ function generateMarkdownResume(
       institution: string;
       year: string;
       details?: string;
+      percentage?: string;
+      board?: string;
+      stream?: string;
+      educationLevel?: 'degree' | '12th' | '10th' | 'other';
+      isPursuing?: boolean;
     }[];
+    isFresher?: boolean;
   }
 ): string {
   const links = [
@@ -557,43 +690,75 @@ function generateMarkdownResume(
     '',
   ];
 
-  if (data.tailoredProjects.length > 0) {
-    md.push('## Featured Projects');
-    data.tailoredProjects.forEach((p) => {
-      const projLinks = [
-        p.links.live ? `[Live Demo](${p.links.live})` : '',
-        p.links.github ? `[Code](${p.links.github})` : '',
-      ]
-        .filter(Boolean)
-        .join(' | ');
+  // Helper closures for section rendering
+  const appendProjects = () => {
+    if (data.tailoredProjects.length > 0) {
+      md.push('## Featured Projects');
+      data.tailoredProjects.forEach((p) => {
+        const projLinks = [
+          p.links.live ? `[Live Demo](${p.links.live})` : '',
+          p.links.github ? `[Code](${p.links.github})` : '',
+        ]
+          .filter(Boolean)
+          .join(' | ');
 
-      md.push(`### ${p.title} — *${p.role}* ${projLinks ? `(${projLinks})` : ''}`);
-      md.push(`*Technologies: ${p.techStack.join(', ')}*`);
-      p.bullets.forEach((b) => md.push(`- ${b}`));
-      md.push('');
-    });
-    md.push('---', '');
-  }
+        md.push(`### ${p.title} — *${p.role}* ${projLinks ? `(${projLinks})` : ''}`);
+        md.push(`*Technologies: ${p.techStack.join(', ')}*`);
+        p.bullets.forEach((b) => md.push(`- ${b}`));
+        md.push('');
+      });
+      md.push('---', '');
+    }
+  };
 
-  if (data.tailoredExperiences.length > 0) {
-    md.push('## Professional Experience');
-    data.tailoredExperiences.forEach((exp) => {
-      md.push(`### ${exp.role} | **${exp.company}**`);
-      md.push(`*${exp.location} • ${exp.period}*`);
-      exp.bullets.forEach((b) => md.push(`- ${b}`));
-      md.push('');
-    });
-    md.push('---', '');
-  }
+  const appendExperience = () => {
+    if (data.tailoredExperiences.length > 0) {
+      md.push('## Professional Experience');
+      data.tailoredExperiences.forEach((exp) => {
+        md.push(`### ${exp.role} | **${exp.company}**`);
+        md.push(`*${exp.location} • ${exp.period}*`);
+        exp.bullets.forEach((b) => md.push(`- ${b}`));
+        md.push('');
+      });
+      md.push('---', '');
+    }
+  };
 
-  if (data.education.length > 0) {
-    md.push('## Education');
-    data.education.forEach((edu) => {
-      md.push(`### ${edu.degree}`);
-      md.push(`**${edu.institution}** — *Graduated ${edu.year}*`);
-      if (edu.details) md.push(`- ${edu.details}`);
-      md.push('');
-    });
+  const appendEducation = () => {
+    if (data.education.length > 0) {
+      md.push('## Education');
+      data.education.forEach((edu) => {
+        const pursuingTag = edu.isPursuing ? ' [Pursuing]' : '';
+        md.push(`### ${edu.degree}${pursuingTag}`);
+        const yearDisplay = edu.isPursuing ? `*Expected ${edu.year} (Pursuing)*` : `*Graduated / Passing Year: ${edu.year}*`;
+        md.push(`**${edu.institution}** — ${yearDisplay}`);
+        if (edu.percentage || edu.board) {
+          const parts = [
+            edu.board ? `Board: ${edu.board}` : '',
+            edu.percentage ? `Score: ${edu.percentage}` : '',
+            edu.stream ? `Stream: ${edu.stream}` : '',
+          ].filter(Boolean);
+          md.push(`- ${parts.join(' • ')}`);
+        }
+        if (edu.details && !edu.details.includes('Percentage:') && !edu.details.includes('Board:')) {
+          md.push(`- ${edu.details}`);
+        }
+        md.push('');
+      });
+    }
+  };
+
+  if (data.isFresher) {
+    // Freshers showcase Education & Projects before Work Experience
+    appendEducation();
+    if (data.education.length > 0) md.push('---', '');
+    appendProjects();
+    appendExperience();
+  } else {
+    // Experienced candidates showcase Projects & Experience first
+    appendProjects();
+    appendExperience();
+    appendEducation();
   }
 
   return md.join('\n');
@@ -628,7 +793,13 @@ function generatePlainTextResume(
       institution: string;
       year: string;
       details?: string;
+      percentage?: string;
+      board?: string;
+      stream?: string;
+      educationLevel?: 'degree' | '12th' | '10th' | 'other';
+      isPursuing?: boolean;
     }[];
+    isFresher?: boolean;
   }
 ): string {
   const contact = [profile.email, profile.phone, profile.location, profile.linkedin, profile.github]
@@ -653,42 +824,69 @@ function generatePlainTextResume(
     '',
   ];
 
-  if (data.tailoredProjects.length > 0) {
-    txt.push(
-      'FEATURED PROJECTS',
-      '--------------------------------------------------------------------------------'
-    );
-    data.tailoredProjects.forEach((p) => {
-      txt.push(`${p.title.toUpperCase()} - ${p.role}`);
-      txt.push(`Technologies: ${p.techStack.join(', ')}`);
-      p.bullets.forEach((b) => txt.push(`* ${b}`));
-      txt.push('');
-    });
-  }
+  const appendProjectsTxt = () => {
+    if (data.tailoredProjects.length > 0) {
+      txt.push(
+        'FEATURED PROJECTS',
+        '--------------------------------------------------------------------------------'
+      );
+      data.tailoredProjects.forEach((p) => {
+        txt.push(`${p.title.toUpperCase()} - ${p.role}`);
+        txt.push(`Technologies: ${p.techStack.join(', ')}`);
+        p.bullets.forEach((b) => txt.push(`* ${b}`));
+        txt.push('');
+      });
+    }
+  };
 
-  if (data.tailoredExperiences.length > 0) {
-    txt.push(
-      'PROFESSIONAL EXPERIENCE',
-      '--------------------------------------------------------------------------------'
-    );
-    data.tailoredExperiences.forEach((exp) => {
-      txt.push(`${exp.role.toUpperCase()} | ${exp.company} (${exp.location})`);
-      txt.push(`Period: ${exp.period}`);
-      exp.bullets.forEach((b) => txt.push(`* ${b}`));
-      txt.push('');
-    });
-  }
+  const appendExperienceTxt = () => {
+    if (data.tailoredExperiences.length > 0) {
+      txt.push(
+        'PROFESSIONAL EXPERIENCE',
+        '--------------------------------------------------------------------------------'
+      );
+      data.tailoredExperiences.forEach((exp) => {
+        txt.push(`${exp.role.toUpperCase()} | ${exp.company} (${exp.location})`);
+        txt.push(`Period: ${exp.period}`);
+        exp.bullets.forEach((b) => txt.push(`* ${b}`));
+        txt.push('');
+      });
+    }
+  };
 
-  if (data.education.length > 0) {
-    txt.push(
-      'EDUCATION',
-      '--------------------------------------------------------------------------------'
-    );
-    data.education.forEach((edu) => {
-      txt.push(`${edu.degree} - ${edu.institution} (${edu.year})`);
-      if (edu.details) txt.push(`* ${edu.details}`);
-      txt.push('');
-    });
+  const appendEducationTxt = () => {
+    if (data.education.length > 0) {
+      txt.push(
+        'EDUCATION',
+        '--------------------------------------------------------------------------------'
+      );
+      data.education.forEach((edu) => {
+        const pursuingTag = edu.isPursuing ? ' [PURSUING]' : '';
+        txt.push(`${edu.degree}${pursuingTag} - ${edu.institution} (${edu.year})`);
+        if (edu.percentage || edu.board) {
+          const scoreParts = [
+            edu.board ? `Board: ${edu.board}` : '',
+            edu.percentage ? `Score: ${edu.percentage}` : '',
+            edu.stream ? `Stream: ${edu.stream}` : '',
+          ].filter(Boolean);
+          txt.push(`* ${scoreParts.join(' | ')}`);
+        }
+        if (edu.details && !edu.details.includes('Percentage:') && !edu.details.includes('Board:')) {
+          txt.push(`* ${edu.details}`);
+        }
+        txt.push('');
+      });
+    }
+  };
+
+  if (data.isFresher) {
+    appendEducationTxt();
+    appendProjectsTxt();
+    appendExperienceTxt();
+  } else {
+    appendProjectsTxt();
+    appendExperienceTxt();
+    appendEducationTxt();
   }
 
   return txt.join('\n');
@@ -727,12 +925,139 @@ export function exportResumeMarkdown(content: string, filename = 'resume.md') {
 /**
  * Renders an ATS-friendly, clean single/two-page printable resume view and opens browser print dialog
  */
-export function exportResumePdf(result: TailoredResumeResult, profile: ResumeCandidateProfile) {
+export function exportResumePdf(
+  result: TailoredResumeResult,
+  profile: ResumeCandidateProfile,
+  templateIdOverride?: string
+) {
   const printWindow = window.open('', '_blank');
   if (!printWindow) {
     alert('Please allow popups to export your resume to PDF.');
     return;
   }
+
+  const activeTemplate = templateIdOverride || result.templateId || 'modern';
+  const isFresher = Boolean(result.isFresher);
+
+  // Template-specific style presets
+  const templateStyles = {
+    modern: {
+      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
+      accentColor: '#059669',
+      headerBorder: '2px solid #10B981',
+      sectionBorder: '1px solid #E5E7EB',
+      headerAlign: 'center',
+      titleCase: 'uppercase',
+    },
+    classic: {
+      fontFamily: 'Georgia, Cambria, "Times New Roman", Times, serif',
+      accentColor: '#1E3A8A',
+      headerBorder: '2.5px solid #1E3A8A',
+      sectionBorder: '1px solid #94A3B8',
+      headerAlign: 'left',
+      titleCase: 'uppercase',
+    },
+    minimal: {
+      fontFamily: 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+      accentColor: '#18181B',
+      headerBorder: '1px solid #18181B',
+      sectionBorder: '1px solid #E4E4E7',
+      headerAlign: 'left',
+      titleCase: 'none',
+    },
+    academic: {
+      fontFamily: 'Baskerville, Georgia, "Times New Roman", serif',
+      accentColor: '#334155',
+      headerBorder: '1.5px solid #475569',
+      sectionBorder: '1px solid #CBD5E1',
+      headerAlign: 'center',
+      titleCase: 'uppercase',
+    },
+  }[activeTemplate] || {
+    fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+    accentColor: '#059669',
+    headerBorder: '2px solid #10B981',
+    sectionBorder: '1px solid #E5E7EB',
+    headerAlign: 'center',
+    titleCase: 'uppercase',
+  };
+
+  const projectsHtml =
+    result.tailoredProjects.length > 0
+      ? `
+  <div class="section-title">Featured Projects</div>
+  ${result.tailoredProjects
+    .map(
+      (p) => `
+    <div class="item-header">
+      <span class="item-title">${p.title} <span style="font-weight:normal;">— ${p.role}</span></span>
+    </div>
+    <div class="item-tech">Technologies: ${p.techStack.join(', ')}</div>
+    <ul class="bullets">
+      ${p.bullets.map((b) => `<li>${b}</li>`).join('')}
+    </ul>
+  `
+    )
+    .join('')}
+  `
+      : '';
+
+  const experienceHtml =
+    result.tailoredExperiences.length > 0
+      ? `
+  <div class="section-title">Professional Experience</div>
+  ${result.tailoredExperiences
+    .map(
+      (exp) => `
+    <div class="item-header">
+      <span class="item-title">${exp.role} <span class="item-company">| ${exp.company}</span></span>
+      <span class="item-period">${exp.location} • ${exp.period}</span>
+    </div>
+    <ul class="bullets">
+      ${exp.bullets.map((b) => `<li>${b}</li>`).join('')}
+    </ul>
+  `
+    )
+    .join('')}
+  `
+      : '';
+
+  const educationHtml =
+    result.education.length > 0
+      ? `
+  <div class="section-title">Education</div>
+  ${result.education
+    .map(
+      (edu) => `
+    <div class="item-header">
+      <span class="item-title">${edu.degree} ${
+        edu.isPursuing
+          ? '<span style="font-size: 7.5pt; background: #ECFDF5; color: #047857; border: 1px solid #A7F3D0; padding: 1px 5px; border-radius: 4px; font-weight: bold; margin-left: 6px;">Pursuing</span>'
+          : ''
+      } <span class="item-company">| ${edu.institution}</span></span>
+      <span class="item-period">${edu.year}</span>
+    </div>
+    ${
+      edu.percentage || edu.board
+        ? `<div style="font-size: 8.5pt; color: #374151; margin-left: 16px; font-weight: 500;">${
+            edu.board ? `Board: ${edu.board} • ` : ''
+          }Score: ${edu.percentage}${edu.stream ? ` • ${edu.stream}` : ''}</div>`
+        : ''
+    }
+    ${
+      edu.details && !edu.details.includes('Percentage:') && !edu.details.includes('Board:')
+        ? `<div style="font-size: 8.5pt; color: #4B5563; margin-left: 16px;">${edu.details}</div>`
+        : ''
+    }
+  `
+    )
+    .join('')}
+  `
+      : '';
+
+  const mainSectionsHtml = isFresher
+    ? `${educationHtml}${projectsHtml}${experienceHtml}`
+    : `${projectsHtml}${experienceHtml}${educationHtml}`;
 
   const html = `
 <!DOCTYPE html>
@@ -751,16 +1076,16 @@ export function exportResumePdf(result: TailoredResumeResult, profile: ResumeCan
       padding: 0;
     }
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      font-family: ${templateStyles.fontFamily};
       font-size: 10pt;
       line-height: 1.45;
       color: #111827;
       background: #fff;
     }
     .header {
-      text-align: center;
+      text-align: ${templateStyles.headerAlign};
       margin-bottom: 12px;
-      border-bottom: 1.5px solid #10B981;
+      border-bottom: ${templateStyles.headerBorder};
       padding-bottom: 10px;
     }
     .name {
@@ -772,7 +1097,7 @@ export function exportResumePdf(result: TailoredResumeResult, profile: ResumeCan
     .target-role {
       font-size: 11pt;
       font-weight: 600;
-      color: #059669;
+      color: ${templateStyles.accentColor};
       margin-top: 2px;
     }
     .contact {
@@ -781,16 +1106,16 @@ export function exportResumePdf(result: TailoredResumeResult, profile: ResumeCan
       margin-top: 4px;
     }
     .contact a {
-      color: #059669;
+      color: ${templateStyles.accentColor};
       text-decoration: none;
     }
     .section-title {
       font-size: 10pt;
       font-weight: 700;
-      text-transform: uppercase;
+      text-transform: ${templateStyles.titleCase};
       letter-spacing: 0.05em;
       color: #111827;
-      border-bottom: 1px solid #D1D5DB;
+      border-bottom: ${templateStyles.sectionBorder};
       padding-bottom: 2px;
       margin-top: 10px;
       margin-bottom: 6px;
@@ -822,7 +1147,7 @@ export function exportResumePdf(result: TailoredResumeResult, profile: ResumeCan
     }
     .item-company {
       font-weight: 600;
-      color: #059669;
+      color: ${templateStyles.accentColor};
     }
     .item-period {
       font-size: 8.5pt;
@@ -872,66 +1197,7 @@ export function exportResumePdf(result: TailoredResumeResult, profile: ResumeCan
     <div><span class="skills-category">Tools, Cloud &amp; Platforms:</span> ${result.skillsCategorized.toolsAndCloud.join(', ')}</div>
   </div>
 
-  ${
-    result.tailoredProjects.length > 0
-      ? `
-  <div class="section-title">Featured Projects</div>
-  ${result.tailoredProjects
-    .map(
-      (p) => `
-    <div class="item-header">
-      <span class="item-title">${p.title} <span style="font-weight:normal;">— ${p.role}</span></span>
-    </div>
-    <div class="item-tech">Technologies: ${p.techStack.join(', ')}</div>
-    <ul class="bullets">
-      ${p.bullets.map((b) => `<li>${b}</li>`).join('')}
-    </ul>
-  `
-    )
-    .join('')}
-  `
-      : ''
-  }
-
-  ${
-    result.tailoredExperiences.length > 0
-      ? `
-  <div class="section-title">Professional Experience</div>
-  ${result.tailoredExperiences
-    .map(
-      (exp) => `
-    <div class="item-header">
-      <span class="item-title">${exp.role} <span class="item-company">| ${exp.company}</span></span>
-      <span class="item-period">${exp.location} • ${exp.period}</span>
-    </div>
-    <ul class="bullets">
-      ${exp.bullets.map((b) => `<li>${b}</li>`).join('')}
-    </ul>
-  `
-    )
-    .join('')}
-  `
-      : ''
-  }
-
-  ${
-    result.education.length > 0
-      ? `
-  <div class="section-title">Education</div>
-  ${result.education
-    .map(
-      (edu) => `
-    <div class="item-header">
-      <span class="item-title">${edu.degree} <span class="item-company">| ${edu.institution}</span></span>
-      <span class="item-period">${edu.year}</span>
-    </div>
-    ${edu.details ? `<div style="font-size: 8.5pt; color: #4B5563; margin-left: 16px;">${edu.details}</div>` : ''}
-  `
-    )
-    .join('')}
-  `
-      : ''
-  }
+  ${mainSectionsHtml}
 
   <script>
     window.onload = function() {

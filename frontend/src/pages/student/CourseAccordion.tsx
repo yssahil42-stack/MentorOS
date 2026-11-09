@@ -1,5 +1,5 @@
 import React from 'react';
-import { ChevronDown, ChevronRight, Sparkles } from 'lucide-react';
+import { ChevronDown, ChevronRight, Plus } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
 import { TaskList } from './TaskList';
 import type { Project } from '../../types/project';
@@ -50,7 +50,7 @@ export const CourseAccordion: React.FC<CourseAccordionProps> = ({
             onClick={onAiPromptClick}
             className="inline-flex items-center gap-1.5"
           >
-            <Sparkles className="w-3.5 h-3.5 text-solar-500" />
+            <Plus className="w-3.5 h-3.5" />
             {emptyStateConfig.actionLabel}
           </Button>
         )}
@@ -65,7 +65,7 @@ export const CourseAccordion: React.FC<CourseAccordionProps> = ({
   return (
     <div className="space-y-3 max-h-[460px] overflow-y-auto pr-1">
       {displayProjects.map((proj) => {
-        const isExpanded = expandedCourses[proj.id] ?? true;
+        const isExpanded = expandedCourses[proj.id] ?? false;
         const allTasks = tasks.filter(
           (t) =>
             t.project_id === proj.id ||
@@ -151,7 +151,7 @@ export const CourseAccordion: React.FC<CourseAccordionProps> = ({
             className="p-3 bg-bg-elevated/40 hover:bg-bg-elevated cursor-pointer flex items-center justify-between gap-3 border-b border-border-base/50"
           >
             <div className="flex items-center gap-2">
-              {(expandedCourses['general'] ?? true) ? (
+              {(expandedCourses['general'] ?? false) ? (
                 <ChevronDown className="w-4 h-4 text-amber-500" />
               ) : (
                 <ChevronRight className="w-4 h-4 text-text-muted" />
@@ -164,7 +164,7 @@ export const CourseAccordion: React.FC<CourseAccordionProps> = ({
               {generalTasks.length} items
             </span>
           </div>
-          {(expandedCourses['general'] ?? true) && (
+          {(expandedCourses['general'] ?? false) && (
             <div className="p-2.5 bg-bg-surface/80">
               <TaskList
                 tasks={generalTasks.slice(0, (courseTaskPages['general'] || 1) * pageSize)}

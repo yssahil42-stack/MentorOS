@@ -144,26 +144,18 @@ export default function StudyPlanPage() {
               <Plus className="w-4 h-4 mr-1.5" />
               Add Study Plan
             </Button>
-            <Button
-              size="sm"
-              onClick={() => openCaptureModal('ai')}
-              className="bg-solar-500 hover:bg-solar-600 text-white shadow-glow-solar"
-            >
-              <Sparkles className="w-4 h-4 mr-1.5" />
-              Plan with AI Assistant
-            </Button>
           </div>
         </div>
       </div>
 
       {/* ─── Top Grid: Pomodoro Focus Timer & Quick AI Assist ──────── */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
-        {/* Active Focus Session Timer */}
+        {/* Active Study Timer */}
         <Card className="p-5 border-border-base relative overflow-hidden flex flex-col justify-between">
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
               <Clock className="w-4 h-4 text-solar-500" />
-              <span className="text-xs font-bold text-text-primary">Focus Session Timer</span>
+              <span className="text-xs font-bold text-text-primary">Start Study Timer</span>
             </div>
             <Badge variant="warning" size="sm">
               Pomodoro
@@ -191,7 +183,7 @@ export default function StudyPlanPage() {
                   : 'bg-solar-500 hover:bg-solar-600 text-white shadow-glow-solar'
               )}
             >
-              {isTimerRunning ? 'Pause' : 'Start Focus'}
+              {isTimerRunning ? 'Pause' : 'Start Session'}
             </Button>
             <Button variant="outline" size="sm" onClick={() => resetTimer(25)} title="Reset to 25m">
               <RotateCcw className="w-3.5 h-3.5" />
@@ -202,14 +194,14 @@ export default function StudyPlanPage() {
           </div>
         </Card>
 
-        {/* AI Exam Readiness & Syllabus Pacing */}
+        {/* Exam Readiness & Syllabus Pacing */}
         <Card className="p-5 border-border-base lg:col-span-2 flex flex-col justify-between bg-gradient-to-br from-bg-surface to-bg-elevated/40">
           <div>
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
-                <Sparkles className="w-4 h-4 text-solar-500" />
+                <Target className="w-4 h-4 text-solar-500" />
                 <span className="text-xs font-bold text-text-primary">
-                  AI Syllabus Readiness Evaluator
+                  Syllabus Readiness &amp; Pacing Evaluator
                 </span>
               </div>
               <span className="text-2xs text-emerald-500 font-semibold bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
@@ -218,7 +210,7 @@ export default function StudyPlanPage() {
             </div>
             <p className="text-xs text-text-secondary leading-relaxed">
               Based on your completed study tasks, you have mastered <strong>68%</strong> of the
-              Distributed Systems syllabus and <strong>42%</strong> of Calculus. AI recommends
+              Distributed Systems syllabus and <strong>42%</strong> of Calculus. Recommended schedule:
               allocating <strong>2 hours this weekend</strong> to Vector Calculus to guarantee exam
               readiness.
             </p>
@@ -231,14 +223,10 @@ export default function StudyPlanPage() {
               <span>🔥 Study Streak: 6 Days</span>
             </div>
             <button
-              onClick={() =>
-                openAIDrawer(
-                  'Generate a structured 7-day study breakdown for my upcoming exams with daily 90-minute revision blocks'
-                )
-              }
+              onClick={() => openCaptureModal('manual')}
               className="text-xs font-bold text-solar-500 hover:text-solar-400 flex items-center gap-1.5 transition-colors"
             >
-              <span>Ask AI for Custom Plan</span>
+              <span>Edit Plan</span>
               <ArrowRight className="w-3.5 h-3.5" />
             </button>
           </div>
@@ -343,12 +331,12 @@ export default function StudyPlanPage() {
                   className="text-xs font-bold text-solar-500 hover:text-solar-400 flex items-center gap-1.5"
                 >
                   <Play className="w-3.5 h-3.5 fill-current" />
-                  <span>Start Focus Session</span>
+                  <span>Start Session</span>
                 </button>
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={() => openCaptureModal('ai')}
+                  onClick={() => openCaptureModal('manual')}
                   className="text-2xs text-text-muted hover:text-text-primary"
                 >
                   + Add Checkpoint
