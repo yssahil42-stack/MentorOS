@@ -49,8 +49,8 @@ class Settings(BaseModel):
     GROQ_MODEL: str = os.getenv("GROQ_MODEL", "openai/gpt-oss-120b")
     AI_TIMEOUT: float = float(os.getenv("AI_TIMEOUT", "15.0"))
     # Google Identity Services / OAuth Credentials
-    GOOGLE_CLIENT_ID: str = os.getenv("GOOGLE_CLIENT_ID", "787072444746-7cp6uis2gfde9ifat86il4rsk34q55a8.apps.googleusercontent.com")
-    GOOGLE_CLIENT_SECRET: str = os.getenv("GOOGLE_CLIENT_SECRET", "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")
+    GOOGLE_CLIENT_ID: str = os.getenv("GOOGLE_CLIENT_ID", "")
+    GOOGLE_CLIENT_SECRET: str = os.getenv("GOOGLE_CLIENT_SECRET", "")
     # GitHub Integration
     GITHUB_PERSONAL_ACCESS_TOKEN: str = os.getenv("GITHUB_PERSONAL_ACCESS_TOKEN", "")
     GITHUB_USERNAME: str = os.getenv("GITHUB_USERNAME", "yssahil42-stack")
