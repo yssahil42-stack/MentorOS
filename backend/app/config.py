@@ -22,17 +22,24 @@ if is_production:
         raise RuntimeError("Production requires explicit CORS_ORIGINS.")
     if any(not origin.strip().startswith("https://") for origin in configured_origins.split(",")):
         raise RuntimeError("Production CORS_ORIGINS must use HTTPS.")
+DEV_SECRET_FALLBACK = "mentoros_stable_dev_secret_key_32_bytes_long_minimum_required_for_hs256"
+
+is_vercel = os.getenv("VERCEL") == "1"
+default_sqlite = "sqlite:////tmp/mentoros.db" if is_vercel else "sqlite:///./mentoros.db"
+
 class Settings(BaseModel):
     APP_ENV: str = app_env
-    SECRET_KEY: str = configured_secret or secrets.token_urlsafe(32)
+    SECRET_KEY: str = configured_secret or (secrets.token_urlsafe(32) if is_production else DEV_SECRET_FALLBACK)
     ALGORITHM: str = "HS256"
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "15"))
-    DATABASE_URL: str = configured_database_url or "sqlite:///./mentoros.db"
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "10080"))
+    DATABASE_URL: str = configured_database_url or default_sqlite
     CORS_ORIGINS: list[str] = [
         origin.strip()
         for origin in (configured_origins or (
             "http://localhost:5173,http://localhost:5174,http://localhost:5175,"
-            "http://127.0.0.1:5173,http://127.0.0.1:5174,http://127.0.0.1:5175"
+            "http://127.0.0.1:5173,http://127.0.0.1:5174,http://127.0.0.1:5175,"
+            "https://mentoros1.vercel.app,https://mentoros-web.vercel.app,"
+            "https://mentoros-dev.vercel.app,https://mentoros-hq.vercel.app"
         )).split(",")
         if origin.strip()
     ]
@@ -44,5 +51,8 @@ class Settings(BaseModel):
     # Google Identity Services / OAuth Credentials
     GOOGLE_CLIENT_ID: str = os.getenv("GOOGLE_CLIENT_ID", "787072444746-7cp6uis2gfde9ifat86il4rsk34q55a8.apps.googleusercontent.com")
     GOOGLE_CLIENT_SECRET: str = os.getenv("GOOGLE_CLIENT_SECRET", "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")
+    # GitHub Integration
+    GITHUB_PERSONAL_ACCESS_TOKEN: str = os.getenv("GITHUB_PERSONAL_ACCESS_TOKEN", "")
+    GITHUB_USERNAME: str = os.getenv("GITHUB_USERNAME", "yssahil42-stack")
 
 settings = Settings()

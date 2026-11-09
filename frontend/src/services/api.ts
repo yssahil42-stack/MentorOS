@@ -18,7 +18,9 @@ export class ApiError extends Error {
 
 export const API_ERROR_EVENT = 'mentor:api-error';
 
-const BASE_URL = import.meta.env.VITE_API_URL ?? 'http://127.0.0.1:8000/api/v1';
+const BASE_URL =
+  import.meta.env.VITE_API_URL ||
+  (import.meta.env.PROD ? '/api/v1' : 'http://127.0.0.1:8000/api/v1');
 
 export function createClient(): AxiosInstance {
   // Default timeout: 8000ms for GET, 30000ms for POST/PATCH/DELETE
