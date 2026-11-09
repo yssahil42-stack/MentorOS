@@ -29,17 +29,17 @@ export default function DevProgressPage() {
 
   const { data: tasks = [], isLoading: tasksLoading } = useQuery({
     queryKey: ['tasks', 'developer'],
-    queryFn: () => fetchTasks(),
+    queryFn: () => fetchTasks({ role: 'developer' }),
   });
 
   const { data: milestones = [], isLoading: milestonesLoading } = useQuery({
     queryKey: ['milestones', 'developer'],
-    queryFn: () => fetchMilestones(),
+    queryFn: () => fetchMilestones({ role: 'developer' }),
   });
 
   const { data: projects = [], isLoading: projectsLoading } = useQuery({
     queryKey: ['projects', 'developer'],
-    queryFn: () => fetchProjects(),
+    queryFn: () => fetchProjects('developer'),
   });
 
   if (tasksLoading || milestonesLoading || projectsLoading) {

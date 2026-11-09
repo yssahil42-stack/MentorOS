@@ -177,8 +177,8 @@ export default function JobProgressPage() {
 
   // 1. Fetch user projects
   const { data: fetchedProjects = [], isLoading: projectsLoading } = useQuery({
-    queryKey: ['projects', 'all'],
-    queryFn: () => fetchProjects(),
+    queryKey: ['projects', 'job_seeker'],
+    queryFn: () => fetchProjects('job_seeker'),
   });
 
   // 2. If a specific project is selected, fetch its detail
@@ -192,14 +192,18 @@ export default function JobProgressPage() {
   const { data: fetchedTasks = [], isLoading: tasksLoading } = useQuery({
     queryKey: ['tasks', selectedProjectId ? `project_${selectedProjectId}` : 'job_seeker'],
     queryFn: () =>
-      selectedProjectId ? fetchTasks({ project_id: selectedProjectId }) : fetchTasks(),
+      selectedProjectId
+        ? fetchTasks({ project_id: selectedProjectId, role: 'job_seeker' })
+        : fetchTasks({ role: 'job_seeker' }),
   });
 
   // 4. Fetch milestones
   const { data: fetchedMilestones = [], isLoading: milestonesLoading } = useQuery({
     queryKey: ['milestones', selectedProjectId ? `project_${selectedProjectId}` : 'job_seeker'],
     queryFn: () =>
-      selectedProjectId ? fetchMilestones(selectedProjectId) : fetchMilestones(),
+      selectedProjectId
+        ? fetchMilestones({ project_id: selectedProjectId, role: 'job_seeker' })
+        : fetchMilestones({ role: 'job_seeker' }),
   });
 
   // Toggle task completion mutation

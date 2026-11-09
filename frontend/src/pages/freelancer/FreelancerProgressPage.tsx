@@ -38,7 +38,7 @@ export default function FreelancerProgressPage() {
 
   const { data: milestones = [], isLoading: milestonesLoading } = useQuery({
     queryKey: ['milestones', 'freelancer'],
-    queryFn: () => fetchMilestones(),
+    queryFn: () => fetchMilestones({ role: 'freelancer' }),
   });
 
   const { data: projects = [], isLoading: projectsLoading } = useQuery({

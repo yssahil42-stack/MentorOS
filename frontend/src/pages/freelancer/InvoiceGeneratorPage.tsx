@@ -85,7 +85,10 @@ export default function InvoiceGeneratorPage() {
 
   const { data: allMilestones = [], isLoading: milestonesLoading } = useQuery({
     queryKey: ['milestones', 'freelancer'],
-    queryFn: () => fetchMilestones(),
+    queryFn: () =>
+      selectedProjectId
+        ? fetchMilestones({ project_id: selectedProjectId, role: 'freelancer' })
+        : fetchMilestones({ role: 'freelancer' }),
     enabled: !!selectedProjectId,
   });
 

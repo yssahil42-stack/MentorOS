@@ -28,10 +28,12 @@ def create_note(
     current_user: models.User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
-    require_owned_project(db, note_in.project_id, current_user.id)
+    target_role = note_in.role or current_user.role
+    if note_in.project_id:
+        require_owned_project(db, note_in.project_id, current_user.id, role=target_role)
     note = models.Note(
         user_id=current_user.id,
-        role=note_in.role or current_user.role,
+        role=target_role,
         project_id=note_in.project_id,
         title=note_in.title,
         content=note_in.content,
@@ -58,8 +60,9 @@ def update_note(
         raise HTTPException(status_code=404, detail="Note not found")
 
     update_data = note_in.dict(exclude_unset=True)
-    if "project_id" in update_data:
-        require_owned_project(db, note_in.project_id, current_user.id)
+    target_role = update_data.get("role", note.role)
+    if "project_id" in update_data and update_data["project_id"] is not None:
+        require_owned_project(db, note_in.project_id, current_user.id, role=target_role)
     for field, val in update_data.items():
         setattr(note, field, val)
 

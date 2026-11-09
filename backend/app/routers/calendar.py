@@ -27,11 +27,14 @@ def create_event(
     current_user: models.User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
-    require_owned_project(db, event_in.project_id, current_user.id)
-    require_owned_task(db, event_in.task_id, current_user.id)
+    target_role = event_in.role or current_user.role
+    if event_in.project_id:
+        require_owned_project(db, event_in.project_id, current_user.id, role=target_role)
+    if event_in.task_id:
+        require_owned_task(db, event_in.task_id, current_user.id, role=target_role)
     ev = models.CalendarEvent(
         user_id=current_user.id,
-        role=event_in.role or current_user.role,
+        role=target_role,
         title=event_in.title,
         description=event_in.description,
         start_at=event_in.start_at,
@@ -62,10 +65,11 @@ def update_event(
         raise HTTPException(status_code=404, detail="Event not found")
 
     update_data = event_in.dict(exclude_unset=True)
-    if "project_id" in update_data:
-        require_owned_project(db, event_in.project_id, current_user.id)
-    if "task_id" in update_data:
-        require_owned_task(db, event_in.task_id, current_user.id)
+    target_role = update_data.get("role", ev.role)
+    if "project_id" in update_data and update_data["project_id"] is not None:
+        require_owned_project(db, event_in.project_id, current_user.id, role=target_role)
+    if "task_id" in update_data and update_data["task_id"] is not None:
+        require_owned_task(db, event_in.task_id, current_user.id, role=target_role)
     for field, val in update_data.items():
         setattr(ev, field, val)
 

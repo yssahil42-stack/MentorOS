@@ -162,12 +162,28 @@ export const projectsApi = {
   delete: (id: number): Promise<void> => api.delete(`/projects/${id}`),
 };
 
+export interface MilestoneQueryOptions {
+  project_id?: number;
+  role?: string;
+}
+
 export const milestonesApi = {
-  get: (projectId?: number, signal?: AbortSignal): Promise<Milestone[]> =>
-    api.get<Milestone[]>('/milestones', {
-      params: projectId ? { project_id: projectId } : undefined,
+  get: (
+    options?: number | MilestoneQueryOptions,
+    signal?: AbortSignal
+  ): Promise<Milestone[]> => {
+    let params: Record<string, unknown> = {};
+    if (typeof options === 'number') {
+      params.project_id = options;
+    } else if (options) {
+      if (options.project_id) params.project_id = options.project_id;
+      if (options.role) params.role = options.role;
+    }
+    return api.get<Milestone[]>('/milestones', {
+      params: Object.keys(params).length > 0 ? params : undefined,
       signal,
-    }),
+    });
+  },
 
   create: (data: CreateMilestoneRequest): Promise<Milestone> =>
     api.post<Milestone>('/milestones', data),

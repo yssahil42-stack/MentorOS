@@ -55,13 +55,13 @@ export default function ClientPortalPage({ projectId: propProjectId }: ClientPor
 
   const { data: projects = [], isLoading: authProjectsLoading } = useQuery({
     queryKey: ['projects', 'freelancer'],
-    queryFn: () => fetchProjects(),
+    queryFn: () => fetchProjects('freelancer'),
     enabled: !isPublicView,
   });
 
   const { data: allMilestones = [] } = useQuery({
     queryKey: ['milestones', 'freelancer'],
-    queryFn: () => fetchMilestones(),
+    queryFn: () => fetchMilestones({ role: 'freelancer' }),
     enabled: !isPublicView && !!projectId,
   });
 

@@ -358,6 +358,105 @@ class WorkspaceIsolationTests(unittest.TestCase):
                 1,
             )
 
+    def test_role_isolation_for_milestones_and_proposals(self):
+        user = self.create_user("student_dev@example.test")
+        headers = self.auth_headers(user)
+
+        with self.session_factory() as db:
+            # Student milestone & proposal
+            student_ms = models.Milestone(
+                user_id=user.id,
+                role="student",
+                title="Student Thesis Proposal",
+                status="pending",
+            )
+            student_prop = models.AIProposal(
+                user_id=user.id,
+                role="student",
+                request_text="Plan study",
+                summary="Study Plan Proposal",
+                status="pending",
+            )
+            # Developer milestone & proposal
+            dev_ms = models.Milestone(
+                user_id=user.id,
+                role="developer",
+                title="Deploy Kubernetes",
+                status="pending",
+            )
+            dev_prop = models.AIProposal(
+                user_id=user.id,
+                role="developer",
+                request_text="Plan deploy",
+                summary="Cloud Architecture Proposal",
+                status="pending",
+            )
+            db.add_all([student_ms, student_prop, dev_ms, dev_prop])
+            db.commit()
+
+        # Query milestones with role=student
+        ms_resp = self.client.get("/api/v1/milestones?role=student", headers=headers)
+        self.assertEqual(ms_resp.status_code, 200)
+        ms_data = ms_resp.json()
+        self.assertEqual(len(ms_data), 1)
+        self.assertEqual(ms_data[0]["title"], "Student Thesis Proposal")
+        self.assertEqual(ms_data[0]["role"], "student")
+
+        # Query proposals with role=student
+        prop_resp = self.client.get("/api/v1/ai/proposals?role=student", headers=headers)
+        self.assertEqual(prop_resp.status_code, 200)
+        prop_data = prop_resp.json()
+        self.assertEqual(len(prop_data), 1)
+        self.assertEqual(prop_data[0]["summary"], "Study Plan Proposal")
+        self.assertEqual(prop_data[0]["role"], "student")
+
+        # Query milestones with role=developer
+        dev_ms_resp = self.client.get("/api/v1/milestones?role=developer", headers=headers)
+        self.assertEqual(dev_ms_resp.status_code, 200)
+        dev_ms_data = dev_ms_resp.json()
+        self.assertEqual(len(dev_ms_data), 1)
+        self.assertEqual(dev_ms_data[0]["title"], "Deploy Kubernetes")
+
+    def test_cannot_link_cross_role_project_to_task_or_milestone(self):
+        user = self.create_user("cross_linker@example.test")
+        headers = self.auth_headers(user)
+
+        with self.session_factory() as db:
+            dev_project = models.Project(
+                user_id=user.id,
+                role="developer",
+                title="Microservices Backend",
+            )
+            db.add(dev_project)
+            db.commit()
+            dev_project_id = dev_project.id
+
+        # Attempt to create a student task pointing to developer project -> should fail 400
+        task_resp = self.client.post(
+            "/api/v1/tasks",
+            headers=headers,
+            json={
+                "title": "Study Biology Chapter 1",
+                "role": "student",
+                "project_id": dev_project_id,
+            },
+        )
+        self.assertEqual(task_resp.status_code, 400)
+        self.assertIn("Project role mismatch", task_resp.json()["detail"])
+
+        # Attempt to create a student milestone pointing to developer project -> should fail 400
+        ms_resp = self.client.post(
+            "/api/v1/milestones",
+            headers=headers,
+            json={
+                "title": "Midterm Exam",
+                "role": "student",
+                "project_id": dev_project_id,
+            },
+        )
+        self.assertEqual(ms_resp.status_code, 400)
+        self.assertIn("Project role mismatch", ms_resp.json()["detail"])
+
 
 if __name__ == "__main__":
     unittest.main()

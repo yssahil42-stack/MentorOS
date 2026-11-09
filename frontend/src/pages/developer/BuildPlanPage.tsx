@@ -59,7 +59,7 @@ export default function BuildPlanPage() {
 
   const { data: milestones = [], isLoading: milestonesLoading } = useQuery({
     queryKey: ['milestones', 'developer'],
-    queryFn: () => fetchMilestones(),
+    queryFn: () => fetchMilestones({ role: 'developer' }),
   });
 
   const { data: tasks = [], isLoading: tasksLoading } = useQuery({

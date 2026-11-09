@@ -52,10 +52,14 @@ def create_task(
     current_user: models.User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
-    require_owned_project(db, task_in.project_id, current_user.id)
+    target_role = task_in.role or current_user.role
+    if task_in.project_id:
+        proj = require_owned_project(db, task_in.project_id, current_user.id, role=target_role)
+        if proj and not task_in.role and proj.role:
+            target_role = proj.role
     task = models.Task(
         user_id=current_user.id,
-        role=task_in.role or current_user.role,
+        role=target_role,
         project_id=task_in.project_id,
         title=task_in.title,
         description=task_in.description,
@@ -91,8 +95,9 @@ def update_task(
 
     old_project_id = task.project_id
     update_data = task_in.dict(exclude_unset=True)
-    if "project_id" in update_data:
-        require_owned_project(db, task_in.project_id, current_user.id)
+    target_role = update_data.get("role", task.role)
+    if "project_id" in update_data and update_data["project_id"] is not None:
+        require_owned_project(db, task_in.project_id, current_user.id, role=target_role)
     for field, val in update_data.items():
         setattr(task, field, val)
 

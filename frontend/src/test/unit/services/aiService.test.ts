@@ -48,7 +48,10 @@ describe('aiService', () => {
       (api.get as any).mockResolvedValueOnce(mockList);
 
       const res = await fetchRecentProposals('student', 10);
-      expect(api.get).toHaveBeenCalledWith('/ai/proposals', { signal: undefined });
+      expect(api.get).toHaveBeenCalledWith('/ai/proposals', {
+        params: { role: 'student' },
+        signal: undefined,
+      });
       expect(res.length).toBe(1);
       expect(res[0].id).toBe(1);
     });

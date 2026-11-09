@@ -55,12 +55,15 @@ export function createClient(): AxiosInstance {
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
-    const activeRole =
+    const matchedPathRole =
       typeof window === 'undefined'
         ? null
         : window.location.pathname
-            .match(/^\/app\/(student|freelancer|developer|job-seeker)(?:\/|$)/)?.[1]
+            .match(/^\/app\/(student|freelancer|developer|job-seeker|job_seeker)(?:\/|$)/)?.[1]
             ?.replace(/-/g, '_');
+    const storedRole =
+      typeof window === 'undefined' ? null : localStorage.getItem('mentor_workspace_role');
+    const activeRole = matchedPathRole || (storedRole as string | null);
     const workspaceEndpoint =
       /^\/(?:tasks|projects|milestones|calendar\/events|notes|ai\/proposals)(?:\/|$)|^\/dashboard\/summary$/.test(
         endpoint

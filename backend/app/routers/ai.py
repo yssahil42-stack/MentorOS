@@ -1,6 +1,6 @@
 import json
 import re
-from typing import Dict, Any, List
+from typing import Dict, Any, List, Optional
 from datetime import datetime, timedelta
 import httpx
 from fastapi import APIRouter, Depends, HTTPException, status
@@ -1154,12 +1154,15 @@ Output raw JSON only. Do not include markdown code block backticks around the JS
 
 @router.get("/proposals", response_model=List[schemas.AIProposalOut])
 def list_proposals(
+    role: Optional[str] = None,
     current_user: models.User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
+    query = db.query(models.AIProposal).filter(models.AIProposal.user_id == current_user.id)
+    if role:
+        query = query.filter(models.AIProposal.role == role)
     return (
-        db.query(models.AIProposal)
-        .filter(models.AIProposal.user_id == current_user.id)
+        query
         .order_by(models.AIProposal.created_at.desc())
         .limit(20)
         .all()

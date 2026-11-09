@@ -18,7 +18,10 @@ export async function fetchRecentProposals(
   userId?: number,
   signal?: AbortSignal
 ): Promise<AIProposal[]> {
-  const proposals = await api.get<AIProposal[]>('/ai/proposals', { signal });
+  const proposals = await api.get<AIProposal[]>('/ai/proposals', {
+    params: role ? { role } : undefined,
+    signal,
+  });
   return proposals.filter(
     (proposal) =>
       (userId === undefined || proposal.user_id === userId) && (!role || proposal.role === role)

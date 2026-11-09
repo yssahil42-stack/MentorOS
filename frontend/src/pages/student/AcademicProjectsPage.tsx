@@ -96,7 +96,7 @@ export default function AcademicProjectsPage() {
   // Fetch milestones
   const { data: milestones = [] } = useQuery({
     queryKey: ['milestones', 'student'],
-    queryFn: () => fetchMilestones(),
+    queryFn: () => fetchMilestones({ role: 'student' }),
   });
 
   // Fetch tasks to dynamically compute real-time milestone and project progress

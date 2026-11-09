@@ -1,5 +1,5 @@
 import { api } from './api';
-import { projectsApi, milestonesApi } from './apiClient';
+import { projectsApi, milestonesApi, type MilestoneQueryOptions } from './apiClient';
 import type {
   Project,
   ProjectDetail,
@@ -41,8 +41,11 @@ export function deleteProject(id: number): Promise<void> {
   return projectsApi.delete(id);
 }
 
-export function fetchMilestones(projectId?: number, signal?: AbortSignal): Promise<Milestone[]> {
-  return milestonesApi.get(projectId, signal);
+export function fetchMilestones(
+  params?: number | MilestoneQueryOptions,
+  signal?: AbortSignal
+): Promise<Milestone[]> {
+  return milestonesApi.get(params, signal);
 }
 
 export function createMilestone(data: CreateMilestoneRequest): Promise<Milestone> {

@@ -42,17 +42,17 @@ export default function MilestonesPage() {
 
   const { data: milestones = [], isLoading } = useQuery({
     queryKey: ['milestones', 'developer'],
-    queryFn: () => fetchMilestones(),
+    queryFn: () => fetchMilestones({ role: 'developer' }),
   });
 
   const { data: projects = [] } = useQuery({
     queryKey: ['projects', 'developer'],
-    queryFn: () => fetchProjects(),
+    queryFn: () => fetchProjects('developer'),
   });
 
   const { data: tasks = [] } = useQuery({
     queryKey: ['tasks', 'developer'],
-    queryFn: () => fetchTasks(),
+    queryFn: () => fetchTasks({ role: 'developer' }),
   });
 
   const createMutation = useMutation({
@@ -62,6 +62,7 @@ export default function MilestonesPage() {
         title,
         description,
         target_date: targetDate,
+        role: 'developer',
       });
     },
     onSuccess: () => {

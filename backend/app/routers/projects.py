@@ -190,10 +190,13 @@ def delete_project(
 @router.get("/milestones", response_model=List[schemas.MilestoneOut])
 def get_milestones(
     project_id: Optional[int] = None,
+    role: Optional[str] = None,
     current_user: models.User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
     query = db.query(models.Milestone).filter(models.Milestone.user_id == current_user.id)
+    if role:
+        query = query.filter(models.Milestone.role == role)
     if project_id:
         query = query.filter(models.Milestone.project_id == project_id)
     return query.order_by(models.Milestone.created_at.asc()).all()
@@ -204,11 +207,15 @@ def create_milestone(
     current_user: models.User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
-    require_owned_project(db, ms_in.project_id, current_user.id)
+    target_role = ms_in.role or current_user.role
+    if ms_in.project_id:
+        proj = require_owned_project(db, ms_in.project_id, current_user.id, role=target_role)
+        if proj and not ms_in.role and proj.role:
+            target_role = proj.role
     ms = models.Milestone(
         user_id=current_user.id,
         project_id=ms_in.project_id,
-        role=ms_in.role or current_user.role,
+        role=target_role,
         title=ms_in.title,
         description=ms_in.description,
         target_date=ms_in.target_date,
@@ -238,7 +245,10 @@ def update_milestone(
     if not ms:
         raise HTTPException(status_code=404, detail="Milestone not found")
 
+    old_project_id = ms.project_id
     update_data = ms_in.dict(exclude_unset=True)
+    if "project_id" in update_data and update_data["project_id"] is not None:
+        require_owned_project(db, ms_in.project_id, current_user.id, role=ms.role)
     for field, val in update_data.items():
         setattr(ms, field, val)
 
@@ -252,6 +262,8 @@ def update_milestone(
 
     if ms.project_id:
         recalculate_project_progress(db, ms.project_id, current_user.id)
+    if old_project_id and old_project_id != ms.project_id:
+        recalculate_project_progress(db, old_project_id, current_user.id)
 
     return ms
 
