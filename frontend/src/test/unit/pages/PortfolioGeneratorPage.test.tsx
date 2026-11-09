@@ -23,7 +23,7 @@ describe('PortfolioGeneratorPage', () => {
       screen.getByRole('heading', { name: /AI Portfolio & README Generator/i })
     ).toBeInTheDocument();
     expect(screen.getByText('Project Specification')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /Generate with AI/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Build Portfolio/i })).toBeInTheDocument();
 
     // Verify Tab buttons
     expect(screen.getByRole('button', { name: /README\.md/i })).toBeInTheDocument();

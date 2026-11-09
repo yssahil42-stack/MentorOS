@@ -1,4 +1,5 @@
 import React from 'react';
+import { BrowserRouter } from 'react-router-dom';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { queryClient } from './store/queryClient';
 import { ThemeProvider } from './contexts/ThemeContext';
@@ -12,20 +13,22 @@ import { QuickCaptureFab } from './components/quickCapture/QuickCaptureFab';
 
 export default function App() {
   return (
-    <ThemeProvider>
-      <QueryClientProvider client={queryClient}>
-        <AuthProvider>
-          <WorkspaceProvider>
-            <QuickCaptureProvider>
-              <ErrorBoundary>
-                <AppRouter />
-              </ErrorBoundary>
-              <ToastContainer />
-              <QuickCaptureFab />
-            </QuickCaptureProvider>
-          </WorkspaceProvider>
-        </AuthProvider>
-      </QueryClientProvider>
-    </ThemeProvider>
+    <ErrorBoundary>
+      <ThemeProvider>
+        <QueryClientProvider client={queryClient}>
+          <AuthProvider>
+            <WorkspaceProvider>
+              <QuickCaptureProvider>
+                <BrowserRouter>
+                  <AppRouter />
+                  <ToastContainer />
+                  <QuickCaptureFab />
+                </BrowserRouter>
+              </QuickCaptureProvider>
+            </WorkspaceProvider>
+          </AuthProvider>
+        </QueryClientProvider>
+      </ThemeProvider>
+    </ErrorBoundary>
   );
 }

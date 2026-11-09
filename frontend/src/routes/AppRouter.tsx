@@ -1,5 +1,5 @@
 import React, { lazy, Suspense } from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { RoleRouteGuard } from './RoleRouteGuard';
 import { PageLoader } from '../components/ui/PageLoader';
@@ -91,9 +91,8 @@ export function AppRouter() {
   const rolePath = (preferredRole ?? user?.role ?? 'student').replace('_', '-');
 
   return (
-    <BrowserRouter>
-      <Suspense fallback={<PageLoader />}>
-        <Routes>
+    <Suspense fallback={<PageLoader />}>
+      <Routes>
           {/* ── Public routes ── */}
           <Route path="/" element={<LandingPage />} />
           <Route
@@ -162,27 +161,27 @@ export function AppRouter() {
               <Route path="dashboard" element={<StudentDashboard />} />
               <Route path="study-plan" element={<StudyPlanPage />} />
               <Route path="ai-tutor" element={<StudyPlanPage />} />
-              <Route path="assignments" element={<AssignmentsPage />} />
+              <Route path="assignments" element={<Navigate to="/app/student/projects" replace />} />
               <Route path="projects" element={<AcademicProjects />} />
               <Route path="courses" element={<AcademicProjects />} />
               <Route path="calendar" element={<StudentCalendar />} />
-              <Route path="tasks" element={<StudentTasks />} />
+              <Route path="tasks" element={<Navigate to="/app/student/projects" replace />} />
               <Route path="notes" element={<StudentNotes />} />
-              <Route path="progress" element={<StudentProgress />} />
+              <Route path="progress" element={<Navigate to="/app/student/dashboard" replace />} />
               <Route path="settings" element={<StudentSettings />} />
             </Route>
 
             {/* Freelancer */}
             <Route path="freelancer" element={<RoleRouteGuard />}>
               <Route path="dashboard" element={<FreelancerDashboard />} />
-              <Route path="work-plans" element={<WorkPlansPage />} />
-              <Route path="invoices" element={<WorkPlansPage />} />
-              <Route path="deliverables" element={<DeliverablesPage />} />
-              <Route path="time-tracking" element={<DeliverablesPage />} />
+              <Route path="work-plans" element={<Navigate to="/app/freelancer/dashboard" replace />} />
+              <Route path="invoices" element={<Navigate to="/app/freelancer/dashboard" replace />} />
+              <Route path="deliverables" element={<Navigate to="/app/freelancer/projects" replace />} />
+              <Route path="time-tracking" element={<Navigate to="/app/freelancer/projects" replace />} />
               <Route path="projects" element={<FreelancerProjects />} />
               <Route path="clients" element={<FreelancerProjects />} />
               <Route path="calendar" element={<FreelancerCalendar />} />
-              <Route path="tasks" element={<FreelancerTasks />} />
+              <Route path="tasks" element={<Navigate to="/app/freelancer/projects" replace />} />
               <Route path="notes" element={<FreelancerNotes />} />
               <Route path="progress" element={<FreelancerProgress />} />
               <Route path="settings" element={<FreelancerSettings />} />
@@ -197,7 +196,7 @@ export function AppRouter() {
               <Route path="build-plan" element={<BuildPlanPage />} />
               <Route path="projects" element={<DevProjectsPage />} />
               <Route path="milestones" element={<MilestonesPage />} />
-              <Route path="tasks" element={<DevTasksPage />} />
+              <Route path="tasks" element={<Navigate to="/app/developer/projects" replace />} />
               <Route path="calendar" element={<DevCalendarPage />} />
               <Route path="notes" element={<DevNotesPage />} />
               <Route path="api-keys" element={<DevApiKeysPage />} />
@@ -215,6 +214,7 @@ export function AppRouter() {
               <Route path="applications" element={<ApplicationTrackerPage />} />
               <Route path="application-tracker" element={<ApplicationTrackerPage />} />
               <Route path="portfolio" element={<PortfolioTasksPage />} />
+              <Route path="profile-builder" element={<ResumeGeneratorPage />} />
               <Route path="interview-prep" element={<InterviewPrepPage />} />
               <Route path="calendar" element={<JobCalendarPage />} />
               <Route path="notes" element={<JobNotesPage />} />
@@ -257,6 +257,5 @@ export function AppRouter() {
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </Suspense>
-    </BrowserRouter>
   );
 }
