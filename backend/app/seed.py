@@ -17,6 +17,13 @@ def seed_initial_data(db: Session) -> None:
         core_accounts = [
             ("student@mentoros.dev", "Alex Student", "student", {"program": "BSc Computer Science", "semester": "Year 3"}),
             ("yssahil42@gmail.com", "Sahil yadav", "student", {"program": "BSc Computer Science", "semester": "Year 3", "main_subjects": "Data Structures, Operating Systems, Cloud Computing"}),
+            ("yssahil422@gmail.com", "Sahil yadav", "developer", {"tech_stack": "TypeScript, Python, FastAPI, React"}),
+            ("yssahil2@gmail.com", "Sahil yadav", "developer", {"tech_stack": "TypeScript, Python, FastAPI, React"}),
+            ("yssahil412@gmail.com", "Sahil yadav", "freelancer", {"hourly_rate": 85, "currency": "USD"}),
+            ("yssahil421@gmail.com", "Sahil yadav", "freelancer", {"hourly_rate": 85, "currency": "USD"}),
+            ("yssahil1@gmail.com", "Sahil yadav", "freelancer", {"hourly_rate": 85, "currency": "USD"}),
+            ("yssahil424@gmail.com", "Sahil yadav", "job_seeker", {"target_role": "Full Stack Engineer", "experience_level": "Senior"}),
+            ("yssahil3@gmail.com", "Sahil yadav", "job_seeker", {"target_role": "Full Stack Engineer", "experience_level": "Senior"}),
             ("developer@mentoros.dev", "Alex Developer", "developer", {"tech_stack": "TypeScript, Python, FastAPI, React"}),
             ("freelancer@mentoros.dev", "Alex Freelancer", "freelancer", {"hourly_rate": 85, "currency": "USD"}),
             ("jobseeker@mentoros.dev", "Alex JobSeeker", "job_seeker", {"target_role": "Full Stack Engineer", "experience_level": "Senior"}),
