@@ -1,13 +1,12 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Eye, EyeOff, Layers, Loader2, Sparkles, Briefcase, Code2, GraduationCap, Zap } from 'lucide-react';
+import { Eye, EyeOff, Layers, Loader2 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useWorkspace } from '../../contexts/WorkspaceContext';
 import { ThemeToggle } from '../../components/ui/ThemeToggle';
 import { Spatial3DCanvas } from '../../components/ui/Spatial3DCanvas';
 import { GoogleSignInButton } from '../../components/auth/GoogleSignInButton';
 import { cn } from '../../utils/cn';
-import type { UserRole } from '../../types/user';
 
 export default function LoginPage() {
   const { login, loginWithGoogle } = useAuth();
@@ -31,24 +30,6 @@ export default function LoginPage() {
       navigate(`/app/${rolePath}/dashboard`, { replace: true });
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Google sign-in failed. Please try again.';
-      setError(msg);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleQuickDemo = async (demoRole: UserRole) => {
-    setError('');
-    setLoading(true);
-    try {
-      const demoEmail = `${demoRole}@mentoros.dev`;
-      const user = await login({ email: demoEmail, password: 'password123' });
-      showToast(`Welcome! Signed in as ${user.full_name} (${user.role.replace('_', ' ')})`, 'success');
-      localStorage.setItem('mentor_workspace_role', user.role);
-      const rolePath = user.role.replace('_', '-');
-      navigate(`/app/${rolePath}/dashboard`, { replace: true });
-    } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : 'Demo sign-in failed.';
       setError(msg);
     } finally {
       setLoading(false);
@@ -228,54 +209,6 @@ export default function LoginPage() {
                 {loading ? 'Signing in…' : 'Sign in to MentorOS'}
               </button>
             </form>
-
-            {/* Quick Demo Access (24/7 Cloud Access) */}
-            <div className="mt-5 pt-4 border-t border-border-base">
-              <div className="flex items-center gap-1.5 mb-2.5">
-                <Sparkles className="w-3.5 h-3.5 text-solar-500" />
-                <span className="text-2xs font-semibold uppercase tracking-wider text-text-muted">
-                  Instant Demo Access (No backend needed)
-                </span>
-              </div>
-              <div className="grid grid-cols-2 gap-2">
-                <button
-                  type="button"
-                  onClick={() => handleQuickDemo('job_seeker')}
-                  disabled={loading}
-                  className="px-2.5 py-1.5 rounded-lg border border-border-base bg-bg-surface hover:bg-bg-subtle text-xs font-medium text-text-secondary hover:text-text-primary flex items-center gap-1.5 transition-colors disabled:opacity-50"
-                >
-                  <Briefcase className="w-3.5 h-3.5 text-solar-500" />
-                  <span>Job Seeker</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleQuickDemo('developer')}
-                  disabled={loading}
-                  className="px-2.5 py-1.5 rounded-lg border border-border-base bg-bg-surface hover:bg-bg-subtle text-xs font-medium text-text-secondary hover:text-text-primary flex items-center gap-1.5 transition-colors disabled:opacity-50"
-                >
-                  <Code2 className="w-3.5 h-3.5 text-developer-500" />
-                  <span>Developer</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleQuickDemo('student')}
-                  disabled={loading}
-                  className="px-2.5 py-1.5 rounded-lg border border-border-base bg-bg-surface hover:bg-bg-subtle text-xs font-medium text-text-secondary hover:text-text-primary flex items-center gap-1.5 transition-colors disabled:opacity-50"
-                >
-                  <GraduationCap className="w-3.5 h-3.5 text-student-500" />
-                  <span>Student</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleQuickDemo('freelancer')}
-                  disabled={loading}
-                  className="px-2.5 py-1.5 rounded-lg border border-border-base bg-bg-surface hover:bg-bg-subtle text-xs font-medium text-text-secondary hover:text-text-primary flex items-center gap-1.5 transition-colors disabled:opacity-50"
-                >
-                  <Zap className="w-3.5 h-3.5 text-freelancer-500" />
-                  <span>Freelancer</span>
-                </button>
-              </div>
-            </div>
           </div>
 
           {/* Register link */}

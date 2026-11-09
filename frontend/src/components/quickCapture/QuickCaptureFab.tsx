@@ -283,11 +283,10 @@ export function QuickCaptureFab({
     handleDirectCreate(newTaskTitle.trim(), selectedPriority);
   };
 
-  const isAuthRoute = ['/login', '/register', '/forgot-password', '/reset-password'].some((path) =>
-    location.pathname.startsWith(path)
-  );
+  // Only render inside the authenticated workspace (/app/*)
+  const isWorkspaceRoute = location.pathname.startsWith('/app');
 
-  if (!enabled || !isAuthed || isAuthRoute) return null;
+  if (!enabled || !isAuthed || !isWorkspaceRoute) return null;
 
   const suggestions = ROLE_SUGGESTIONS[currentRole] || ROLE_SUGGESTIONS.job_seeker;
   const taskBoardPath = `/app/${currentRole === 'job_seeker' ? 'job_seeker' : currentRole}/tasks`;

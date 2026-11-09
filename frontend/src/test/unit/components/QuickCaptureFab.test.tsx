@@ -64,12 +64,20 @@ describe('QuickCaptureFab', () => {
     );
   });
 
-  const renderComponent = () =>
+  const renderComponent = (initialPath = '/app/job_seeker/dashboard') =>
     render(
-      <MemoryRouter>
+      <MemoryRouter initialEntries={[initialPath]}>
         <QuickCaptureFab />
       </MemoryRouter>
     );
+
+  it('does not render on public or landing routes outside /app', () => {
+    renderComponent('/');
+
+    expect(
+      screen.queryByRole('button', { name: /Open quick task manager/i })
+    ).not.toBeInTheDocument();
+  });
 
   it('does not render if user is not signed in', () => {
     mockAuthState.user = null;
