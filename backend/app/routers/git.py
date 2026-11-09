@@ -10,6 +10,7 @@ from ..database import get_db
 from ..auth import get_current_user
 from ..models import User, Task
 from ..config import settings
+from ..ownership import require_owned_project
 
 logger = logging.getLogger(__name__)
 
@@ -59,12 +60,18 @@ def _get_github_headers(token: Optional[str] = None) -> Dict[str, str]:
         headers["Authorization"] = f"Bearer {auth_token}"
     return headers
 
+def _require_owned_repo(repo_id: int, user_id: int) -> Dict[str, Any]:
+    repo = CONNECTED_REPOS.get(repo_id)
+    if not repo or repo.get("user_id") != user_id:
+        raise HTTPException(status_code=404, detail="Repository not found")
+    return repo
+
 @router.get("/repositories")
 async def list_repositories(
     current_user: User = Depends(get_current_user),
 ):
-    """Returns connected repositories."""
-    return list(CONNECTED_REPOS.values())
+    """Returns connected repositories belonging strictly to the authenticated user."""
+    return [r for r in CONNECTED_REPOS.values() if r.get("user_id") == current_user.id]
 
 @router.post("/repositories")
 async def connect_repository(
@@ -79,12 +86,17 @@ async def connect_repository(
     if "/" not in repo_name and settings.GITHUB_USERNAME:
         repo_name = f"{settings.GITHUB_USERNAME}/{repo_name}"
 
+    gh_repo = {}
     async with httpx.AsyncClient(timeout=10.0) as client:
         try:
-            resp = await client.get(f"https://api.github.com/repos/{repo_name}", headers=headers)
+            resp = await client.get(
+                f"https://api.github.com/repos/{repo_name}",
+                headers=headers,
+            )
             if resp.status_code == 200:
                 gh_repo = resp.json()
             else:
+                logger.warning("GitHub API returned %s for %s", resp.status_code, repo_name)
                 gh_repo = {
                     "id": abs(hash(repo_name)) % 1000000,
                     "name": repo_name.split("/")[-1],
@@ -119,7 +131,7 @@ async def connect_repository(
 
     repo_obj = {
         "id": repo_id,
-        "user_id": current_user.id if current_user else 1,
+        "user_id": current_user.id,
         "provider": "github",
         "external_id": str(gh_repo.get("id")),
         "name": gh_repo.get("name"),
@@ -128,10 +140,10 @@ async def connect_repository(
         "private": gh_repo.get("private", False),
         "html_url": gh_repo.get("html_url"),
         "default_branch": gh_repo.get("default_branch", "main"),
-        "language": gh_repo.get("language"),
-        "stars": gh_repo.get("stargazers_count", 0),
-        "forks": gh_repo.get("forks_count", 0),
-        "open_issues": gh_repo.get("open_issues_count", 0),
+        "language": gh_repo.get("language") or "TypeScript",
+        "stargazers_count": gh_repo.get("stargazers_count", 0),
+        "forks_count": gh_repo.get("forks_count", 0),
+        "open_issues_count": gh_repo.get("open_issues_count", 0),
         "last_sync_at": now,
         "created_at": now,
         "updated_at": now,
@@ -153,32 +165,50 @@ async def connect_repository(
     }
 
 @router.get("/repositories/{repo_id}")
-async def get_repository(repo_id: int):
-    if repo_id not in CONNECTED_REPOS:
-        raise HTTPException(status_code=404, detail="Repository not found")
-    return CONNECTED_REPOS[repo_id]
+async def get_repository(
+    repo_id: int,
+    current_user: User = Depends(get_current_user),
+):
+    repo = _require_owned_repo(repo_id, current_user.id)
+    return repo
 
 @router.delete("/repositories/{repo_id}")
-async def disconnect_repository(repo_id: int):
+async def disconnect_repository(
+    repo_id: int,
+    current_user: User = Depends(get_current_user),
+):
+    _require_owned_repo(repo_id, current_user.id)
     CONNECTED_REPOS.pop(repo_id, None)
     SYNC_SETTINGS.pop(repo_id, None)
     SYNC_LOGS.pop(repo_id, None)
     return {"status": "disconnected"}
 
 @router.get("/repositories/{repo_id}/sync-settings")
-async def get_sync_settings(repo_id: int):
+async def get_sync_settings(
+    repo_id: int,
+    current_user: User = Depends(get_current_user),
+):
+    _require_owned_repo(repo_id, current_user.id)
     return SYNC_SETTINGS.get(repo_id, DEFAULT_SYNC_SETTINGS)
 
 @router.patch("/repositories/{repo_id}/sync-settings")
-async def update_sync_settings(repo_id: int, settings_update: Dict[str, Any]):
+async def update_sync_settings(
+    repo_id: int,
+    settings_update: Dict[str, Any],
+    current_user: User = Depends(get_current_user),
+):
+    _require_owned_repo(repo_id, current_user.id)
     current = SYNC_SETTINGS.get(repo_id, DEFAULT_SYNC_SETTINGS.copy())
     current.update(settings_update)
     SYNC_SETTINGS[repo_id] = current
     return current
 
 @router.post("/sync")
-async def trigger_sync(req: TriggerSyncRequest):
-    repo = CONNECTED_REPOS.get(req.repository_id)
+async def trigger_sync(
+    req: TriggerSyncRequest,
+    current_user: User = Depends(get_current_user),
+):
+    repo = _require_owned_repo(req.repository_id, current_user.id)
     now = datetime.datetime.utcnow().isoformat() + "Z"
 
     log_entry = {
@@ -196,24 +226,24 @@ async def trigger_sync(req: TriggerSyncRequest):
         SYNC_LOGS[req.repository_id] = []
     SYNC_LOGS[req.repository_id].insert(0, log_entry)
 
-    if repo:
-        repo["last_sync_at"] = now
-
+    repo["last_sync_at"] = now
     return {"sync_log": log_entry}
 
 @router.get("/repositories/{repo_id}/sync-logs")
-async def get_sync_logs(repo_id: int):
+async def get_sync_logs(
+    repo_id: int,
+    current_user: User = Depends(get_current_user),
+):
+    _require_owned_repo(repo_id, current_user.id)
     return SYNC_LOGS.get(repo_id, [])
 
 @router.get("/repositories/{repo_id}/issues")
 async def get_repository_issues(
     repo_id: int,
     state: str = Query("open"),
+    current_user: User = Depends(get_current_user),
 ):
-    repo = CONNECTED_REPOS.get(repo_id)
-    if not repo:
-        return []
-
+    repo = _require_owned_repo(repo_id, current_user.id)
     headers = _get_github_headers()
     async with httpx.AsyncClient(timeout=10.0) as client:
         try:
@@ -252,11 +282,9 @@ async def get_repository_issues(
 async def get_repository_prs(
     repo_id: int,
     state: str = Query("open"),
+    current_user: User = Depends(get_current_user),
 ):
-    repo = CONNECTED_REPOS.get(repo_id)
-    if not repo:
-        return []
-
+    repo = _require_owned_repo(repo_id, current_user.id)
     headers = _get_github_headers()
     async with httpx.AsyncClient(timeout=10.0) as client:
         try:
@@ -293,11 +321,11 @@ async def get_repository_prs(
     return []
 
 @router.get("/repositories/{repo_id}/commits")
-async def get_repository_commits(repo_id: int):
-    repo = CONNECTED_REPOS.get(repo_id)
-    if not repo:
-        return []
-
+async def get_repository_commits(
+    repo_id: int,
+    current_user: User = Depends(get_current_user),
+):
+    repo = _require_owned_repo(repo_id, current_user.id)
     headers = _get_github_headers()
     async with httpx.AsyncClient(timeout=10.0) as client:
         try:
@@ -325,7 +353,11 @@ async def get_repository_commits(repo_id: int):
     return []
 
 @router.get("/repositories/{repo_id}/milestones")
-async def get_repository_milestones(repo_id: int):
+async def get_repository_milestones(
+    repo_id: int,
+    current_user: User = Depends(get_current_user),
+):
+    _require_owned_repo(repo_id, current_user.id)
     return []
 
 @router.post("/issues/create-task")
@@ -334,6 +366,9 @@ async def create_task_from_issue(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
+    if req.project_id:
+        require_owned_project(db, req.project_id, current_user.id)
+
     task = Task(
         user_id=current_user.id,
         title=f"GitHub Issue #{req.issue_id}",

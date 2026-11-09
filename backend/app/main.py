@@ -5,20 +5,37 @@ from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-from .database import engine, Base
+from .database import engine, Base, SessionLocal
 from .config import settings
 from .rate_limit import RateLimitMiddleware
+from .seed import seed_initial_data
 from .routers import auth, tasks, projects, calendar, notes, dashboard, ai, invoices, git
 
 logger = logging.getLogger(__name__)
 
+# Initialize database schema and baseline demo data
 Base.metadata.create_all(bind=engine)
+try:
+    seed_initial_data(SessionLocal())
+except Exception as exc:
+    logger.warning("Database baseline seeding skipped: %s", exc)
 
 app = FastAPI(
     title="MentorOS API",
     description="Backend REST API for MentorOS AI Workspace",
     version="1.0.0",
 )
+
+# ── Security Headers Middleware ───────────────────────────────────────────────
+@app.middleware("http")
+async def add_security_headers(request: Request, call_next):
+    response = await call_next(request)
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["X-Frame-Options"] = "DENY"
+    response.headers["X-XSS-Protection"] = "1; mode=block"
+    response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+    response.headers["Permissions-Policy"] = "camera=(), microphone=(), geolocation=()"
+    return response
 
 app.add_middleware(RateLimitMiddleware)
 app.add_middleware(
@@ -60,5 +77,11 @@ async def unhandled_exception_handler(request: Request, exc: Exception):
 
 
 @app.get("/health")
+@app.get("/api/health")
+@app.get("/api/v1/health")
 def health_check():
-    return {"status": "ok", "app": "MentorOS", "timestamp": datetime.datetime.utcnow().isoformat()}
+    return {
+        "status": "ok",
+        "app": "MentorOS",
+        "timestamp": datetime.datetime.utcnow().isoformat(),
+    }

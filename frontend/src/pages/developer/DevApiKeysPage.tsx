@@ -35,7 +35,7 @@ const INITIAL_KEYS: ApiKeyItem[] = [
     name: 'Gemini 1.5 Pro Production',
     service: 'Google Gemini AI',
     prefix: 'AIzaSyD-•••••••••••••99mK',
-    secret: 'AIzaSyD-99xLK3920xLm99mK88201',
+    secret: 'demo_mock_gemini_key_placeholder',
     created: '2026-10-15',
     lastUsed: '2 mins ago',
     status: 'active',
@@ -45,7 +45,7 @@ const INITIAL_KEYS: ApiKeyItem[] = [
     name: 'OpenAI GPT-4o API Key',
     service: 'OpenAI (ChatGPT / GPT-4o)',
     prefix: 'sk-proj-•••••••••••••a1B2',
-    secret: 'sk-proj-99xLK3920xLm99mKa1B2',
+    secret: 'demo_mock_openai_key_placeholder',
     created: '2026-11-07',
     lastUsed: 'Just now',
     status: 'active',
@@ -385,8 +385,8 @@ LOCAL_LLM_ENDPOINT="http://localhost:11434"`;
           <pre className="p-3.5 rounded-xl bg-slate-900 text-slate-100 font-mono text-2xs overflow-x-auto leading-relaxed border border-slate-800 shadow-inner">
             {`# MentorOS Local Developer Pipeline
 AI_PROVIDER="gemini"
-GEMINI_API_KEY="${keys.find((k) => k.service.includes('Gemini'))?.secret || 'AIzaSyD-99xLK3920xLm99mK88201'}"
-OPENAI_API_KEY="${keys.find((k) => k.service.includes('OpenAI'))?.secret || 'sk-proj-99xLK3920xLm99mKa1B2'}"
+GEMINI_API_KEY="${keys.find((k) => k.service.includes('Gemini'))?.secret || 'demo_mock_gemini_key_placeholder'}"
+OPENAI_API_KEY="${keys.find((k) => k.service.includes('OpenAI'))?.secret || 'demo_mock_openai_key_placeholder'}"
 LOCAL_LLM_ENDPOINT="http://localhost:11434"`}
           </pre>
         </Card>

@@ -5,7 +5,8 @@ env/
 ENV/
 *.env
 *.env.*
-!*.env.example
+!.env.example
+!.env.sample
 
 # Python
 __pycache__/
@@ -14,15 +15,18 @@ __pycache__/
 *.pyd
 *.pyo
 .pytest_cache/
+.mypy_cache/
 .coverage
 htmlcov/
+coverage/
 
-# Databases
+# Databases & Backups
 *.db
 *.sqlite
 *.sqlite3
+*.sql
+backups/
 !backend/mentoros.db.example
-!backend/mentoros_seed.db
 
 # Node / Frontend
 node_modules/
@@ -30,8 +34,9 @@ dist/
 dist-ssr/
 *.local
 
-# Logs & temp
+# Logs & Temp
 *.log
+logs/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
@@ -49,8 +54,15 @@ test-results/
 # Secrets & Credentials
 backend/client_secret.json
 client_secret*.json
+secrets.json
+credentials.json
+service-account.json
 *.pem
 *.key
+*.p12
+*.pfx
+id_rsa
+*.pub
 
 # IDE & OS
 .vscode/
@@ -59,5 +71,6 @@ client_secret*.json
 .DS_Store
 Thumbs.db
 
+# Deployment
 .vercel
 unslop/
