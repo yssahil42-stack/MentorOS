@@ -39,12 +39,12 @@ export default function DevProjectsPage() {
 
   const { data: projects = [], isLoading } = useQuery({
     queryKey: ['projects', 'developer'],
-    queryFn: () => fetchProjects(),
+    queryFn: () => fetchProjects('developer'),
   });
 
   const { data: tasks = [] } = useQuery({
     queryKey: ['tasks', 'developer'],
-    queryFn: () => fetchTasks(),
+    queryFn: () => fetchTasks({ role: 'developer' }),
   });
 
   const createMutation = useMutation({
@@ -54,6 +54,7 @@ export default function DevProjectsPage() {
         description: newDesc,
         priority: newPriority,
         target_date: newTargetDate,
+        role: 'developer',
       });
     },
     onSuccess: () => {

@@ -8,11 +8,22 @@ from starlette.responses import JSONResponse, Response
 
 
 class RateLimitMiddleware(BaseHTTPMiddleware):
+    _instances = []
+
     def __init__(self, app):
         super().__init__(app)
         self._requests: dict[tuple[str, str], deque[float]] = defaultdict(deque)
         self._lock = asyncio.Lock()
         self._last_cleanup = time.monotonic()
+        RateLimitMiddleware._instances.append(self)
+
+    def reset(self):
+        self._requests.clear()
+
+    @classmethod
+    def reset_all(cls):
+        for inst in cls._instances:
+            inst.reset()
 
     async def dispatch(self, request: Request, call_next) -> Response:
         path = request.url.path

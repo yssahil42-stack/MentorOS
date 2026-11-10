@@ -35,18 +35,17 @@ function resolveRoleForUser(email: string, requestedRole?: string): UserRole {
     lower.includes('student') ||
     lower.includes('study') ||
     lower.includes('academic') ||
-    lower.includes('college') ||
-    lower === 'yssahil42@gmail.com'
+    lower.includes('college')
   ) {
     return 'student';
   }
-  if (lower.includes('dev') || lower === 'yssahil422@gmail.com' || lower === 'yssahil2@gmail.com') {
+  if (lower.includes('dev')) {
     return 'developer';
   }
-  if (lower.includes('freelance') || lower === 'yssahil412@gmail.com' || lower === 'yssahil421@gmail.com' || lower === 'yssahil1@gmail.com') {
+  if (lower.includes('freelance')) {
     return 'freelancer';
   }
-  if (lower.includes('job') || lower.includes('seek') || lower === 'yssahil424@gmail.com' || lower === 'yssahil3@gmail.com') {
+  if (lower.includes('job') || lower.includes('seek')) {
     return 'job_seeker';
   }
   try {
@@ -117,84 +116,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const login = useCallback(async (req: LoginRequest): Promise<User> => {
-    try {
-      const res = await api.post<AuthResponse>('/auth/login', req);
-      return persistSession(res);
-    } catch (err: any) {
-      const isNetworkError =
-        err?.status === 0 ||
-        err?.message?.includes('Unable to reach the server') ||
-        err?.message?.includes('Network Error');
-      if (isNetworkError) {
-        const demoRole = resolveRoleForUser(req.email);
-        const rawName = req.email.split('@')[0].replace(/[._-]/g, ' ') || 'Demo User';
-        const demoName = rawName.charAt(0).toUpperCase() + rawName.slice(1);
-        const demoUser: User = {
-          id: 1,
-          email: req.email,
-          full_name: demoName,
-          role: demoRole,
-          created_at: new Date().toISOString(),
-        };
-        return persistSession({
-          access_token: 'demo_token_' + Date.now(),
-          user: demoUser,
-        });
-      }
-      throw err;
-    }
+    const res = await api.post<AuthResponse>('/auth/login', req);
+    return persistSession(res);
   }, []);
 
   const register = useCallback(async (req: RegisterRequest): Promise<User> => {
-    try {
-      const res = await api.post<AuthResponse>('/auth/register', req);
-      return persistSession(res);
-    } catch (err: any) {
-      const isNetworkError =
-        err?.status === 0 ||
-        err?.message?.includes('Unable to reach the server') ||
-        err?.message?.includes('Network Error');
-      if (isNetworkError) {
-        const demoUser: User = {
-          id: Date.now(),
-          email: req.email,
-          full_name: req.full_name || 'New Member',
-          role: resolveRoleForUser(req.email, req.role),
-          created_at: new Date().toISOString(),
-        };
-        return persistSession({
-          access_token: 'demo_token_' + Date.now(),
-          user: demoUser,
-        });
-      }
-      throw err;
-    }
+    const res = await api.post<AuthResponse>('/auth/register', req);
+    return persistSession(res);
   }, []);
 
   const loginWithGoogle = useCallback(async (credential: string, role?: string): Promise<User> => {
-    try {
-      const res = await api.post<AuthResponse>('/auth/google', { credential, role });
-      return persistSession(res);
-    } catch (err: any) {
-      const isNetworkError =
-        err?.status === 0 ||
-        err?.message?.includes('Unable to reach the server') ||
-        err?.message?.includes('Network Error');
-      if (isNetworkError) {
-        const demoUser: User = {
-          id: 1,
-          email: 'google.user@mentoros.dev',
-          full_name: 'Google User',
-          role: resolveRoleForUser('google.user@mentoros.dev', role),
-          created_at: new Date().toISOString(),
-        };
-        return persistSession({
-          access_token: 'demo_token_' + Date.now(),
-          user: demoUser,
-        });
-      }
-      throw err;
-    }
+    const res = await api.post<AuthResponse>('/auth/google', { credential, role });
+    return persistSession(res);
   }, []);
 
   const logout = useCallback(async () => {

@@ -111,7 +111,7 @@ export default function DeployPreviewPage() {
   // ─── Data Fetching ──────────────────────────────────────────────────────────
   const { data: projects = [] } = useQuery({
     queryKey: ['projects', 'developer'],
-    queryFn: () => fetchProjects(),
+    queryFn: () => fetchProjects('developer'),
   });
 
   const {

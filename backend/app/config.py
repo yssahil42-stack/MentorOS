@@ -31,13 +31,13 @@ class Settings(BaseModel):
     APP_ENV: str = app_env
     SECRET_KEY: str = configured_secret or (secrets.token_urlsafe(32) if is_production else DEV_SECRET_FALLBACK)
     ALGORITHM: str = "HS256"
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "10080"))
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "60"))
     DATABASE_URL: str = configured_database_url or default_sqlite
     CORS_ORIGINS: list[str] = [
         origin.strip()
         for origin in (configured_origins or (
-            "http://localhost:5173,http://localhost:5174,http://localhost:5175,"
-            "http://127.0.0.1:5173,http://127.0.0.1:5174,http://127.0.0.1:5175,"
+            "http://localhost:5173,http://localhost:5174,http://localhost:5175,http://localhost:4173,http://localhost:3000,"
+            "http://127.0.0.1:5173,http://127.0.0.1:5174,http://127.0.0.1:5175,http://127.0.0.1:4173,http://127.0.0.1:3000,"
             "https://mentoros1.vercel.app,https://mentoros-web.vercel.app,"
             "https://mentoros-dev.vercel.app,https://mentoros-hq.vercel.app"
         )).split(",")
@@ -49,13 +49,10 @@ class Settings(BaseModel):
     GROQ_MODEL: str = os.getenv("GROQ_MODEL", "openai/gpt-oss-120b")
     AI_TIMEOUT: float = float(os.getenv("AI_TIMEOUT", "15.0"))
     # Google Identity Services / OAuth Credentials
-    GOOGLE_CLIENT_ID: str = os.getenv(
-        "GOOGLE_CLIENT_ID",
-        "787072444746-7cp6uis2gfde9ifat86il4rsk34q55a8.apps.googleusercontent.com",
-    )
+    GOOGLE_CLIENT_ID: str = os.getenv("GOOGLE_CLIENT_ID", "")
     GOOGLE_CLIENT_SECRET: str = os.getenv("GOOGLE_CLIENT_SECRET", "")
     # GitHub Integration
     GITHUB_PERSONAL_ACCESS_TOKEN: str = os.getenv("GITHUB_PERSONAL_ACCESS_TOKEN", "")
-    GITHUB_USERNAME: str = os.getenv("GITHUB_USERNAME", "yssahil42-stack")
+    GITHUB_USERNAME: str = os.getenv("GITHUB_USERNAME", "")
 
 settings = Settings()

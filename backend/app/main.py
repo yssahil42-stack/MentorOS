@@ -13,12 +13,13 @@ from .routers import auth, tasks, projects, calendar, notes, dashboard, ai, invo
 
 logger = logging.getLogger(__name__)
 
-# Initialize database schema and baseline demo data
+# Initialize database schema and baseline demo data (non-production only)
 Base.metadata.create_all(bind=engine)
-try:
-    seed_initial_data(SessionLocal())
-except Exception as exc:
-    logger.warning("Database baseline seeding skipped: %s", exc)
+if settings.APP_ENV != "production":
+    try:
+        seed_initial_data(SessionLocal())
+    except Exception as exc:
+        logger.warning("Database baseline seeding skipped: %s", exc)
 
 app = FastAPI(
     title="MentorOS API",
@@ -35,6 +36,14 @@ async def add_security_headers(request: Request, call_next):
     response.headers["X-XSS-Protection"] = "1; mode=block"
     response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
     response.headers["Permissions-Policy"] = "camera=(), microphone=(), geolocation=()"
+    response.headers["Content-Security-Policy"] = (
+        "default-src 'self'; "
+        "script-src 'self' 'unsafe-inline' https://accounts.google.com; "
+        "style-src 'self' 'unsafe-inline'; "
+        "img-src 'self' data: https:; "
+        "connect-src 'self' https://accounts.google.com https://oauth2.googleapis.com; "
+        "frame-src https://accounts.google.com;"
+    )
     return response
 
 app.add_middleware(RateLimitMiddleware)

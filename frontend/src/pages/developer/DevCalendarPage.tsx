@@ -44,7 +44,7 @@ export default function DevCalendarPage() {
 
   const { data: events = [], isLoading } = useQuery({
     queryKey: ['calendar', 'developer'],
-    queryFn: () => fetchCalendarEvents(),
+    queryFn: () => fetchCalendarEvents({ role: 'developer' }),
   });
 
   const createMutation = useMutation({
@@ -56,6 +56,7 @@ export default function DevCalendarPage() {
         event_type: eventType,
         start_at: start,
         end_at: end,
+        role: 'developer',
       });
     },
     onSuccess: () => {

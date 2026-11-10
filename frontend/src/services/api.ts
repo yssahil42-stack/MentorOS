@@ -53,7 +53,11 @@ export function createClient(): AxiosInstance {
 
     const token = localStorage.getItem('mentor_token');
     if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+      if (typeof config.headers?.set === 'function') {
+        config.headers.set('Authorization', `Bearer ${token}`);
+      } else {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
     }
     const matchedPathRole =
       typeof window === 'undefined'
@@ -99,18 +103,20 @@ export function createClient(): AxiosInstance {
       const status = err.response?.status ?? 0;
       const detail = err.response?.data?.detail;
       const endpoint = (err.config?.url ?? '').split('?')[0];
-      const isAuthAttempt = /^\/auth\/(?:login|register)$/.test(endpoint);
+      const isAuthAttempt = /(?:\/api\/v1)?\/auth\/(?:login|register|google)$/.test(endpoint);
       const message =
         status === 0
           ? err.code === 'ECONNABORTED'
             ? 'The request timed out. Please try again.'
             : 'Unable to reach the server. Check your connection and try again.'
           : status === 401
-            ? endpoint === '/auth/login'
+            ? endpoint.endsWith('/auth/login')
               ? 'Invalid email or password.'
-              : endpoint === '/auth/register'
+              : endpoint.endsWith('/auth/register')
                 ? 'Unable to create an account with the supplied details.'
-                : 'Your session has expired. Please sign in again.'
+                : endpoint.endsWith('/auth/google')
+                  ? 'Google authentication failed or expired.'
+                  : 'Your session has expired. Please sign in again.'
             : status === 403
               ? 'You do not have permission to perform this action.'
               : status === 404

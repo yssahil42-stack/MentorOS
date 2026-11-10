@@ -5,7 +5,6 @@ import { cn } from '../../utils/cn';
 import { useAuth } from '../../contexts/AuthContext';
 import { useWorkspace } from '../../contexts/WorkspaceContext';
 import { NotificationDropdown } from './NotificationDropdown';
-import { WorkspaceSwitcher } from './WorkspaceSwitcher';
 
 interface TopBarProps {
   onMenuClick: () => void;
@@ -67,9 +66,6 @@ export function TopBar({ onMenuClick }: TopBarProps) {
 
       {/* ─── Right actions ─────────────────────────────────── */}
       <div className="flex items-center gap-2 shrink-0">
-        {/* Module / Workspace Switcher */}
-        <WorkspaceSwitcher />
-
         {/* Notifications Dropdown */}
         <NotificationDropdown />
 

@@ -16,6 +16,7 @@ from backend.app.rate_limit import RateLimitMiddleware
 
 class WorkspaceIsolationTests(unittest.TestCase):
     def setUp(self):
+        RateLimitMiddleware.reset_all()
         self.engine = create_engine(
             "sqlite://",
             connect_args={"check_same_thread": False},
@@ -40,6 +41,7 @@ class WorkspaceIsolationTests(unittest.TestCase):
         app.dependency_overrides.clear()
         Base.metadata.drop_all(bind=self.engine)
         self.engine.dispose()
+        RateLimitMiddleware.reset_all()
 
     def create_user(self, email: str) -> models.User:
         with self.session_factory() as db:

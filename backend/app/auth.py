@@ -1,4 +1,5 @@
 import datetime
+import uuid
 from typing import Optional
 import bcrypt
 from jose import JWTError, jwt
@@ -32,6 +33,8 @@ def create_access_token(data: dict, expires_delta: Optional[datetime.timedelta] 
         expire = datetime.datetime.utcnow() + expires_delta
     else:
         expire = datetime.datetime.utcnow() + datetime.timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
+    if "jti" not in to_encode:
+        to_encode["jti"] = uuid.uuid4().hex
     to_encode.update({"exp": expire})
     encoded_jwt = jwt.encode(to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
     return encoded_jwt
@@ -48,8 +51,18 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
         if not isinstance(raw_user_id, (int, str)) or not str(raw_user_id).isdigit():
             raise credentials_exception
         user_id = int(raw_user_id)
+        jti = payload.get("jti")
     except JWTError:
         raise credentials_exception
+
+    if jti:
+        revoked = db.query(models.RevokedToken).filter(models.RevokedToken.jti == jti).first()
+        if revoked:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Token has been revoked",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
 
     user = db.query(models.User).filter(models.User.id == user_id).first()
     if user is None:

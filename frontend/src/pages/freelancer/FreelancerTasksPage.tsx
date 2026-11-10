@@ -61,12 +61,12 @@ export default function FreelancerTasksPage() {
 
   const { data: tasks = [], isLoading: tasksLoading } = useQuery({
     queryKey: ['tasks', 'freelancer'],
-    queryFn: () => fetchTasks(),
+    queryFn: () => fetchTasks({ role: 'freelancer' }),
   });
 
   const { data: projects = [], isLoading: projectsLoading } = useQuery({
     queryKey: ['projects', 'freelancer'],
-    queryFn: () => fetchProjects(),
+    queryFn: () => fetchProjects('freelancer'),
   });
 
   const toggleMutation = useMutation({

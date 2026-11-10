@@ -22,8 +22,8 @@ def get_projects(
     db: Session = Depends(get_db),
 ):
     query = db.query(models.Project).filter(models.Project.user_id == current_user.id)
-    if role:
-        query = query.filter(models.Project.role == role)
+    target_role = role or current_user.role
+    query = query.filter(models.Project.role == target_role)
     
     total = query.count()
     response.headers["X-Total-Count"] = str(total)
@@ -195,8 +195,8 @@ def get_milestones(
     db: Session = Depends(get_db),
 ):
     query = db.query(models.Milestone).filter(models.Milestone.user_id == current_user.id)
-    if role:
-        query = query.filter(models.Milestone.role == role)
+    target_role = role or current_user.role
+    query = query.filter(models.Milestone.role == target_role)
     if project_id:
         query = query.filter(models.Milestone.project_id == project_id)
     return query.order_by(models.Milestone.created_at.asc()).all()

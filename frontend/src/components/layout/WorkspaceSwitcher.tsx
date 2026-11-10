@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { useQueryClient } from '@tanstack/react-query';
 import {
   GraduationCap,
   Code2,
@@ -59,6 +60,7 @@ export function WorkspaceSwitcher() {
   const containerRef = useRef<HTMLDivElement>(null);
   const location = useLocation();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const { user } = useAuth();
   const { showToast } = useWorkspace();
 
@@ -94,6 +96,7 @@ export function WorkspaceSwitcher() {
     } catch {
       // ignore
     }
+    queryClient.clear();
     setIsOpen(false);
     const targetRoute = getRoleDashboardRoute(opt.role);
     showToast(`Switched to ${opt.label} Workspace`, 'info');

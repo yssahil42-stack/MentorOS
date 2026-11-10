@@ -16,8 +16,8 @@ def get_notes(
     db: Session = Depends(get_db),
 ):
     query = db.query(models.Note).filter(models.Note.user_id == current_user.id)
-    if role:
-        query = query.filter(models.Note.role == role)
+    target_role = role or current_user.role
+    query = query.filter(models.Note.role == target_role)
     if project_id:
         query = query.filter(models.Note.project_id == project_id)
     return query.order_by(models.Note.is_pinned.desc(), models.Note.created_at.desc()).all()

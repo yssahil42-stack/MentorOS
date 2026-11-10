@@ -116,6 +116,8 @@ class CalendarEvent(Base):
     updated_at = Column(DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
 
     user = relationship("User", back_populates="events")
+    project = relationship("Project")
+    task = relationship("Task")
 
 
 class Note(Base):
@@ -132,6 +134,7 @@ class Note(Base):
     updated_at = Column(DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
 
     user = relationship("User", back_populates="notes")
+    project = relationship("Project")
 
 
 class AIProposal(Base):
@@ -264,4 +267,15 @@ class InvoiceLineItem(Base):
     source_id = Column(Integer, nullable=True)
 
     invoice = relationship("Invoice", back_populates="line_items")
+
+
+class RevokedToken(Base):
+    __tablename__ = "revoked_tokens"
+
+    id = Column(Integer, primary_key=True, index=True)
+    jti = Column(String(255), unique=True, index=True, nullable=False)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=True)
+    revoked_at = Column(DateTime, default=datetime.datetime.utcnow, nullable=False)
+    expires_at = Column(DateTime, nullable=False)
+
 

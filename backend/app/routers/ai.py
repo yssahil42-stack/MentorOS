@@ -1159,8 +1159,8 @@ def list_proposals(
     db: Session = Depends(get_db),
 ):
     query = db.query(models.AIProposal).filter(models.AIProposal.user_id == current_user.id)
-    if role:
-        query = query.filter(models.AIProposal.role == role)
+    target_role = role or current_user.role
+    query = query.filter(models.AIProposal.role == target_role)
     return (
         query
         .order_by(models.AIProposal.created_at.desc())

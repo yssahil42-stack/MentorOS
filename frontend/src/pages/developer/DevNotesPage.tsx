@@ -25,12 +25,12 @@ export default function DevNotesPage() {
 
   const { data: notes = [], isLoading } = useQuery({
     queryKey: ['notes', 'developer'],
-    queryFn: () => fetchNotes(),
+    queryFn: () => fetchNotes(undefined, 'developer'),
   });
 
   const createMutation = useMutation({
     mutationFn: async () => {
-      return createNote({ title, content, is_pinned: isPinned });
+      return createNote({ title, content, is_pinned: isPinned, role: 'developer' });
     },
     onSuccess: (newN) => {
       setIsModalOpen(false);

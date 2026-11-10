@@ -50,6 +50,16 @@ export function GoogleSignInButton({
   const containerRef = useRef<HTMLDivElement>(null);
   const [scriptLoaded, setScriptLoaded] = useState(false);
   const [loading, setLoading] = useState(false);
+  const onSuccessRef = useRef(onSuccess);
+  const onErrorRef = useRef(onError);
+
+  useEffect(() => {
+    onSuccessRef.current = onSuccess;
+  }, [onSuccess]);
+
+  useEffect(() => {
+    onErrorRef.current = onError;
+  }, [onError]);
 
   useEffect(() => {
     let interval: ReturnType<typeof setInterval> | undefined;
@@ -63,12 +73,12 @@ export function GoogleSignInButton({
               if (response.credential) {
                 setLoading(true);
                 try {
-                  onSuccess(response.credential);
+                  onSuccessRef.current(response.credential);
                 } finally {
                   setLoading(false);
                 }
               } else {
-                onError?.('Failed to receive Google credential token.');
+                onErrorRef.current?.('Failed to receive Google credential token.');
               }
             },
             auto_select: false,
@@ -110,18 +120,18 @@ export function GoogleSignInButton({
     return () => {
       if (interval) clearInterval(interval);
     };
-  }, [onSuccess, onError, text]);
+  }, [text]);
 
   return (
-    <div className="w-full flex flex-col items-center justify-center">
+    <div className="w-full flex flex-col items-center justify-center min-h-[44px]">
       <div
         ref={containerRef}
         className={`w-full flex justify-center min-h-[44px] ${
           disabled || loading ? 'opacity-50 pointer-events-none' : ''
-        }`}
+        } ${!scriptLoaded ? 'hidden' : ''}`}
       />
       {!scriptLoaded && (
-        <div className="w-full h-10 rounded-xl border border-border-base bg-bg-surface flex items-center justify-center gap-2 text-xs font-semibold text-text-muted animate-pulse">
+        <div className="w-full h-[44px] rounded-xl border border-border-base bg-bg-surface flex items-center justify-center gap-2 text-xs font-semibold text-text-muted animate-pulse">
           <Loader2 className="w-4 h-4 animate-spin text-text-faint" />
           <span>Connecting to Google Identity...</span>
         </div>

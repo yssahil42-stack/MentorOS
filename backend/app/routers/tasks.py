@@ -22,8 +22,8 @@ def get_tasks(
     db: Session = Depends(get_db),
 ):
     query = db.query(models.Task).filter(models.Task.user_id == current_user.id)
-    if role:
-        query = query.filter(models.Task.role == role)
+    target_role = role or current_user.role
+    query = query.filter(models.Task.role == target_role)
     if status:
         query = query.filter(models.Task.status == status)
     if project_id:
@@ -32,9 +32,14 @@ def get_tasks(
     total = query.count()
     response.headers["X-Total-Count"] = str(total)
 
+    MAX_PAGE_SIZE = 100
     query = query.order_by(models.Task.created_at.desc())
     if page is not None and page_size is not None and page > 0 and page_size > 0:
-        query = query.offset((page - 1) * page_size).limit(page_size)
+        clamped_size = min(page_size, MAX_PAGE_SIZE)
+        query = query.offset((page - 1) * clamped_size).limit(clamped_size)
+    elif page_size is not None and page_size > 0:
+        clamped_size = min(page_size, MAX_PAGE_SIZE)
+        query = query.limit(clamped_size)
     tasks = query.all()
 
     # Populate project_title

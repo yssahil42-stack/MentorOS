@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, Layers, Loader2 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
@@ -19,7 +19,7 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const handleGoogleSuccess = async (credential: string) => {
+  const handleGoogleSuccess = useCallback(async (credential: string) => {
     setError('');
     setLoading(true);
     try {
@@ -34,7 +34,11 @@ export default function LoginPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [loginWithGoogle, showToast, navigate]);
+
+  const handleGoogleError = useCallback((err: string) => {
+    setError(err);
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -61,7 +65,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-bg-base flex items-center justify-center px-4 py-12 relative overflow-hidden">
+    <div className="min-h-screen bg-bg-base flex items-center justify-center px-4 py-12 relative overflow-y-auto">
       {/* Floating Theme Toggle in corner */}
       <div className="absolute top-6 right-6 z-20">
         <ThemeToggle size="sm" variant="expanded" showLabel />
@@ -108,7 +112,7 @@ export default function LoginPage() {
             <div className="mb-4">
               <GoogleSignInButton
                 onSuccess={handleGoogleSuccess}
-                onError={(err) => setError(err)}
+                onError={handleGoogleError}
                 text="continue_with"
                 disabled={loading}
               />

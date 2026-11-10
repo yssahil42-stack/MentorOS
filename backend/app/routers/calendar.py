@@ -17,8 +17,12 @@ def get_events(
     db: Session = Depends(get_db),
 ):
     query = db.query(models.CalendarEvent).filter(models.CalendarEvent.user_id == current_user.id)
-    if role:
-        query = query.filter(models.CalendarEvent.role == role)
+    target_role = role or current_user.role
+    query = query.filter(models.CalendarEvent.role == target_role)
+    if start:
+        query = query.filter(models.CalendarEvent.end_at >= start)
+    if end:
+        query = query.filter(models.CalendarEvent.start_at <= end)
     return query.order_by(models.CalendarEvent.start_at.asc()).all()
 
 @router.post("/events", response_model=schemas.CalendarEventOut)

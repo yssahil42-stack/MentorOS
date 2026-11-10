@@ -80,7 +80,7 @@ export default function InvoiceGeneratorPage() {
   // ─── Data Fetching ──────────────────────────────────────────────────────────
   const { data: projects = [], isLoading: projectsLoading } = useQuery({
     queryKey: ['projects', 'freelancer'],
-    queryFn: () => fetchProjects(),
+    queryFn: () => fetchProjects('freelancer'),
   });
 
   const { data: allMilestones = [], isLoading: milestonesLoading } = useQuery({

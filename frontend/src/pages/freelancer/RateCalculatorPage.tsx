@@ -233,7 +233,7 @@ export default function RateCalculatorPage() {
   const { showToast } = useWorkspace();
   const { data: projects = [] } = useQuery({
     queryKey: ['projects', 'freelancer'],
-    queryFn: () => fetchProjects(),
+    queryFn: () => fetchProjects('freelancer'),
   });
 
   // ─── Rate Calculator State ──────────────────────────────────────────────────

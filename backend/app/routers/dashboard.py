@@ -253,7 +253,7 @@ def get_dashboard_summary(
                 "start_at": e.start_at,
                 "end_at": e.end_at,
                 "event_type": e.event_type,
-                "project_title": e.project.title if e.project else None,
+                "project_title": e.project.title if getattr(e, "project", None) else None,
             }
             for e in sorted(today_events, key=lambda ev: ev.start_at or "")[:5]
         ],

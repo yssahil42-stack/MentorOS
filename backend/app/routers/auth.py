@@ -1,12 +1,20 @@
+import datetime
 import secrets
 import httpx
+from jose import jwt
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 from ..database import get_db
 from ..config import settings
 from .. import models, schemas
-from ..auth import get_password_hash, verify_password, create_access_token, get_current_user
+from ..auth import (
+    get_password_hash,
+    verify_password,
+    create_access_token,
+    get_current_user,
+    oauth2_scheme,
+)
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -24,26 +32,18 @@ def register(user_in: schemas.UserRegister, db: Session = Depends(get_db)):
     if not existing:
         existing = db.query(models.User).filter(models.User.email.ilike(clean_email)).first()
 
-    hashed_pw = get_password_hash(user_in.password)
     if existing:
-        # Existing account - update credentials and profile in the database
-        existing.hashed_password = hashed_pw
-        if user_in.full_name:
-            existing.full_name = user_in.full_name
-        if user_in.role:
-            existing.role = user_in.role
-        if user_in.profile_data:
-            existing.profile_data = user_in.profile_data
-        db.commit()
-        db.refresh(existing)
-        token = create_access_token(data={"sub": str(existing.id)})
-        return schemas.TokenResponse(access_token=token, user=_to_user_out(existing))
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="An account with this email already exists.",
+        )
 
+    hashed_pw = get_password_hash(user_in.password)
     user = models.User(
         email=clean_email,
         hashed_password=hashed_pw,
-        full_name=user_in.full_name,
-        role=user_in.role,
+        full_name=user_in.full_name or "MentorOS Member",
+        role=user_in.role or "student",
         onboarding_completed=True,
         profile_data=user_in.profile_data or {},
     )
@@ -53,16 +53,10 @@ def register(user_in: schemas.UserRegister, db: Session = Depends(get_db)):
         db.refresh(user)
     except IntegrityError:
         db.rollback()
-        user = db.query(models.User).filter(models.User.email == clean_email).first()
-        if user:
-            user.hashed_password = hashed_pw
-            db.commit()
-            db.refresh(user)
-        else:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Unable to create an account with the supplied details.",
-            )
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="An account with this email already exists.",
+        )
 
     token = create_access_token(data={"sub": str(user.id)})
     return schemas.TokenResponse(access_token=token, user=_to_user_out(user))
@@ -74,39 +68,12 @@ def login(login_in: schemas.UserLogin, db: Session = Depends(get_db)):
     if not user:
         user = db.query(models.User).filter(models.User.email.ilike(clean_email)).first()
 
-    if not user:
-        # Auto-provision user account in the database so credentials are saved immediately
-        clean_name = clean_email.split("@")[0].replace(".", " ").replace("_", " ").title()
-        inferred_role = "student"
-        if any(k in clean_email for k in ["dev", "code", "422", "yssahil2"]):
-            inferred_role = "developer"
-        elif any(k in clean_email for k in ["freelance", "client", "412", "421", "yssahil1"]):
-            inferred_role = "freelancer"
-        elif any(k in clean_email for k in ["job", "seek", "career", "424", "yssahil3"]):
-            inferred_role = "job_seeker"
-
-        hashed_pw = get_password_hash(login_in.password)
-        user = models.User(
-            email=clean_email,
-            hashed_password=hashed_pw,
-            full_name=clean_name or "MentorOS Member",
-            role=inferred_role,
-            onboarding_completed=True,
-            profile_data={},
+    if not user or not verify_password(login_in.password, user.hashed_password):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect email or password.",
+            headers={"WWW-Authenticate": "Bearer"},
         )
-        db.add(user)
-        try:
-            db.commit()
-            db.refresh(user)
-        except Exception:
-            db.rollback()
-            user = db.query(models.User).filter(models.User.email == clean_email).first()
-    else:
-        # User already exists - check password or update to new valid password so credentials are saved
-        if not verify_password(login_in.password, user.hashed_password):
-            user.hashed_password = get_password_hash(login_in.password)
-            db.commit()
-            db.refresh(user)
 
     token = create_access_token(data={"sub": str(user.id)})
     return schemas.TokenResponse(access_token=token, user=_to_user_out(user))
@@ -131,15 +98,9 @@ async def google_login(payload: schemas.GoogleAuthRequest, db: Session = Depends
             detail=f"Could not connect to Google authentication service: {exc}",
         )
 
-    # Verify audience matches client_id
+    # Verify audience matches client_id if configured
     token_aud = id_info.get("aud")
-    valid_client_ids = [
-        cid for cid in [
-            settings.GOOGLE_CLIENT_ID,
-            "787072444746-7cp6uis2gfde9ifat86il4rsk34q55a8.apps.googleusercontent.com",
-        ] if cid
-    ]
-    if token_aud not in valid_client_ids:
+    if settings.GOOGLE_CLIENT_ID and token_aud != settings.GOOGLE_CLIENT_ID:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Google token was not issued for this application.",
@@ -150,6 +111,13 @@ async def google_login(payload: schemas.GoogleAuthRequest, db: Session = Depends
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Google profile is missing an email address.",
+        )
+
+    email_verified = id_info.get("email_verified")
+    if str(email_verified).lower() not in ("true", "1"):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Google account email is not verified.",
         )
 
     full_name = id_info.get("name") or email.split("@")[0]
@@ -225,6 +193,32 @@ def complete_onboarding_me(
     return _save_onboarding(data, current_user, db)
 
 @router.post("/logout")
-def logout():
+def logout(
+    token: str = Depends(oauth2_scheme),
+    current_user: models.User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    try:
+        payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
+        jti = payload.get("jti")
+        exp_timestamp = payload.get("exp")
+        if exp_timestamp:
+            expires_at = datetime.datetime.utcfromtimestamp(exp_timestamp)
+        else:
+            expires_at = datetime.datetime.utcnow() + datetime.timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
+
+        if jti:
+            existing = db.query(models.RevokedToken).filter(models.RevokedToken.jti == jti).first()
+            if not existing:
+                revoked = models.RevokedToken(
+                    jti=jti,
+                    user_id=current_user.id,
+                    expires_at=expires_at,
+                )
+                db.add(revoked)
+                db.commit()
+    except Exception:
+        db.rollback()
+
     return {"message": "Logged out successfully"}
 
