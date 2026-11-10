@@ -222,11 +222,10 @@ def create_milestone(
         status="pending",
     )
     db.add(ms)
-    db.commit()
-    db.refresh(ms)
-
     if ms.project_id:
         recalculate_project_progress(db, ms.project_id, current_user.id)
+    db.commit()
+    db.refresh(ms)
 
     return ms
 

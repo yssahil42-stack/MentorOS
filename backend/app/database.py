@@ -11,10 +11,21 @@ elif db_url.startswith("postgresql://") and not db_url.startswith("postgresql+")
 # If sqlite, set check_same_thread=False
 connect_args = {"check_same_thread": False} if db_url.startswith("sqlite") else {}
 
+engine_kwargs = {
+    "connect_args": connect_args,
+    "pool_pre_ping": True,
+}
+if not db_url.startswith("sqlite"):
+    engine_kwargs.update({
+        "pool_size": 5,
+        "max_overflow": 10,
+        "pool_recycle": 300,
+        "pool_timeout": 20,
+    })
+
 engine = create_engine(
     db_url,
-    connect_args=connect_args,
-    pool_pre_ping=True,
+    **engine_kwargs,
 )
 
 if db_url.startswith("sqlite"):

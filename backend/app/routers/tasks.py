@@ -58,6 +58,7 @@ def create_task(
     db: Session = Depends(get_db),
 ):
     target_role = task_in.role or current_user.role
+    proj = None
     if task_in.project_id:
         proj = require_owned_project(db, task_in.project_id, current_user.id, role=target_role)
         if proj and not task_in.role and proj.role:
@@ -73,14 +74,13 @@ def create_task(
         estimated_minutes=task_in.estimated_minutes or 60,
     )
     db.add(task)
+    if task.project_id:
+        recalculate_project_progress(db, task.project_id, current_user.id)
     db.commit()
     db.refresh(task)
 
-    if task.project_id:
-        recalculate_project_progress(db, task.project_id, current_user.id)
-
     out = schemas.TaskOut.from_orm(task)
-    out.project_title = task.project.title if task.project else None
+    out.project_title = proj.title if proj else (task.project.title if task.project else None)
     return out
 
 @router.patch("/{task_id}", response_model=schemas.TaskOut)
