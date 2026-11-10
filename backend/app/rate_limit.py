@@ -30,7 +30,8 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
         if request.method == "OPTIONS" or path == "/health" or not path.startswith("/api/"):
             return await call_next(request)
 
-        client_ip = request.client.host if request.client else "unknown"
+        forwarded = request.headers.get("x-forwarded-for")
+        client_ip = forwarded.split(",")[0].strip() if forwarded else (request.client.host if request.client else "unknown")
         bucket, limit, window_seconds = self._get_bucket(path)
         key = (client_ip, bucket)
         now = time.monotonic()
@@ -64,7 +65,7 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
 
     @staticmethod
     def _get_bucket(path: str) -> tuple[str, int, int]:
-        if path in {"/api/v1/auth/login", "/api/v1/auth/register"}:
+        if path in {"/api/v1/auth/login", "/api/v1/auth/register", "/api/v1/auth/forgot-password", "/api/v1/auth/reset-password"}:
             return "auth", 10, 60
         if path == "/api/v1/ai/propose":
             return "ai", 5, 60
