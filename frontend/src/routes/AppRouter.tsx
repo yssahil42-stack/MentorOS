@@ -11,6 +11,8 @@ import ServerErrorPage from '../pages/ServerErrorPage';
 const LandingPage = lazy(() => import('../pages/LandingPage'));
 const LoginPage = lazy(() => import('../pages/auth/LoginPage'));
 const RegisterPage = lazy(() => import('../pages/auth/RegisterPage'));
+const ForgotPasswordPage = lazy(() => import('../pages/auth/ForgotPasswordPage'));
+const ResetPasswordPage = lazy(() => import('../pages/auth/ResetPasswordPage'));
 const OnboardingPage = lazy(() => import('../pages/onboarding/OnboardingPage'));
 const UnauthorizedPage = lazy(() => import('../pages/UnauthorizedPage'));
 const NotFoundPage = lazy(() => import('../pages/NotFoundPage'));
@@ -116,6 +118,8 @@ export function AppRouter() {
               )
             }
           />
+          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+          <Route path="/reset-password" element={<ResetPasswordPage />} />
           <Route
             path="/dashboard"
             element={

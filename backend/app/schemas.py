@@ -85,6 +85,31 @@ class SetPasswordRequest(InputModel):
     new_password: str = Field(min_length=8, max_length=72, description="New account password")
 
 
+class ForgotPasswordRequest(InputModel):
+    email: EmailStr
+
+    @field_validator("email", mode="before")
+    @classmethod
+    def normalize_email(cls, email: str) -> str:
+        return email.strip().lower() if isinstance(email, str) else email
+
+
+class ResetPasswordRequest(InputModel):
+    token: str = Field(min_length=10, max_length=1000)
+    new_password: str = Field(min_length=8, max_length=72, description="New account password")
+
+    @field_validator("new_password")
+    @classmethod
+    def password_fits_bcrypt(cls, password: str) -> str:
+        if len(password.encode("utf-8")) > 72:
+            raise ValueError("Password must be at most 72 UTF-8 bytes.")
+        return password
+
+
+class VerifyResetTokenRequest(InputModel):
+    token: str = Field(min_length=10, max_length=1000)
+
+
 class UserOut(BaseModel):
     id: int
     email: str

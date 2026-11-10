@@ -250,3 +250,124 @@ def set_password(
     return {"message": "Password updated successfully. You can now sign in using your email and password."}
 
 
+RESET_TOKEN_EXPIRE_MINUTES = 15
+
+
+@router.post("/forgot-password")
+def forgot_password(
+    payload: schemas.ForgotPasswordRequest,
+    db: Session = Depends(get_db),
+):
+    clean_email = payload.email.strip().lower()
+    user = db.query(models.User).filter(models.User.email == clean_email).first()
+    if not user:
+        user = db.query(models.User).filter(models.User.email.ilike(clean_email)).first()
+
+    response = {
+        "message": "If an account exists with this email, a password reset link has been generated.",
+        "email": clean_email,
+    }
+
+    if user:
+        now = datetime.datetime.utcnow()
+        expire = now + datetime.timedelta(minutes=RESET_TOKEN_EXPIRE_MINUTES)
+        token_payload = {
+            "sub": str(user.id),
+            "email": user.email,
+            "purpose": "password_reset",
+            "iat": now,
+            "exp": expire,
+        }
+        reset_token = jwt.encode(token_payload, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
+        response["reset_token"] = reset_token
+        response["reset_url"] = f"/reset-password?token={reset_token}"
+
+    return response
+
+
+@router.post("/verify-reset-token")
+def verify_reset_token(
+    payload: schemas.VerifyResetTokenRequest,
+    db: Session = Depends(get_db),
+):
+    try:
+        decoded = jwt.decode(payload.token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
+    except jwt.ExpiredSignatureError:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Password reset link has expired. Please request a new one.",
+        )
+    except Exception:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid or corrupt password reset link.",
+        )
+
+    if decoded.get("purpose") != "password_reset":
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid reset token purpose.",
+        )
+
+    user_id = decoded.get("sub")
+    user = db.query(models.User).filter(models.User.id == int(user_id)).first()
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User account not found.",
+        )
+
+    return {
+        "valid": True,
+        "email": user.email,
+        "full_name": user.full_name,
+    }
+
+
+@router.post("/reset-password")
+def reset_password(
+    payload: schemas.ResetPasswordRequest,
+    db: Session = Depends(get_db),
+):
+    try:
+        decoded = jwt.decode(payload.token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
+    except jwt.ExpiredSignatureError:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Password reset link has expired. Please request a new one.",
+        )
+    except Exception:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid or corrupt password reset link.",
+        )
+
+    if decoded.get("purpose") != "password_reset":
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid reset token purpose.",
+        )
+
+    user_id = decoded.get("sub")
+    user = db.query(models.User).filter(models.User.id == int(user_id)).first()
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User account not found.",
+        )
+
+    user.hashed_password = get_password_hash(payload.new_password)
+    profile = dict(user.profile_data or {})
+    profile["has_password"] = True
+    user.profile_data = profile
+
+    db.commit()
+    db.refresh(user)
+
+    return {
+        "message": "Password has been successfully reset. You can now sign in with your new password.",
+        "email": user.email,
+    }
+
+
+
