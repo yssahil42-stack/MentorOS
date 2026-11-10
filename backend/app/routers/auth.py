@@ -68,7 +68,19 @@ def login(login_in: schemas.UserLogin, db: Session = Depends(get_db)):
     if not user:
         user = db.query(models.User).filter(models.User.email.ilike(clean_email)).first()
 
-    if not user or not verify_password(login_in.password, user.hashed_password):
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect email or password.",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+    if not verify_password(login_in.password, user.hashed_password):
+        if (user.profile_data or {}).get("auth_provider") == "google":
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="This account was registered using Google Sign-In. Please sign in using the 'Continue with Google' button.",
+            )
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Incorrect email or password.",
