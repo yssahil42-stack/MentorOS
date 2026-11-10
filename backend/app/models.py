@@ -227,7 +227,7 @@ class Invoice(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
-    project_id = Column(Integer, ForeignKey("projects.id"), nullable=False)
+    project_id = Column(Integer, ForeignKey("projects.id"), nullable=True)
     role = Column(String(50), nullable=False, default="freelancer")
     invoice_number = Column(String(100), nullable=False)
     status = Column(String(50), default="draft")  # draft, sent, paid, overdue, cancelled

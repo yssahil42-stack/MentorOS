@@ -303,8 +303,8 @@ def get_public_client_portal(
     if not project:
         raise HTTPException(status_code=404, detail="Project not found")
 
-    if token and not (token == f"public-{project_id}" or token.startswith("public-")):
-        raise HTTPException(status_code=403, detail="Invalid client portal share token")
+    if not token or not (token == f"public-{project_id}" or token.startswith("public-")):
+        raise HTTPException(status_code=403, detail="Valid client portal share token is required")
 
     milestones = [
         schemas.MilestoneOut.from_orm(m)

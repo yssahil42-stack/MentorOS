@@ -187,7 +187,8 @@ def create_invoice(
     current_user: models.User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
-    require_owned_project(db, invoice_in.project_id, current_user.id)
+    if invoice_in.project_id:
+        require_owned_project(db, invoice_in.project_id, current_user.id)
 
     issue_date = invoice_in.issue_date or datetime.utcnow().strftime("%Y-%m-%d")
     terms = invoice_in.payment_terms or "net_30"

@@ -11,11 +11,17 @@ import {
   Download,
   Trash2,
   Database,
+  Lock,
+  Eye,
+  EyeOff,
+  ShieldCheck,
 } from 'lucide-react';
 import { Card } from '../ui/Card';
 import { Button } from '../ui/Button';
 import { useTheme } from '../../contexts/ThemeContext';
 import { useWorkspace } from '../../contexts/WorkspaceContext';
+import { useAuth } from '../../contexts/AuthContext';
+import { api } from '../../services/api';
 import { cn } from '../../utils/cn';
 
 export interface AppSettingsData {
@@ -41,6 +47,49 @@ export function AppSettingsSection({
 }) {
   const { theme, setTheme } = useTheme();
   const { showToast } = useWorkspace();
+  const { user } = useAuth();
+
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [showNewPass, setShowNewPass] = useState(false);
+  const [showConfirmPass, setShowConfirmPass] = useState(false);
+  const [isUpdatingPassword, setIsUpdatingPassword] = useState(false);
+  const [passwordSuccess, setPasswordSuccess] = useState('');
+  const [passwordError, setPasswordError] = useState('');
+
+  const handleSetPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setPasswordError('');
+    setPasswordSuccess('');
+
+    if (newPassword.length < 8) {
+      setPasswordError('Password must be at least 8 characters long.');
+      return;
+    }
+    if (newPassword.length > 72) {
+      setPasswordError('Password must be at most 72 characters.');
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      setPasswordError('Passwords do not match.');
+      return;
+    }
+
+    setIsUpdatingPassword(true);
+    try {
+      await api.post('/auth/set-password', { new_password: newPassword });
+      setPasswordSuccess('Password saved! You can now log in using your email and password.');
+      showToast('Account password updated successfully!', 'success');
+      setNewPassword('');
+      setConfirmPassword('');
+    } catch (err: any) {
+      const msg = err?.response?.data?.detail || err?.message || 'Failed to update password.';
+      setPasswordError(msg);
+      showToast(msg, 'error');
+    } finally {
+      setIsUpdatingPassword(false);
+    }
+  };
 
   const [settings, setSettings] = useState<AppSettingsData>(() => {
     try {
@@ -296,6 +345,111 @@ export function AppSettingsSection({
             Clear Cache
           </Button>
         </div>
+      </Card>
+
+      {/* ─── Account & Password Security ─────────────────────────── */}
+      <Card className="p-5 space-y-4">
+        <div className="flex items-center gap-2.5 pb-2 border-b border-border-base">
+          <Lock className="w-5 h-5 text-accent-primary" />
+          <div>
+            <h3 className="text-sm font-bold text-text-primary">Account &amp; Password Security</h3>
+            <p className="text-xs text-text-muted">
+              Set or change a manual password to enable Email &amp; Password login
+            </p>
+          </div>
+        </div>
+
+        <div className="bg-bg-subtle/50 p-3 rounded-lg border border-border-base text-xs space-y-1">
+          <div className="flex items-center justify-between">
+            <span className="text-text-muted">Account Email:</span>
+            <span className="font-semibold text-text-primary">{user?.email || 'Current Account'}</span>
+          </div>
+          <div className="flex items-center justify-between">
+            <span className="text-text-muted">Google Sign-In:</span>
+            <span className="text-emerald-500 font-medium flex items-center gap-1">
+              <ShieldCheck className="w-3.5 h-3.5" /> Active &amp; Linked
+            </span>
+          </div>
+          <p className="text-3xs text-text-muted pt-1 border-t border-border-base">
+            Setting a password allows you to sign in manually or via Google anytime.
+          </p>
+        </div>
+
+        <form onSubmit={handleSetPassword} className="space-y-3 pt-1">
+          {passwordSuccess && (
+            <div className="p-2.5 rounded-md bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 text-xs flex items-center gap-2">
+              <ShieldCheck className="w-4 h-4 shrink-0" />
+              <span>{passwordSuccess}</span>
+            </div>
+          )}
+
+          {passwordError && (
+            <div className="p-2.5 rounded-md bg-rose-500/10 border border-rose-500/20 text-rose-500 text-xs">
+              {passwordError}
+            </div>
+          )}
+
+          <div className="space-y-1.5">
+            <label className="text-xs font-semibold text-text-primary">
+              New Password <span className="text-text-muted text-3xs">(min. 8 characters)</span>
+            </label>
+            <div className="relative">
+              <input
+                type={showNewPass ? 'text' : 'password'}
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                placeholder="Enter new password"
+                className="w-full text-xs px-3 py-2 pr-9 rounded-md bg-bg-surface border border-border-base focus:outline-none focus:border-accent-primary text-text-primary placeholder:text-text-muted"
+                required
+              />
+              <button
+                type="button"
+                onClick={() => setShowNewPass(!showNewPass)}
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-text-muted hover:text-text-primary"
+                aria-label={showNewPass ? 'Hide password' : 'Show password'}
+              >
+                {showNewPass ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+              </button>
+            </div>
+          </div>
+
+          <div className="space-y-1.5">
+            <label className="text-xs font-semibold text-text-primary">
+              Confirm New Password
+            </label>
+            <div className="relative">
+              <input
+                type={showConfirmPass ? 'text' : 'password'}
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                placeholder="Confirm new password"
+                className="w-full text-xs px-3 py-2 pr-9 rounded-md bg-bg-surface border border-border-base focus:outline-none focus:border-accent-primary text-text-primary placeholder:text-text-muted"
+                required
+              />
+              <button
+                type="button"
+                onClick={() => setShowConfirmPass(!showConfirmPass)}
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-text-muted hover:text-text-primary"
+                aria-label={showConfirmPass ? 'Hide password' : 'Show password'}
+              >
+                {showConfirmPass ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+              </button>
+            </div>
+          </div>
+
+          <div className="flex justify-end pt-1">
+            <Button
+              type="submit"
+              variant="primary"
+              size="sm"
+              disabled={isUpdatingPassword || !newPassword || !confirmPassword}
+              loading={isUpdatingPassword}
+              leftIcon={<Lock className="w-3.5 h-3.5" />}
+            >
+              {isUpdatingPassword ? 'Saving Password...' : 'Save Password'}
+            </Button>
+          </div>
+        </form>
       </Card>
     </div>
   );

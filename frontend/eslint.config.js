@@ -1,6 +1,3 @@
-// For more info, see https://github.com/storybookjs/eslint-plugin-storybook#configuration-flat-config-format
-import storybook from "eslint-plugin-storybook";
-
 import js from '@eslint/js';
 import tsPlugin from '@typescript-eslint/eslint-plugin';
 import tsParser from '@typescript-eslint/parser';
@@ -77,4 +74,4 @@ export default [{
     'no-undef': 'off',
     'no-console': ['warn', { allow: ['warn', 'error'] }],
   },
-}, ...storybook.configs["flat/recommended"]];
+}];

@@ -81,6 +81,10 @@ class GoogleAuthRequest(InputModel):
     role: Optional[WorkspaceRole] = "student"
 
 
+class SetPasswordRequest(InputModel):
+    new_password: str = Field(min_length=8, max_length=72, description="New account password")
+
+
 class UserOut(BaseModel):
     id: int
     email: str
@@ -375,7 +379,7 @@ class InvoiceLineItemOut(BaseModel):
 
 
 class InvoiceCreate(InputModel):
-    project_id: int = Field(ge=1)
+    project_id: Optional[int] = Field(default=None, ge=1)
     invoice_number: Optional[str] = Field(default=None, max_length=100)
     issue_date: Optional[str] = Field(default=None, max_length=50)
     due_date: Optional[str] = Field(default=None, max_length=50)
@@ -407,7 +411,7 @@ class InvoiceOut(BaseModel):
     id: int
     user_id: int
     role: str
-    project_id: int
+    project_id: Optional[int] = None
     invoice_number: str
     status: str
     issue_date: str

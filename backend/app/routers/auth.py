@@ -234,3 +234,19 @@ def logout(
 
     return {"message": "Logged out successfully"}
 
+
+@router.post("/set-password")
+def set_password(
+    payload: schemas.SetPasswordRequest,
+    current_user: models.User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    current_user.hashed_password = get_password_hash(payload.new_password)
+    profile = dict(current_user.profile_data or {})
+    profile["has_password"] = True
+    current_user.profile_data = profile
+    db.commit()
+    db.refresh(current_user)
+    return {"message": "Password updated successfully. You can now sign in using your email and password."}
+
+
