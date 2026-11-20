@@ -115,14 +115,16 @@ export function createClient(): AxiosInstance {
             ? 'The request timed out. Please try again.'
             : 'Unable to reach the server. Check your connection and try again.'
           : status === 401
-            ? typeof detail === 'string'
-              ? detail
-              : endpoint.endsWith('/auth/login')
-                ? 'Invalid email or password.'
-                : endpoint.endsWith('/auth/register')
-                  ? 'Unable to create an account with the supplied details.'
-                  : endpoint.endsWith('/auth/google')
-                    ? 'Google authentication failed or expired.'
+            ? endpoint.endsWith('/auth/login')
+              ? 'Invalid email or password.'
+              : endpoint.endsWith('/auth/register')
+                ? 'Unable to create an account with the supplied details.'
+                : endpoint.endsWith('/auth/google')
+                  ? typeof detail === 'string'
+                    ? detail
+                    : 'Google authentication failed or expired.'
+                  : typeof detail === 'string'
+                    ? detail
                     : 'Your session has expired. Please sign in again.'
             : status === 403
               ? 'You do not have permission to perform this action.'
