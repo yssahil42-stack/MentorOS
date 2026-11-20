@@ -131,7 +131,7 @@ export const DashboardMetrics: React.FC<DashboardMetricsProps> = ({
               className="font-semibold text-xs h-9.5 px-4 !bg-solar-500 hover:!bg-solar-600 text-white shadow-sm hover:shadow transition-all"
               icon={<Sparkles className="w-3.5 h-3.5" />}
             >
-              Plan with AI Assistant
+              Plan with Skillpath AI
             </Button>
           </div>
         </div>

@@ -164,7 +164,7 @@ export const FreelancerMetrics: React.FC<FreelancerMetricsProps> = ({
               className="font-semibold text-xs h-9.5 px-4 !bg-amber-500 hover:!bg-amber-600 text-stone-950 shadow-sm hover:shadow transition-all"
               leftIcon={<Sparkles className="w-3.5 h-3.5" />}
             >
-              Plan with AI Assistant
+              Plan with Skillpath AI
             </Button>
           </div>
         </div>

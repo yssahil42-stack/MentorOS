@@ -27,7 +27,7 @@ describe('FreelancerMetrics Component', () => {
     expect(screen.getByText('Welcome back, Elena')).toBeInTheDocument();
     expect(screen.getByText('Rate Calculator')).toBeInTheDocument();
     expect(screen.getByText('Add Deliverable')).toBeInTheDocument();
-    expect(screen.getByText('Plan with AI Assistant')).toBeInTheDocument();
+    expect(screen.getByText('Plan with Skillpath AI')).toBeInTheDocument();
   });
 
   it('renders all 4 systematic metric cards with accurate values and progress', () => {

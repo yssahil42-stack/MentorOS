@@ -144,7 +144,7 @@ export default function JobSeekerDashboard() {
                 className="font-semibold text-xs h-9.5 px-4 !bg-emerald-600 hover:!bg-emerald-700 text-white shadow-sm hover:shadow transition-all"
                 icon={<Sparkles className="w-3.5 h-3.5" />}
               >
-                Plan with AI Assistant
+                Plan with Skillpath AI
               </Button>
             </div>
           </div>
