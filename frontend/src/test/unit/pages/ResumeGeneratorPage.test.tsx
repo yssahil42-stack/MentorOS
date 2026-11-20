@@ -153,7 +153,9 @@ describe('ResumeGeneratorPage', () => {
     expect(screen.getByText(/10th Standard \/ Secondary School/i)).toBeInTheDocument();
 
     // Verify board and percentage inputs are present
-    const boardInputs = screen.getAllByPlaceholderText(/e.g. CBSE, ISC, State Board|e.g. CBSE, ICSE, State Board/i);
+    const boardInputs = screen.getAllByPlaceholderText(
+      /e.g. CBSE, ISC, State Board|e.g. CBSE, ICSE, State Board/i
+    );
     expect(boardInputs.length).toBeGreaterThanOrEqual(2);
 
     // Update 12th Board

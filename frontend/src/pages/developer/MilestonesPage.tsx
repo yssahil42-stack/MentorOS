@@ -220,7 +220,11 @@ export default function MilestonesPage() {
                       : isCompleted
                         ? 100
                         : 0;
-                  const { expectedMinutes, actualMinutes } = getMilestoneTimeTotals(m, tasks, milestones);
+                  const { expectedMinutes, actualMinutes } = getMilestoneTimeTotals(
+                    m,
+                    tasks,
+                    milestones
+                  );
 
                   return (
                     <Card className="p-4 border border-border-base hover:border-amber-500/40 transition-all flex flex-col gap-3">
@@ -403,9 +407,7 @@ export default function MilestonesPage() {
 
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1">
-              <label className="text-xs font-semibold text-text-secondary block">
-                Target Date
-              </label>
+              <label className="text-xs font-semibold text-text-secondary block">Target Date</label>
               <input
                 type="date"
                 value={targetDate}

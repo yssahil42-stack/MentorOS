@@ -55,9 +55,7 @@ export const StudentProgressSection: React.FC<StudentProgressSectionProps> = ({
           );
           const pCompleted = pTasks.filter((t) => t.status === 'completed').length;
           const pPct =
-            pTasks.length > 0
-              ? Math.round((pCompleted / pTasks.length) * 100)
-              : p.progress || 88;
+            pTasks.length > 0 ? Math.round((pCompleted / pTasks.length) * 100) : p.progress || 88;
           const grade =
             pPct >= 93 ? 'A' : pPct >= 90 ? 'A-' : pPct >= 85 ? 'B+' : pPct >= 80 ? 'B' : 'B-';
           const defaultCodes = ['CS-480', 'CS-401', 'MATH-320', 'PHYS-210', 'ENG-301'];
@@ -137,7 +135,6 @@ export const StudentProgressSection: React.FC<StudentProgressSectionProps> = ({
             Real-time GPA projections, degree credit standing, and weekly study pacing metrics
           </p>
         </div>
-
       </div>
 
       {/* 4 Systematic Metric Cards */}
@@ -162,7 +159,9 @@ export const StudentProgressSection: React.FC<StudentProgressSectionProps> = ({
             <GraduationCap className="w-4 h-4 text-amber-400" />
           </div>
           <div className="mt-2 flex items-baseline gap-2">
-            <span className="text-2xl sm:text-3xl font-black text-text-primary">{earnedCredits}</span>
+            <span className="text-2xl sm:text-3xl font-black text-text-primary">
+              {earnedCredits}
+            </span>
             <span className="text-xs text-text-muted">/ {totalCredits} credits</span>
           </div>
           <div className="mt-2 text-2xs text-amber-400 font-semibold">
@@ -176,7 +175,9 @@ export const StudentProgressSection: React.FC<StudentProgressSectionProps> = ({
             <Clock className="w-4 h-4 text-emerald-400" />
           </div>
           <div className="mt-2 flex items-baseline gap-2">
-            <span className="text-2xl sm:text-3xl font-black text-text-primary">{studyHoursWeekly}h</span>
+            <span className="text-2xl sm:text-3xl font-black text-text-primary">
+              {studyHoursWeekly}h
+            </span>
             <span className="text-xs text-text-muted">logged</span>
           </div>
           <div className="mt-2 text-2xs text-emerald-400 font-semibold flex items-center gap-1">
@@ -190,7 +191,9 @@ export const StudentProgressSection: React.FC<StudentProgressSectionProps> = ({
             <CheckCircle2 className="w-4 h-4 text-orange-500 dark:text-orange-400" />
           </div>
           <div className="mt-2 flex items-baseline gap-2">
-            <span className="text-2xl sm:text-3xl font-black text-text-primary">{taskCompletionRate}%</span>
+            <span className="text-2xl sm:text-3xl font-black text-text-primary">
+              {taskCompletionRate}%
+            </span>
             <span className="text-xs text-text-muted">on-time</span>
           </div>
           <div className="mt-2 text-2xs text-orange-500 dark:text-orange-400 font-semibold">

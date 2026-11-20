@@ -107,7 +107,12 @@ export const studentConfig: RoleConfig = {
       icon: 'Sparkles',
       promptStarter: 'Create a realistic study and project plan from my current priorities.',
     },
-    { id: 'add-deadline', label: 'Add Deadline', icon: 'Calendar', href: '/app/student/dashboard#my-schedule' },
+    {
+      id: 'add-deadline',
+      label: 'Add Deadline',
+      icon: 'Calendar',
+      href: '/app/student/dashboard#my-schedule',
+    },
   ],
 
   aiTemplates: [

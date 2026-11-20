@@ -146,7 +146,9 @@ export function formatCurrencyAmount(
       notation: options.compact ? 'compact' : 'standard',
     }).format(amount);
   } catch {
-    const formattedNum = hideDecimals ? Math.round(amount).toLocaleString(config.locale) : amount.toFixed(2);
+    const formattedNum = hideDecimals
+      ? Math.round(amount).toLocaleString(config.locale)
+      : amount.toFixed(2);
     return `${config.symbol}${formattedNum}`;
   }
 }

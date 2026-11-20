@@ -111,7 +111,9 @@ export const ClientProjectAccordion: React.FC<ClientProjectAccordionProps> = ({
                     </span>
                   </div>
                   {proj.description && (
-                    <p className="text-3xs text-text-muted truncate max-w-sm mt-0.5">{proj.description}</p>
+                    <p className="text-3xs text-text-muted truncate max-w-sm mt-0.5">
+                      {proj.description}
+                    </p>
                   )}
                 </div>
               </div>

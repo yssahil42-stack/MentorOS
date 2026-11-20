@@ -99,175 +99,183 @@ export function AppRouter() {
   return (
     <Suspense fallback={<PageLoader />}>
       <Routes>
-          {/* ── Public routes ── */}
-          <Route path="/" element={<LandingPage />} />
+        {/* ── Public routes ── */}
+        <Route path="/" element={<LandingPage />} />
+        <Route
+          path="/login"
+          element={
+            isAuthenticated ? <Navigate to={`/app/${rolePath}/dashboard`} replace /> : <LoginPage />
+          }
+        />
+        <Route
+          path="/register"
+          element={
+            isAuthenticated ? (
+              <Navigate to={`/app/${rolePath}/dashboard`} replace />
+            ) : (
+              <RegisterPage />
+            )
+          }
+        />
+        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+        <Route path="/reset-password" element={<ResetPasswordPage />} />
+        <Route
+          path="/dashboard"
+          element={
+            isAuthenticated ? (
+              <Navigate to={`/app/${rolePath}/dashboard`} replace />
+            ) : (
+              <Navigate to="/login" replace />
+            )
+          }
+        />
+        <Route
+          path="/onboarding"
+          element={
+            <RoleRouteGuard requireAuth requireOnboarding={false}>
+              <OnboardingPage />
+            </RoleRouteGuard>
+          }
+        />
+        <Route path="/app/unauthorized" element={<UnauthorizedPage />} />
+
+        {/* Quick Capture routes (public for share target) */}
+        <Route path="/capture" element={<CapturePage />} />
+        <Route path="/inbox" element={<InboxPage />} />
+
+        {/* Public Client Portal (no auth required) */}
+        <Route path="/client/:projectId" element={<ClientPortalPage />} />
+
+        {/* Public Sharing routes */}
+        <Route path="/templates/:id" element={<PublicTemplatePage />} />
+        <Route path="/portfolio/:username" element={<DeveloperPortfolioPage />} />
+        <Route path="/case-study/:id" element={<PublicCaseStudyPage />} />
+
+        {/* ── Protected workspace ── */}
+        <Route
+          path="/app"
+          element={
+            <RoleRouteGuard requireAuth>
+              <AppShell />
+            </RoleRouteGuard>
+          }
+        >
+          {/* Student */}
+          <Route path="student" element={<RoleRouteGuard />}>
+            <Route path="dashboard" element={<StudentDashboard />} />
+            <Route path="study-plan" element={<StudyPlanPage />} />
+            <Route path="ai-tutor" element={<StudyPlanPage />} />
+            <Route path="assignments" element={<Navigate to="/app/student/projects" replace />} />
+            <Route path="projects" element={<AcademicProjects />} />
+            <Route path="courses" element={<AcademicProjects />} />
+            <Route path="calendar" element={<StudentCalendar />} />
+            <Route path="tasks" element={<Navigate to="/app/student/projects" replace />} />
+            <Route path="notes" element={<StudentNotes />} />
+            <Route path="progress" element={<Navigate to="/app/student/dashboard" replace />} />
+            <Route path="settings" element={<StudentSettings />} />
+          </Route>
+
+          {/* Freelancer */}
+          <Route path="freelancer" element={<RoleRouteGuard />}>
+            <Route path="dashboard" element={<FreelancerDashboard />} />
+            <Route
+              path="work-plans"
+              element={<Navigate to="/app/freelancer/dashboard" replace />}
+            />
+            <Route path="invoices" element={<Navigate to="/app/freelancer/dashboard" replace />} />
+            <Route
+              path="deliverables"
+              element={<Navigate to="/app/freelancer/projects" replace />}
+            />
+            <Route
+              path="time-tracking"
+              element={<Navigate to="/app/freelancer/projects" replace />}
+            />
+            <Route path="projects" element={<FreelancerProjects />} />
+            <Route path="clients" element={<FreelancerProjects />} />
+            <Route path="calendar" element={<FreelancerCalendar />} />
+            <Route path="tasks" element={<Navigate to="/app/freelancer/projects" replace />} />
+            <Route path="notes" element={<FreelancerNotes />} />
+            <Route path="progress" element={<FreelancerProgress />} />
+            <Route path="settings" element={<FreelancerSettings />} />
+            <Route path="invoice-generator" element={<InvoiceGeneratorPage />} />
+            <Route path="client-portal/:projectId" element={<ClientPortalPage />} />
+            <Route path="rate-calculator" element={<RateCalculatorPage />} />
+          </Route>
+
+          {/* Developer */}
+          <Route path="developer" element={<RoleRouteGuard />}>
+            <Route path="dashboard" element={<DeveloperDashboard />} />
+            <Route path="build-plan" element={<BuildPlanPage />} />
+            <Route path="projects" element={<DevProjectsPage />} />
+            <Route path="milestones" element={<MilestonesPage />} />
+            <Route path="tasks" element={<Navigate to="/app/developer/projects" replace />} />
+            <Route path="calendar" element={<DevCalendarPage />} />
+            <Route path="notes" element={<DevNotesPage />} />
+            <Route path="api-keys" element={<DevApiKeysPage />} />
+            <Route path="progress" element={<DevProgressPage />} />
+            <Route path="settings" element={<DevSettingsPage />} />
+            <Route path="gitlab-sync" element={<GitHubSyncPage />} />
+            <Route
+              path="github-sync"
+              element={<Navigate to="/app/developer/gitlab-sync" replace />}
+            />
+            <Route path="deploy-preview" element={<DeployPreviewPage />} />
+            <Route path="portfolio-generator" element={<PortfolioGeneratorPage />} />
+          </Route>
+
+          {/* Job Seeker */}
+          <Route path="job-seeker" element={<RoleRouteGuard />}>
+            <Route path="dashboard" element={<JobSeekerDashboard />} />
+            <Route path="search-plan" element={<SearchPlanPage />} />
+            <Route path="applications" element={<ApplicationTrackerPage />} />
+            <Route path="application-tracker" element={<ApplicationTrackerPage />} />
+            <Route path="portfolio" element={<PortfolioTasksPage />} />
+            <Route path="profile-builder" element={<ResumeGeneratorPage />} />
+            <Route path="interview-prep" element={<InterviewPrepPage />} />
+            <Route path="calendar" element={<JobCalendarPage />} />
+            <Route path="notes" element={<JobNotesPage />} />
+            <Route path="progress" element={<JobProgressPage />} />
+            <Route path="settings" element={<JobSettingsPage />} />
+            <Route path="resume-generator" element={<ResumeGeneratorPage />} />
+          </Route>
+
+          {/* Quick Capture (accessible within app) */}
+          <Route path="capture" element={<CapturePage />} />
+          <Route path="inbox" element={<InboxPage />} />
+
+          {/* AI Conversational Assistant (Ask) */}
+          <Route path="ask" element={<AskChatbotPage />} />
           <Route
-            path="/login"
+            path="settings"
             element={
-              isAuthenticated ? (
-                <Navigate to={`/app/${rolePath}/dashboard`} replace />
-              ) : (
-                <LoginPage />
-              )
-            }
-          />
-          <Route
-            path="/register"
-            element={
-              isAuthenticated ? (
-                <Navigate to={`/app/${rolePath}/dashboard`} replace />
-              ) : (
-                <RegisterPage />
-              )
-            }
-          />
-          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-          <Route path="/reset-password" element={<ResetPasswordPage />} />
-          <Route
-            path="/dashboard"
-            element={
-              isAuthenticated ? (
-                <Navigate to={`/app/${rolePath}/dashboard`} replace />
+              user ? (
+                <Navigate to={`/app/${user.role.replace('_', '-')}/settings`} replace />
               ) : (
                 <Navigate to="/login" replace />
               )
             }
           />
+
+          {/* Default /app → redirect to role dashboard */}
           <Route
-            path="/onboarding"
+            index
             element={
-              <RoleRouteGuard requireAuth requireOnboarding={false}>
-                <OnboardingPage />
-              </RoleRouteGuard>
+              user ? (
+                <Navigate to={`/app/${user.role.replace('_', '-')}/dashboard`} replace />
+              ) : (
+                <Navigate to="/login" replace />
+              )
             }
           />
-          <Route path="/app/unauthorized" element={<UnauthorizedPage />} />
+        </Route>
 
-          {/* Quick Capture routes (public for share target) */}
-          <Route path="/capture" element={<CapturePage />} />
-          <Route path="/inbox" element={<InboxPage />} />
+        {/* Explicit Server Error route */}
+        <Route path="/500" element={<ServerErrorPage />} />
 
-          {/* Public Client Portal (no auth required) */}
-          <Route path="/client/:projectId" element={<ClientPortalPage />} />
-
-          {/* Public Sharing routes */}
-          <Route path="/templates/:id" element={<PublicTemplatePage />} />
-          <Route path="/portfolio/:username" element={<DeveloperPortfolioPage />} />
-          <Route path="/case-study/:id" element={<PublicCaseStudyPage />} />
-
-          {/* ── Protected workspace ── */}
-          <Route
-            path="/app"
-            element={
-              <RoleRouteGuard requireAuth>
-                <AppShell />
-              </RoleRouteGuard>
-            }
-          >
-            {/* Student */}
-            <Route path="student" element={<RoleRouteGuard />}>
-              <Route path="dashboard" element={<StudentDashboard />} />
-              <Route path="study-plan" element={<StudyPlanPage />} />
-              <Route path="ai-tutor" element={<StudyPlanPage />} />
-              <Route path="assignments" element={<Navigate to="/app/student/projects" replace />} />
-              <Route path="projects" element={<AcademicProjects />} />
-              <Route path="courses" element={<AcademicProjects />} />
-              <Route path="calendar" element={<StudentCalendar />} />
-              <Route path="tasks" element={<Navigate to="/app/student/projects" replace />} />
-              <Route path="notes" element={<StudentNotes />} />
-              <Route path="progress" element={<Navigate to="/app/student/dashboard" replace />} />
-              <Route path="settings" element={<StudentSettings />} />
-            </Route>
-
-            {/* Freelancer */}
-            <Route path="freelancer" element={<RoleRouteGuard />}>
-              <Route path="dashboard" element={<FreelancerDashboard />} />
-              <Route path="work-plans" element={<Navigate to="/app/freelancer/dashboard" replace />} />
-              <Route path="invoices" element={<Navigate to="/app/freelancer/dashboard" replace />} />
-              <Route path="deliverables" element={<Navigate to="/app/freelancer/projects" replace />} />
-              <Route path="time-tracking" element={<Navigate to="/app/freelancer/projects" replace />} />
-              <Route path="projects" element={<FreelancerProjects />} />
-              <Route path="clients" element={<FreelancerProjects />} />
-              <Route path="calendar" element={<FreelancerCalendar />} />
-              <Route path="tasks" element={<Navigate to="/app/freelancer/projects" replace />} />
-              <Route path="notes" element={<FreelancerNotes />} />
-              <Route path="progress" element={<FreelancerProgress />} />
-              <Route path="settings" element={<FreelancerSettings />} />
-              <Route path="invoice-generator" element={<InvoiceGeneratorPage />} />
-              <Route path="client-portal/:projectId" element={<ClientPortalPage />} />
-              <Route path="rate-calculator" element={<RateCalculatorPage />} />
-            </Route>
-
-            {/* Developer */}
-            <Route path="developer" element={<RoleRouteGuard />}>
-              <Route path="dashboard" element={<DeveloperDashboard />} />
-              <Route path="build-plan" element={<BuildPlanPage />} />
-              <Route path="projects" element={<DevProjectsPage />} />
-              <Route path="milestones" element={<MilestonesPage />} />
-              <Route path="tasks" element={<Navigate to="/app/developer/projects" replace />} />
-              <Route path="calendar" element={<DevCalendarPage />} />
-              <Route path="notes" element={<DevNotesPage />} />
-              <Route path="api-keys" element={<DevApiKeysPage />} />
-              <Route path="progress" element={<DevProgressPage />} />
-              <Route path="settings" element={<DevSettingsPage />} />
-              <Route path="gitlab-sync" element={<GitHubSyncPage />} />
-              <Route path="github-sync" element={<Navigate to="/app/developer/gitlab-sync" replace />} />
-              <Route path="deploy-preview" element={<DeployPreviewPage />} />
-              <Route path="portfolio-generator" element={<PortfolioGeneratorPage />} />
-            </Route>
-
-            {/* Job Seeker */}
-            <Route path="job-seeker" element={<RoleRouteGuard />}>
-              <Route path="dashboard" element={<JobSeekerDashboard />} />
-              <Route path="search-plan" element={<SearchPlanPage />} />
-              <Route path="applications" element={<ApplicationTrackerPage />} />
-              <Route path="application-tracker" element={<ApplicationTrackerPage />} />
-              <Route path="portfolio" element={<PortfolioTasksPage />} />
-              <Route path="profile-builder" element={<ResumeGeneratorPage />} />
-              <Route path="interview-prep" element={<InterviewPrepPage />} />
-              <Route path="calendar" element={<JobCalendarPage />} />
-              <Route path="notes" element={<JobNotesPage />} />
-              <Route path="progress" element={<JobProgressPage />} />
-              <Route path="settings" element={<JobSettingsPage />} />
-              <Route path="resume-generator" element={<ResumeGeneratorPage />} />
-            </Route>
-
-            {/* Quick Capture (accessible within app) */}
-            <Route path="capture" element={<CapturePage />} />
-            <Route path="inbox" element={<InboxPage />} />
-
-            {/* AI Conversational Assistant (Ask) */}
-            <Route path="ask" element={<AskChatbotPage />} />
-            <Route
-              path="settings"
-              element={
-                user ? (
-                  <Navigate to={`/app/${user.role.replace('_', '-')}/settings`} replace />
-                ) : (
-                  <Navigate to="/login" replace />
-                )
-              }
-            />
-
-            {/* Default /app → redirect to role dashboard */}
-            <Route
-              index
-              element={
-                user ? (
-                  <Navigate to={`/app/${user.role.replace('_', '-')}/dashboard`} replace />
-                ) : (
-                  <Navigate to="/login" replace />
-                )
-              }
-            />
-          </Route>
-
-          {/* Explicit Server Error route */}
-          <Route path="/500" element={<ServerErrorPage />} />
-
-          {/* Catch-all: 404 Not Found */}
-          <Route path="*" element={<NotFoundPage />} />
-        </Routes>
-      </Suspense>
+        {/* Catch-all: 404 Not Found */}
+        <Route path="*" element={<NotFoundPage />} />
+      </Routes>
+    </Suspense>
   );
 }

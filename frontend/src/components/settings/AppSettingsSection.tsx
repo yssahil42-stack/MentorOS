@@ -362,7 +362,9 @@ export function AppSettingsSection({
         <div className="bg-bg-subtle/50 p-3 rounded-lg border border-border-base text-xs space-y-1">
           <div className="flex items-center justify-between">
             <span className="text-text-muted">Account Email:</span>
-            <span className="font-semibold text-text-primary">{user?.email || 'Current Account'}</span>
+            <span className="font-semibold text-text-primary">
+              {user?.email || 'Current Account'}
+            </span>
           </div>
           <div className="flex items-center justify-between">
             <span className="text-text-muted">Google Sign-In:</span>
@@ -414,9 +416,7 @@ export function AppSettingsSection({
           </div>
 
           <div className="space-y-1.5">
-            <label className="text-xs font-semibold text-text-primary">
-              Confirm New Password
-            </label>
+            <label className="text-xs font-semibold text-text-primary">Confirm New Password</label>
             <div className="relative">
               <input
                 type={showConfirmPass ? 'text' : 'password'}
@@ -432,7 +432,11 @@ export function AppSettingsSection({
                 className="absolute right-2.5 top-1/2 -translate-y-1/2 text-text-muted hover:text-text-primary"
                 aria-label={showConfirmPass ? 'Hide password' : 'Show password'}
               >
-                {showConfirmPass ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                {showConfirmPass ? (
+                  <EyeOff className="w-3.5 h-3.5" />
+                ) : (
+                  <Eye className="w-3.5 h-3.5" />
+                )}
               </button>
             </div>
           </div>

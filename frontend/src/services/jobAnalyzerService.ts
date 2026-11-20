@@ -19,23 +19,43 @@ export const POPULAR_ROLE_PRESETS: RolePreset[] = [
     role: 'Data Analyst',
     label: 'Data Analyst',
     category: 'Analytics & Data',
-    description: 'Transform raw data into business intelligence, KPI dashboards, and statistical insights.',
-    suggestedSkills: ['SQL', 'Python', 'Excel', 'Tableau', 'Power BI', 'Pandas', 'Statistics', 'A/B Testing'],
+    description:
+      'Transform raw data into business intelligence, KPI dashboards, and statistical insights.',
+    suggestedSkills: [
+      'SQL',
+      'Python',
+      'Excel',
+      'Tableau',
+      'Power BI',
+      'Pandas',
+      'Statistics',
+      'A/B Testing',
+    ],
   },
   {
     id: 'frontend-dev',
     role: 'Frontend Developer',
     label: 'Frontend Developer',
     category: 'Engineering',
-    description: 'Craft responsive, high-performance web applications and interactive client interfaces.',
-    suggestedSkills: ['React', 'TypeScript', 'JavaScript', 'Tailwind CSS', 'Next.js', 'REST APIs', 'Git'],
+    description:
+      'Craft responsive, high-performance web applications and interactive client interfaces.',
+    suggestedSkills: [
+      'React',
+      'TypeScript',
+      'JavaScript',
+      'Tailwind CSS',
+      'Next.js',
+      'REST APIs',
+      'Git',
+    ],
   },
   {
     id: 'fullstack-eng',
     role: 'Full-Stack Engineer',
     label: 'Full-Stack Engineer',
     category: 'Engineering',
-    description: 'Build complete web architectures spanning responsive frontends, backend APIs, and databases.',
+    description:
+      'Build complete web architectures spanning responsive frontends, backend APIs, and databases.',
     suggestedSkills: ['TypeScript', 'React', 'Node.js', 'PostgreSQL', 'Docker', 'REST APIs', 'Git'],
   },
   {
@@ -43,31 +63,76 @@ export const POPULAR_ROLE_PRESETS: RolePreset[] = [
     role: 'Machine Learning Engineer',
     label: 'ML / AI Engineer',
     category: 'Artificial Intelligence',
-    description: 'Train, evaluate, and deploy predictive models, neural networks, and LLM pipelines.',
-    suggestedSkills: ['Python', 'PyTorch', 'Scikit-Learn', 'Pandas', 'FastAPI', 'Docker', 'SQL', 'NLP'],
+    description:
+      'Train, evaluate, and deploy predictive models, neural networks, and LLM pipelines.',
+    suggestedSkills: [
+      'Python',
+      'PyTorch',
+      'Scikit-Learn',
+      'Pandas',
+      'FastAPI',
+      'Docker',
+      'SQL',
+      'NLP',
+    ],
   },
   {
     id: 'devops-eng',
     role: 'Cloud / DevOps Engineer',
     label: 'Cloud / DevOps Engineer',
     category: 'Infrastructure',
-    description: 'Architect scalable cloud infrastructure, CI/CD automation pipelines, and monitoring.',
-    suggestedSkills: ['Docker', 'Kubernetes', 'AWS', 'Linux', 'Terraform', 'CI/CD Pipelines', 'GitHub Actions'],
+    description:
+      'Architect scalable cloud infrastructure, CI/CD automation pipelines, and monitoring.',
+    suggestedSkills: [
+      'Docker',
+      'Kubernetes',
+      'AWS',
+      'Linux',
+      'Terraform',
+      'CI/CD Pipelines',
+      'GitHub Actions',
+    ],
   },
   {
     id: 'bi-analyst',
     role: 'Business Intelligence Analyst',
     label: 'BI Analyst',
     category: 'Analytics & Strategy',
-    description: 'Design executive dashboards, build dimensional data models, and communicate business metrics.',
-    suggestedSkills: ['SQL (Advanced)', 'Power BI / DAX', 'Tableau', 'Data Warehousing', 'Excel', 'Stakeholder Presentations'],
+    description:
+      'Design executive dashboards, build dimensional data models, and communicate business metrics.',
+    suggestedSkills: [
+      'SQL (Advanced)',
+      'Power BI / DAX',
+      'Tableau',
+      'Data Warehousing',
+      'Excel',
+      'Stakeholder Presentations',
+    ],
   },
 ];
 
 interface RoleBenchmark {
-  coreSkills: { name: string; aliases: string[]; whyItMatters: string; timeToLearn: string; project: string }[];
-  highValueSkills: { name: string; aliases: string[]; whyItMatters: string; timeToLearn: string; project: string }[];
-  bonusSkills: { name: string; aliases: string[]; whyItMatters: string; timeToLearn: string; project: string }[];
+  coreSkills: {
+    name: string;
+    aliases: string[];
+    whyItMatters: string;
+    timeToLearn: string;
+    project: string;
+  }[];
+  highValueSkills: {
+    name: string;
+    aliases: string[];
+    whyItMatters: string;
+    timeToLearn: string;
+    project: string;
+  }[];
+  bonusSkills: {
+    name: string;
+    aliases: string[];
+    whyItMatters: string;
+    timeToLearn: string;
+    project: string;
+  }[];
   industries: TargetIndustryProfile[];
   mentorInsights: {
     fresherAdvice: string;
@@ -86,51 +151,78 @@ const ROLE_BENCHMARKS: Record<string, RoleBenchmark> = {
       {
         name: 'SQL (Queries, Joins, Aggregations)',
         aliases: ['sql', 'postgresql', 'mysql', 'sqlite', 'oracle sql', 'transact-sql', 't-sql'],
-        whyItMatters: '90%+ of data screening rounds test SQL. Extracting, joining, and filtering datasets is non-negotiable.',
+        whyItMatters:
+          '90%+ of data screening rounds test SQL. Extracting, joining, and filtering datasets is non-negotiable.',
         timeToLearn: '1-2 weeks',
-        project: 'Write complex multi-table analytical queries with window functions on retail transaction data.',
+        project:
+          'Write complex multi-table analytical queries with window functions on retail transaction data.',
       },
       {
         name: 'BI & Dashboarding (Tableau or Power BI)',
         aliases: ['tableau', 'power bi', 'powerbi', 'looker', 'metabase', 'dashboarding', 'bi'],
-        whyItMatters: 'Executives do not read raw queries. They require visual charts and automated business KPI dashboards.',
+        whyItMatters:
+          'Executives do not read raw queries. They require visual charts and automated business KPI dashboards.',
         timeToLearn: '1-2 weeks',
-        project: 'Create an executive churn-risk or revenue-retention dashboard published on Tableau Public or NovyPro.',
+        project:
+          'Create an executive churn-risk or revenue-retention dashboard published on Tableau Public or NovyPro.',
       },
       {
         name: 'Python for Data Analysis (Pandas & NumPy)',
         aliases: ['python', 'pandas', 'numpy', 'jupyter', 'eda'],
-        whyItMatters: 'Crucial for cleaning messy datasets, missing-value imputation, and automated reporting scripts.',
+        whyItMatters:
+          'Crucial for cleaning messy datasets, missing-value imputation, and automated reporting scripts.',
         timeToLearn: '2-3 weeks',
-        project: 'Conduct an Exploratory Data Analysis (EDA) notebook investigating customer lifetime value (LTV).',
+        project:
+          'Conduct an Exploratory Data Analysis (EDA) notebook investigating customer lifetime value (LTV).',
       },
       {
         name: 'Excel (Pivot Tables & VLOOKUP/XLOOKUP)',
-        aliases: ['excel', 'advanced excel', 'spreadsheets', 'google sheets', 'pivot tables', 'vlookup', 'xlookup'],
+        aliases: [
+          'excel',
+          'advanced excel',
+          'spreadsheets',
+          'google sheets',
+          'pivot tables',
+          'vlookup',
+          'xlookup',
+        ],
         whyItMatters: 'The universal language of business stakeholders and cross-functional teams.',
         timeToLearn: '3-5 days',
-        project: 'Build a financial scenario model with dynamic pivot tables, slicers, and conditional formatting.',
+        project:
+          'Build a financial scenario model with dynamic pivot tables, slicers, and conditional formatting.',
       },
     ],
     highValueSkills: [
       {
         name: 'Statistical Hypothesis Testing & A/B Testing',
-        aliases: ['statistics', 'hypothesis testing', 'a/b testing', 'ab testing', 'p-value', 'experimentation'],
-        whyItMatters: 'Distinguishes junior query writers from strategic decision partners who validate feature rollouts.',
+        aliases: [
+          'statistics',
+          'hypothesis testing',
+          'a/b testing',
+          'ab testing',
+          'p-value',
+          'experimentation',
+        ],
+        whyItMatters:
+          'Distinguishes junior query writers from strategic decision partners who validate feature rollouts.',
         timeToLearn: '2 weeks',
-        project: 'Simulate a 2-sample conversion rate test calculating sample sizes, p-values, and confidence intervals.',
+        project:
+          'Simulate a 2-sample conversion rate test calculating sample sizes, p-values, and confidence intervals.',
       },
       {
         name: 'Data Modeling & Schema Design',
         aliases: ['data modeling', 'star schema', 'snowflake schema', 'normalization', 'dbt'],
-        whyItMatters: 'Ensures dashboards run fast and analytics queries remain reliable over millions of rows.',
+        whyItMatters:
+          'Ensures dashboards run fast and analytics queries remain reliable over millions of rows.',
         timeToLearn: '1-2 weeks',
-        project: 'Design a Star Schema (fact & dimension tables) for an e-commerce subscription model.',
+        project:
+          'Design a Star Schema (fact & dimension tables) for an e-commerce subscription model.',
       },
       {
         name: 'Business KPI Definition & Metrics Framework',
         aliases: ['kpi', 'metrics', 'business analysis', 'okrs', 'cohort analysis', 'retention'],
-        whyItMatters: 'Hiring managers prize analysts who understand business drivers like CAC, LTV, and churn.',
+        whyItMatters:
+          'Hiring managers prize analysts who understand business drivers like CAC, LTV, and churn.',
         timeToLearn: '1 week',
         project: 'Build a cohort retention analysis matrix showing month-over-month user drop-off.',
       },
@@ -145,54 +237,84 @@ const ROLE_BENCHMARKS: Record<string, RoleBenchmark> = {
       },
       {
         name: 'Machine Learning Basics (Scikit-Learn Regression)',
-        aliases: ['machine learning', 'scikit-learn', 'linear regression', 'forecasting', 'time series'],
+        aliases: [
+          'machine learning',
+          'scikit-learn',
+          'linear regression',
+          'forecasting',
+          'time series',
+        ],
         whyItMatters: 'Enables predictive modeling beyond descriptive backward-looking summaries.',
         timeToLearn: '2 weeks',
-        project: 'Train a sales forecasting time-series model comparing ARIMA against Random Forest.',
+        project:
+          'Train a sales forecasting time-series model comparing ARIMA against Random Forest.',
       },
       {
         name: 'Version Control (Git & GitHub)',
         aliases: ['git', 'github', 'version control', 'gitlab'],
-        whyItMatters: 'Collaborate with engineering teams through pull requests and version-controlled SQL scripts.',
+        whyItMatters:
+          'Collaborate with engineering teams through pull requests and version-controlled SQL scripts.',
         timeToLearn: '3-5 days',
-        project: 'Publish a clean, documented repository with reproducible analysis notebooks and SQL migrations.',
+        project:
+          'Publish a clean, documented repository with reproducible analysis notebooks and SQL migrations.',
       },
     ],
     industries: [
       {
         name: 'FinTech & Digital Payments',
-        description: 'High transaction volumes requiring fraud detection, credit risk, and user transaction velocity analytics.',
-        typicalRoles: ['Junior Data Analyst', 'Risk & Fraud Analyst', 'Product Analytics Specialist'],
+        description:
+          'High transaction volumes requiring fraud detection, credit risk, and user transaction velocity analytics.',
+        typicalRoles: [
+          'Junior Data Analyst',
+          'Risk & Fraud Analyst',
+          'Product Analytics Specialist',
+        ],
         exampleCompanies: ['Stripe', 'Razorpay', 'Revolut', 'PayPal', 'Block / Square'],
         hiringFocus: 'Heavy SQL performance, cohort analysis, and transaction anomaly detection.',
       },
       {
         name: 'E-Commerce, D2C & Quick-Commerce',
-        description: 'Focus on marketing spend ROAS, basket size, delivery SLA analytics, and inventory forecasting.',
+        description:
+          'Focus on marketing spend ROAS, basket size, delivery SLA analytics, and inventory forecasting.',
         typicalRoles: ['Growth Analyst', 'Commercial Data Analyst', 'Supply Chain Analyst'],
         exampleCompanies: ['Amazon', 'Shopify', 'Flipkart', 'Instacart', 'Target Tech'],
         hiringFocus: 'A/B testing, cohort retention, and customer acquisition cost optimization.',
       },
       {
         name: 'B2B SaaS & Product-Led Tech',
-        description: 'SaaS metrics such as Net Revenue Retention (NRR), product feature adoption, and churn prediction.',
-        typicalRoles: ['Product Data Analyst', 'Customer Success Analyst', 'Revenue Operations Analyst'],
+        description:
+          'SaaS metrics such as Net Revenue Retention (NRR), product feature adoption, and churn prediction.',
+        typicalRoles: [
+          'Product Data Analyst',
+          'Customer Success Analyst',
+          'Revenue Operations Analyst',
+        ],
         exampleCompanies: ['HubSpot', 'Notion', 'Datadog', 'Zendesk', 'Linear'],
-        hiringFocus: 'Event telemetry analytics, Mixpanel/Amplitude, and funnel conversion tracking.',
+        hiringFocus:
+          'Event telemetry analytics, Mixpanel/Amplitude, and funnel conversion tracking.',
       },
       {
         name: 'Healthcare & Pharma Analytics',
-        description: 'Clinical trial patient outcome monitoring, hospital bed allocation, and regulatory compliance.',
-        typicalRoles: ['Healthcare Data Analyst', 'Clinical Operations Analyst', 'Biostatistics Associate'],
+        description:
+          'Clinical trial patient outcome monitoring, hospital bed allocation, and regulatory compliance.',
+        typicalRoles: [
+          'Healthcare Data Analyst',
+          'Clinical Operations Analyst',
+          'Biostatistics Associate',
+        ],
         exampleCompanies: ['UnitedHealth', 'IQVIA', 'Cerner', 'Epic Systems', 'Oscar Health'],
         hiringFocus: 'Statistical rigor, data privacy (HIPAA), and clean reproducible reporting.',
       },
     ],
     mentorInsights: {
-      fresherAdvice: 'Do not just list Python libraries on your resume. Hiring managers want to see 1 solid SQL project with window functions and 1 interactive dashboard (Tableau Public or Power BI) with a live clickable link.',
-      experiencedAdvice: 'Emphasize business impact over tool names. Frame bullet points around how your analysis increased revenue, cut churn, or shaved hours off manual reporting pipelines.',
-      criticalWarning: 'Avoid applying without SQL proficiency. Almost all initial screening rounds involve a live or timed HackerRank SQL assessment.',
-      topPortfolioDeliverable: 'An interactive 2-page executive dashboard with a live link and a GitHub repo containing clean, commented SQL queries.',
+      fresherAdvice:
+        'Do not just list Python libraries on your resume. Hiring managers want to see 1 solid SQL project with window functions and 1 interactive dashboard (Tableau Public or Power BI) with a live clickable link.',
+      experiencedAdvice:
+        'Emphasize business impact over tool names. Frame bullet points around how your analysis increased revenue, cut churn, or shaved hours off manual reporting pipelines.',
+      criticalWarning:
+        'Avoid applying without SQL proficiency. Almost all initial screening rounds involve a live or timed HackerRank SQL assessment.',
+      topPortfolioDeliverable:
+        'An interactive 2-page executive dashboard with a live link and a GitHub repo containing clean, commented SQL queries.',
     },
   },
   'frontend developer': {
@@ -207,43 +329,81 @@ const ROLE_BENCHMARKS: Record<string, RoleBenchmark> = {
       {
         name: 'TypeScript',
         aliases: ['typescript', 'ts', 'type system'],
-        whyItMatters: 'Default requirement across almost all high-paying teams for maintainable frontend code.',
+        whyItMatters:
+          'Default requirement across almost all high-paying teams for maintainable frontend code.',
         timeToLearn: '1-2 weeks',
         project: 'Migrate a JavaScript application to strict TypeScript with zero any assertions.',
       },
       {
         name: 'CSS Systems & Responsive Design (Tailwind / CSS Modules)',
-        aliases: ['tailwind', 'css', 'tailwind css', 'scss', 'responsive design', 'flexbox', 'grid'],
+        aliases: [
+          'tailwind',
+          'css',
+          'tailwind css',
+          'scss',
+          'responsive design',
+          'flexbox',
+          'grid',
+        ],
         whyItMatters: 'Essential for mobile-friendly, fluid, accessible, and pixel-perfect UIs.',
         timeToLearn: '1 week',
-        project: 'Create a fully accessible responsive layout supporting dark mode and keyboard navigation.',
+        project:
+          'Create a fully accessible responsive layout supporting dark mode and keyboard navigation.',
       },
       {
         name: 'State Management & Asynchronous Data Fetching',
-        aliases: ['tanstack query', 'react query', 'redux', 'zustand', 'axios', 'fetch', 'rest api'],
-        whyItMatters: 'Handles loading states, cache invalidation, and server synchronization seamlessly.',
+        aliases: [
+          'tanstack query',
+          'react query',
+          'redux',
+          'zustand',
+          'axios',
+          'fetch',
+          'rest api',
+        ],
+        whyItMatters:
+          'Handles loading states, cache invalidation, and server synchronization seamlessly.',
         timeToLearn: '1 week',
-        project: 'Implement infinite scrolling with optimistic mutations and offline cache using TanStack Query.',
+        project:
+          'Implement infinite scrolling with optimistic mutations and offline cache using TanStack Query.',
       },
     ],
     highValueSkills: [
       {
         name: 'Next.js & Server-Side Rendering (SSR / App Router)',
         aliases: ['next.js', 'nextjs', 'ssr', 'ssg', 'server components', 'app router'],
-        whyItMatters: 'Powers modern SEO-friendly production web applications and high-speed page loads.',
+        whyItMatters:
+          'Powers modern SEO-friendly production web applications and high-speed page loads.',
         timeToLearn: '2 weeks',
-        project: 'Build an e-commerce storefront with server components, dynamic metadata, and ISR.',
+        project:
+          'Build an e-commerce storefront with server components, dynamic metadata, and ISR.',
       },
       {
         name: 'Frontend Testing (Vitest, Testing Library & Playwright)',
-        aliases: ['testing', 'vitest', 'jest', 'react testing library', 'playwright', 'cypress', 'unit tests'],
-        whyItMatters: 'Hiring managers use automated test writing to identify engineering maturity.',
+        aliases: [
+          'testing',
+          'vitest',
+          'jest',
+          'react testing library',
+          'playwright',
+          'cypress',
+          'unit tests',
+        ],
+        whyItMatters:
+          'Hiring managers use automated test writing to identify engineering maturity.',
         timeToLearn: '1-2 weeks',
         project: 'Write unit tests covering edge cases and an end-to-end user checkout flow.',
       },
       {
         name: 'Web Performance Optimization (Core Web Vitals)',
-        aliases: ['performance', 'core web vitals', 'lcp', 'bundle size', 'lighthouse', 'lazy loading'],
+        aliases: [
+          'performance',
+          'core web vitals',
+          'lcp',
+          'bundle size',
+          'lighthouse',
+          'lazy loading',
+        ],
         whyItMatters: 'Crucial for conversion rates and top-tier consumer apps.',
         timeToLearn: '1 week',
         project: 'Audit and optimize an application to achieve a 95+ score on Google Lighthouse.',
@@ -268,24 +428,30 @@ const ROLE_BENCHMARKS: Record<string, RoleBenchmark> = {
     industries: [
       {
         name: 'Product-Led SaaS Startups',
-        description: 'Focus on slick developer tools, productivity suites, and interactive canvases.',
+        description:
+          'Focus on slick developer tools, productivity suites, and interactive canvases.',
         typicalRoles: ['Frontend Engineer', 'UI Platform Engineer', 'Web Developer'],
         exampleCompanies: ['Vercel', 'Figma', 'Linear', 'Notion', 'Supabase'],
         hiringFocus: 'TypeScript rigor, component design systems, sub-100ms UI latency.',
       },
       {
         name: 'Consumer Platforms & Streaming',
-        description: 'Large user volume where mobile responsiveness and responsive caching dominate.',
+        description:
+          'Large user volume where mobile responsiveness and responsive caching dominate.',
         typicalRoles: ['Web Platform Engineer', 'UI/UX Developer'],
         exampleCompanies: ['Netflix', 'Spotify', 'Airbnb', 'Uber'],
         hiringFocus: 'Performance optimization, accessibility (WCAG), and responsive rendering.',
       },
     ],
     mentorInsights: {
-      fresherAdvice: 'Do not build another generic Todo app or weather widget. Build a feature-rich, deployed product with authentication, real API integration, and clean responsive CSS.',
-      experiencedAdvice: 'Emphasize architectural decisions, performance wins (e.g. bundle size reduction, LCP gains), and design system governance.',
-      criticalWarning: 'Make sure your portfolio links actually work! Broken links or unstyled mobile views result in immediate candidate rejection.',
-      topPortfolioDeliverable: 'A deployed SaaS or dashboard tool featuring TypeScript, full responsive design, and integration with a real public backend.',
+      fresherAdvice:
+        'Do not build another generic Todo app or weather widget. Build a feature-rich, deployed product with authentication, real API integration, and clean responsive CSS.',
+      experiencedAdvice:
+        'Emphasize architectural decisions, performance wins (e.g. bundle size reduction, LCP gains), and design system governance.',
+      criticalWarning:
+        'Make sure your portfolio links actually work! Broken links or unstyled mobile views result in immediate candidate rejection.',
+      topPortfolioDeliverable:
+        'A deployed SaaS or dashboard tool featuring TypeScript, full responsive design, and integration with a real public backend.',
     },
   },
   'full-stack engineer': {
@@ -295,19 +461,22 @@ const ROLE_BENCHMARKS: Record<string, RoleBenchmark> = {
         aliases: ['node.js', 'express', 'python', 'fastapi', 'django', 'backend', 'rest apis'],
         whyItMatters: 'Creating secure, scalable, and well-documented server endpoints.',
         timeToLearn: '2-3 weeks',
-        project: 'Build a RESTful API with authentication, rate limiting, and structured validation.',
+        project:
+          'Build a RESTful API with authentication, rate limiting, and structured validation.',
       },
       {
         name: 'Relational Database & ORM (PostgreSQL / MySQL)',
         aliases: ['sql', 'postgresql', 'mysql', 'prisma', 'sqlalchemy', 'drizzle'],
         whyItMatters: 'Data integrity, indexing, foreign keys, and performant query execution.',
         timeToLearn: '2 weeks',
-        project: 'Design a multi-tenant relational schema with indexes, transactions, and migrations.',
+        project:
+          'Design a multi-tenant relational schema with indexes, transactions, and migrations.',
       },
       {
         name: 'Modern Frontend (React / TypeScript)',
         aliases: ['react', 'typescript', 'frontend', 'javascript', 'tailwind'],
-        whyItMatters: 'Full-stack roles require independently executing from database to browser UI.',
+        whyItMatters:
+          'Full-stack roles require independently executing from database to browser UI.',
         timeToLearn: '2 weeks',
         project: 'Connect your backend API to a responsive TypeScript dashboard.',
       },
@@ -318,12 +487,14 @@ const ROLE_BENCHMARKS: Record<string, RoleBenchmark> = {
         aliases: ['docker', 'containers', 'docker compose'],
         whyItMatters: 'Guarantees reliable local environments and seamless production deploys.',
         timeToLearn: '1 week',
-        project: 'Dockerize a multi-service app (frontend, backend API, Postgres, Redis) with Docker Compose.',
+        project:
+          'Dockerize a multi-service app (frontend, backend API, Postgres, Redis) with Docker Compose.',
       },
       {
         name: 'Caching & Queues (Redis / BullMQ / Celery)',
         aliases: ['redis', 'caching', 'queues', 'celery', 'background jobs'],
-        whyItMatters: 'Keeps API response times low by offloading heavy work to asynchronous workers.',
+        whyItMatters:
+          'Keeps API response times low by offloading heavy work to asynchronous workers.',
         timeToLearn: '1-2 weeks',
         project: 'Implement an asynchronous email/report generator using Redis job queues.',
       },
@@ -341,23 +512,29 @@ const ROLE_BENCHMARKS: Record<string, RoleBenchmark> = {
         aliases: ['aws', 'gcp', 'cloud', 'terraform', 'github actions'],
         whyItMatters: 'Enables end-to-end product delivery from code to production cloud.',
         timeToLearn: '2 weeks',
-        project: 'Deploy a containerized application to AWS ECS or GCP Cloud Run with automated CI/CD.',
+        project:
+          'Deploy a containerized application to AWS ECS or GCP Cloud Run with automated CI/CD.',
       },
     ],
     industries: [
       {
         name: 'High-Growth Tech Startups',
-        description: 'Fast-moving teams that value generalists who can ship features end-to-end in days.',
+        description:
+          'Fast-moving teams that value generalists who can ship features end-to-end in days.',
         typicalRoles: ['Founding Engineer', 'Full-Stack Developer', 'Product Engineer'],
         exampleCompanies: ['Y Combinator Startups', 'Ramp', 'Retool', 'Brex', 'Postman'],
         hiringFocus: 'Speed of shipping, self-sufficiency, clean API design, and rapid iteration.',
       },
     ],
     mentorInsights: {
-      fresherAdvice: 'Show you know how both sides connect. Document how your frontend communicates with your database, and how you handle authentication securely.',
-      experiencedAdvice: 'Highlight system scalability, database migration workflows, and production incident management.',
-      criticalWarning: 'Avoid neglecting database fundamentals. Many full-stack candidates fail technical interviews on SQL joins and database concurrency.',
-      topPortfolioDeliverable: 'A deployed full-stack SaaS with user authentication, database persistence, background workers, and CI/CD pipelines.',
+      fresherAdvice:
+        'Show you know how both sides connect. Document how your frontend communicates with your database, and how you handle authentication securely.',
+      experiencedAdvice:
+        'Highlight system scalability, database migration workflows, and production incident management.',
+      criticalWarning:
+        'Avoid neglecting database fundamentals. Many full-stack candidates fail technical interviews on SQL joins and database concurrency.',
+      topPortfolioDeliverable:
+        'A deployed full-stack SaaS with user authentication, database persistence, background workers, and CI/CD pipelines.',
     },
   },
 };
@@ -366,7 +543,10 @@ const ROLE_BENCHMARKS: Record<string, RoleBenchmark> = {
  * Normalizes strings for resilient keyword matching
  */
 function normalize(str: string): string {
-  return str.toLowerCase().replace(/[^a-z0-9]/g, ' ').trim();
+  return str
+    .toLowerCase()
+    .replace(/[^a-z0-9]/g, ' ')
+    .trim();
 }
 
 /**
@@ -383,7 +563,11 @@ function matchSkill(
       userSkill.norm === normalize(benchmarkItem.name) ||
       benchmarkItem.aliases.some((alias) => {
         const normAlias = normalize(alias);
-        return userSkill.norm === normAlias || userSkill.norm.includes(normAlias) || normAlias.includes(userSkill.norm);
+        return (
+          userSkill.norm === normAlias ||
+          userSkill.norm.includes(normAlias) ||
+          normAlias.includes(userSkill.norm)
+        );
       })
     ) {
       matches.push(userSkill.raw);
@@ -408,37 +592,43 @@ export function generateJobPortalLinks(role: string, location = 'Remote'): JobPo
       platform: 'LinkedIn Jobs',
       url: `https://www.linkedin.com/jobs/search/?keywords=${encRole}&location=${encLoc}`,
       badge: 'Highest Volume',
-      description: 'Primary platform for corporate, tech, and agency postings with 1-click recruiter connections.',
+      description:
+        'Primary platform for corporate, tech, and agency postings with 1-click recruiter connections.',
     },
     {
       platform: 'Wellfound (AngelList)',
       url: `https://wellfound.com/jobs?role=${encRole}`,
       badge: 'Best for Startups',
-      description: 'Direct access to startup founders and engineering leads without third-party recruiter middleman.',
+      description:
+        'Direct access to startup founders and engineering leads without third-party recruiter middleman.',
     },
     {
       platform: 'Indeed',
       url: `https://www.indeed.com/jobs?q=${encRole}&l=${encLoc}`,
       badge: 'Mid-Market & Enterprise',
-      description: 'Extensive listing across local, hybrid, enterprise, and government contracting positions.',
+      description:
+        'Extensive listing across local, hybrid, enterprise, and government contracting positions.',
     },
     {
       platform: 'RemoteOK',
       url: `https://remoteok.com/remote-${roleSlug}-jobs`,
       badge: 'Global Remote',
-      description: 'Curated 100% remote job listings with public salary ranges and USD compensation benchmarks.',
+      description:
+        'Curated 100% remote job listings with public salary ranges and USD compensation benchmarks.',
     },
     {
       platform: 'Google Jobs Search',
       url: `https://www.google.com/search?q=${encodeURIComponent(`${role} jobs ${location}`)}&ibp=htl;jobs`,
       badge: 'Aggregator',
-      description: 'Aggregates job listings across company career portals, Greenhouse, Lever, and Workday.',
+      description:
+        'Aggregates job listings across company career portals, Greenhouse, Lever, and Workday.',
     },
     {
       platform: 'Glassdoor',
       url: `https://www.glassdoor.com/Job/jobs.htm?sc.keyword=${encRole}`,
       badge: 'Salary & Reviews',
-      description: 'Detailed company reviews, interview questions, and transparent salary breakdowns.',
+      description:
+        'Detailed company reviews, interview questions, and transparent salary breakdowns.',
     },
   ];
 }
@@ -448,31 +638,54 @@ export function generateJobPortalLinks(role: string, location = 'Remote'): JobPo
  */
 function buildGenericBenchmark(targetRole: string): RoleBenchmark {
   const normRole = targetRole.toLowerCase();
-  const isData = normRole.includes('data') || normRole.includes('analytics') || normRole.includes('bi');
-  const isCode = normRole.includes('developer') || normRole.includes('engineer') || normRole.includes('software');
+  const isData =
+    normRole.includes('data') || normRole.includes('analytics') || normRole.includes('bi');
+  const isCode =
+    normRole.includes('developer') ||
+    normRole.includes('engineer') ||
+    normRole.includes('software');
 
   return {
     coreSkills: [
       {
-        name: isData ? 'SQL & Data Extraction' : isCode ? 'Core Programming Language' : 'Domain Subject Matter Expertise',
-        aliases: isData ? ['sql', 'database'] : isCode ? ['python', 'javascript', 'typescript', 'java', 'c++'] : ['domain knowledge'],
+        name: isData
+          ? 'SQL & Data Extraction'
+          : isCode
+            ? 'Core Programming Language'
+            : 'Domain Subject Matter Expertise',
+        aliases: isData
+          ? ['sql', 'database']
+          : isCode
+            ? ['python', 'javascript', 'typescript', 'java', 'c++']
+            : ['domain knowledge'],
         whyItMatters: `Fundamental baseline required in virtually every interview for ${targetRole}.`,
         timeToLearn: '2-3 weeks',
         project: `Build a foundational portfolio project demonstrating practical command of ${targetRole} workflows.`,
       },
       {
-        name: isData ? 'Data Analysis & Visualization' : isCode ? 'Frameworks & Systems Design' : 'Industry Tooling & Workflow',
-        aliases: isData ? ['tableau', 'power bi', 'excel'] : isCode ? ['react', 'node', 'fastapi', 'architecture'] : ['workflow tools'],
-        whyItMatters: 'Enables translating raw tasks into tangible, usable deliverables for team leaders.',
+        name: isData
+          ? 'Data Analysis & Visualization'
+          : isCode
+            ? 'Frameworks & Systems Design'
+            : 'Industry Tooling & Workflow',
+        aliases: isData
+          ? ['tableau', 'power bi', 'excel']
+          : isCode
+            ? ['react', 'node', 'fastapi', 'architecture']
+            : ['workflow tools'],
+        whyItMatters:
+          'Enables translating raw tasks into tangible, usable deliverables for team leaders.',
         timeToLearn: '2 weeks',
         project: `Produce a polished case study showcasing your problem-solving methodology for ${targetRole}.`,
       },
       {
         name: 'Technical Communication & Reporting',
         aliases: ['communication', 'documentation', 'reporting', 'stakeholder management'],
-        whyItMatters: 'Hiring managers filter for candidates who can explain complex findings concisely.',
+        whyItMatters:
+          'Hiring managers filter for candidates who can explain complex findings concisely.',
         timeToLearn: '1 week',
-        project: 'Write a 1-page executive summary or RFC document summarizing a technical challenge.',
+        project:
+          'Write a 1-page executive summary or RFC document summarizing a technical challenge.',
       },
     ],
     highValueSkills: [
@@ -481,14 +694,17 @@ function buildGenericBenchmark(targetRole: string): RoleBenchmark {
         aliases: ['automation', 'python', 'scripting', 'bash', 'macros'],
         whyItMatters: 'Automates repetitive work and accelerates turnaround times by 5x.',
         timeToLearn: '1-2 weeks',
-        project: 'Create an automated script or template that reduces a manual 3-step process to 1 click.',
+        project:
+          'Create an automated script or template that reduces a manual 3-step process to 1 click.',
       },
       {
         name: 'Quantitative Metrics & Performance Measurement',
         aliases: ['kpi', 'metrics', 'analytics', 'statistics', 'evaluation'],
-        whyItMatters: 'Shows strategic business awareness rather than merely following instructions.',
+        whyItMatters:
+          'Shows strategic business awareness rather than merely following instructions.',
         timeToLearn: '1 week',
-        project: 'Define 3 primary KPIs and measure their improvement across an illustrative project.',
+        project:
+          'Define 3 primary KPIs and measure their improvement across an illustrative project.',
       },
     ],
     bonusSkills: [
@@ -503,14 +719,16 @@ function buildGenericBenchmark(targetRole: string): RoleBenchmark {
     industries: [
       {
         name: 'Tech & Digital Products',
-        description: 'Fast-paced growth organizations prioritizing technical proficiency and rapid delivery.',
+        description:
+          'Fast-paced growth organizations prioritizing technical proficiency and rapid delivery.',
         typicalRoles: [targetRole, `Associate ${targetRole}`, `Senior ${targetRole}`],
         exampleCompanies: ['Product Startups', 'Growth-stage Scaleups', 'B2B SaaS Companies'],
         hiringFocus: 'Portfolio proof of work, adaptability, and clear communication.',
       },
       {
         name: 'Enterprise & Consultancies',
-        description: 'Established firms offering structured onboarding, mentorship programs, and client projects.',
+        description:
+          'Established firms offering structured onboarding, mentorship programs, and client projects.',
         typicalRoles: [targetRole, `Staff ${targetRole}`, `Consultant`],
         exampleCompanies: ['Global Consultancies', 'Financial Services', 'Enterprise SaaS'],
         hiringFocus: 'Methodology, documentation quality, and stakeholder presentation skills.',
@@ -671,8 +889,8 @@ export function analyzeJobRole(request: JobAnalysisRequest): JobAnalysisResult {
     criticalGaps.length > 0
       ? `Lack of demonstrated ${criticalGaps[0].name}. Hiring managers or automated ATS filters look for this within the first 10 seconds of scanning.`
       : missingSkills.length > 0
-      ? `Distinction in practical projects. You have core skills, but need to prove impact through an active case study.`
-      : 'No major blockers. Your skills closely match the target profile!';
+        ? `Distinction in practical projects. You have core skills, but need to prove impact through an active case study.`
+        : 'No major blockers. Your skills closely match the target profile!';
 
   const strengthsSummary =
     matchedSkills.length > 0
@@ -692,7 +910,10 @@ export function analyzeJobRole(request: JobAnalysisRequest): JobAnalysisResult {
     {
       phase: 'Phase 1: Gap Closure',
       timeline: 'Days 1 - 10',
-      title: criticalGaps.length > 0 ? `Target ${criticalGaps[0].name.split('(')[0].trim()}` : 'Deepen Core Capabilities',
+      title:
+        criticalGaps.length > 0
+          ? `Target ${criticalGaps[0].name.split('(')[0].trim()}`
+          : 'Deepen Core Capabilities',
       tasks: [
         criticalGaps.length > 0
           ? `Complete targeted practice: ${criticalGaps[0].suggestedProject}`
@@ -735,24 +956,30 @@ export function analyzeJobRole(request: JobAnalysisRequest): JobAnalysisResult {
   };
 
   // Compile Where To Apply
-  const portalLinks = generateJobPortalLinks(targetRoleClean, request.locationPreference || 'Remote');
+  const portalLinks = generateJobPortalLinks(
+    targetRoleClean,
+    request.locationPreference || 'Remote'
+  );
   const targetIndustries = benchmark.industries;
 
   const recommendedChannels = [
     {
       channel: 'Direct Recruiter Outreach & LinkedIn InMail',
       allocation: 45,
-      advice: 'Find engineering managers and talent acquisition leads at companies hiring for this role. Send a polite 3-sentence note referencing your portfolio project.',
+      advice:
+        'Find engineering managers and talent acquisition leads at companies hiring for this role. Send a polite 3-sentence note referencing your portfolio project.',
     },
     {
       channel: 'Startup & Direct Founder Hiring (Wellfound / YC)',
       allocation: 35,
-      advice: 'Startups move fast and value raw capability over years of corporate tenure. Emphasize your ability to own projects independently.',
+      advice:
+        'Startups move fast and value raw capability over years of corporate tenure. Emphasize your ability to own projects independently.',
     },
     {
       channel: 'General Career Portals (Indeed, Glassdoor, LinkedIn Jobs)',
       allocation: 20,
-      advice: 'Apply only when your resume is keyword-tailored to the posting description to ensure ATS compatibility.',
+      advice:
+        'Apply only when your resume is keyword-tailored to the posting description to ensure ATS compatibility.',
     },
   ];
 

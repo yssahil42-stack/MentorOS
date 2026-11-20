@@ -438,80 +438,98 @@ export function RoadmapWorkspace({ isOpen, onClose, initialPrompt = '' }: Roadma
     job_seeker: [
       {
         title: '🎯 30-Day Job Search & Application Sprint',
-        prompt: 'Create a focused 30-day job search strategy with daily application targets and company outreach cadences',
+        prompt:
+          'Create a focused 30-day job search strategy with daily application targets and company outreach cadences',
       },
       {
         title: '🗣️ Technical & System Design Interview Prep',
-        prompt: 'Create a 4-week structured technical interview, algorithm drills, and behavioral STAR questions prep roadmap',
+        prompt:
+          'Create a 4-week structured technical interview, algorithm drills, and behavioral STAR questions prep roadmap',
       },
       {
         title: '📄 High-Impact Resume & Portfolio Revamp',
-        prompt: 'Create a 2-week roadmap to tailor my resume for target roles, build standout case studies, and optimize LinkedIn profile',
+        prompt:
+          'Create a 2-week roadmap to tailor my resume for target roles, build standout case studies, and optimize LinkedIn profile',
       },
       {
         title: '💼 Recruiter Outreach & Networking Cadence',
-        prompt: 'Create a 3-week cold outreach and recruiter networking roadmap for target tech companies and startups',
+        prompt:
+          'Create a 3-week cold outreach and recruiter networking roadmap for target tech companies and startups',
       },
     ],
     developer: [
       {
         title: '🏗️ Full-Stack System Architecture & MVP',
-        prompt: 'Create full architectural build roadmap for a distributed real-time platform with scalable database and API endpoints',
+        prompt:
+          'Create full architectural build roadmap for a distributed real-time platform with scalable database and API endpoints',
       },
       {
         title: '🚀 CI/CD Pipeline & Docker Deployment Roadmap',
-        prompt: 'Create a step-by-step roadmap to Dockerize, configure GitHub Actions CI, and deploy to cloud runners',
+        prompt:
+          'Create a step-by-step roadmap to Dockerize, configure GitHub Actions CI, and deploy to cloud runners',
       },
       {
         title: '⚡ Microservices & Low-Latency Sync Engine',
-        prompt: 'Create an architectural sprint plan to build a low-latency microservices backend with caching and websockets',
+        prompt:
+          'Create an architectural sprint plan to build a low-latency microservices backend with caching and websockets',
       },
       {
         title: '🧪 Test-Driven Suite & Security Hardening',
-        prompt: 'Create an end-to-end testing, integration test coverage, and API security hardening roadmap',
+        prompt:
+          'Create an end-to-end testing, integration test coverage, and API security hardening roadmap',
       },
     ],
     freelancer: [
       {
         title: '💼 Client Project Delivery & Milestone Plan',
-        prompt: 'Turn client requirements into a phased milestone roadmap with clear deliverables, review checkpoints, and deadlines',
+        prompt:
+          'Turn client requirements into a phased milestone roadmap with clear deliverables, review checkpoints, and deadlines',
       },
       {
         title: '📈 Retainer & Pricing Growth Strategy',
-        prompt: 'Create a 60-day roadmap to land high-ticket retainer clients, standardize scopes of work, and scale freelance pricing',
+        prompt:
+          'Create a 60-day roadmap to land high-ticket retainer clients, standardize scopes of work, and scale freelance pricing',
       },
       {
         title: '⏱️ 2-Week Fixed-Price MVP Build Sprint',
-        prompt: 'Create an agile 2-week client MVP build plan with daily subtasks, scope containment, and demo deliverables',
+        prompt:
+          'Create an agile 2-week client MVP build plan with daily subtasks, scope containment, and demo deliverables',
       },
       {
         title: '🧾 Proposal-to-Invoicing Lifecycle Roadmap',
-        prompt: 'Create a structured workflow roadmap from client proposal to milestone deliverables, client portal updates, and final invoice',
+        prompt:
+          'Create a structured workflow roadmap from client proposal to milestone deliverables, client portal updates, and final invoice',
       },
     ],
     student: [
       {
         title: '🐍 3-Month Python & Data Science Mastery',
-        prompt: 'I want to learn Python and fundamental data science in 3 months with weekly hands-on projects and quizzes',
+        prompt:
+          'I want to learn Python and fundamental data science in 3 months with weekly hands-on projects and quizzes',
       },
       {
         title: '📚 Semester Exam Prep & Active Recall Sprint',
-        prompt: 'Create a 3-week study roadmap with active recall sessions, spaced repetition schedule, and mock exam simulations',
+        prompt:
+          'Create a 3-week study roadmap with active recall sessions, spaced repetition schedule, and mock exam simulations',
       },
       {
         title: '🎓 Capstone / Final Year Project Execution Plan',
-        prompt: 'Deconstruct my university capstone project into architectural phases, research deliverables, and weekly milestones',
+        prompt:
+          'Deconstruct my university capstone project into architectural phases, research deliverables, and weekly milestones',
       },
       {
         title: '⏱️ Daily 2-Hour Deep Study & Coding Schedule',
-        prompt: 'Create a structured daily 2-hour study and coding practice schedule that balances coursework and practical build projects',
+        prompt:
+          'Create a structured daily 2-hour study and coding practice schedule that balances coursework and practical build projects',
       },
     ],
   };
 
   const ROLE_PLACEHOLDERS: Record<UserRole, string> = {
-    job_seeker: 'e.g. 30-Day Frontend Engineer job search plan, or FAANG mock interview prep roadmap...',
-    developer: 'e.g. Microservices refactor sprints, Next.js 15 migration roadmap, or CI/CD pipeline...',
+    job_seeker:
+      'e.g. 30-Day Frontend Engineer job search plan, or FAANG mock interview prep roadmap...',
+    developer:
+      'e.g. Microservices refactor sprints, Next.js 15 migration roadmap, or CI/CD pipeline...',
     freelancer: 'e.g. Client delivery sprint, fixed-price MVP roadmap, or retainers growth plan...',
     student: 'e.g. i want to learn python in 3 months, or Capstone ML roadmap...',
   };
@@ -842,7 +860,8 @@ export function RoadmapWorkspace({ isOpen, onClose, initialPrompt = '' }: Roadma
                     Interactive Planning Studio
                   </h2>
                   <p className="text-xs text-text-muted leading-relaxed">
-                    Enter your learning or delivery goal above to synthesize structured milestones, task breakdowns, and sprint timelines.
+                    Enter your learning or delivery goal above to synthesize structured milestones,
+                    task breakdowns, and sprint timelines.
                   </p>
                 </div>
 
@@ -924,7 +943,8 @@ export function RoadmapWorkspace({ isOpen, onClose, initialPrompt = '' }: Roadma
                         <span>Curriculum &amp; Milestone Phases</span>
                       </h3>
                       <span className="text-[11px] font-semibold text-text-muted bg-slate-100 dark:bg-bg-elevated px-2.5 py-0.5 rounded-full border border-border-base/70">
-                        {phases.length} phases • {phases.reduce((acc, p) => acc + p.tasks.length, 0)} tasks
+                        {phases.length} phases •{' '}
+                        {phases.reduce((acc, p) => acc + p.tasks.length, 0)} tasks
                       </span>
                     </div>
 

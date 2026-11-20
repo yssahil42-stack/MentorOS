@@ -47,7 +47,8 @@ const DEFAULT_PROPOSALS: WorkProposal[] = [
     id: 'prop-2',
     title: 'REST API Endpoints & Auth Migration',
     client: 'Nexus Cloud Services',
-    scope: 'JWT authentication, PostgreSQL migrations, role-based access control, and Swagger docs.',
+    scope:
+      'JWT authentication, PostgreSQL migrations, role-based access control, and Swagger docs.',
     budget: 95000,
     currency: 'INR',
     timeline: '2 Weeks',
@@ -58,7 +59,8 @@ const DEFAULT_PROPOSALS: WorkProposal[] = [
     id: 'prop-3',
     title: 'Mobile UI Audit & Performance Optimization',
     client: 'Horizon Labs',
-    scope: 'Core Web Vitals remediation, bundle minimization, asset lazy loading, and accessibility.',
+    scope:
+      'Core Web Vitals remediation, bundle minimization, asset lazy loading, and accessibility.',
     budget: 45000,
     currency: 'INR',
     timeline: '10 Days',
@@ -137,8 +139,8 @@ export function FreelancerProposalsSection({ projects = [] }: FreelancerProposal
           nextStatus === 'accepted'
             ? 'Proposal accepted! Client engagement active 🚀'
             : nextStatus === 'sent'
-            ? 'Proposal marked as sent to client ✉️'
-            : 'Proposal moved back to draft',
+              ? 'Proposal marked as sent to client ✉️'
+              : 'Proposal moved back to draft',
           'success'
         );
         return { ...p, status: nextStatus };
@@ -213,31 +215,49 @@ export function FreelancerProposalsSection({ projects = [] }: FreelancerProposal
       {/* ─── Metrics Bar ───────────────────────────────────────────────── */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3.5">
         <div className="rounded-xl border border-border-base/80 dark:border-white/[0.08] bg-white dark:bg-bg-surface p-4 shadow-2xs hover:shadow-sm transition-all">
-          <span className="text-3xs font-semibold text-text-muted uppercase tracking-wider">Active Proposals</span>
-          <div className="mt-1 text-2xl font-black text-text-primary font-mono">{proposals.length}</div>
-          <span className="text-3xs text-text-muted mt-0.5 block">{acceptedCount} closed engagements</span>
+          <span className="text-3xs font-semibold text-text-muted uppercase tracking-wider">
+            Active Proposals
+          </span>
+          <div className="mt-1 text-2xl font-black text-text-primary font-mono">
+            {proposals.length}
+          </div>
+          <span className="text-3xs text-text-muted mt-0.5 block">
+            {acceptedCount} closed engagements
+          </span>
         </div>
 
         <div className="rounded-xl border border-border-base/80 dark:border-white/[0.08] bg-white dark:bg-bg-surface p-4 shadow-2xs hover:shadow-sm transition-all">
-          <span className="text-3xs font-semibold text-text-muted uppercase tracking-wider">Pipeline Value (INR)</span>
+          <span className="text-3xs font-semibold text-text-muted uppercase tracking-wider">
+            Pipeline Value (INR)
+          </span>
           <div className="mt-1 text-2xl font-black text-amber-600 dark:text-amber-400 font-mono">
             {formatCurrency(totalValue, 'INR')}
           </div>
-          <span className="text-3xs text-text-muted mt-0.5 block">Sent &amp; accepted contracts</span>
+          <span className="text-3xs text-text-muted mt-0.5 block">
+            Sent &amp; accepted contracts
+          </span>
         </div>
 
         <div className="rounded-xl border border-border-base/80 dark:border-white/[0.08] bg-white dark:bg-bg-surface p-4 shadow-2xs hover:shadow-sm transition-all">
-          <span className="text-3xs font-semibold text-text-muted uppercase tracking-wider">Under Review</span>
+          <span className="text-3xs font-semibold text-text-muted uppercase tracking-wider">
+            Under Review
+          </span>
           <div className="mt-1 text-2xl font-black text-text-primary font-mono">{sentCount}</div>
-          <span className="text-3xs text-amber-600 dark:text-amber-400 font-medium mt-0.5 block">Awaiting client signature</span>
+          <span className="text-3xs text-amber-600 dark:text-amber-400 font-medium mt-0.5 block">
+            Awaiting client signature
+          </span>
         </div>
 
         <div className="rounded-xl border border-border-base/80 dark:border-white/[0.08] bg-white dark:bg-bg-surface p-4 shadow-2xs hover:shadow-sm transition-all">
-          <span className="text-3xs font-semibold text-text-muted uppercase tracking-wider">Acceptance Rate</span>
+          <span className="text-3xs font-semibold text-text-muted uppercase tracking-wider">
+            Acceptance Rate
+          </span>
           <div className="mt-1 text-2xl font-black text-emerald-600 dark:text-emerald-400 font-mono">
             {proposals.length ? Math.round((acceptedCount / proposals.length) * 100) : 0}%
           </div>
-          <span className="text-3xs text-emerald-600 dark:text-emerald-400 font-medium mt-0.5 block">High proposal conversion</span>
+          <span className="text-3xs text-emerald-600 dark:text-emerald-400 font-medium mt-0.5 block">
+            High proposal conversion
+          </span>
         </div>
       </div>
 
@@ -293,8 +313,8 @@ export function FreelancerProposalsSection({ projects = [] }: FreelancerProposal
                   {prop.status === 'draft'
                     ? 'Send to Client'
                     : prop.status === 'sent'
-                    ? 'Mark Accepted'
-                    : 'Reopen'}
+                      ? 'Mark Accepted'
+                      : 'Reopen'}
                 </span>
                 <ArrowRight className="w-3 h-3" />
               </button>

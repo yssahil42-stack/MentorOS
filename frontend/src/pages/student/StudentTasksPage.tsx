@@ -742,7 +742,8 @@ export default function StudentTasksPage() {
               <BookOpen className="w-10 h-10 text-text-muted mx-auto opacity-50" />
               <h3 className="text-base font-bold text-text-primary">No study roadmaps found</h3>
               <p className="text-xs text-text-muted max-w-sm mx-auto">
-                No study roadmaps or subtasks available. Clear your filters or create a new study task.
+                No study roadmaps or subtasks available. Clear your filters or create a new study
+                task.
               </p>
               <div className="flex items-center justify-center gap-3 pt-2">
                 {hasActiveFilters && (

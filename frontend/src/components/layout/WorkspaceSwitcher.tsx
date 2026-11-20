@@ -1,15 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
-import {
-  GraduationCap,
-  Code2,
-  Briefcase,
-  Target,
-  ChevronDown,
-  Check,
-  Layers,
-} from 'lucide-react';
+import { GraduationCap, Code2, Briefcase, Target, ChevronDown, Check, Layers } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useWorkspace } from '../../contexts/WorkspaceContext';
 import type { UserRole } from '../../types/user';
@@ -64,21 +56,14 @@ export function WorkspaceSwitcher() {
   const { user } = useAuth();
   const { showToast } = useWorkspace();
 
-  const currentRole = getWorkspaceRole(
-    location.pathname,
-    (user?.role as UserRole) || 'student'
-  );
+  const currentRole = getWorkspaceRole(location.pathname, (user?.role as UserRole) || 'student');
 
-  const activeWorkspace =
-    WORKSPACES.find((w) => w.role === currentRole) ?? WORKSPACES[0];
+  const activeWorkspace = WORKSPACES.find((w) => w.role === currentRole) ?? WORKSPACES[0];
   const ActiveIcon = activeWorkspace.icon;
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-      if (
-        containerRef.current &&
-        !containerRef.current.contains(event.target as Node)
-      ) {
+      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
         setIsOpen(false);
       }
     }
@@ -125,16 +110,11 @@ export function WorkspaceSwitcher() {
         aria-haspopup="listbox"
         title="Switch Workspace Module"
       >
-        <ActiveIcon
-          className="w-4 h-4 shrink-0"
-          style={{ color: activeWorkspace.color }}
-        />
+        <ActiveIcon className="w-4 h-4 shrink-0" style={{ color: activeWorkspace.color }} />
         <span className="hidden sm:inline font-bold text-text-primary">
           {activeWorkspace.label}
         </span>
-        <span className="hidden md:inline text-[10px] text-text-muted font-normal">
-          Workspace
-        </span>
+        <span className="hidden md:inline text-[10px] text-text-muted font-normal">Workspace</span>
         <ChevronDown
           className={cn(
             'w-3.5 h-3.5 text-text-muted transition-transform duration-200 shrink-0',
@@ -191,9 +171,7 @@ export function WorkspaceSwitcher() {
                     </div>
                     <div className="min-w-0">
                       <div className="flex items-center gap-1.5">
-                        <span className="text-xs font-bold text-text-primary">
-                          {opt.label}
-                        </span>
+                        <span className="text-xs font-bold text-text-primary">{opt.label}</span>
                         {isSelected && (
                           <span
                             className="text-[9px] font-extrabold uppercase px-1.5 py-0.2 rounded-md"
@@ -206,17 +184,12 @@ export function WorkspaceSwitcher() {
                           </span>
                         )}
                       </div>
-                      <p className="text-[11px] text-text-muted truncate">
-                        {opt.tagline}
-                      </p>
+                      <p className="text-[11px] text-text-muted truncate">{opt.tagline}</p>
                     </div>
                   </div>
 
                   {isSelected && (
-                    <Check
-                      className="w-4 h-4 shrink-0 ml-2"
-                      style={{ color: opt.color }}
-                    />
+                    <Check className="w-4 h-4 shrink-0 ml-2" style={{ color: opt.color }} />
                   )}
                 </button>
               );

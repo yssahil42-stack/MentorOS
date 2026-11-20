@@ -47,7 +47,12 @@ export function createClient(): AxiosInstance {
     // Default: 8000ms for GET, 30000ms for POST/PATCH/DELETE (90000ms for /ai/propose)
     if (endpoint === '/ai/propose') {
       config.timeout = 90_000;
-    } else if (!config.timeout || config.timeout === 8_000 || config.timeout === 30_000 || config.timeout === 15_000) {
+    } else if (
+      !config.timeout ||
+      config.timeout === 8_000 ||
+      config.timeout === 30_000 ||
+      config.timeout === 15_000
+    ) {
       config.timeout = 30_000;
     }
 

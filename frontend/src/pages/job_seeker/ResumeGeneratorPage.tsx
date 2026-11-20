@@ -105,9 +105,15 @@ export default function ResumeGeneratorPage() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [result, setResult] = useState<TailoredResumeResult | null>(null);
   const [activeTab, setActiveTab] = useState<'formatted' | 'markdown' | 'plaintext'>('formatted');
-  const [activeInputTab, setActiveInputTab] = useState<'target' | 'experience' | 'projects' | 'education'>('target');
-  const [selectedTemplate, setSelectedTemplate] = useState<ResumeTemplateId>(form.templateId || 'modern');
-  const [selectedSummaryStyle, setSelectedSummaryStyle] = useState<SummaryStyle>(form.summaryStyle || 'metrics');
+  const [activeInputTab, setActiveInputTab] = useState<
+    'target' | 'experience' | 'projects' | 'education'
+  >('target');
+  const [selectedTemplate, setSelectedTemplate] = useState<ResumeTemplateId>(
+    form.templateId || 'modern'
+  );
+  const [selectedSummaryStyle, setSelectedSummaryStyle] = useState<SummaryStyle>(
+    form.summaryStyle || 'metrics'
+  );
   const [isEditingSummary, setIsEditingSummary] = useState(false);
   const [summaryEditText, setSummaryEditText] = useState('');
   const [copied, setCopied] = useState(false);
@@ -201,7 +207,12 @@ export default function ResumeGeneratorPage() {
       setSummaryEditText(tailored.summary);
       return updated;
     });
-    showToast(isFresher ? 'Switched to Fresher / Entry-Level mode' : 'Switched to Professional Experience mode', 'info');
+    showToast(
+      isFresher
+        ? 'Switched to Fresher / Entry-Level mode'
+        : 'Switched to Professional Experience mode',
+      'info'
+    );
   };
 
   // Switch Resume Template
@@ -213,7 +224,10 @@ export default function ResumeGeneratorPage() {
       setResult(tailored);
       return updated;
     });
-    showToast(`Applied ${TEMPLATE_OPTIONS.find((t) => t.id === templateId)?.name} template`, 'info');
+    showToast(
+      `Applied ${TEMPLATE_OPTIONS.find((t) => t.id === templateId)?.name} template`,
+      'info'
+    );
   };
 
   // Switch Summary Style (Metrics vs Technical vs Growth)
@@ -384,7 +398,10 @@ export default function ResumeGeneratorPage() {
         if (exp.id !== expId) return exp;
         return {
           ...exp,
-          bullets: [...exp.bullets, 'Delivered key feature enhancements driving measurable system velocity.'],
+          bullets: [
+            ...exp.bullets,
+            'Delivered key feature enhancements driving measurable system velocity.',
+          ],
         };
       });
       const updated = { ...prev, experiences: updatedExperiences };
@@ -599,7 +616,8 @@ export default function ResumeGeneratorPage() {
       headerBorder: 'border-b-2 border-slate-700',
       accentColor: 'text-slate-800 dark:text-slate-300',
       accentBg: 'bg-slate-500/10',
-      sectionTitle: 'border-b border-slate-300 uppercase tracking-widest text-slate-900 font-semibold',
+      sectionTitle:
+        'border-b border-slate-300 uppercase tracking-widest text-slate-900 font-semibold',
     },
   }[selectedTemplate];
 
@@ -617,7 +635,8 @@ export default function ResumeGeneratorPage() {
             </span>
           </div>
           <p className="text-xs sm:text-sm text-text-muted">
-            Customize personal data, edit work descriptions, select templates, or tailor for Freshers &amp; Students.
+            Customize personal data, edit work descriptions, select templates, or tailor for
+            Freshers &amp; Students.
           </p>
         </div>
 
@@ -723,7 +742,9 @@ export default function ResumeGeneratorPage() {
                 <div className="flex items-center justify-between border-b border-border-base pb-2">
                   <div className="flex items-center gap-2">
                     <Target className="w-4 h-4 text-emerald-500" />
-                    <h2 className="text-sm font-bold text-text-primary">Target Job Specification</h2>
+                    <h2 className="text-sm font-bold text-text-primary">
+                      Target Job Specification
+                    </h2>
                   </div>
                   <Badge variant="outline" className="text-2xs font-mono">
                     {form.seniority.toUpperCase()}
@@ -800,7 +821,9 @@ export default function ResumeGeneratorPage() {
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-1.5">
                       <User className="w-3.5 h-3.5 text-emerald-500" />
-                      <h3 className="text-xs font-bold text-text-primary">Personal &amp; Contact Data</h3>
+                      <h3 className="text-xs font-bold text-text-primary">
+                        Personal &amp; Contact Data
+                      </h3>
                     </div>
                     {user && (
                       <button
@@ -937,7 +960,9 @@ export default function ResumeGeneratorPage() {
                 {/* Fresher Option: Omit Work History */}
                 <div className="p-3 rounded-xl bg-bg-surface/80 border border-border-base flex items-center justify-between text-xs">
                   <div>
-                    <span className="font-semibold text-text-primary">Fresher / No Corporate Experience?</span>
+                    <span className="font-semibold text-text-primary">
+                      Fresher / No Corporate Experience?
+                    </span>
                     <p className="text-2xs text-text-muted">
                       Omit work history and prioritize Education &amp; Projects.
                     </p>
@@ -963,7 +988,9 @@ export default function ResumeGeneratorPage() {
                 {/* Add Experience Modal Form */}
                 {isAddingExperience && (
                   <div className="p-3.5 rounded-xl bg-bg-surface border border-emerald-500/40 space-y-2.5 text-xs">
-                    <div className="font-bold text-text-primary text-xs">Add New Work Experience</div>
+                    <div className="font-bold text-text-primary text-xs">
+                      Add New Work Experience
+                    </div>
                     <div className="grid grid-cols-2 gap-2">
                       <Input
                         value={newExpRole}
@@ -1016,7 +1043,11 @@ export default function ResumeGeneratorPage() {
                       />
                     </div>
                     <div className="flex justify-end gap-2 pt-1">
-                      <Button variant="ghost" size="sm" onClick={() => setIsAddingExperience(false)}>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setIsAddingExperience(false)}
+                      >
                         Cancel
                       </Button>
                       <Button
@@ -1036,7 +1067,8 @@ export default function ResumeGeneratorPage() {
                   <div className="space-y-3 max-h-80 overflow-y-auto pr-1">
                     {form.experiences.length === 0 ? (
                       <div className="p-4 rounded-xl border border-dashed border-border-base text-center text-text-muted text-xs">
-                        No work experience logged. Click &quot;Add Job&quot; above or toggle Fresher Mode.
+                        No work experience logged. Click &quot;Add Job&quot; above or toggle Fresher
+                        Mode.
                       </div>
                     ) : (
                       form.experiences.map((exp) => (
@@ -1051,7 +1083,8 @@ export default function ResumeGeneratorPage() {
                                 @ {exp.company}
                               </span>
                               <div className="text-2xs text-text-muted mt-0.5">
-                                {exp.location} • {exp.startDate} - {exp.current ? 'Present' : exp.endDate}
+                                {exp.location} • {exp.startDate} -{' '}
+                                {exp.current ? 'Present' : exp.endDate}
                               </div>
                             </div>
                             <button
@@ -1067,7 +1100,9 @@ export default function ResumeGeneratorPage() {
                           {/* Editable Bullet Points */}
                           <div className="space-y-1.5 pt-1 border-t border-border-base">
                             <div className="flex items-center justify-between text-2xs text-text-muted">
-                              <span className="font-semibold">Bullet Points ({exp.bullets.length})</span>
+                              <span className="font-semibold">
+                                Bullet Points ({exp.bullets.length})
+                              </span>
                               <button
                                 type="button"
                                 onClick={() => handleAddExperienceBullet(exp.id)}
@@ -1378,7 +1413,11 @@ export default function ResumeGeneratorPage() {
                         placeholder="Honors / Coursework (e.g. Specialization in AI & Systems)"
                       />
                       <div className="flex justify-end gap-2 pt-1">
-                        <Button variant="ghost" size="sm" onClick={() => setIsAddingEducation(false)}>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setIsAddingEducation(false)}
+                        >
                           Cancel
                         </Button>
                         <Button
@@ -1425,7 +1464,9 @@ export default function ResumeGeneratorPage() {
                               <strong className="text-text-primary">{edu.graduationYear}</strong>
                             </div>
                             {edu.details && (
-                              <div className="text-2xs text-text-faint mt-1 italic">{edu.details}</div>
+                              <div className="text-2xs text-text-faint mt-1 italic">
+                                {edu.details}
+                              </div>
                             )}
                           </div>
                           <button
@@ -1641,8 +1682,12 @@ export default function ResumeGeneratorPage() {
                       {tpl.badge}
                     </span>
                   </div>
-                  <div className="text-xs font-bold text-text-primary leading-tight">{tpl.name}</div>
-                  <div className="text-[10px] text-text-muted mt-0.5 line-clamp-1">{tpl.description}</div>
+                  <div className="text-xs font-bold text-text-primary leading-tight">
+                    {tpl.name}
+                  </div>
+                  <div className="text-[10px] text-text-muted mt-0.5 line-clamp-1">
+                    {tpl.description}
+                  </div>
                 </button>
               ))}
             </div>
@@ -1777,7 +1822,9 @@ export default function ResumeGeneratorPage() {
                     </span>
                   </div>
                   <div className="text-right border-l border-border-base pl-3">
-                    <span className="text-2xs font-semibold text-text-muted block">Readability</span>
+                    <span className="text-2xs font-semibold text-text-muted block">
+                      Readability
+                    </span>
                     <span className="text-base font-black text-text-primary">
                       {keywordReport.atsScore}/100
                     </span>
@@ -1953,7 +2000,9 @@ export default function ResumeGeneratorPage() {
                     <h2 className="text-2xl font-bold tracking-tight text-gray-900">
                       {form.profile.name}
                     </h2>
-                    <div className={`text-sm font-semibold mt-0.5 ${previewTemplateStyles.accentColor}`}>
+                    <div
+                      className={`text-sm font-semibold mt-0.5 ${previewTemplateStyles.accentColor}`}
+                    >
                       {form.targetRole}
                     </div>
                     <div className="text-xs text-gray-600 mt-1 flex items-center justify-center flex-wrap gap-x-2">
@@ -2040,7 +2089,8 @@ export default function ResumeGeneratorPage() {
                                 {edu.percentage && (
                                   <span>
                                     {' '}
-                                    • Score: <strong className="text-gray-900">{edu.percentage}</strong>
+                                    • Score:{' '}
+                                    <strong className="text-gray-900">{edu.percentage}</strong>
                                   </span>
                                 )}
                                 {edu.board && <span> • Board: {edu.board}</span>}
@@ -2151,7 +2201,8 @@ export default function ResumeGeneratorPage() {
                                 {edu.percentage && (
                                   <span>
                                     {' '}
-                                    • Score: <strong className="text-gray-900">{edu.percentage}</strong>
+                                    • Score:{' '}
+                                    <strong className="text-gray-900">{edu.percentage}</strong>
                                   </span>
                                 )}
                                 {edu.board && <span> • Board: {edu.board}</span>}

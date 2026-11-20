@@ -38,12 +38,7 @@ import {
   updateMilestone,
   deleteMilestone,
 } from '../../services/projectService';
-import {
-  fetchTasks,
-  createTask,
-  updateTask,
-  deleteTask,
-} from '../../services/taskService';
+import { fetchTasks, createTask, updateTask, deleteTask } from '../../services/taskService';
 import { Card } from '../../components/ui/Card';
 import { Card3D } from '../../components/ui/Card3D';
 import { Button } from '../../components/ui/Button';
@@ -71,7 +66,9 @@ export default function FreelancerProjectsPage() {
   const debouncedSearchQuery = useDebounce(searchQuery, 300);
   const [statusFilter, setStatusFilter] = useState<ProjectStatus | 'all'>('all');
   const [priorityFilter, setPriorityFilter] = useState<ProjectPriority | 'all'>('all');
-  const [sortBy, setSortBy] = useState<'updated' | 'created' | 'progress' | 'target_date'>('updated');
+  const [sortBy, setSortBy] = useState<'updated' | 'created' | 'progress' | 'target_date'>(
+    'updated'
+  );
   const [showArchived, setShowArchived] = useState(false);
   const [editingProject, setEditingProject] = useState<Project | null>(null);
   const [editForm, setEditForm] = useState({
@@ -87,7 +84,9 @@ export default function FreelancerProjectsPage() {
 
   // ─── Deliverables / Milestone Form State ─────────────────────────────────
   const [quickDeliverableTitle, setQuickDeliverableTitle] = useState('');
-  const [quickDeliverableProjectId, setQuickDeliverableProjectId] = useState<number | undefined>(undefined);
+  const [quickDeliverableProjectId, setQuickDeliverableProjectId] = useState<number | undefined>(
+    undefined
+  );
   const [quickDeliverableDate, setQuickDeliverableDate] = useState('');
   const [quickDeliverableMinutes, setQuickDeliverableMinutes] = useState(120);
   const [quickDeliverableActualMinutes, setQuickDeliverableActualMinutes] = useState(0);
@@ -340,8 +339,10 @@ export default function FreelancerProjectsPage() {
   });
 
   filteredProjects.sort((a, b) => {
-    if (sortBy === 'updated') return new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime();
-    if (sortBy === 'created') return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+    if (sortBy === 'updated')
+      return new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime();
+    if (sortBy === 'created')
+      return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
     if (sortBy === 'progress') return (b.progress || 0) - (a.progress || 0);
     if (sortBy === 'target_date') {
       if (!a.target_date) return 1;
@@ -360,7 +361,10 @@ export default function FreelancerProjectsPage() {
     if (taskProjectFilter !== 'all' && t.project_id !== taskProjectFilter) return false;
     if (taskSearch) {
       const q = taskSearch.toLowerCase();
-      return t.title.toLowerCase().includes(q) || (t.description && t.description.toLowerCase().includes(q));
+      return (
+        t.title.toLowerCase().includes(q) ||
+        (t.description && t.description.toLowerCase().includes(q))
+      );
     }
     return true;
   });
@@ -411,7 +415,8 @@ export default function FreelancerProjectsPage() {
             Projects, Deliverables &amp; Tasks
           </h1>
           <p className="text-xs md:text-sm text-text-secondary max-w-2xl">
-            Manage client engagements, project deliverables, and execution tasks in one unified workspace.
+            Manage client engagements, project deliverables, and execution tasks in one unified
+            workspace.
           </p>
         </div>
 
@@ -460,7 +465,12 @@ export default function FreelancerProjectsPage() {
 
       {/* ─── METRICS ROW ───────────────────────────────────────────────── */}
       <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4">
-        <Card3D maxTilt={5} depth={20} variant="glass" className="p-4 sm:p-5 border border-border-base/90 shadow-card">
+        <Card3D
+          maxTilt={5}
+          depth={20}
+          variant="glass"
+          className="p-4 sm:p-5 border border-border-base/90 shadow-card"
+        >
           <div className="flex items-center justify-between text-xs text-text-muted font-medium">
             <span>Project Tasks</span>
             <div className="p-2 rounded-xl bg-amber-500/15 text-amber-500 border border-amber-500/25">
@@ -475,7 +485,12 @@ export default function FreelancerProjectsPage() {
           </div>
         </Card3D>
 
-        <Card3D maxTilt={5} depth={20} variant="glass" className="p-4 sm:p-5 border border-border-base/90 shadow-card">
+        <Card3D
+          maxTilt={5}
+          depth={20}
+          variant="glass"
+          className="p-4 sm:p-5 border border-border-base/90 shadow-card"
+        >
           <div className="flex items-center justify-between text-xs text-text-muted font-medium">
             <span>Deliverables</span>
             <div className="p-2 rounded-xl bg-emerald-500/15 text-emerald-500 border border-emerald-500/25">
@@ -490,7 +505,12 @@ export default function FreelancerProjectsPage() {
           </div>
         </Card3D>
 
-        <Card3D maxTilt={5} depth={20} variant="glass" className="p-4 sm:p-5 border border-border-base/90 shadow-card">
+        <Card3D
+          maxTilt={5}
+          depth={20}
+          variant="glass"
+          className="p-4 sm:p-5 border border-border-base/90 shadow-card"
+        >
           <div className="flex items-center justify-between text-xs text-text-muted font-medium">
             <span>Client Tasks</span>
             <div className="p-2 rounded-xl bg-cyan-500/15 text-cyan-500 border border-cyan-500/25">
@@ -505,7 +525,12 @@ export default function FreelancerProjectsPage() {
           </div>
         </Card3D>
 
-        <Card3D maxTilt={5} depth={20} variant="glass" className="p-4 sm:p-5 border border-border-base/90 shadow-card">
+        <Card3D
+          maxTilt={5}
+          depth={20}
+          variant="glass"
+          className="p-4 sm:p-5 border border-border-base/90 shadow-card"
+        >
           <div className="flex items-center justify-between text-xs text-text-muted font-medium">
             <span>Avg Progress</span>
             <div className="p-2 rounded-xl bg-solar-500/15 text-solar-500 border border-solar-500/25">
@@ -519,7 +544,12 @@ export default function FreelancerProjectsPage() {
           </div>
         </Card3D>
 
-        <Card3D maxTilt={5} depth={20} variant="glass" className="p-4 sm:p-5 border border-border-base/90 shadow-card">
+        <Card3D
+          maxTilt={5}
+          depth={20}
+          variant="glass"
+          className="p-4 sm:p-5 border border-border-base/90 shadow-card"
+        >
           <div className="flex items-center justify-between text-xs text-text-muted font-medium">
             <span>Pipeline Value (INR)</span>
             <div className="p-2 rounded-xl bg-purple-500/15 text-purple-500 border border-purple-500/25">
@@ -591,7 +621,12 @@ export default function FreelancerProjectsPage() {
       {activeTab === 'projects' && (
         <div className="space-y-6">
           {/* Toolbar */}
-          <Card3D maxTilt={2} depth={15} variant="glass" className="p-4 border border-border-base/80 shadow-card">
+          <Card3D
+            maxTilt={2}
+            depth={15}
+            variant="glass"
+            className="p-4 border border-border-base/80 shadow-card"
+          >
             <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center justify-between">
               <div className="flex flex-col sm:flex-row gap-2 items-start sm:items-center flex-1">
                 <div className="relative flex-1 max-w-xs">
@@ -705,7 +740,9 @@ export default function FreelancerProjectsPage() {
                           <h3 className="text-sm font-bold text-text-primary truncate max-w-[200px]">
                             {project.title}
                           </h3>
-                          <span className={`text-xs font-medium px-2 py-0.5 rounded-full border ${statusColors[project.status]}`}>
+                          <span
+                            className={`text-xs font-medium px-2 py-0.5 rounded-full border ${statusColors[project.status]}`}
+                          >
                             {statusLabels[project.status]}
                           </span>
                         </div>
@@ -741,7 +778,9 @@ export default function FreelancerProjectsPage() {
                     <div className="space-y-1.5">
                       <div className="flex items-center justify-between text-2xs text-text-muted">
                         <span>Milestones &amp; Progress</span>
-                        <span className="font-semibold text-text-primary font-mono">{project.progress}%</span>
+                        <span className="font-semibold text-text-primary font-mono">
+                          {project.progress}%
+                        </span>
                       </div>
                       <div className="w-full bg-bg-base h-2 rounded-full overflow-hidden border border-border-base">
                         <div
@@ -784,13 +823,24 @@ export default function FreelancerProjectsPage() {
           {filteredProjects.length > PAGE_SIZE && (
             <div className="flex items-center justify-between p-4 rounded-xl bg-bg-surface border border-border-base">
               <span className="text-xs text-text-muted">
-                Showing {(page - 1) * PAGE_SIZE + 1} to {Math.min(page * PAGE_SIZE, filteredProjects.length)} of {filteredProjects.length}
+                Showing {(page - 1) * PAGE_SIZE + 1} to{' '}
+                {Math.min(page * PAGE_SIZE, filteredProjects.length)} of {filteredProjects.length}
               </span>
               <div className="flex gap-2">
-                <Button size="xs" variant="outline" disabled={page <= 1} onClick={() => setPage((p) => p - 1)}>
+                <Button
+                  size="xs"
+                  variant="outline"
+                  disabled={page <= 1}
+                  onClick={() => setPage((p) => p - 1)}
+                >
                   Previous
                 </Button>
-                <Button size="xs" variant="outline" disabled={page >= totalPages} onClick={() => setPage((p) => p + 1)}>
+                <Button
+                  size="xs"
+                  variant="outline"
+                  disabled={page >= totalPages}
+                  onClick={() => setPage((p) => p + 1)}
+                >
                   Next
                 </Button>
               </div>
@@ -861,16 +911,23 @@ export default function FreelancerProjectsPage() {
             {milestones.length === 0 ? (
               <div className="card p-12 text-center border-dashed border-border-base">
                 <Clock className="w-12 h-12 text-amber-500/50 mx-auto mb-3" />
-                <h4 className="text-base font-bold text-text-primary">No client deliverables scheduled</h4>
+                <h4 className="text-base font-bold text-text-primary">
+                  No client deliverables scheduled
+                </h4>
                 <p className="text-xs text-text-muted mt-1 max-w-sm mx-auto">
-                  Add deliverables above to track delivery milestones, client approvals, and invoice-ready checkpoints.
+                  Add deliverables above to track delivery milestones, client approvals, and
+                  invoice-ready checkpoints.
                 </p>
               </div>
             ) : (
               milestones.map((m) => {
                 const isDone = m.status === 'completed';
                 const project = projects.find((p) => p.id === m.project_id);
-                const { expectedMinutes, actualMinutes } = getMilestoneTimeTotals(m, tasks, milestones);
+                const { expectedMinutes, actualMinutes } = getMilestoneTimeTotals(
+                  m,
+                  tasks,
+                  milestones
+                );
                 return (
                   <div
                     key={m.id}
@@ -889,7 +946,9 @@ export default function FreelancerProjectsPage() {
                       >
                         <CheckCircle2
                           className={`w-5 h-5 ${
-                            isDone ? 'text-emerald-500 fill-emerald-500/20' : 'text-text-muted hover:text-amber-500'
+                            isDone
+                              ? 'text-emerald-500 fill-emerald-500/20'
+                              : 'text-text-muted hover:text-amber-500'
                           }`}
                         />
                       </button>
@@ -1118,7 +1177,10 @@ export default function FreelancerProjectsPage() {
                                           in_progress: 'todo',
                                           completed: 'in_progress',
                                         };
-                                        updateTaskMutation.mutate({ id: t.id, status: prevStatus[col.id] || 'todo' });
+                                        updateTaskMutation.mutate({
+                                          id: t.id,
+                                          status: prevStatus[col.id] || 'todo',
+                                        });
                                       }}
                                       className="px-1.5 py-0.5 rounded bg-bg-elevated hover:bg-bg-base border border-border-base text-text-muted"
                                       title="Move back"
@@ -1134,7 +1196,10 @@ export default function FreelancerProjectsPage() {
                                           todo: 'in_progress',
                                           in_progress: 'completed',
                                         };
-                                        updateTaskMutation.mutate({ id: t.id, status: nextStatus[col.id] || 'completed' });
+                                        updateTaskMutation.mutate({
+                                          id: t.id,
+                                          status: nextStatus[col.id] || 'completed',
+                                        });
                                       }}
                                       className="px-1.5 py-0.5 rounded bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/30 text-amber-500 font-bold"
                                       title="Move forward"
@@ -1160,7 +1225,9 @@ export default function FreelancerProjectsPage() {
                 <div className="card p-10 text-center border-dashed border-border-base">
                   <CheckSquare className="w-10 h-10 text-amber-500/50 mx-auto mb-2" />
                   <h4 className="text-sm font-bold text-text-primary">No tasks found</h4>
-                  <p className="text-xs text-text-muted mt-1">Add client tasks above or switch view modes.</p>
+                  <p className="text-xs text-text-muted mt-1">
+                    Add client tasks above or switch view modes.
+                  </p>
                 </div>
               ) : (
                 filteredTasks.map((t) => {
@@ -1188,7 +1255,9 @@ export default function FreelancerProjectsPage() {
                         >
                           <CheckCircle2
                             className={`w-5 h-5 ${
-                              isDone ? 'text-emerald-500 fill-emerald-500/20' : 'text-text-muted hover:text-amber-500'
+                              isDone
+                                ? 'text-emerald-500 fill-emerald-500/20'
+                                : 'text-text-muted hover:text-amber-500'
                             }`}
                           />
                         </button>
@@ -1296,7 +1365,9 @@ export default function FreelancerProjectsPage() {
                   </label>
                   <Select
                     value={editForm.status}
-                    onValueChange={(val) => setEditForm({ ...editForm, status: val as ProjectStatus })}
+                    onValueChange={(val) =>
+                      setEditForm({ ...editForm, status: val as ProjectStatus })
+                    }
                     options={[
                       { value: 'planning', label: 'Planning' },
                       { value: 'active', label: 'Active' },
@@ -1312,7 +1383,9 @@ export default function FreelancerProjectsPage() {
                   </label>
                   <Select
                     value={editForm.priority}
-                    onValueChange={(val) => setEditForm({ ...editForm, priority: val as ProjectPriority })}
+                    onValueChange={(val) =>
+                      setEditForm({ ...editForm, priority: val as ProjectPriority })
+                    }
                     options={[
                       { value: 'low', label: 'Low' },
                       { value: 'medium', label: 'Medium' },

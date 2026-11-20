@@ -1,6 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useSearchParams, useNavigate } from 'react-router-dom';
-import { Layers, Loader2, ArrowLeft, Lock, CheckCircle2, AlertCircle, Eye, EyeOff, ShieldCheck } from 'lucide-react';
+import {
+  Layers,
+  Loader2,
+  ArrowLeft,
+  Lock,
+  CheckCircle2,
+  AlertCircle,
+  Eye,
+  EyeOff,
+  ShieldCheck,
+} from 'lucide-react';
 import { ThemeToggle } from '../../components/ui/ThemeToggle';
 import { Spatial3DCanvas } from '../../components/ui/Spatial3DCanvas';
 import { api } from '../../services/api';
@@ -39,7 +49,10 @@ export default function ResetPasswordPage() {
         setTargetEmail(resp?.email || '');
       } catch (err: any) {
         setTokenValid(false);
-        const msg = err?.response?.data?.detail || err?.message || 'Password reset link is invalid or has expired.';
+        const msg =
+          err?.response?.data?.detail ||
+          err?.message ||
+          'Password reset link is invalid or has expired.';
         setVerifyError(msg);
       } finally {
         setIsVerifying(false);
@@ -102,7 +115,11 @@ export default function ResetPasswordPage() {
       </header>
 
       {/* Main Glass Card wrapped in Spatial3DCanvas */}
-      <Spatial3DCanvas defaultMode="2d" defaultPreset="standard" className="w-full max-w-sm mx-auto z-10 my-8">
+      <Spatial3DCanvas
+        defaultMode="2d"
+        defaultPreset="standard"
+        className="w-full max-w-sm mx-auto z-10 my-8"
+      >
         <div className="relative rounded-2xl bg-bg-surface/80 backdrop-blur-xl border border-border-base p-8 shadow-2xl">
           {isVerifying ? (
             <div className="text-center py-8 space-y-3">
@@ -195,7 +212,10 @@ export default function ResetPasswordPage() {
                     htmlFor="new-password"
                     className="block text-xs font-semibold text-text-secondary mb-1.5"
                   >
-                    New Password <span className="text-text-muted font-normal text-3xs">(min. 8 characters)</span>
+                    New Password{' '}
+                    <span className="text-text-muted font-normal text-3xs">
+                      (min. 8 characters)
+                    </span>
                   </label>
                   <div className="relative">
                     <input
@@ -255,7 +275,11 @@ export default function ResetPasswordPage() {
                       className="absolute right-3 top-1/2 -translate-y-1/2 text-text-muted hover:text-text-primary p-1 rounded-lg"
                       aria-label={showConfirmPass ? 'Hide password' : 'Show password'}
                     >
-                      {showConfirmPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      {showConfirmPass ? (
+                        <EyeOff className="w-4 h-4" />
+                      ) : (
+                        <Eye className="w-4 h-4" />
+                      )}
                     </button>
                   </div>
                 </div>

@@ -169,9 +169,7 @@ export default function StudentNotesPage() {
             <span>Recent Notes</span>
             <FileText className="w-4 h-4 text-orange-500 dark:text-orange-400" />
           </div>
-          <div className="mt-2 text-2xl font-extrabold text-text-primary">
-            {notes.length}
-          </div>
+          <div className="mt-2 text-2xl font-extrabold text-text-primary">{notes.length}</div>
           <p className="text-2xs text-orange-500 dark:text-orange-400 mt-1">
             Across study subjects
           </p>

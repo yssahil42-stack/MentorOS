@@ -18,15 +18,8 @@ import {
   BookOpen,
   Filter,
 } from 'lucide-react';
-import {
-  POPULAR_ROLE_PRESETS,
-  analyzeJobRole,
-} from '../../services/jobAnalyzerService';
-import type {
-  SeniorityLevel,
-  JobAnalysisResult,
-  RolePreset,
-} from '../../types/jobAnalyzer';
+import { POPULAR_ROLE_PRESETS, analyzeJobRole } from '../../services/jobAnalyzerService';
+import type { SeniorityLevel, JobAnalysisResult, RolePreset } from '../../types/jobAnalyzer';
 import { useWorkspace } from '../../contexts/WorkspaceContext';
 
 export default function SearchPlanPage() {
@@ -47,7 +40,9 @@ export default function SearchPlanPage() {
   const [newSkillInput, setNewSkillInput] = useState<string>('');
   const [jobDescription, setJobDescription] = useState<string>('');
   const [showJdInput, setShowJdInput] = useState<boolean>(false);
-  const [activeTab, setActiveTab] = useState<'skills' | 'where_to_apply' | 'mentor_opinion'>('skills');
+  const [activeTab, setActiveTab] = useState<'skills' | 'where_to_apply' | 'mentor_opinion'>(
+    'skills'
+  );
   const [isCopied, setIsCopied] = useState<boolean>(false);
 
   // Load user skills from localStorage / profile on initial mount
@@ -112,7 +107,10 @@ export default function SearchPlanPage() {
         const parsed = JSON.parse(storedUser);
         const devSkills = parsed.profile_data?.developer?.tech_stack;
         if (devSkills && typeof devSkills === 'string') {
-          const split = devSkills.split(',').map((s: string) => s.trim()).filter(Boolean);
+          const split = devSkills
+            .split(',')
+            .map((s: string) => s.trim())
+            .filter(Boolean);
           setUserSkills((prev) => Array.from(new Set([...prev, ...split])));
           showToast(`Synced ${split.length} skills from your profile`, 'success');
           return;
@@ -192,7 +190,9 @@ ${analysisResult.mentorOpinion.strategicActionPlan
             </span>
           </div>
           <p className="text-sm text-text-muted mt-1 max-w-3xl">
-            Target any role (e.g. <strong>Data Analyst</strong>) to pinpoint your exact skill match, uncover critical gaps, discover where to apply, and receive personalized senior mentor strategic advice.
+            Target any role (e.g. <strong>Data Analyst</strong>) to pinpoint your exact skill match,
+            uncover critical gaps, discover where to apply, and receive personalized senior mentor
+            strategic advice.
           </p>
         </div>
 
@@ -254,9 +254,13 @@ ${analysisResult.mentorOpinion.strategicActionPlan
                 >
                   {preset.label}
                   {isDataAnalyst && (
-                    <span className={`text-[10px] px-1.5 py-0.2 rounded font-semibold ${
-                      isSelected ? 'bg-emerald-800 text-emerald-100' : 'bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300'
-                    }`}>
+                    <span
+                      className={`text-[10px] px-1.5 py-0.2 rounded font-semibold ${
+                        isSelected
+                          ? 'bg-emerald-800 text-emerald-100'
+                          : 'bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300'
+                      }`}
+                    >
                       Featured
                     </span>
                   )}
@@ -328,7 +332,9 @@ ${analysisResult.mentorOpinion.strategicActionPlan
           {/* Current Skills Chips */}
           <div className="flex flex-wrap gap-1.5 min-h-[38px] p-2.5 rounded-lg bg-surface-elevated border border-border-subtle">
             {userSkills.length === 0 ? (
-              <span className="text-xs text-text-faint italic py-1">No skills added yet. Type below or select suggested skills.</span>
+              <span className="text-xs text-text-faint italic py-1">
+                No skills added yet. Type below or select suggested skills.
+              </span>
             ) : (
               userSkills.map((skill) => (
                 <span
@@ -397,7 +403,9 @@ ${analysisResult.mentorOpinion.strategicActionPlan
               onClick={() => setShowJdInput(!showJdInput)}
               className="text-xs text-text-muted hover:text-text-primary flex items-center gap-1 underline"
             >
-              {showJdInput ? '− Hide Job Description' : '+ Paste Target Job Description (Optional for custom matching)'}
+              {showJdInput
+                ? '− Hide Job Description'
+                : '+ Paste Target Job Description (Optional for custom matching)'}
             </button>
             {showJdInput && (
               <textarea
@@ -435,15 +443,15 @@ ${analysisResult.mentorOpinion.strategicActionPlan
                     analysisResult.mentorOpinion.verdictTone === 'ready'
                       ? 'bg-emerald-100 dark:bg-emerald-950/70 text-emerald-800 dark:text-emerald-300 border border-emerald-300'
                       : analysisResult.mentorOpinion.verdictTone === 'competitive_gap'
-                      ? 'bg-amber-100 dark:bg-amber-950/70 text-amber-800 dark:text-amber-300 border border-amber-300'
-                      : 'bg-rose-100 dark:bg-rose-950/70 text-rose-800 dark:text-rose-300 border border-rose-300'
+                        ? 'bg-amber-100 dark:bg-amber-950/70 text-amber-800 dark:text-amber-300 border border-amber-300'
+                        : 'bg-rose-100 dark:bg-rose-950/70 text-rose-800 dark:text-rose-300 border border-rose-300'
                   }`}
                 >
                   {analysisResult.mentorOpinion.verdictTone === 'ready'
                     ? '🚀 Ready to Apply'
                     : analysisResult.mentorOpinion.verdictTone === 'competitive_gap'
-                    ? '⚡ Competitive with Gaps'
-                    : '🌱 Foundational Stage'}
+                      ? '⚡ Competitive with Gaps'
+                      : '🌱 Foundational Stage'}
                 </span>
                 <span className="text-xs text-text-faint">
                   Role: <strong>{analysisResult.targetRole}</strong> ({analysisResult.seniority})
@@ -496,7 +504,11 @@ ${analysisResult.mentorOpinion.strategicActionPlan
             onClick={handleCopyStrategy}
             className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-surface hover:bg-surface-elevated border border-border-subtle text-text-primary transition-colors flex items-center gap-1.5 shadow-sm"
           >
-            {isCopied ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
+            {isCopied ? (
+              <Check className="w-3.5 h-3.5 text-emerald-500" />
+            ) : (
+              <Copy className="w-3.5 h-3.5" />
+            )}
             {isCopied ? 'Copied Strategy!' : 'Copy Mentor Strategy'}
           </button>
         </div>
@@ -515,7 +527,8 @@ ${analysisResult.mentorOpinion.strategicActionPlan
           <Code2 className="w-4 h-4" />
           Skills Gap Analysis
           <span className="text-xs px-2 py-0.2 rounded-full bg-surface-elevated border border-border-subtle">
-            {analysisResult.matchedSkills.length} Matched / {analysisResult.missingSkills.length} Gaps
+            {analysisResult.matchedSkills.length} Matched / {analysisResult.missingSkills.length}{' '}
+            Gaps
           </span>
         </button>
 
@@ -559,8 +572,12 @@ ${analysisResult.mentorOpinion.strategicActionPlan
                     <CheckCircle2 className="w-4 h-4" />
                   </span>
                   <div>
-                    <h3 className="text-sm font-bold text-text-primary">Skills You Have (Matched)</h3>
-                    <p className="text-xs text-text-muted">Skills you command that qualify you for {targetRole}</p>
+                    <h3 className="text-sm font-bold text-text-primary">
+                      Skills You Have (Matched)
+                    </h3>
+                    <p className="text-xs text-text-muted">
+                      Skills you command that qualify you for {targetRole}
+                    </p>
                   </div>
                 </div>
                 <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300">
@@ -570,7 +587,8 @@ ${analysisResult.mentorOpinion.strategicActionPlan
 
               {analysisResult.matchedSkills.length === 0 ? (
                 <div className="py-8 text-center text-xs text-text-muted">
-                  No matched skills found yet. Add your current skills in the configuration card above.
+                  No matched skills found yet. Add your current skills in the configuration card
+                  above.
                 </div>
               ) : (
                 <div className="space-y-3 mt-4">
@@ -629,8 +647,12 @@ ${analysisResult.mentorOpinion.strategicActionPlan
                     <AlertCircle className="w-4 h-4" />
                   </span>
                   <div>
-                    <h3 className="text-sm font-bold text-text-primary">Skills You Need (Gaps to Close)</h3>
-                    <p className="text-xs text-text-muted">Targeted skills required by employers hiring for {targetRole}</p>
+                    <h3 className="text-sm font-bold text-text-primary">
+                      Skills You Need (Gaps to Close)
+                    </h3>
+                    <p className="text-xs text-text-muted">
+                      Targeted skills required by employers hiring for {targetRole}
+                    </p>
                   </div>
                 </div>
                 <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-rose-100 dark:bg-rose-950 text-rose-800 dark:text-rose-300">
@@ -640,7 +662,8 @@ ${analysisResult.mentorOpinion.strategicActionPlan
 
               {analysisResult.missingSkills.length === 0 ? (
                 <div className="py-8 text-center text-xs text-emerald-600 font-medium">
-                  🎉 Outstanding! You cover all standard core and differentiator benchmarks for this role.
+                  🎉 Outstanding! You cover all standard core and differentiator benchmarks for this
+                  role.
                 </div>
               ) : (
                 <div className="space-y-3 mt-4">
@@ -651,8 +674,8 @@ ${analysisResult.mentorOpinion.strategicActionPlan
                         gap.priority === 'critical'
                           ? 'bg-rose-500/5 border-rose-500/30'
                           : gap.priority === 'high'
-                          ? 'bg-amber-500/5 border-amber-500/30'
-                          : 'bg-surface-elevated border-border-subtle'
+                            ? 'bg-amber-500/5 border-amber-500/30'
+                            : 'bg-surface-elevated border-border-subtle'
                       }`}
                     >
                       <div className="flex items-start justify-between gap-2">
@@ -662,8 +685,8 @@ ${analysisResult.mentorOpinion.strategicActionPlan
                               gap.priority === 'critical'
                                 ? 'text-rose-500'
                                 : gap.priority === 'high'
-                                ? 'text-amber-500'
-                                : 'text-blue-500'
+                                  ? 'text-amber-500'
+                                  : 'text-blue-500'
                             }`}
                           />
                           <div>
@@ -673,15 +696,15 @@ ${analysisResult.mentorOpinion.strategicActionPlan
                                 gap.priority === 'critical'
                                   ? 'bg-rose-100 dark:bg-rose-950 text-rose-800 dark:text-rose-300'
                                   : gap.priority === 'high'
-                                  ? 'bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300'
-                                  : 'bg-blue-100 dark:bg-blue-950 text-blue-800 dark:text-blue-300'
+                                    ? 'bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300'
+                                    : 'bg-blue-100 dark:bg-blue-950 text-blue-800 dark:text-blue-300'
                               }`}
                             >
                               {gap.priority === 'critical'
                                 ? '🔴 Critical Blocker'
                                 : gap.priority === 'high'
-                                ? '🟡 High-Value Advantage'
-                                : '🟢 Bonus Differentiator'}
+                                  ? '🟡 High-Value Advantage'
+                                  : '🟢 Bonus Differentiator'}
                             </span>
                           </div>
                         </div>
@@ -692,8 +715,7 @@ ${analysisResult.mentorOpinion.strategicActionPlan
                           className="text-[10px] font-semibold px-2 py-1 rounded bg-surface hover:bg-emerald-500/10 hover:text-emerald-600 border border-border-subtle text-text-secondary transition-colors whitespace-nowrap flex items-center gap-1"
                           title="Add to your skills if you already know this"
                         >
-                          <Plus className="w-2.5 h-2.5 text-emerald-500" />
-                          I know this
+                          <Plus className="w-2.5 h-2.5 text-emerald-500" />I know this
                         </button>
                       </div>
 
@@ -731,7 +753,9 @@ ${analysisResult.mentorOpinion.strategicActionPlan
                   Direct 1-Click Job Portals for {analysisResult.targetRole}
                 </h3>
                 <p className="text-xs text-text-muted">
-                  Pre-configured search queries pre-filtered for <strong>{analysisResult.targetRole}</strong> in <strong>{locationPreference}</strong>
+                  Pre-configured search queries pre-filtered for{' '}
+                  <strong>{analysisResult.targetRole}</strong> in{' '}
+                  <strong>{locationPreference}</strong>
                 </p>
               </div>
             </div>
@@ -777,7 +801,8 @@ ${analysisResult.mentorOpinion.strategicActionPlan
               High-Hiring Industries & Target Companies for {analysisResult.targetRole}
             </h3>
             <p className="text-xs text-text-muted">
-              Sectors with active hiring pipelines and specific candidate expectations for this role.
+              Sectors with active hiring pipelines and specific candidate expectations for this
+              role.
             </p>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -792,9 +817,7 @@ ${analysisResult.mentorOpinion.strategicActionPlan
                       Active Hiring
                     </span>
                   </div>
-                  <p className="text-xs text-text-muted">
-                    {ind.description}
-                  </p>
+                  <p className="text-xs text-text-muted">{ind.description}</p>
                   <div className="text-[11px] space-y-1 pt-1">
                     <p className="text-text-secondary">
                       <strong>Sample Employers:</strong> {ind.exampleCompanies.join(', ')}
@@ -823,10 +846,15 @@ ${analysisResult.mentorOpinion.strategicActionPlan
 
             <div className="space-y-3">
               {analysisResult.whereToApply.recommendedChannels.map((channel, idx) => (
-                <div key={idx} className="p-3 rounded-lg bg-surface-elevated border border-border-subtle">
+                <div
+                  key={idx}
+                  className="p-3 rounded-lg bg-surface-elevated border border-border-subtle"
+                >
                   <div className="flex items-center justify-between text-xs font-bold text-text-primary mb-1">
                     <span>{channel.channel}</span>
-                    <span className="text-emerald-600 dark:text-emerald-400">{channel.allocation}% of effort</span>
+                    <span className="text-emerald-600 dark:text-emerald-400">
+                      {channel.allocation}% of effort
+                    </span>
                   </div>
                   <div className="w-full bg-border-subtle rounded-full h-1.5 mb-2 overflow-hidden">
                     <div
@@ -834,9 +862,7 @@ ${analysisResult.mentorOpinion.strategicActionPlan
                       style={{ width: `${channel.allocation}%` }}
                     />
                   </div>
-                  <p className="text-[11px] text-text-muted">
-                    {channel.advice}
-                  </p>
+                  <p className="text-[11px] text-text-muted">{channel.advice}</p>
                 </div>
               ))}
             </div>
@@ -858,7 +884,8 @@ ${analysisResult.mentorOpinion.strategicActionPlan
                   Senior Engineering & Analytics Mentor Opinion
                 </h3>
                 <p className="text-xs text-text-muted">
-                  Candid evaluation based on current market hiring bars for <strong>{analysisResult.targetRole}</strong>.
+                  Candid evaluation based on current market hiring bars for{' '}
+                  <strong>{analysisResult.targetRole}</strong>.
                 </p>
               </div>
             </div>
@@ -868,7 +895,10 @@ ${analysisResult.mentorOpinion.strategicActionPlan
                 <strong>The Reality Check:</strong> {analysisResult.mentorOpinion.executiveSummary}
               </p>
               <p>
-                <strong>The Biggest Blocker to Fix:</strong> <span className="text-rose-600 dark:text-rose-400 font-semibold">{analysisResult.mentorOpinion.biggestBlocker}</span>
+                <strong>The Biggest Blocker to Fix:</strong>{' '}
+                <span className="text-rose-600 dark:text-rose-400 font-semibold">
+                  {analysisResult.mentorOpinion.biggestBlocker}
+                </span>
               </p>
             </div>
 
@@ -926,9 +956,12 @@ ${analysisResult.mentorOpinion.strategicActionPlan
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="card p-5 bg-surface border border-border-subtle rounded-xl flex items-center justify-between">
               <div>
-                <h4 className="text-xs font-bold text-text-primary">Tailor Resume for {analysisResult.targetRole}</h4>
+                <h4 className="text-xs font-bold text-text-primary">
+                  Tailor Resume for {analysisResult.targetRole}
+                </h4>
                 <p className="text-[11px] text-text-muted mt-0.5">
-                  Generate an ATS-optimized resume emphasizing your qualified skills and chosen template.
+                  Generate an ATS-optimized resume emphasizing your qualified skills and chosen
+                  template.
                 </p>
               </div>
               <button
@@ -944,7 +977,8 @@ ${analysisResult.mentorOpinion.strategicActionPlan
               <div>
                 <h4 className="text-xs font-bold text-text-primary">Track Applications</h4>
                 <p className="text-[11px] text-text-muted mt-0.5">
-                  Log your target job applications, schedule 7d/14d follow-ups, and track recruiter responses.
+                  Log your target job applications, schedule 7d/14d follow-ups, and track recruiter
+                  responses.
                 </p>
               </div>
               <button

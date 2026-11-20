@@ -16,11 +16,7 @@ import { Button } from '../../components/ui/Button';
 import { Badge } from '../../components/ui/Badge';
 import { CurrencyConverter } from '../../components/ui/CurrencyConverter';
 import { formatCurrency } from '../../utils/dateUtils';
-import {
-  CURRENCY_OPTIONS,
-  getCurrencySymbol,
-  convertCurrency,
-} from '../../utils/currency';
+import { CURRENCY_OPTIONS, getCurrencySymbol, convertCurrency } from '../../utils/currency';
 import { cn } from '../../utils/cn';
 
 // ─── Calculator Interfaces ───────────────────────────────────────────────────
@@ -72,18 +68,14 @@ export default function RateCalculatorPage() {
     const overheadCost = annualGross * (safeOverhead / 100);
     const annualNet = annualGross - overheadCost;
     const monthlyNet = annualNet / 12;
-    const effectiveHourlyRate =
-      annualBillableHours > 0 ? annualNet / annualBillableHours : 0;
+    const effectiveHourlyRate = annualBillableHours > 0 ? annualNet / annualBillableHours : 0;
 
     const annualTarget = safeRate > 0 ? monthlyTarget * 12 : 0;
     const targetWithOverhead = annualTarget / (1 - safeOverhead / 100);
-    const requiredBillableHours =
-      safeRate > 0 ? targetWithOverhead / safeRate : 0;
-    const requiredBillableHoursPerWeek =
-      safeWeeks > 0 ? requiredBillableHours / safeWeeks : 0;
+    const requiredBillableHours = safeRate > 0 ? targetWithOverhead / safeRate : 0;
+    const requiredBillableHoursPerWeek = safeWeeks > 0 ? requiredBillableHours / safeWeeks : 0;
 
-    const breakEvenRate =
-      annualBillableHours > 0 ? targetWithOverhead / annualBillableHours : 0;
+    const breakEvenRate = annualBillableHours > 0 ? targetWithOverhead / annualBillableHours : 0;
 
     return {
       annualBillableHours,
@@ -107,9 +99,7 @@ export default function RateCalculatorPage() {
     const oldCurrency = inputs.currency;
     if (oldCurrency === newCurrency) return;
 
-    const convertedRate = Math.round(
-      convertCurrency(inputs.hourlyRate, oldCurrency, newCurrency)
-    );
+    const convertedRate = Math.round(convertCurrency(inputs.hourlyRate, oldCurrency, newCurrency));
     const convertedTarget = Math.round(
       convertCurrency(inputs.monthlyTarget, oldCurrency, newCurrency)
     );
@@ -138,18 +128,19 @@ export default function RateCalculatorPage() {
               RATE CALCULATOR
             </span>
           </div>
-          <h1 className="text-2xl md:text-3xl font-extrabold text-text-primary">
-            Rate Calculator
-          </h1>
+          <h1 className="text-2xl md:text-3xl font-extrabold text-text-primary">Rate Calculator</h1>
           <p className="text-xs md:text-sm text-text-secondary max-w-2xl">
-            Calculate your target hourly rate, minimum viable billing, project milestones, and retainer pricing based on your real expenses and billable hours.
+            Calculate your target hourly rate, minimum viable billing, project milestones, and
+            retainer pricing based on your real expenses and billable hours.
           </p>
         </div>
 
         <div className="flex items-center gap-3 flex-wrap">
           {/* Currency Switcher */}
           <div className="flex items-center gap-2 bg-bg-surface border border-border-base rounded-xl px-3 py-2 shadow-2xs">
-            <span className="text-2xs font-semibold text-text-muted uppercase tracking-wider">Currency:</span>
+            <span className="text-2xs font-semibold text-text-muted uppercase tracking-wider">
+              Currency:
+            </span>
             <select
               value={inputs.currency}
               onChange={(e) => handleCurrencyChange(e.target.value)}
@@ -300,7 +291,13 @@ export default function RateCalculatorPage() {
               {(inputs.currency === 'INR'
                 ? [
                     { label: 'Junior Freelancer', rate: 1200, hours: 25, overhead: 20, util: 70 },
-                    { label: 'Mid-Level Specialist', rate: 2500, hours: 20, overhead: 25, util: 75 },
+                    {
+                      label: 'Mid-Level Specialist',
+                      rate: 2500,
+                      hours: 20,
+                      overhead: 25,
+                      util: 75,
+                    },
                     { label: 'Senior Consultant', rate: 4500, hours: 15, overhead: 30, util: 80 },
                     { label: 'Principal / Lead', rate: 7500, hours: 10, overhead: 35, util: 60 },
                   ]
@@ -367,9 +364,7 @@ export default function RateCalculatorPage() {
             <MetricCard
               label="Hours Needed for Target"
               value={`${metrics.requiredBillableHoursPerWeek.toFixed(1)} hrs/wk`}
-              subtitle={
-                metrics.requiredBillableHoursPerWeek > 40 ? '⚠️ Unrealistic' : 'Achievable'
-              }
+              subtitle={metrics.requiredBillableHoursPerWeek > 40 ? '⚠️ Unrealistic' : 'Achievable'}
               icon={<Target className="w-5 h-5" />}
               color={metrics.requiredBillableHoursPerWeek > 40 ? 'red' : 'purple'}
             />
@@ -454,9 +449,7 @@ export default function RateCalculatorPage() {
               <ScenarioCard
                 title="Conservative"
                 description="75% utilization, 35% overhead"
-                monthlyNet={
-                  inputs.hourlyRate * inputs.billableHoursPerWeek * 4 * 0.75 * 0.65
-                }
+                monthlyNet={inputs.hourlyRate * inputs.billableHoursPerWeek * 4 * 0.75 * 0.65}
                 color="amber"
                 currency={inputs.currency}
               />
@@ -471,9 +464,7 @@ export default function RateCalculatorPage() {
               <ScenarioCard
                 title="Optimistic"
                 description="90% utilization, 25% overhead"
-                monthlyNet={
-                  inputs.hourlyRate * inputs.billableHoursPerWeek * 4 * 0.9 * 0.75
-                }
+                monthlyNet={inputs.hourlyRate * inputs.billableHoursPerWeek * 4 * 0.9 * 0.75}
                 color="blue"
                 currency={inputs.currency}
               />
@@ -591,7 +582,9 @@ function RowMetric({ label, gross, net, highlight, currency = 'INR' }: RowMetric
     <tr className={cn(highlight && 'bg-amber-500/5 font-semibold')}>
       <td className="py-2 text-text-secondary">{label}</td>
       <td className="py-2 text-right text-text-primary">{formatCurrency(gross, currency)}</td>
-      <td className="py-2 text-right font-medium text-emerald-400">{formatCurrency(net, currency)}</td>
+      <td className="py-2 text-right font-medium text-emerald-400">
+        {formatCurrency(net, currency)}
+      </td>
     </tr>
   );
 }
@@ -605,7 +598,14 @@ interface ScenarioCardProps {
   currency?: string;
 }
 
-function ScenarioCard({ title, description, monthlyNet, color, highlight, currency = 'INR' }: ScenarioCardProps) {
+function ScenarioCard({
+  title,
+  description,
+  monthlyNet,
+  color,
+  highlight,
+  currency = 'INR',
+}: ScenarioCardProps) {
   const colorClasses = {
     amber: 'bg-amber-500/10 border-amber-500/25 text-amber-400',
     blue: 'bg-blue-500/10 border-blue-500/25 text-blue-400',

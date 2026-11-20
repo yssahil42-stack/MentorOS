@@ -49,7 +49,9 @@ export const TimeTrackingBadge: React.FC<TimeTrackingBadgeProps> = ({
       >
         <span className="inline-flex items-center gap-1">
           <Clock className={`${iconSize} text-text-faint shrink-0`} />
-          <span>{expectedLabel}: {formatTimeMinutes(exp)}</span>
+          <span>
+            {expectedLabel}: {formatTimeMinutes(exp)}
+          </span>
         </span>
         <span className="text-border-base font-sans">|</span>
         <span
@@ -62,7 +64,9 @@ export const TimeTrackingBadge: React.FC<TimeTrackingBadgeProps> = ({
           }`}
         >
           <Timer className={`${iconSize} shrink-0`} />
-          <span>{actualLabel}: {formatTimeMinutes(act)}</span>
+          <span>
+            {actualLabel}: {formatTimeMinutes(act)}
+          </span>
         </span>
       </div>
     );
@@ -77,7 +81,9 @@ export const TimeTrackingBadge: React.FC<TimeTrackingBadgeProps> = ({
         <Clock className={`${iconSize} text-text-faint shrink-0`} />
         <span>{formatTimeMinutes(exp)}</span>
         <span className="text-border-base">/</span>
-        <Timer className={`${iconSize} ${hasActual ? 'text-emerald-400' : 'text-text-faint'} shrink-0`} />
+        <Timer
+          className={`${iconSize} ${hasActual ? 'text-emerald-400' : 'text-text-faint'} shrink-0`}
+        />
         <span className={hasActual ? 'text-text-primary font-medium' : 'text-text-faint'}>
           {formatTimeMinutes(act)}
         </span>
@@ -87,7 +93,9 @@ export const TimeTrackingBadge: React.FC<TimeTrackingBadgeProps> = ({
 
   // Default 'badges'
   return (
-    <div className={`inline-flex items-center gap-1.5 font-mono ${textSize} shrink-0 flex-wrap ${className}`}>
+    <div
+      className={`inline-flex items-center gap-1.5 font-mono ${textSize} shrink-0 flex-wrap ${className}`}
+    >
       {/* Expected Time Badge */}
       <span
         className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-bg-elevated/80 border border-border-subtle text-text-muted"

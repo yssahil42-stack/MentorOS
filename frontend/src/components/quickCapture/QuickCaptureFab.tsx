@@ -1,13 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useLocation, Link } from 'react-router-dom';
-import {
-  Plus,
-  X,
-  ListTodo,
-  CheckCircle2,
-  ArrowRight,
-  Trash2,
-} from 'lucide-react';
+import { Plus, X, ListTodo, CheckCircle2, ArrowRight, Trash2 } from 'lucide-react';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { cn } from '../../utils/cn';
 import { Button } from '../ui/Button';
@@ -104,36 +97,34 @@ const DEFAULT_TASKS_BY_ROLE: Record<string, Task[]> = {
   ],
 };
 
-const ROLE_SUGGESTIONS: Record<
-  string,
-  { label: string; priority: TaskPriority; icon: string }[]
-> = {
-  job_seeker: [
-    { label: 'Tailor resume for target job description', priority: 'high', icon: '🎯' },
-    { label: 'Send follow-up email for submitted application', priority: 'high', icon: '✉️' },
-    { label: 'Connect with 2 hiring managers on LinkedIn', priority: 'medium', icon: '💼' },
-    { label: 'Practice 15-min behavioral interview answers', priority: 'high', icon: '🎤' },
-    { label: 'Audit missing skills on Job Analyzer', priority: 'medium', icon: '📊' },
-  ],
-  developer: [
-    { label: 'Deploy feature branch preview & test API', priority: 'high', icon: '🚀' },
-    { label: 'Write unit tests for recent changes', priority: 'high', icon: '🧪' },
-    { label: 'Document system architecture & endpoints', priority: 'medium', icon: '📝' },
-    { label: 'Refactor state management in core component', priority: 'medium', icon: '⚡' },
-  ],
-  freelancer: [
-    { label: 'Draft and send client milestone invoice', priority: 'high', icon: '📄' },
-    { label: 'Send deliverable progress update to client', priority: 'high', icon: '💬' },
-    { label: 'Log billable hours for today', priority: 'medium', icon: '⏱️' },
-    { label: 'Follow up on pending project proposal', priority: 'medium', icon: '🎯' },
-  ],
-  student: [
-    { label: 'Complete 45-min deep work study block', priority: 'high', icon: '📚' },
-    { label: 'Review lecture notes and summaries', priority: 'medium', icon: '📝' },
-    { label: 'Submit upcoming course assignment', priority: 'high', icon: '🎯' },
-    { label: 'Revise flashcards and practice problems', priority: 'medium', icon: '💡' },
-  ],
-};
+const ROLE_SUGGESTIONS: Record<string, { label: string; priority: TaskPriority; icon: string }[]> =
+  {
+    job_seeker: [
+      { label: 'Tailor resume for target job description', priority: 'high', icon: '🎯' },
+      { label: 'Send follow-up email for submitted application', priority: 'high', icon: '✉️' },
+      { label: 'Connect with 2 hiring managers on LinkedIn', priority: 'medium', icon: '💼' },
+      { label: 'Practice 15-min behavioral interview answers', priority: 'high', icon: '🎤' },
+      { label: 'Audit missing skills on Job Analyzer', priority: 'medium', icon: '📊' },
+    ],
+    developer: [
+      { label: 'Deploy feature branch preview & test API', priority: 'high', icon: '🚀' },
+      { label: 'Write unit tests for recent changes', priority: 'high', icon: '🧪' },
+      { label: 'Document system architecture & endpoints', priority: 'medium', icon: '📝' },
+      { label: 'Refactor state management in core component', priority: 'medium', icon: '⚡' },
+    ],
+    freelancer: [
+      { label: 'Draft and send client milestone invoice', priority: 'high', icon: '📄' },
+      { label: 'Send deliverable progress update to client', priority: 'high', icon: '💬' },
+      { label: 'Log billable hours for today', priority: 'medium', icon: '⏱️' },
+      { label: 'Follow up on pending project proposal', priority: 'medium', icon: '🎯' },
+    ],
+    student: [
+      { label: 'Complete 45-min deep work study block', priority: 'high', icon: '📚' },
+      { label: 'Review lecture notes and summaries', priority: 'medium', icon: '📝' },
+      { label: 'Submit upcoming course assignment', priority: 'high', icon: '🎯' },
+      { label: 'Revise flashcards and practice problems', priority: 'medium', icon: '💡' },
+    ],
+  };
 
 export function QuickCaptureFab({
   position = 'bottom-right',
@@ -217,13 +208,8 @@ export function QuickCaptureFab({
 
   const handleToggleTask = async (id: number, currentStatus: TaskStatus) => {
     const nextStatus: TaskStatus = currentStatus === 'completed' ? 'todo' : 'completed';
-    setLocalTasks((prev) =>
-      prev.map((t) => (t.id === id ? { ...t, status: nextStatus } : t))
-    );
-    showToast(
-      nextStatus === 'completed' ? 'Task marked completed!' : 'Task active',
-      'success'
-    );
+    setLocalTasks((prev) => prev.map((t) => (t.id === id ? { ...t, status: nextStatus } : t)));
+    showToast(nextStatus === 'completed' ? 'Task marked completed!' : 'Task active', 'success');
 
     try {
       await tasksApi.update(id, { status: nextStatus });
@@ -433,9 +419,7 @@ export function QuickCaptureFab({
                   type="button"
                   onClick={() => setActiveFilter('all')}
                   className={`px-1.5 py-0.5 rounded ${
-                    activeFilter === 'all'
-                      ? 'bg-solar-500 text-white font-bold'
-                      : 'text-text-muted'
+                    activeFilter === 'all' ? 'bg-solar-500 text-white font-bold' : 'text-text-muted'
                   }`}
                 >
                   All ({localTasks.length})
@@ -477,7 +461,9 @@ export function QuickCaptureFab({
                         </button>
                         <span
                           className={`text-2xs truncate ${
-                            isDone ? 'line-through text-text-muted' : 'text-text-primary font-medium'
+                            isDone
+                              ? 'line-through text-text-muted'
+                              : 'text-text-primary font-medium'
                           }`}
                         >
                           {t.title}

@@ -87,10 +87,30 @@ export default function StudyPlanPage() {
       totalHoursTarget: 24,
       hoursCompleted: 16.5,
       milestones: [
-        { title: 'Paxos vs Raft Comparison & Election Safety', status: 'completed', estimated_minutes: 90, actual_minutes: 95 },
-        { title: 'Log Replication & Committed Entry Rules', status: 'in_progress', estimated_minutes: 120, actual_minutes: 60 },
-        { title: 'Network Partition Scenarios & Byzantine Tolerance', status: 'pending', estimated_minutes: 90, actual_minutes: 0 },
-        { title: 'Practice Midterm Paper 2025', status: 'pending', estimated_minutes: 120, actual_minutes: 0 },
+        {
+          title: 'Paxos vs Raft Comparison & Election Safety',
+          status: 'completed',
+          estimated_minutes: 90,
+          actual_minutes: 95,
+        },
+        {
+          title: 'Log Replication & Committed Entry Rules',
+          status: 'in_progress',
+          estimated_minutes: 120,
+          actual_minutes: 60,
+        },
+        {
+          title: 'Network Partition Scenarios & Byzantine Tolerance',
+          status: 'pending',
+          estimated_minutes: 90,
+          actual_minutes: 0,
+        },
+        {
+          title: 'Practice Midterm Paper 2025',
+          status: 'pending',
+          estimated_minutes: 120,
+          actual_minutes: 0,
+        },
       ],
     },
     {
@@ -102,10 +122,30 @@ export default function StudyPlanPage() {
       totalHoursTarget: 18,
       hoursCompleted: 7.5,
       milestones: [
-        { title: 'Double & Triple Integrals over General Regions', status: 'completed', estimated_minutes: 90, actual_minutes: 85 },
-        { title: 'Green’s Theorem Problem Set Mastery', status: 'in_progress', estimated_minutes: 90, actual_minutes: 45 },
-        { title: 'Surface Integrals & Flux Computations', status: 'pending', estimated_minutes: 75, actual_minutes: 0 },
-        { title: 'Stokes’ & Divergence Theorem Review', status: 'pending', estimated_minutes: 90, actual_minutes: 0 },
+        {
+          title: 'Double & Triple Integrals over General Regions',
+          status: 'completed',
+          estimated_minutes: 90,
+          actual_minutes: 85,
+        },
+        {
+          title: 'Green’s Theorem Problem Set Mastery',
+          status: 'in_progress',
+          estimated_minutes: 90,
+          actual_minutes: 45,
+        },
+        {
+          title: 'Surface Integrals & Flux Computations',
+          status: 'pending',
+          estimated_minutes: 75,
+          actual_minutes: 0,
+        },
+        {
+          title: 'Stokes’ & Divergence Theorem Review',
+          status: 'pending',
+          estimated_minutes: 90,
+          actual_minutes: 0,
+        },
       ],
     },
   ];
@@ -211,9 +251,9 @@ export default function StudyPlanPage() {
             </div>
             <p className="text-xs text-text-secondary leading-relaxed">
               Based on your completed study tasks, you have mastered <strong>68%</strong> of the
-              Distributed Systems syllabus and <strong>42%</strong> of Calculus. Recommended schedule:
-              allocating <strong>2 hours this weekend</strong> to Vector Calculus to guarantee exam
-              readiness.
+              Distributed Systems syllabus and <strong>42%</strong> of Calculus. Recommended
+              schedule: allocating <strong>2 hours this weekend</strong> to Vector Calculus to
+              guarantee exam readiness.
             </p>
           </div>
 

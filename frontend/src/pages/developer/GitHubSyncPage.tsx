@@ -391,11 +391,10 @@ export default function GitHubSyncPage() {
               GITLAB SYNC
             </span>
           </div>
-          <h1 className="text-2xl md:text-3xl font-extrabold text-text-primary">
-            GitLab Sync
-          </h1>
+          <h1 className="text-2xl md:text-3xl font-extrabold text-text-primary">GitLab Sync</h1>
           <p className="text-xs md:text-sm text-text-secondary max-w-2xl">
-            Sync GitLab projects, issues, and merge requests. Auto-create tasks from GitLab activity.
+            Sync GitLab projects, issues, and merge requests. Auto-create tasks from GitLab
+            activity.
           </p>
         </div>
 
@@ -861,10 +860,14 @@ export default function GitHubSyncPage() {
               </span>
               <div>
                 <p className="text-xs font-bold text-text-primary">GitLab Integration</p>
-                <p className="text-2xs text-text-muted">GitLab.com or Self-Hosted GitLab Instance</p>
+                <p className="text-2xs text-text-muted">
+                  GitLab.com or Self-Hosted GitLab Instance
+                </p>
               </div>
             </div>
-            <Badge variant="success" size="sm">Active Provider</Badge>
+            <Badge variant="success" size="sm">
+              Active Provider
+            </Badge>
           </div>
 
           {/* Project Path / URL input */}
@@ -876,13 +879,12 @@ export default function GitHubSyncPage() {
               type="text"
               placeholder="e.g. gitlab-org/gitlab or username/my-project"
               value={connectForm.repository}
-              onChange={(e) =>
-                setConnectForm((prev) => ({ ...prev, repository: e.target.value }))
-              }
+              onChange={(e) => setConnectForm((prev) => ({ ...prev, repository: e.target.value }))}
               className="w-full text-xs"
             />
             <p className="text-3xs text-text-muted">
-              Enter the namespace and project name (e.g. <code>my-org/backend-service</code>) or full GitLab project URL.
+              Enter the namespace and project name (e.g. <code>my-org/backend-service</code>) or
+              full GitLab project URL.
             </p>
           </div>
 
@@ -901,7 +903,8 @@ export default function GitHubSyncPage() {
               className="w-full text-xs font-mono"
             />
             <p className="text-3xs text-text-muted">
-              Optional if server-wide <code>GITLAB_PERSONAL_ACCESS_TOKEN</code> is configured in environment. Required scope: <code>read_api</code> or <code>api</code>.
+              Optional if server-wide <code>GITLAB_PERSONAL_ACCESS_TOKEN</code> is configured in
+              environment. Required scope: <code>read_api</code> or <code>api</code>.
             </p>
           </div>
 

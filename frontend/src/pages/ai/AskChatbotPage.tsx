@@ -31,11 +31,6 @@ export default function AskChatbotPage() {
   const { showToast } = useWorkspace();
   const { user } = useAuth();
 
-  // Ask AI is strictly for student, freelancer, and developer modules — NOT job seeker
-  if (user?.role === 'job_seeker') {
-    return <Navigate to="/app/job-seeker/dashboard" replace />;
-  }
-
   const initialRole: SupportedAskRole =
     user?.role === 'student' || user?.role === 'freelancer' ? user.role : 'developer';
 
@@ -83,7 +78,11 @@ export default function AskChatbotPage() {
       if (userPrompt.length <= 60) return userPrompt;
       return userPrompt.slice(0, 57) + '...';
     }
-    const firstLine = content.split('\n')[0].replace(/^#+\s*/, '').replace(/^\*+\s*/, '').trim();
+    const firstLine = content
+      .split('\n')[0]
+      .replace(/^#+\s*/, '')
+      .replace(/^\*+\s*/, '')
+      .trim();
     if (firstLine.length > 3 && firstLine.length <= 60) return firstLine;
     return 'Actionable Insight';
   };
@@ -136,7 +135,9 @@ export default function AskChatbotPage() {
 
   // Check AI health on mount
   useEffect(() => {
-    checkAiHealth().then((info) => setAiStatusInfo(info)).catch(() => {});
+    checkAiHealth()
+      .then((info) => setAiStatusInfo(info))
+      .catch(() => {});
   }, []);
 
   // Scroll to bottom
@@ -160,9 +161,7 @@ export default function AskChatbotPage() {
     setIsLoading(true);
 
     try {
-      const historyToSend = messages
-        .filter((m) => m.id !== 'msg-welcome-page')
-        .concat(userMessage);
+      const historyToSend = messages.filter((m) => m.id !== 'msg-welcome-page').concat(userMessage);
 
       const res = await askChatbot({
         message: text,
@@ -262,6 +261,11 @@ export default function AskChatbotPage() {
     showToast('Conversation cleared', 'info');
   };
 
+  // Ask AI is strictly for student, freelancer, and developer modules — NOT job seeker
+  if (user?.role === 'job_seeker') {
+    return <Navigate to="/app/job-seeker/dashboard" replace />;
+  }
+
   return (
     <div className="space-y-5 max-w-7xl mx-auto pb-8">
       {/* ─── Header ───────────────────────────────────────────────────────────── */}
@@ -281,7 +285,8 @@ export default function AskChatbotPage() {
             </div>
           </div>
           <p className="text-xs sm:text-sm text-text-secondary max-w-2xl">
-            Conversational assistant for queries, doubts, debugging, and concept explanations. (Not a roadmap generator).
+            Conversational assistant for queries, doubts, debugging, and concept explanations. (Not
+            a roadmap generator).
           </p>
         </div>
 
@@ -294,9 +299,15 @@ export default function AskChatbotPage() {
               onChange={(e) => setSelectedRole(e.target.value as SupportedAskRole)}
               className="bg-transparent text-xs font-bold text-text-primary focus:outline-none cursor-pointer capitalize"
             >
-              <option value="developer" className="bg-bg-surface text-text-primary">Developer</option>
-              <option value="student" className="bg-bg-surface text-text-primary">Student</option>
-              <option value="freelancer" className="bg-bg-surface text-text-primary">Freelancer</option>
+              <option value="developer" className="bg-bg-surface text-text-primary">
+                Developer
+              </option>
+              <option value="student" className="bg-bg-surface text-text-primary">
+                Student
+              </option>
+              <option value="freelancer" className="bg-bg-surface text-text-primary">
+                Freelancer
+              </option>
             </select>
           </div>
 
@@ -428,7 +439,9 @@ export default function AskChatbotPage() {
                     <span className="w-1.5 h-1.5 rounded-full bg-orange-500 animate-pulse delay-150" />
                     <span className="w-1.5 h-1.5 rounded-full bg-orange-500 animate-pulse delay-300" />
                   </div>
-                  <span className="text-xs text-text-muted font-medium">Ask is synthesizing response...</span>
+                  <span className="text-xs text-text-muted font-medium">
+                    Ask is synthesizing response...
+                  </span>
                 </div>
               </div>
             )}
@@ -476,7 +489,8 @@ export default function AskChatbotPage() {
             <span>Ask AI Mentorship</span>
           </div>
           <span className="text-3xs sm:text-xs text-text-muted">
-            Direct conversational Q&amp;A, troubleshooting, and discussions (Not a roadmap generator).
+            Direct conversational Q&amp;A, troubleshooting, and discussions (Not a roadmap
+            generator).
           </span>
         </Card>
       </div>

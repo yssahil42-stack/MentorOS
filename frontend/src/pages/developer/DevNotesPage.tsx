@@ -1,6 +1,17 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { FileText, Plus, Search, Sparkles, Pin, Trash2, BookOpen, Calendar, Bot, MessageSquare } from 'lucide-react';
+import {
+  FileText,
+  Plus,
+  Search,
+  Sparkles,
+  Pin,
+  Trash2,
+  BookOpen,
+  Calendar,
+  Bot,
+  MessageSquare,
+} from 'lucide-react';
 import { useWorkspace } from '../../contexts/WorkspaceContext';
 import { fetchNotes, createNote, deleteNote, updateNote } from '../../services/noteService';
 import { Card } from '../../components/ui/Card';

@@ -27,7 +27,10 @@ const USER_KEY = 'mentor_user';
 // ─── Provider ────────────────────────────────────────────────────────────────
 
 function resolveRoleForUser(email: string, requestedRole?: string): UserRole {
-  if (requestedRole && ['student', 'developer', 'freelancer', 'job_seeker'].includes(requestedRole)) {
+  if (
+    requestedRole &&
+    ['student', 'developer', 'freelancer', 'job_seeker'].includes(requestedRole)
+  ) {
     return requestedRole as UserRole;
   }
   const lower = (email || '').toLowerCase().trim();

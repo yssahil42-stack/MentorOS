@@ -131,7 +131,11 @@ export default function DevProgressPage() {
         </div>
 
         <Link to="/app/developer/projects">
-          <Button variant="outline" size="sm" className="text-xs font-semibold flex items-center gap-1.5">
+          <Button
+            variant="outline"
+            size="sm"
+            className="text-xs font-semibold flex items-center gap-1.5"
+          >
             <FolderGit2 className="w-3.5 h-3.5 text-developer-400" />
             All Projects
           </Button>
@@ -224,7 +228,10 @@ export default function DevProgressPage() {
               thisTot > 0 ? Math.round((thisComp / thisTot) * 100) : proj.progress || 0;
 
             return (
-              <div key={proj.id} className="space-y-2 p-4 rounded-xl border border-border-base bg-bg-surface">
+              <div
+                key={proj.id}
+                className="space-y-2 p-4 rounded-xl border border-border-base bg-bg-surface"
+              >
                 <div className="flex items-center justify-between text-xs">
                   <span className="font-bold text-text-primary text-sm">{proj.title}</span>
                   <span className="font-mono font-bold text-developer-400 bg-developer-500/10 px-2 py-0.5 rounded-full border border-developer-500/25">
@@ -271,7 +278,11 @@ export default function DevProgressPage() {
 
           <div className="space-y-2">
             {projectMilestones.map((m) => {
-              const { expectedMinutes, actualMinutes } = getMilestoneTimeTotals(m, tasks, milestones);
+              const { expectedMinutes, actualMinutes } = getMilestoneTimeTotals(
+                m,
+                tasks,
+                milestones
+              );
               const isDone = m.status === 'completed';
               return (
                 <div
@@ -283,8 +294,12 @@ export default function DevProgressPage() {
                   }`}
                 >
                   <div className="flex items-center gap-2.5 min-w-0">
-                    <Flag className={`w-4 h-4 shrink-0 ${isDone ? 'text-emerald-400' : 'text-amber-400'}`} />
-                    <span className={`font-semibold truncate ${isDone ? 'line-through text-text-muted' : 'text-text-primary'}`}>
+                    <Flag
+                      className={`w-4 h-4 shrink-0 ${isDone ? 'text-emerald-400' : 'text-amber-400'}`}
+                    />
+                    <span
+                      className={`font-semibold truncate ${isDone ? 'line-through text-text-muted' : 'text-text-primary'}`}
+                    >
                       {m.title}
                     </span>
                   </div>
@@ -339,11 +354,15 @@ export default function DevProgressPage() {
                         }`}
                       />
                       <div>
-                        <p className={`font-semibold ${isDone ? 'line-through text-text-muted' : 'text-text-primary'}`}>
+                        <p
+                          className={`font-semibold ${isDone ? 'line-through text-text-muted' : 'text-text-primary'}`}
+                        >
                           {task.title}
                         </p>
                         {task.description && (
-                          <p className="text-2xs text-text-muted line-clamp-1 mt-0.5">{task.description}</p>
+                          <p className="text-2xs text-text-muted line-clamp-1 mt-0.5">
+                            {task.description}
+                          </p>
                         )}
                       </div>
                     </div>

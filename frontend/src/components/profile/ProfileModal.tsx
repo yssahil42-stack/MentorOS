@@ -260,7 +260,9 @@ export function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
             <span className="text-[11px] uppercase font-bold tracking-wider text-text-muted block">
               Workspace Role
             </span>
-            <span className="text-sm font-bold text-text-primary block">{activeRoleConfig.label}</span>
+            <span className="text-sm font-bold text-text-primary block">
+              {activeRoleConfig.label}
+            </span>
           </div>
           <div className="p-3.5 rounded-xl bg-slate-50/70 dark:bg-bg-elevated/40 border border-border-base/80 dark:border-white/[0.06] shadow-2xs space-y-1">
             <span className="text-[11px] uppercase font-bold tracking-wider text-text-muted block">
@@ -601,7 +603,11 @@ export function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
               disabled={isSaving}
               className="bg-gradient-to-r from-solar-500 to-solar-600 hover:from-solar-600 hover:to-solar-700 text-white font-semibold shadow-xs rounded-xl px-4 py-2 text-xs transition-all active:translate-y-[1px]"
               leftIcon={
-                isSaving ? <Check className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />
+                isSaving ? (
+                  <Check className="w-3.5 h-3.5 animate-spin" />
+                ) : (
+                  <Save className="w-3.5 h-3.5" />
+                )
               }
             >
               {isSaving ? 'Saving...' : `Save ${activeRoleConfig.label} Information`}

@@ -133,22 +133,25 @@ export default function RegisterPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const handleGoogleSuccess = useCallback(async (credential: string) => {
-    setError('');
-    setLoading(true);
-    try {
-      const user = await loginWithGoogle(credential, role || 'student');
-      showToast(`Welcome to MentorOS, ${user.full_name}!`, 'success');
-      localStorage.setItem('mentor_workspace_role', user.role);
-      const rolePath = user.role.replace('_', '-');
-      navigate(`/app/${rolePath}/dashboard`, { replace: true });
-    } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : 'Google sign-up failed. Please try again.';
-      setError(msg);
-    } finally {
-      setLoading(false);
-    }
-  }, [loginWithGoogle, role, showToast, navigate]);
+  const handleGoogleSuccess = useCallback(
+    async (credential: string) => {
+      setError('');
+      setLoading(true);
+      try {
+        const user = await loginWithGoogle(credential, role || 'student');
+        showToast(`Welcome to MentorOS, ${user.full_name}!`, 'success');
+        localStorage.setItem('mentor_workspace_role', user.role);
+        const rolePath = user.role.replace('_', '-');
+        navigate(`/app/${rolePath}/dashboard`, { replace: true });
+      } catch (err: unknown) {
+        const msg = err instanceof Error ? err.message : 'Google sign-up failed. Please try again.';
+        setError(msg);
+      } finally {
+        setLoading(false);
+      }
+    },
+    [loginWithGoogle, role, showToast, navigate]
+  );
 
   const handleGoogleError = useCallback((err: string) => {
     setError(err);

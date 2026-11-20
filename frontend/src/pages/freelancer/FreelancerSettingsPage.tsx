@@ -145,7 +145,8 @@ export default function FreelancerSettingsPage() {
                   Commercial Rates &amp; Payment Terms
                 </h3>
                 <p className="text-xs text-text-muted">
-                  Applied to proposal generation, invoice creation, and client contract scoping (Default: INR ₹)
+                  Applied to proposal generation, invoice creation, and client contract scoping
+                  (Default: INR ₹)
                 </p>
               </div>
             </div>
@@ -433,7 +434,10 @@ export default function FreelancerSettingsPage() {
               onApplyRate={(convertedAmount, targetCurr) => {
                 setHourlyRate(String(Math.round(convertedAmount)));
                 setCurrency(targetCurr);
-                showToast(`Standard rate set to ${getCurrencySymbol(targetCurr)}${Math.round(convertedAmount).toLocaleString()}/hr (${targetCurr})`, 'success');
+                showToast(
+                  `Standard rate set to ${getCurrencySymbol(targetCurr)}${Math.round(convertedAmount).toLocaleString()}/hr (${targetCurr})`,
+                  'success'
+                );
                 setShowConverterModal(false);
               }}
               variant="modal"

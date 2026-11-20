@@ -438,7 +438,8 @@ export function synthesizeTailoredResume(input: ResumeTailorInput): TailoredResu
   const selectedProjects = input.projects.filter((p) => p.selected);
 
   // Synthesize tailored summary variations
-  const topMatched = keywordReport.matchedKeywords.slice(0, 4).join(', ') || 'modern full-stack tooling';
+  const topMatched =
+    keywordReport.matchedKeywords.slice(0, 4).join(', ') || 'modern full-stack tooling';
   const seniorityLabel = input.isFresher
     ? 'Entry-Level'
     : input.seniority.charAt(0).toUpperCase() + input.seniority.slice(1);
@@ -730,7 +731,9 @@ function generateMarkdownResume(
       data.education.forEach((edu) => {
         const pursuingTag = edu.isPursuing ? ' [Pursuing]' : '';
         md.push(`### ${edu.degree}${pursuingTag}`);
-        const yearDisplay = edu.isPursuing ? `*Expected ${edu.year} (Pursuing)*` : `*Graduated / Passing Year: ${edu.year}*`;
+        const yearDisplay = edu.isPursuing
+          ? `*Expected ${edu.year} (Pursuing)*`
+          : `*Graduated / Passing Year: ${edu.year}*`;
         md.push(`**${edu.institution}** — ${yearDisplay}`);
         if (edu.percentage || edu.board) {
           const parts = [
@@ -740,7 +743,11 @@ function generateMarkdownResume(
           ].filter(Boolean);
           md.push(`- ${parts.join(' • ')}`);
         }
-        if (edu.details && !edu.details.includes('Percentage:') && !edu.details.includes('Board:')) {
+        if (
+          edu.details &&
+          !edu.details.includes('Percentage:') &&
+          !edu.details.includes('Board:')
+        ) {
           md.push(`- ${edu.details}`);
         }
         md.push('');
@@ -871,7 +878,11 @@ function generatePlainTextResume(
           ].filter(Boolean);
           txt.push(`* ${scoreParts.join(' | ')}`);
         }
-        if (edu.details && !edu.details.includes('Percentage:') && !edu.details.includes('Board:')) {
+        if (
+          edu.details &&
+          !edu.details.includes('Percentage:') &&
+          !edu.details.includes('Board:')
+        ) {
           txt.push(`* ${edu.details}`);
         }
         txt.push('');
@@ -942,7 +953,8 @@ export function exportResumePdf(
   // Template-specific style presets
   const templateStyles = {
     modern: {
-      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
+      fontFamily:
+        '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
       accentColor: '#059669',
       headerBorder: '2px solid #10B981',
       sectionBorder: '1px solid #E5E7EB',

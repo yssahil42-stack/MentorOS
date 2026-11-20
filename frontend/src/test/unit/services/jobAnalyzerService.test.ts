@@ -27,7 +27,9 @@ describe('jobAnalyzerService', () => {
     expect(result.seniority).toBe('fresher');
 
     // User has Python, Excel, Pandas -> should be in matchedSkills
-    const matchedWithStrings = result.matchedSkills.map((s) => s.matchedWith.toLowerCase()).join(' ');
+    const matchedWithStrings = result.matchedSkills
+      .map((s) => s.matchedWith.toLowerCase())
+      .join(' ');
     expect(matchedWithStrings).toContain('python');
     expect(matchedWithStrings).toContain('excel');
     expect(matchedWithStrings).toContain('pandas');

@@ -27,7 +27,8 @@ export function Badge({
   dot = false,
   className,
 }: BadgeProps) {
-  const textContent = typeof children === 'string' ? children : typeof label === 'string' ? label : null;
+  const textContent =
+    typeof children === 'string' ? children : typeof label === 'string' ? label : null;
   if (textContent && textContent.trim().toLowerCase() === 'medium') {
     return null;
   }

@@ -351,7 +351,9 @@ export default function DevApiKeysPage() {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Code2 className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
-              <h3 className="text-sm font-bold text-text-primary">Local .env.local Configuration</h3>
+              <h3 className="text-sm font-bold text-text-primary">
+                Local .env.local Configuration
+              </h3>
             </div>
             <button
               type="button"

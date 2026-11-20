@@ -1,13 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import {
-  Layers,
-  ArrowRight,
-  Shield,
-  CheckCircle2,
-  Database,
-  Check,
-} from 'lucide-react';
+import { Layers, ArrowRight, Shield, CheckCircle2, Database, Check } from 'lucide-react';
 import { cn } from '../utils/cn';
 import { ThemeToggle } from '../components/ui/ThemeToggle';
 import { useAuth } from '../contexts/AuthContext';
@@ -49,7 +42,8 @@ const ROLE_PREVIEWS: Record<RoleKey, RolePreviewContent> = {
     trackFooter: 'Semester sprint on track',
     trackStatus: '2/3 completed',
     proposalTag: 'AI PROPOSAL: Study Roadmap',
-    proposalQuote: '“Break down task summary: Distributed systems consensus algorithms and fault tolerance proofs.”',
+    proposalQuote:
+      '“Break down task summary: Distributed systems consensus algorithms and fault tolerance proofs.”',
     scheduleList: [
       { name: 'Research Paper Draft Submission', time: 'Tomorrow 14:00', highlight: true },
       { name: 'Oral Defense Checkpoint', time: 'Monday 10:00' },
@@ -72,7 +66,8 @@ const ROLE_PREVIEWS: Record<RoleKey, RolePreviewContent> = {
     trackFooter: 'Sprint 14 velocity 94%',
     trackStatus: '3/4 completed',
     proposalTag: 'AI PROPOSAL: Architecture Plan',
-    proposalQuote: '“Draft ADR on state management: Zustand vs TanStack Query cache invalidation trade-offs.”',
+    proposalQuote:
+      '“Draft ADR on state management: Zustand vs TanStack Query cache invalidation trade-offs.”',
     scheduleList: [
       { name: 'Staging Release Deployment', time: 'Today 18:00', highlight: true },
       { name: 'Architecture Review Meeting', time: 'Thursday 11:30' },
@@ -95,7 +90,8 @@ const ROLE_PREVIEWS: Record<RoleKey, RolePreviewContent> = {
     trackFooter: 'Client milestone sign-off pending',
     trackStatus: '2/3 delivered',
     proposalTag: 'AI PROPOSAL: Scope Revision',
-    proposalQuote: '“Polite client response draft for handling out-of-scope feature requests without friction.”',
+    proposalQuote:
+      '“Polite client response draft for handling out-of-scope feature requests without friction.”',
     scheduleList: [
       { name: 'Milestone 2 Sign-off & Demo', time: 'Friday 15:00', highlight: true },
       { name: 'Net-15 Invoice Due Date', time: 'Nov 28' },
@@ -118,7 +114,8 @@ const ROLE_PREVIEWS: Record<RoleKey, RolePreviewContent> = {
     trackFooter: '3 active hiring loops',
     trackStatus: '3 interviews scheduled',
     proposalTag: 'AI PROPOSAL: Interview Pitch',
-    proposalQuote: '“Tailored STAR response for microservice scalability and database indexing questions.”',
+    proposalQuote:
+      '“Tailored STAR response for microservice scalability and database indexing questions.”',
     scheduleList: [
       { name: 'Technical Round 2 (Staff Eng)', time: 'Wednesday 16:30', highlight: true },
       { name: 'Founder & Culture Fit Chat', time: 'Friday 11:00' },
@@ -148,7 +145,10 @@ export default function LandingPage() {
       />
 
       {/* ─── Top Navigation Header ──────────────────────────────────────── */}
-      <header role="banner" className="sticky top-0 z-50 bg-[#faf8f5]/90 dark:bg-[#0c0e14]/90 backdrop-blur-md border-b border-[#eee7e0] dark:border-stone-800/80 transition-colors">
+      <header
+        role="banner"
+        className="sticky top-0 z-50 bg-[#faf8f5]/90 dark:bg-[#0c0e14]/90 backdrop-blur-md border-b border-[#eee7e0] dark:border-stone-800/80 transition-colors"
+      >
         <nav
           className="max-w-7xl mx-auto flex items-center justify-between px-6 md:px-12 h-16"
           aria-label="Site navigation"
@@ -183,7 +183,9 @@ export default function LandingPage() {
               Privacy
             </a>
             <Link
-              to={isAuthenticated && user ? `/app/${user.role.replace('_', '-')}/dashboard` : '/login'}
+              to={
+                isAuthenticated && user ? `/app/${user.role.replace('_', '-')}/dashboard` : '/login'
+              }
               className="hover:text-[#c04b1e] dark:hover:text-orange-400 transition-colors"
             >
               Workspace
@@ -246,8 +248,8 @@ export default function LandingPage() {
               {/* Subheading */}
               <p className="text-sm sm:text-base text-stone-600 dark:text-stone-300 leading-relaxed max-w-xl">
                 MentorOS helps you organize project goals, projects, tasks, schedules and content.
-                Plan with Skillpath AI, review every change, and sync updates across all
-                connected modules.
+                Plan with Skillpath AI, review every change, and sync updates across all connected
+                modules.
               </p>
 
               {/* Call to action buttons */}
@@ -501,8 +503,8 @@ export default function LandingPage() {
               How MentorOS works in 5 simple steps
             </h2>
             <p className="text-xs sm:text-sm text-stone-600 dark:text-stone-300 max-w-xl mx-auto leading-relaxed">
-              From initial project planning to execution, scheduling, and review: clear,
-              automated, and completely under your control.
+              From initial project planning to execution, scheduling, and review: clear, automated,
+              and completely under your control.
             </p>
           </div>
 
@@ -552,8 +554,8 @@ export default function LandingPage() {
                   Generate roadmap
                 </h3>
                 <p className="text-xs text-stone-600 dark:text-stone-300 leading-relaxed">
-                  Skillpath AI proposes structured milestones, daily schedules, and execution checklists
-                  to hit your target date without guesswork.
+                  Skillpath AI proposes structured milestones, daily schedules, and execution
+                  checklists to hit your target date without guesswork.
                 </p>
               </div>
               <div className="mt-5 p-3 rounded-xl bg-[#fbf5f0] dark:bg-stone-900/60 border border-[#f5e3d7] dark:border-stone-800 text-xs space-y-1">
@@ -675,7 +677,8 @@ export default function LandingPage() {
               </h2>
               <p className="text-xs sm:text-sm text-stone-600 dark:text-stone-300 leading-relaxed max-w-md">
                 Your notes, project details, and goals remain safely stored on your local workspace.
-                AI suggestions run securely and never silently modify your data without explicit approval.
+                AI suggestions run securely and never silently modify your data without explicit
+                approval.
               </p>
               <div className="pt-2">
                 <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 text-emerald-800 dark:text-emerald-300 text-xs font-semibold shadow-2xs">

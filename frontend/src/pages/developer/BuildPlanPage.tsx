@@ -88,8 +88,7 @@ export default function BuildPlanPage() {
   const createMilestoneMutation = useMutation({
     mutationFn: async () => {
       const targetProjId =
-        newProjectId ??
-        (selectedProjectId !== 'all' ? selectedProjectId : projects[0]?.id ?? 1);
+        newProjectId ?? (selectedProjectId !== 'all' ? selectedProjectId : (projects[0]?.id ?? 1));
       return createMilestone({
         project_id: targetProjId,
         title: newTitle.trim(),
@@ -169,7 +168,8 @@ export default function BuildPlanPage() {
   const totalMilestones = filteredMilestones.length;
   const completedMilestones = filteredMilestones.filter((m) => m.status === 'completed').length;
   const inProgressMilestones = filteredMilestones.filter((m) => m.status === 'in_progress').length;
-  const overallProgress = totalMilestones > 0 ? Math.round((completedMilestones / totalMilestones) * 100) : 0;
+  const overallProgress =
+    totalMilestones > 0 ? Math.round((completedMilestones / totalMilestones) * 100) : 0;
 
   if (projectsLoading || milestonesLoading || tasksLoading) {
     return (
@@ -197,7 +197,8 @@ export default function BuildPlanPage() {
             Build Plan &amp; Roadmap
           </h1>
           <p className="text-xs md:text-sm text-text-secondary max-w-2xl font-normal">
-            Deconstruct engineering goals into architectural phases, track shippable milestones, and review linked technical deliverables.
+            Deconstruct engineering goals into architectural phases, track shippable milestones, and
+            review linked technical deliverables.
           </p>
         </div>
 
@@ -247,7 +248,9 @@ export default function BuildPlanPage() {
         <Card className="p-4 border-border-base/80 bg-white dark:bg-bg-surface">
           <div className="flex items-center justify-between text-2xs font-semibold uppercase tracking-wider text-text-muted">
             <span>Sprint Completion</span>
-            <span className="text-indigo-600 dark:text-indigo-400 font-bold">{overallProgress}%</span>
+            <span className="text-indigo-600 dark:text-indigo-400 font-bold">
+              {overallProgress}%
+            </span>
           </div>
           <div className="w-full bg-slate-100 dark:bg-bg-elevated h-2 rounded-full overflow-hidden mt-3 border border-border-base/60">
             <div
@@ -310,7 +313,8 @@ export default function BuildPlanPage() {
             </div>
             <h3 className="text-sm font-bold text-text-primary">No Milestones Recorded</h3>
             <p className="text-xs text-text-secondary max-w-sm mx-auto">
-              Break down your active repository into milestones, technical deliverables, and shippable releases.
+              Break down your active repository into milestones, technical deliverables, and
+              shippable releases.
             </p>
             <div className="pt-2 flex items-center justify-center">
               <Button
@@ -329,7 +333,9 @@ export default function BuildPlanPage() {
             const isExpanded = !!expandedMilestones[m.id];
             const project = projects.find((p) => p.id === m.project_id);
             const milestoneTasks = tasks.filter((t) => t.project_id === m.project_id);
-            const completedTasksCount = milestoneTasks.filter((t) => t.status === 'completed').length;
+            const completedTasksCount = milestoneTasks.filter(
+              (t) => t.status === 'completed'
+            ).length;
             const taskProgress =
               milestoneTasks.length > 0
                 ? Math.round((completedTasksCount / milestoneTasks.length) * 100)
@@ -386,11 +392,7 @@ export default function BuildPlanPage() {
 
                         <Badge
                           variant={
-                            isDone
-                              ? 'success'
-                              : m.status === 'in_progress'
-                                ? 'primary'
-                                : 'neutral'
+                            isDone ? 'success' : m.status === 'in_progress' ? 'primary' : 'neutral'
                           }
                           size="sm"
                           className="text-[10px]"
@@ -415,7 +417,9 @@ export default function BuildPlanPage() {
                   <div className="flex items-center gap-4 shrink-0 self-end md:self-center">
                     <div className="text-right hidden sm:block">
                       <div className="text-2xs font-mono text-text-muted">
-                        <span>{completedTasksCount}/{milestoneTasks.length} tasks</span>
+                        <span>
+                          {completedTasksCount}/{milestoneTasks.length} tasks
+                        </span>
                         <span className="mx-1.5">•</span>
                         <span className="font-semibold text-text-primary">{taskProgress}%</span>
                       </div>

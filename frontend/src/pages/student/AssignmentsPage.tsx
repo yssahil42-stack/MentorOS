@@ -420,7 +420,8 @@ export default function AssignmentsPage() {
             <ClipboardList className="w-10 h-10 text-text-muted mx-auto opacity-50" />
             <h3 className="text-base font-bold text-text-primary">No matching roadmaps found</h3>
             <p className="text-xs text-text-muted max-w-sm mx-auto">
-              No roadmaps or subtasks match your query. Clear your filters or create a new assignment task.
+              No roadmaps or subtasks match your query. Clear your filters or create a new
+              assignment task.
             </p>
             <div className="flex items-center justify-center gap-3 pt-2">
               {hasActiveFilters && (

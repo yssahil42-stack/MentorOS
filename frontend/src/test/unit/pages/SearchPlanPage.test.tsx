@@ -81,6 +81,8 @@ describe('SearchPlanPage (Job Analyzer)', () => {
     // Should display reality check and 30-day action plan
     expect(screen.getByText(/Senior Engineering & Analytics Mentor Opinion/i)).toBeInTheDocument();
     expect(screen.getByText(/Your 30-Day Step-by-Step Strategic Action Plan/i)).toBeInTheDocument();
-    expect(screen.getByText(/The #1 Portfolio Asset That Will Get You Interviews/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/The #1 Portfolio Asset That Will Get You Interviews/i)
+    ).toBeInTheDocument();
   });
 });

@@ -129,7 +129,9 @@ export function DailyStandupWidget({ role = 'student', standupData }: DailyStand
                     <div className="w-8 h-8 rounded-full bg-slate-100 dark:bg-bg-elevated flex items-center justify-center text-text-faint mb-2">
                       <Check className="w-4 h-4" />
                     </div>
-                    <p className="text-xs text-text-muted font-medium">No completed items recorded.</p>
+                    <p className="text-xs text-text-muted font-medium">
+                      No completed items recorded.
+                    </p>
                   </div>
                 ) : (
                   yesterdayItems.map((item) => (
@@ -194,7 +196,9 @@ export function DailyStandupWidget({ role = 'student', standupData }: DailyStand
                     <div className="w-8 h-8 rounded-full bg-slate-100 dark:bg-bg-elevated flex items-center justify-center text-text-faint mb-2">
                       <Calendar className="w-4 h-4" />
                     </div>
-                    <p className="text-xs text-text-muted font-medium">No agenda items scheduled for today.</p>
+                    <p className="text-xs text-text-muted font-medium">
+                      No agenda items scheduled for today.
+                    </p>
                   </div>
                 ) : (
                   <>
@@ -204,7 +208,9 @@ export function DailyStandupWidget({ role = 'student', standupData }: DailyStand
                         className="p-3 rounded-xl bg-white dark:bg-bg-surface border border-border-base/70 dark:border-white/[0.06] shadow-2xs space-y-1.5 hover:border-solar-500/30 transition-all"
                       >
                         <div className="flex items-center justify-between gap-2">
-                          <p className="text-xs font-semibold text-text-primary truncate">{event.title}</p>
+                          <p className="text-xs font-semibold text-text-primary truncate">
+                            {event.title}
+                          </p>
                           <Badge
                             variant="neutral"
                             size="sm"
@@ -226,7 +232,9 @@ export function DailyStandupWidget({ role = 'student', standupData }: DailyStand
                         className="p-3 rounded-xl bg-white dark:bg-bg-surface border border-border-base/70 dark:border-white/[0.06] shadow-2xs flex items-center justify-between gap-2.5 hover:border-amber-500/30 transition-all"
                       >
                         <div className="min-w-0">
-                          <p className="text-xs font-semibold text-text-primary truncate">{task.title}</p>
+                          <p className="text-xs font-semibold text-text-primary truncate">
+                            {task.title}
+                          </p>
                           <div className="flex items-center gap-2 mt-1 flex-wrap">
                             {task.project_title && (
                               <span className="inline-block text-[10px] font-medium text-text-muted bg-slate-100 dark:bg-bg-elevated px-2 py-0.5 rounded-md truncate max-w-full">

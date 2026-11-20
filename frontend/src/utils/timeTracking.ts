@@ -44,8 +44,7 @@ export function getMilestoneTimeTotals(
   // Filter tasks belonging to the milestone's project
   const projTasks = tasks.filter(
     (t) =>
-      t.project_id === milestone.project_id ||
-      String(t.project_id) === String(milestone.project_id)
+      t.project_id === milestone.project_id || String(t.project_id) === String(milestone.project_id)
   );
 
   if (projTasks.length === 0) {

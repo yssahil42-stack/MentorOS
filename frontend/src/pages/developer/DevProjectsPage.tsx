@@ -250,7 +250,10 @@ export default function DevProjectsPage() {
                     <div className="flex items-center justify-between pt-1">
                       <span className="text-3xs text-text-muted">Total Time:</span>
                       <TimeTrackingBadge
-                        expectedMinutes={projTasks.reduce((s, t) => s + (t.estimated_minutes || 0), 0)}
+                        expectedMinutes={projTasks.reduce(
+                          (s, t) => s + (t.estimated_minutes || 0),
+                          0
+                        )}
                         actualMinutes={projTasks.reduce((s, t) => s + (t.actual_minutes || 0), 0)}
                         size="xs"
                         variant="pill"

@@ -101,7 +101,9 @@ export default function FreelancerProgressPage() {
 
   const completedMilestones = projectMilestones.filter((m) => m.status === 'completed');
   const milestoneRate =
-    projectMilestones.length > 0 ? Math.round((completedMilestones.length / projectMilestones.length) * 100) : 0;
+    projectMilestones.length > 0
+      ? Math.round((completedMilestones.length / projectMilestones.length) * 100)
+      : 0;
 
   const totalEstimatedMins = projectTasks.reduce((sum, t) => sum + (t.estimated_minutes || 60), 0);
   const completedMins = completedTasks.reduce(
@@ -126,7 +128,8 @@ export default function FreelancerProgressPage() {
             Freelancer Progress &amp; Analytics
           </h1>
           <p className="text-xs md:text-sm text-text-muted mt-1">
-            Track client deliverables, milestone completion, task execution rate, and delivery momentum.
+            Track client deliverables, milestone completion, task execution rate, and delivery
+            momentum.
           </p>
         </div>
 
@@ -165,7 +168,8 @@ export default function FreelancerProgressPage() {
                 Filtered to Project: {selectedProject.title}
               </span>
               <span className="text-text-muted text-2xs block">
-                Showing milestone completion, deliverable tasks, and effort metrics for this project only.
+                Showing milestone completion, deliverable tasks, and effort metrics for this project
+                only.
               </span>
             </div>
           </div>
@@ -249,9 +253,7 @@ export default function FreelancerProgressPage() {
               {displayedProjects.length === 1 ? 'contract' : 'contracts'}
             </span>
           </div>
-          <div className="mt-2 text-2xs text-purple-500 font-medium">
-            Active client initiatives
-          </div>
+          <div className="mt-2 text-2xs text-purple-500 font-medium">Active client initiatives</div>
         </Card>
       </div>
 
@@ -271,9 +273,15 @@ export default function FreelancerProgressPage() {
 
         {displayedProjects.length === 0 ? (
           <div className="p-8 text-center text-xs text-text-muted space-y-2">
-            <p>No active projects found. Save an AI roadmap or create a project to track progress.</p>
+            <p>
+              No active projects found. Save an AI roadmap or create a project to track progress.
+            </p>
             <Link to="/app/freelancer/projects">
-              <Button size="xs" variant="primary" className="bg-amber-500 hover:bg-amber-600 text-white mt-2">
+              <Button
+                size="xs"
+                variant="primary"
+                className="bg-amber-500 hover:bg-amber-600 text-white mt-2"
+              >
                 Create First Project
               </Button>
             </Link>
@@ -296,7 +304,8 @@ export default function FreelancerProgressPage() {
                 (m) =>
                   m.project_id === proj.id ||
                   ((m as any).project_title &&
-                    (m as any).project_title.trim().toLowerCase() === proj.title.trim().toLowerCase())
+                    (m as any).project_title.trim().toLowerCase() ===
+                      proj.title.trim().toLowerCase())
               );
               const compMilestones = projMilestones.filter((m) => m.status === 'completed').length;
 
@@ -335,7 +344,8 @@ export default function FreelancerProgressPage() {
                     <div className="flex flex-wrap items-center gap-4">
                       <span className="flex items-center gap-1 font-mono">
                         <Flag className="w-3 h-3 text-amber-500" />
-                        {compMilestones}/{projMilestones.length || proj.milestone_count || 0} milestones
+                        {compMilestones}/{projMilestones.length || proj.milestone_count || 0}{' '}
+                        milestones
                       </span>
                       <span className="flex items-center gap-1 font-mono">
                         <CheckSquare className="w-3 h-3 text-emerald-500" />
@@ -446,7 +456,9 @@ export default function FreelancerProgressPage() {
                           size="xs"
                           variant="pill"
                         />
-                        {task.due_date && <span>Due {new Date(task.due_date).toLocaleDateString()}</span>}
+                        {task.due_date && (
+                          <span>Due {new Date(task.due_date).toLocaleDateString()}</span>
+                        )}
                       </div>
                     </div>
                   </div>

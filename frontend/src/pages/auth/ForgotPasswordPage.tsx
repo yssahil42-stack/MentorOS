@@ -30,7 +30,8 @@ export default function ForgotPasswordPage() {
         setDirectResetUrl(resp.reset_url);
       }
     } catch (err: any) {
-      const msg = err?.response?.data?.detail || err?.message || 'Unable to request password reset.';
+      const msg =
+        err?.response?.data?.detail || err?.message || 'Unable to request password reset.';
       setError(msg);
     } finally {
       setLoading(false);
@@ -56,7 +57,11 @@ export default function ForgotPasswordPage() {
       </header>
 
       {/* Main Glass Card wrapped in Spatial3DCanvas */}
-      <Spatial3DCanvas defaultMode="2d" defaultPreset="standard" className="w-full max-w-sm mx-auto z-10 my-8">
+      <Spatial3DCanvas
+        defaultMode="2d"
+        defaultPreset="standard"
+        className="w-full max-w-sm mx-auto z-10 my-8"
+      >
         <div className="relative rounded-2xl bg-bg-surface/80 backdrop-blur-xl border border-border-base p-8 shadow-2xl">
           {success ? (
             <div className="text-center space-y-4 py-2">
@@ -75,9 +80,7 @@ export default function ForgotPasswordPage() {
 
               {directResetUrl && (
                 <div className="p-3 rounded-xl bg-bg-subtle/80 border border-border-base text-left space-y-2 mt-4">
-                  <p className="text-3xs text-text-muted">
-                    Instant link for this session:
-                  </p>
+                  <p className="text-3xs text-text-muted">Instant link for this session:</p>
                   <Link
                     to={directResetUrl}
                     className="inline-flex items-center justify-center w-full px-3 py-2 text-xs font-semibold text-white bg-accent-primary hover:bg-accent-hover rounded-lg transition-colors shadow-sm"

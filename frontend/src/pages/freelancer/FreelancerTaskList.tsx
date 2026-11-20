@@ -50,7 +50,9 @@ export const FreelancerTaskList: React.FC<FreelancerTaskListProps> = ({
               >
                 <CheckCircle2
                   className={`w-4 h-4 transition-transform active:scale-125 ${
-                    isDone ? 'text-amber-500 fill-amber-500/20' : 'text-text-muted hover:text-amber-500'
+                    isDone
+                      ? 'text-amber-500 fill-amber-500/20'
+                      : 'text-text-muted hover:text-amber-500'
                   }`}
                 />
               </button>

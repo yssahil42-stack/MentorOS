@@ -51,7 +51,9 @@ export const FreelancerMetrics: React.FC<FreelancerMetricsProps> = ({
       accentColor: 'from-amber-500 to-amber-600',
       footer: (
         <div className="mt-3.5 pt-3 border-t border-border-base/60 flex items-center justify-between text-xs">
-          <span className="text-amber-600 dark:text-amber-400 font-semibold">{avgProjectProgress}% avg progress</span>
+          <span className="text-amber-600 dark:text-amber-400 font-semibold">
+            {avgProjectProgress}% avg progress
+          </span>
           <div className="w-20 h-1.5 rounded-full bg-slate-100 dark:bg-bg-base overflow-hidden border border-border-subtle/80">
             <div
               className="h-full bg-gradient-to-r from-amber-500 to-amber-600 rounded-full transition-all duration-500"
@@ -80,13 +82,16 @@ export const FreelancerMetrics: React.FC<FreelancerMetricsProps> = ({
     {
       title: 'Completed Milestones',
       icon: <CheckCircle2 className="w-4 h-4 text-emerald-500" aria-hidden="true" />,
-      iconBox: 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20 group-hover:bg-emerald-500/15',
+      iconBox:
+        'bg-emerald-500/10 text-emerald-500 border-emerald-500/20 group-hover:bg-emerald-500/15',
       value: completedTaskCount,
       label: 'finished',
       accentColor: 'from-emerald-500 to-emerald-600',
       footer: (
         <div className="mt-3.5 pt-3 border-t border-border-base/60 flex items-center justify-between text-xs">
-          <span className="text-emerald-600 dark:text-emerald-400 font-semibold">{taskCompletionRate}% completion</span>
+          <span className="text-emerald-600 dark:text-emerald-400 font-semibold">
+            {taskCompletionRate}% completion
+          </span>
           <div className="w-20 h-1.5 rounded-full bg-slate-100 dark:bg-bg-base overflow-hidden border border-border-subtle/80">
             <div
               className="h-full bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full transition-all duration-500"

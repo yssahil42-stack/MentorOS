@@ -104,9 +104,7 @@ describe('QuickCaptureFab', () => {
 
     // Should open Quick Task Manager, NOT redirect to AI
     expect(screen.getByText('Quick Task Manager')).toBeInTheDocument();
-    expect(
-      screen.getByText('Direct task actions without AI redirection')
-    ).toBeInTheDocument();
+    expect(screen.getByText('Direct task actions without AI redirection')).toBeInTheDocument();
   });
 
   it('allows adding a specific task directly without AI redirection', async () => {
@@ -125,9 +123,7 @@ describe('QuickCaptureFab', () => {
     fireEvent.submit(form!);
 
     await waitFor(() => {
-      expect(
-        screen.getByText('Follow up on Stripe frontend application')
-      ).toBeInTheDocument();
+      expect(screen.getByText('Follow up on Stripe frontend application')).toBeInTheDocument();
     });
   });
 
@@ -158,9 +154,7 @@ describe('QuickCaptureFab', () => {
     const fabButton = screen.getByRole('button', { name: /Open quick task manager/i });
     fireEvent.click(fabButton);
 
-    expect(
-      screen.getByText('Review target job requirements for Data Analyst')
-    ).toBeInTheDocument();
+    expect(screen.getByText('Review target job requirements for Data Analyst')).toBeInTheDocument();
 
     const toggleBtn = screen.getAllByTitle('Mark as done')[0];
     fireEvent.click(toggleBtn);

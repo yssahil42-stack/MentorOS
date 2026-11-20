@@ -107,9 +107,7 @@ export function NotificationDropdown() {
   };
 
   const markAsRead = (id: string) => {
-    setNotifications((prev) =>
-      prev.map((n) => (n.id === id ? { ...n, read: true } : n))
-    );
+    setNotifications((prev) => prev.map((n) => (n.id === id ? { ...n, read: true } : n)));
   };
 
   const clearAll = () => {
@@ -210,7 +208,9 @@ export function NotificationDropdown() {
                 <div className="w-8 h-8 rounded-full bg-slate-100 dark:bg-bg-elevated text-text-muted flex items-center justify-center mx-auto">
                   <Bell className="w-4 h-4 opacity-50" />
                 </div>
-                <p className="text-xs font-semibold text-text-primary">You&apos;re all caught up!</p>
+                <p className="text-xs font-semibold text-text-primary">
+                  You&apos;re all caught up!
+                </p>
                 <p className="text-3xs text-text-muted">No new alerts or milestones scheduled.</p>
               </div>
             ) : (
@@ -229,10 +229,14 @@ export function NotificationDropdown() {
 
                   <div className="flex-1 min-w-0 space-y-0.5">
                     <div className="flex items-center justify-between gap-2">
-                      <h4 className={cn(
-                        'text-xs truncate',
-                        item.read ? 'font-medium text-text-secondary' : 'font-bold text-text-primary'
-                      )}>
+                      <h4
+                        className={cn(
+                          'text-xs truncate',
+                          item.read
+                            ? 'font-medium text-text-secondary'
+                            : 'font-bold text-text-primary'
+                        )}
+                      >
                         {item.title}
                       </h4>
                       <span className="text-[10px] text-text-faint font-mono shrink-0">

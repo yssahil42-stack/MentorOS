@@ -182,9 +182,7 @@ export const CurrencyConverter: React.FC<CurrencyConverterProps> = ({
 
         {/* Target Currency */}
         <div className="md:col-span-5 space-y-2">
-          <label className="block text-xs font-semibold text-text-secondary">
-            Target Currency
-          </label>
+          <label className="block text-xs font-semibold text-text-secondary">Target Currency</label>
           <div className="flex gap-2">
             <select
               value={toCurrency}
@@ -244,7 +242,13 @@ export const CurrencyConverter: React.FC<CurrencyConverterProps> = ({
               size="xs"
               onClick={handleCopy}
               className="text-xs font-medium"
-              icon={isCopied ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
+              icon={
+                isCopied ? (
+                  <Check className="w-3.5 h-3.5 text-emerald-500" />
+                ) : (
+                  <Copy className="w-3.5 h-3.5" />
+                )
+              }
             >
               {isCopied ? 'Copied' : 'Copy'}
             </Button>
@@ -252,7 +256,9 @@ export const CurrencyConverter: React.FC<CurrencyConverterProps> = ({
               <Button
                 variant="primary"
                 size="xs"
-                onClick={() => onApplyRate(toCurrency === 'INR' ? convertedAmount : amount, fromCurrency)}
+                onClick={() =>
+                  onApplyRate(toCurrency === 'INR' ? convertedAmount : amount, fromCurrency)
+                }
                 className="bg-amber-500 hover:bg-amber-600 text-stone-950 font-bold text-xs"
                 icon={<Calculator className="w-3.5 h-3.5" />}
               >

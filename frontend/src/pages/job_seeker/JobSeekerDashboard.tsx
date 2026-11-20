@@ -508,7 +508,9 @@ export default function JobSeekerDashboard() {
                     <div className="space-y-1.5">
                       <div className="flex items-start justify-between gap-2">
                         <h4 className="text-xs font-bold text-text-primary group-hover:text-solar-500 transition-colors">
-                          <Link to={`/app/job-seeker/progress?projectId=${proj.id}`}>{proj.title}</Link>
+                          <Link to={`/app/job-seeker/progress?projectId=${proj.id}`}>
+                            {proj.title}
+                          </Link>
                         </h4>
                         <span className="text-xs font-mono font-bold text-solar-500 bg-amber-500/10 px-2 py-0.5 rounded-full border border-amber-500/25">
                           {proj.progress}%

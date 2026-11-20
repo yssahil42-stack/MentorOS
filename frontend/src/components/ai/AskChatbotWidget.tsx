@@ -79,7 +79,11 @@ export function AskChatbotWidget() {
       if (userPrompt.length <= 60) return userPrompt;
       return userPrompt.slice(0, 57) + '...';
     }
-    const firstLine = content.split('\n')[0].replace(/^#+\s*/, '').replace(/^\*+\s*/, '').trim();
+    const firstLine = content
+      .split('\n')[0]
+      .replace(/^#+\s*/, '')
+      .replace(/^\*+\s*/, '')
+      .trim();
     if (firstLine.length > 3 && firstLine.length <= 60) return firstLine;
     return 'Actionable Insight';
   };
@@ -171,9 +175,7 @@ export function AskChatbotWidget() {
 
     try {
       // Send message along with prior history turns (excluding welcome message)
-      const historyToSend = messages
-        .filter((m) => m.id !== 'msg-welcome')
-        .concat(userMessage);
+      const historyToSend = messages.filter((m) => m.id !== 'msg-welcome').concat(userMessage);
 
       const res = await askChatbot({
         message: text,
@@ -356,7 +358,11 @@ export function AskChatbotWidget() {
                 className="p-1.5 rounded-lg text-text-muted hover:text-text-primary hover:bg-slate-100 dark:hover:bg-bg-elevated transition-colors cursor-pointer"
                 title={isExpanded ? 'Restore size' : 'Expand window'}
               >
-                {isExpanded ? <Minimize2 className="w-3.5 h-3.5" /> : <Maximize2 className="w-3.5 h-3.5" />}
+                {isExpanded ? (
+                  <Minimize2 className="w-3.5 h-3.5" />
+                ) : (
+                  <Maximize2 className="w-3.5 h-3.5" />
+                )}
               </button>
               <button
                 type="button"
@@ -493,7 +499,9 @@ export function AskChatbotWidget() {
                     <span className="w-1.5 h-1.5 rounded-full bg-orange-500 animate-pulse delay-150" />
                     <span className="w-1.5 h-1.5 rounded-full bg-orange-500 animate-pulse delay-300" />
                   </div>
-                  <span className="text-[11px] text-text-muted font-medium">Ask is thinking...</span>
+                  <span className="text-[11px] text-text-muted font-medium">
+                    Ask is thinking...
+                  </span>
                 </div>
               </div>
             )}

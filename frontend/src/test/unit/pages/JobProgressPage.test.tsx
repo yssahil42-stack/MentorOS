@@ -92,9 +92,7 @@ vi.mock('../../../services/projectService', () => ({
 vi.mock('../../../services/taskService', () => ({
   fetchTasks: vi.fn((params?: { project_id?: number }) =>
     Promise.resolve(
-      params?.project_id
-        ? mockTasks.filter((t) => t.project_id === params.project_id)
-        : mockTasks
+      params?.project_id ? mockTasks.filter((t) => t.project_id === params.project_id) : mockTasks
     )
   ),
   updateTask: vi.fn(() => Promise.resolve({})),
@@ -114,11 +112,7 @@ function renderWithClient(ui: React.ReactElement) {
       },
     },
   });
-  return render(
-    <QueryClientProvider client={testQueryClient}>
-      {ui}
-    </QueryClientProvider>
-  );
+  return render(<QueryClientProvider client={testQueryClient}>{ui}</QueryClientProvider>);
 }
 
 describe('JobProgressPage', () => {
@@ -136,7 +130,9 @@ describe('JobProgressPage', () => {
     );
 
     // Wait for the specific project title to appear in the header
-    const titleElements = await screen.findAllByText(/Recommendation System Development Roadmap Progress/i);
+    const titleElements = await screen.findAllByText(
+      /Recommendation System Development Roadmap Progress/i
+    );
     expect(titleElements[0]).toBeInTheDocument();
 
     // Verify filter banner
@@ -156,10 +152,10 @@ describe('JobProgressPage', () => {
 
     // Verify milestones of project 1 are displayed
     expect(screen.getByText(/Phase 1: Dataset & Matrix Factorization/i)).toBeInTheDocument();
+    expect(screen.getByText(/Phase 2: Hybrid Filtering & Precision@K/i)).toBeInTheDocument();
     expect(
-      screen.getByText(/Phase 2: Hybrid Filtering & Precision@K/i)
-    ).toBeInTheDocument();
-    expect(screen.queryByText(/Phase 1: Advanced SQL & Star Schema Modeling/i)).not.toBeInTheDocument();
+      screen.queryByText(/Phase 1: Advanced SQL & Star Schema Modeling/i)
+    ).not.toBeInTheDocument();
   });
 
   it('renders all projects when no projectId query parameter is present', async () => {
@@ -174,11 +170,7 @@ describe('JobProgressPage', () => {
     expect(await screen.findByText(/Job Search Progress & Analytics/i)).toBeInTheDocument();
 
     // Both projects should be visible
-    expect(
-      screen.getByText('Recommendation System Development Roadmap')
-    ).toBeInTheDocument();
-    expect(
-      screen.getByText('Data Analyst & Analytics Engineering Track')
-    ).toBeInTheDocument();
+    expect(screen.getByText('Recommendation System Development Roadmap')).toBeInTheDocument();
+    expect(screen.getByText('Data Analyst & Analytics Engineering Track')).toBeInTheDocument();
   });
 });

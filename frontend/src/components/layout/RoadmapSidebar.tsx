@@ -1,12 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
-import {
-  Plus,
-  FolderKanban,
-  Clock,
-  ChevronRight,
-  X,
-} from 'lucide-react';
+import { Plus, FolderKanban, Clock, ChevronRight, X } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { ROLE_CONFIGS } from '../../config/roles';
 import { fetchProjects } from '../../services/projectService';
@@ -153,7 +147,9 @@ export function RoadmapSidebar({
               <FolderKanban className="w-3.5 h-3.5 text-text-muted" />
               <span>Projects</span>
             </span>
-            <span className="text-[10px] font-semibold text-text-muted bg-slate-200/60 dark:bg-white/[0.06] px-2 py-0.5 rounded-full">{projects.length}</span>
+            <span className="text-[10px] font-semibold text-text-muted bg-slate-200/60 dark:bg-white/[0.06] px-2 py-0.5 rounded-full">
+              {projects.length}
+            </span>
           </div>
 
           <div className="space-y-1.5">
@@ -183,7 +179,9 @@ export function RoadmapSidebar({
                     <div className="flex items-center gap-2 mt-1 text-[11px] text-text-muted font-medium">
                       <span>{project.milestone_count || 0} phases</span>
                       <span className="text-border-base">•</span>
-                      <span className="font-semibold text-text-secondary">{project.progress || 0}%</span>
+                      <span className="font-semibold text-text-secondary">
+                        {project.progress || 0}%
+                      </span>
                     </div>
                     <div className="mt-1.5 h-1 w-full bg-slate-100 dark:bg-bg-elevated rounded-full overflow-hidden">
                       <div
@@ -206,7 +204,9 @@ export function RoadmapSidebar({
               <Clock className="w-3.5 h-3.5 text-text-muted" />
               <span>Recent</span>
             </span>
-            <span className="text-[10px] font-semibold text-text-muted bg-slate-200/60 dark:bg-white/[0.06] px-2 py-0.5 rounded-full">{recentRoadmaps.length}</span>
+            <span className="text-[10px] font-semibold text-text-muted bg-slate-200/60 dark:bg-white/[0.06] px-2 py-0.5 rounded-full">
+              {recentRoadmaps.length}
+            </span>
           </div>
 
           <div className="space-y-1.5">

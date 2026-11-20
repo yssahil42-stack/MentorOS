@@ -168,10 +168,7 @@ export interface MilestoneQueryOptions {
 }
 
 export const milestonesApi = {
-  get: (
-    options?: number | MilestoneQueryOptions,
-    signal?: AbortSignal
-  ): Promise<Milestone[]> => {
+  get: (options?: number | MilestoneQueryOptions, signal?: AbortSignal): Promise<Milestone[]> => {
     let params: Record<string, unknown> = {};
     if (typeof options === 'number') {
       params.project_id = options;

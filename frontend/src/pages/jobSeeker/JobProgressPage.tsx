@@ -242,7 +242,12 @@ export default function JobProgressPage() {
     },
   });
 
-  if (tasksLoading || milestonesLoading || projectsLoading || (selectedProjectId && singleLoading)) {
+  if (
+    tasksLoading ||
+    milestonesLoading ||
+    projectsLoading ||
+    (selectedProjectId && singleLoading)
+  ) {
     return (
       <div className="space-y-4 max-w-6xl mx-auto">
         <LoadingSkeleton variant="card" className="h-32" />
@@ -275,9 +280,9 @@ export default function JobProgressPage() {
 
   // Filter tasks specifically for this project
   const projectTasks = selectedProject
-    ? (singleProject?.tasks && singleProject.tasks.length > 0
-        ? singleProject.tasks
-        : (selectedProject as any).tasks && (selectedProject as any).tasks.length > 0
+    ? singleProject?.tasks && singleProject.tasks.length > 0
+      ? singleProject.tasks
+      : (selectedProject as any).tasks && (selectedProject as any).tasks.length > 0
         ? (selectedProject as any).tasks
         : fetchedTasks.filter(
             (t) =>
@@ -285,16 +290,16 @@ export default function JobProgressPage() {
               String(t.project_id) === String(selectedProject.id) ||
               (t.project_title &&
                 t.project_title.trim().toLowerCase() === selectedProject.title.trim().toLowerCase())
-          ))
+          )
     : fetchedTasks.length > 0
-    ? fetchedTasks
-    : DEFAULT_JOB_TRACKS.flatMap((p) => p.tasks);
+      ? fetchedTasks
+      : DEFAULT_JOB_TRACKS.flatMap((p) => p.tasks);
 
   // Filter milestones specifically for this project
   const projectMilestones = selectedProject
-    ? (singleProject?.milestones && singleProject.milestones.length > 0
-        ? singleProject.milestones
-        : (selectedProject as any).milestones && (selectedProject as any).milestones.length > 0
+    ? singleProject?.milestones && singleProject.milestones.length > 0
+      ? singleProject.milestones
+      : (selectedProject as any).milestones && (selectedProject as any).milestones.length > 0
         ? (selectedProject as any).milestones
         : fetchedMilestones.filter(
             (m) =>
@@ -303,10 +308,10 @@ export default function JobProgressPage() {
               ((m as any).project_title &&
                 (m as any).project_title.trim().toLowerCase() ===
                   selectedProject.title.trim().toLowerCase())
-          ))
+          )
     : fetchedMilestones.length > 0
-    ? fetchedMilestones
-    : DEFAULT_JOB_TRACKS.flatMap((p) => p.milestones);
+      ? fetchedMilestones
+      : DEFAULT_JOB_TRACKS.flatMap((p) => p.milestones);
 
   // Calculate task and milestone completion rates
   const completedTasks = projectTasks.filter((t: any) => t.status === 'completed');
@@ -324,8 +329,8 @@ export default function JobProgressPage() {
     projectTasks.length > 0
       ? taskCompletionRate
       : projectMilestones.length > 0
-      ? milestoneRate
-      : selectedProject?.progress || 0;
+        ? milestoneRate
+        : selectedProject?.progress || 0;
 
   return (
     <div className="space-y-6 max-w-6xl mx-auto animate-fade-in pb-12">
@@ -337,11 +342,15 @@ export default function JobProgressPage() {
               <TrendingUp className="w-5 h-5" />
             </span>
             <span className="text-2xs font-mono font-bold uppercase tracking-wider text-teal-500">
-              {selectedProject ? `PIPELINE TRACK: ${selectedProject.title}` : 'CAREER & SEARCH VELOCITY'}
+              {selectedProject
+                ? `PIPELINE TRACK: ${selectedProject.title}`
+                : 'CAREER & SEARCH VELOCITY'}
             </span>
           </div>
           <h1 className="text-2xl md:text-3xl font-extrabold text-text-primary mt-1">
-            {selectedProject ? `${selectedProject.title} Progress` : 'Job Search Progress & Analytics'}
+            {selectedProject
+              ? `${selectedProject.title} Progress`
+              : 'Job Search Progress & Analytics'}
           </h1>
           <p className="text-xs md:text-sm text-text-muted mt-1">
             {selectedProject
@@ -387,7 +396,8 @@ export default function JobProgressPage() {
                 Filtered to Track: {selectedProject.title}
               </span>
               <span className="text-text-muted text-2xs block">
-                Showing milestone completion, interview rounds, and tasks for this specific track only.
+                Showing milestone completion, interview rounds, and tasks for this specific track
+                only.
               </span>
             </div>
           </div>
@@ -529,13 +539,15 @@ export default function JobProgressPage() {
           ) : (
             <div className="space-y-4">
               {availableProjects.map((proj) => {
-                const thisProjTasks = (proj as any).tasks || fetchedTasks.filter(
-                  (t) =>
-                    t.project_id === proj.id ||
-                    String(t.project_id) === String(proj.id) ||
-                    (t.project_title &&
-                      t.project_title.trim().toLowerCase() === proj.title.trim().toLowerCase())
-                );
+                const thisProjTasks =
+                  (proj as any).tasks ||
+                  fetchedTasks.filter(
+                    (t) =>
+                      t.project_id === proj.id ||
+                      String(t.project_id) === String(proj.id) ||
+                      (t.project_title &&
+                        t.project_title.trim().toLowerCase() === proj.title.trim().toLowerCase())
+                  );
                 const thisComp = thisProjTasks.filter((t: any) => t.status === 'completed').length;
                 const thisTot = thisProjTasks.length;
                 const dynamicP =
@@ -578,8 +590,14 @@ export default function JobProgressPage() {
                       <span>{proj.description || 'Target track pipeline'}</span>
                       <div className="flex items-center gap-2">
                         <TimeTrackingBadge
-                          expectedMinutes={thisProjTasks.reduce((sum: number, t: any) => sum + (t.estimated_minutes || 0), 0)}
-                          actualMinutes={thisProjTasks.reduce((sum: number, t: any) => sum + (t.actual_minutes || 0), 0)}
+                          expectedMinutes={thisProjTasks.reduce(
+                            (sum: number, t: any) => sum + (t.estimated_minutes || 0),
+                            0
+                          )}
+                          actualMinutes={thisProjTasks.reduce(
+                            (sum: number, t: any) => sum + (t.actual_minutes || 0),
+                            0
+                          )}
                           size="xs"
                           variant="pill"
                         />

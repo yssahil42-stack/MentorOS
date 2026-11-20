@@ -35,13 +35,7 @@ export interface DocumentationGeneratorModalProps {
 }
 
 export type DocTemplate =
-  | 'adr'
-  | 'tech_spec'
-  | 'api_spec'
-  | 'component_guide'
-  | 'runbook'
-  | 'db_schema'
-  | 'security_audit';
+  'adr' | 'tech_spec' | 'api_spec' | 'component_guide' | 'runbook' | 'db_schema' | 'security_audit';
 
 export type DocAudience = 'engineers' | 'architects' | 'devops' | 'qa' | 'product';
 
@@ -94,17 +88,37 @@ const DOC_TEMPLATES: { id: DocTemplate; label: string; icon: string; desc: strin
 
 const AUDIENCES: { id: DocAudience; label: string; desc: string }[] = [
   { id: 'engineers', label: 'Software Engineers', desc: 'Implementation focus with code patterns' },
-  { id: 'architects', label: 'Tech Leads & Architects', desc: 'Design rationale, scaling & trade-offs' },
+  {
+    id: 'architects',
+    label: 'Tech Leads & Architects',
+    desc: 'Design rationale, scaling & trade-offs',
+  },
   { id: 'devops', label: 'DevOps & SRE', desc: 'Infrastructure, deployment & monitoring' },
-  { id: 'qa', label: 'QA & Test Engineers', desc: 'Edge cases, test scenarios & acceptance criteria' },
+  {
+    id: 'qa',
+    label: 'QA & Test Engineers',
+    desc: 'Edge cases, test scenarios & acceptance criteria',
+  },
   { id: 'product', label: 'Product & Cross-Functional', desc: 'High-level architecture & impact' },
 ];
 
 const DETAIL_LEVELS: { id: DocDetailLevel; label: string; desc: string }[] = [
-  { id: 'comprehensive', label: 'Comprehensive', desc: 'Full context, tables, schemas and code blocks' },
-  { id: 'concise', label: 'Concise & Pragmatic', desc: 'Key takeaways and bulleted specifications' },
+  {
+    id: 'comprehensive',
+    label: 'Comprehensive',
+    desc: 'Full context, tables, schemas and code blocks',
+  },
+  {
+    id: 'concise',
+    label: 'Concise & Pragmatic',
+    desc: 'Key takeaways and bulleted specifications',
+  },
   { id: 'code_heavy', label: 'Code-Heavy', desc: 'Maximized code samples and minimal prose' },
-  { id: 'step_by_step', label: 'Step-by-Step Guide', desc: 'Sequential walkthrough from setup to verify' },
+  {
+    id: 'step_by_step',
+    label: 'Step-by-Step Guide',
+    desc: 'Sequential walkthrough from setup to verify',
+  },
 ];
 
 const TECH_STACK_PRESETS = [
@@ -332,7 +346,13 @@ ${contextDetails.trim() || 'Include industry best practices, production-ready co
                 variant="ghost"
                 size="xs"
                 onClick={handleCopy}
-                icon={hasCopied ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
+                icon={
+                  hasCopied ? (
+                    <Check className="w-3 h-3 text-emerald-400" />
+                  ) : (
+                    <Copy className="w-3 h-3" />
+                  )
+                }
               >
                 {hasCopied ? 'Copied' : 'Copy'}
               </Button>
