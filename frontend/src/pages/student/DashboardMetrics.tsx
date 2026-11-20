@@ -53,7 +53,7 @@ export const DashboardMetrics: React.FC<DashboardMetricsProps> = ({
             {timeGreeting}, {displayName}
           </h2>
           <p className="text-xs sm:text-sm text-stone-600 dark:text-stone-300 font-medium">
-            <span className="sr-only">Welcome back, {displayName}. </span>
+            <span className="sr-only">Welcome back, {displayName}</span>
             {completedToday} of {totalTaskCount || completedToday + remainingToday} tasks done
             today.
             {remainingToday > 0 ? ` ${remainingToday} left before midnight.` : ' All caught up!'}

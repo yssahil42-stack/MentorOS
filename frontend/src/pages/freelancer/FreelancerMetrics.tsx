@@ -60,8 +60,8 @@ export const FreelancerMetrics: React.FC<FreelancerMetricsProps> = ({
             {timeGreeting}, {displayName}
           </h1>
           <p className="text-xs sm:text-sm text-stone-600 dark:text-stone-300 font-medium">
-            Welcome back, {displayName}. Track client deliverables, contracts, and schedule project
-            milestones.
+            <span className="sr-only">Welcome back, {displayName}</span>
+            Track client deliverables, contracts, and schedule project milestones.
           </p>
         </div>
 
