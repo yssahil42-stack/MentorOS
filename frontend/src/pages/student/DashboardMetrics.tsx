@@ -1,7 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { BookOpen, ListTodo, CheckCircle2, Calendar, Sparkles, ArrowRight } from 'lucide-react';
-import { Card3D } from '../../components/ui/Card3D';
+import { BookOpen, Sparkles, ArrowRight } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
 
 interface DashboardMetricsProps {
@@ -30,139 +29,158 @@ export const DashboardMetrics: React.FC<DashboardMetricsProps> = ({
   const leftPercent =
     totalTaskCount > 0 ? Math.round((pendingTaskCount / totalTaskCount) * 100) : 0;
 
-  const metrics = [
-    {
-      title: 'Course Projects',
-      icon: <BookOpen className="w-4 h-4 text-solar-500" />,
-      iconBox: 'bg-amber-500/15 text-amber-400 border-amber-500/25',
-      value: projectCount,
-      label: 'active',
-      hoverBorder: 'hover:border-solar-500/40',
-      footer: (
-        <div className="mt-2.5 flex items-center justify-between text-2xs">
-          <span className="text-solar-500 font-semibold">{avgProjectProgress}% avg progress</span>
-          <div className="w-16 h-1.5 rounded-full bg-bg-base overflow-hidden border border-border-subtle">
-            <div
-              className="h-full bg-gradient-to-r from-amber-500 to-solar-500 rounded-full"
-              style={{ width: `${Math.min(100, Math.max(5, avgProjectProgress))}%` }}
-            />
-          </div>
-        </div>
-      ),
-    },
-    {
-      title: 'Assignments Due',
-      icon: <ListTodo className="w-4 h-4 text-amber-400" />,
-      iconBox: 'bg-amber-500/15 text-amber-400 border-amber-500/25',
-      value: pendingTaskCount,
-      label: 'pending',
-      hoverBorder: 'hover:border-amber-500/40',
-      footer: (
-        <div className="mt-2.5 flex items-center justify-between text-2xs text-text-muted">
-          <span>{completedTaskCount} completed</span>
-          <span className="font-mono text-3xs font-bold text-amber-400">{leftPercent}% left</span>
-        </div>
-      ),
-    },
-    {
-      title: 'Tasks Done',
-      icon: <CheckCircle2 className="w-4 h-4 text-emerald-400" />,
-      iconBox: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/25',
-      value: completedTaskCount,
-      label: 'finished',
-      hoverBorder: 'hover:border-emerald-500/40',
-      footer: (
-        <div className="mt-2.5 flex items-center justify-between text-2xs">
-          <span className="text-emerald-400 font-semibold">{taskCompletionRate}% completion</span>
-          <div className="w-16 h-1.5 rounded-full bg-bg-base overflow-hidden border border-border-subtle">
-            <div
-              className="h-full bg-gradient-to-r from-emerald-500 to-teal-400 rounded-full"
-              style={{ width: `${Math.min(100, Math.max(5, taskCompletionRate))}%` }}
-            />
-          </div>
-        </div>
-      ),
-    },
-    {
-      title: 'Target Milestone',
-      icon: <Calendar className="w-4 h-4 text-purple-400" />,
-      iconBox: 'bg-purple-500/15 text-purple-400 border-purple-500/25',
-      value: nextDeadlineTitle,
-      label: '',
-      hoverBorder: 'hover:border-purple-500/40',
-      footer: (
-        <div className="mt-2.5 text-2xs text-purple-400 font-medium flex items-center gap-1">
-          <span className="w-1.5 h-1.5 rounded-full bg-purple-400 animate-pulse" />
-          Upcoming deadline
-        </div>
-      ),
-    },
-  ];
+  const hour = new Date().getHours();
+  const timeGreeting =
+    hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
+
+  const formattedDate = new Date().toLocaleDateString('en-US', {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'short',
+  });
+
+  const remainingToday = pendingTaskCount;
+  const completedToday = completedTaskCount;
 
   return (
     <div className="space-y-6">
-      <Card3D
-        variant="glass"
-        maxTilt={3}
-        depth={20}
-        className="p-6 md:p-7 border border-border-base/80 bg-gradient-to-r from-bg-surface/90 via-bg-elevated/70 to-bg-surface/90 shadow-card backdrop-blur-xl"
-      >
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div className="space-y-1">
-            <h2 className="text-2xl md:text-3xl font-extrabold text-text-primary tracking-tight">
-              Welcome back, {displayName}
-            </h2>
-            <p className="text-xs sm:text-sm text-text-secondary">
-              Here is your daily study schedule, active coursework, and upcoming assignments.
-            </p>
+      {/* ─── Hero Header & Action Buttons ───────────────────────────────── */}
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 pt-1">
+        <div className="space-y-1">
+          <div className="text-xs font-semibold text-stone-500 dark:text-stone-400">
+            {formattedDate}
           </div>
-          <div className="flex items-center gap-2.5 flex-wrap shrink-0 self-start sm:self-auto">
-            <Link
-              to="/app/student/projects"
-              className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-bg-elevated hover:bg-slate-200 dark:hover:bg-bg-surface border border-border-base text-text-primary font-semibold text-xs transition-colors shrink-0"
-            >
-              <BookOpen className="w-3.5 h-3.5 text-solar-500" />
-              <span>My Courses</span>
-            </Link>
-            <Button
-              variant="primary"
-              size="sm"
-              onClick={onPlanWithAI}
-              className="font-semibold text-xs h-9.5 px-4 !bg-solar-500 hover:!bg-solar-600 text-white shadow-sm hover:shadow transition-all"
-              icon={<Sparkles className="w-3.5 h-3.5" />}
-            >
-              Plan with Skillpath AI
-            </Button>
+          <h2 className="text-3xl sm:text-4xl font-extrabold text-stone-950 dark:text-white tracking-tight">
+            {timeGreeting}, {displayName}
+          </h2>
+          <p className="text-xs sm:text-sm text-stone-600 dark:text-stone-300 font-medium">
+            <span className="sr-only">Welcome back, {displayName}. </span>
+            {completedToday} of {totalTaskCount || completedToday + remainingToday} tasks done
+            today.
+            {remainingToday > 0 ? ` ${remainingToday} left before midnight.` : ' All caught up!'}
+          </p>
+        </div>
+
+        <div className="flex items-center gap-2.5 flex-wrap shrink-0">
+          <Link
+            to="/app/student/projects"
+            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-white dark:bg-[#161922] hover:bg-stone-50 dark:hover:bg-stone-800/80 border border-[#eee7e0] dark:border-stone-800 text-stone-800 dark:text-stone-200 text-xs sm:text-sm font-semibold transition-all shadow-xs"
+          >
+            <BookOpen className="w-3.5 h-3.5 text-stone-500" />
+            <span>My courses</span>
+          </Link>
+          <Button
+            variant="primary"
+            size="sm"
+            onClick={onPlanWithAI}
+            className="font-semibold text-xs h-9.5 px-4 !bg-[#c04b1e] hover:!bg-[#a83f17] text-white shadow-xs transition-all cursor-pointer rounded-xl flex items-center gap-1.5"
+            icon={<Sparkles className="w-3.5 h-3.5 text-white" />}
+          >
+            Plan with Skillpath AI
+          </Button>
+        </div>
+      </div>
+
+      {/* ─── 4 Terracotta Stat Cards ────────────────────────────────────── */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {/* Card 1: Course Projects (GPA / Projects) */}
+        <div className="bg-white dark:bg-[#161922] border border-[#eee7e0] dark:border-stone-800/80 rounded-2xl md:rounded-3xl p-5 shadow-xs flex flex-col justify-between hover:border-[#c04b1e]/30 transition-colors">
+          <div>
+            <div className="text-xs font-semibold text-stone-500 dark:text-stone-400">
+              Course Projects
+            </div>
+            <div className="mt-2.5 flex items-baseline gap-1.5">
+              <span className="text-2xl sm:text-3xl font-extrabold text-stone-950 dark:text-white font-mono tracking-tight">
+                {projectCount}
+              </span>
+              <span className="text-xs font-medium text-stone-400">active</span>
+            </div>
+          </div>
+          <div className="mt-4 pt-1">
+            <div className="w-full bg-stone-100 dark:bg-stone-800 h-1.5 rounded-full overflow-hidden mb-2">
+              <div
+                className="bg-[#0d9488] h-full rounded-full transition-all duration-500"
+                style={{ width: `${Math.min(100, Math.max(5, avgProjectProgress))}%` }}
+              />
+            </div>
+            <div className="text-xs font-semibold text-[#0d9488] dark:text-teal-400 truncate">
+              {avgProjectProgress}% avg progress
+            </div>
           </div>
         </div>
-      </Card3D>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-        {metrics.map((m) => (
-          <Card3D
-            key={m.title}
-            maxTilt={7}
-            depth={25}
-            variant="glass"
-            className={`p-4 sm:p-5 border border-border-base/90 ${m.hoverBorder} transition-all shadow-card group`}
-          >
-            <div className="flex items-center justify-between text-xs text-text-muted font-medium">
-              <span>{m.title}</span>
-              <div className={`p-2 rounded-xl border transition-transform ${m.iconBox}`}>
-                {m.icon}
-              </div>
+        {/* Card 2: Assignments Due */}
+        <div className="bg-white dark:bg-[#161922] border border-[#eee7e0] dark:border-stone-800/80 rounded-2xl md:rounded-3xl p-5 shadow-xs flex flex-col justify-between hover:border-[#c04b1e]/30 transition-colors">
+          <div>
+            <div className="text-xs font-semibold text-stone-500 dark:text-stone-400">
+              Assignments Due
             </div>
-            <div className="mt-3 flex items-baseline gap-1.5">
-              <span
-                className={`text-text-primary font-mono tracking-tight ${typeof m.value === 'number' ? 'text-2xl sm:text-3xl font-extrabold' : 'text-sm sm:text-base font-bold truncate'}`}
-              >
-                {m.value}
+            <div className="mt-2.5 flex items-baseline gap-1.5">
+              <span className="text-2xl sm:text-3xl font-extrabold text-stone-950 dark:text-white font-mono tracking-tight">
+                {pendingTaskCount}
               </span>
-              {m.label && <span className="text-xs text-text-muted">{m.label}</span>}
+              <span className="text-xs font-medium text-stone-400">pending</span>
             </div>
-            {m.footer}
-          </Card3D>
-        ))}
+          </div>
+          <div className="mt-4 pt-1">
+            <div className="w-full bg-stone-100 dark:bg-stone-800 h-1.5 rounded-full overflow-hidden mb-2">
+              <div
+                className="bg-stone-900 dark:bg-stone-100 h-full rounded-full transition-all duration-500"
+                style={{ width: `${Math.min(100, Math.max(5, 100 - leftPercent))}%` }}
+              />
+            </div>
+            <div className="text-xs font-medium text-stone-500 dark:text-stone-400 flex items-center justify-between">
+              <span>{completedTaskCount} completed</span>
+              <span className="font-mono text-3xs font-semibold text-stone-700 dark:text-stone-300">
+                {leftPercent}% left
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* Card 3: Tasks Done */}
+        <div className="bg-white dark:bg-[#161922] border border-[#eee7e0] dark:border-stone-800/80 rounded-2xl md:rounded-3xl p-5 shadow-xs flex flex-col justify-between hover:border-[#c04b1e]/30 transition-colors">
+          <div>
+            <div className="text-xs font-semibold text-stone-500 dark:text-stone-400">
+              Tasks Done
+            </div>
+            <div className="mt-2.5 flex items-baseline gap-1.5">
+              <span className="text-2xl sm:text-3xl font-extrabold text-stone-950 dark:text-white font-mono tracking-tight">
+                {completedTaskCount}
+              </span>
+              <span className="text-xs font-medium text-stone-400">finished</span>
+            </div>
+          </div>
+          <div className="mt-4 pt-1">
+            <div className="w-full bg-stone-100 dark:bg-stone-800 h-1.5 rounded-full overflow-hidden mb-2">
+              <div
+                className="bg-[#c04b1e] h-full rounded-full transition-all duration-500"
+                style={{ width: `${Math.min(100, Math.max(5, taskCompletionRate))}%` }}
+              />
+            </div>
+            <div className="text-xs font-semibold text-[#c04b1e] dark:text-orange-400 truncate">
+              {taskCompletionRate}% completion
+            </div>
+          </div>
+        </div>
+
+        {/* Card 4: Target Milestone */}
+        <div className="bg-white dark:bg-[#161922] border border-[#eee7e0] dark:border-stone-800/80 rounded-2xl md:rounded-3xl p-5 shadow-xs flex flex-col justify-between hover:border-[#c04b1e]/30 transition-colors">
+          <div>
+            <div className="text-xs font-semibold text-stone-500 dark:text-stone-400">
+              Target Milestone
+            </div>
+            <div className="mt-2.5 flex items-baseline gap-1.5">
+              <span className="text-lg sm:text-xl font-bold text-stone-950 dark:text-white truncate">
+                {nextDeadlineTitle}
+              </span>
+            </div>
+          </div>
+          <div className="mt-4 pt-1 flex items-center gap-1.5 text-xs text-purple-600 dark:text-purple-400 font-semibold">
+            <span className="w-1.5 h-1.5 rounded-full bg-purple-500 animate-pulse" />
+            <span>Upcoming deadline</span>
+          </div>
+        </div>
       </div>
     </div>
   );

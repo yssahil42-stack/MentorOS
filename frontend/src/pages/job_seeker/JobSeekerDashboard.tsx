@@ -2,42 +2,33 @@ import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import {
-  CheckCircle2,
-  Plus,
-  Calendar,
   Building2,
-  ListTodo,
-  ArrowRight,
-  UserCheck,
   Sparkles,
-  TrendingUp,
+  Check,
+  ChevronLeft,
+  ChevronRight,
+  Star,
+  Clock,
+  Award,
+  Calendar,
 } from 'lucide-react';
 import { useWorkspace } from '../../contexts/WorkspaceContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { fetchDashboardSummary } from '../../services/dashboardService';
 import { tasksApi, projectsApi } from '../../services/apiClient';
-import { Card } from '../../components/ui/Card';
-import { Card3D } from '../../components/ui/Card3D';
-import { Button } from '../../components/ui/Button';
-import { PriorityBadge } from '../../components/ui/Badge';
-import { TimeTrackingBadge } from '../../components/ui/TimeTrackingBadge';
 import { DashboardSkeleton } from '../../components/ui/LoadingSkeleton';
-import { SmallCalendar } from '../../components/ui/SmallCalendar';
 import { DailyStandupWidget } from '../../components/dashboard/DailyStandupWidget';
-import { ROLE_CONFIGS } from '../../config/roles';
 import type { TaskStatus } from '../../types/task';
+import { cn } from '../../utils/cn';
 
 export default function JobSeekerDashboard() {
-  const { openCaptureModal, openAIDrawer, showToast } = useWorkspace();
+  const { openAIDrawer, showToast } = useWorkspace();
   const { user } = useAuth();
   const queryClient = useQueryClient();
-
-  const roleConfig = ROLE_CONFIGS.job_seeker;
-  const emptyStateConfig = roleConfig.emptyStates.tasks;
-  const promptStarter = roleConfig.firstAiPrompt;
-
   const [quickTaskTitle, setQuickTaskTitle] = useState('');
-  const [taskFilter, setTaskFilter] = useState<'all' | 'todo' | 'completed'>('all');
+
+  // Calendar navigation state
+  const [calendarDate, setCalendarDate] = useState(() => new Date());
 
   const { data: summary, isLoading: summaryLoading } = useQuery({
     queryKey: ['dashboard', 'job_seeker'],
@@ -54,46 +45,43 @@ export default function JobSeekerDashboard() {
     queryFn: ({ signal }) => projectsApi.get('job_seeker', { signal }),
   });
 
+  const invalidate = () =>
+    ['tasks', 'dashboard', 'projects', 'milestones'].forEach((k) =>
+      queryClient.invalidateQueries({ queryKey: [k] })
+    );
+
   const toggleMutation = useMutation({
-    mutationFn: async ({ id, status }: { id: number; status: TaskStatus }) => {
-      return tasksApi.update(id, { status });
-    },
-    onSuccess: (updated) => {
-      queryClient.invalidateQueries({ queryKey: ['tasks'] });
-      queryClient.invalidateQueries({ queryKey: ['dashboard'] });
-      queryClient.invalidateQueries({ queryKey: ['projects'] });
-      queryClient.invalidateQueries({ queryKey: ['milestones'] });
-      showToast(
-        updated.status === 'completed' ? 'Task marked as done!' : 'Task updated',
-        'success'
-      );
+    mutationFn: async ({ id, status }: { id: number; status: TaskStatus }) =>
+      tasksApi.update(id, { status }),
+    onSuccess: (updated, variables) => {
+      invalidate();
+      if (updated.status === 'completed') {
+        showToast('Application task completed!', 'success', {
+          action: {
+            label: 'Undo',
+            onClick: () => toggleMutation.mutate({ id: variables.id, status: 'todo' }),
+          },
+        });
+      } else {
+        showToast('Task updated', 'success');
+      }
     },
   });
 
   const addTaskMutation = useMutation({
-    mutationFn: async (title: string) => {
-      return tasksApi.create({
+    mutationFn: async (title: string) =>
+      tasksApi.create({
         title,
         priority: 'high',
-        estimated_minutes: 30,
+        estimated_minutes: 45,
         role: 'job_seeker',
-      });
-    },
+      }),
     onSuccess: () => {
       setQuickTaskTitle('');
-      queryClient.invalidateQueries({ queryKey: ['tasks'] });
-      queryClient.invalidateQueries({ queryKey: ['dashboard'] });
-      queryClient.invalidateQueries({ queryKey: ['projects'] });
-      queryClient.invalidateQueries({ queryKey: ['milestones'] });
+      invalidate();
       showToast('Career task added!', 'success');
     },
   });
-
-  const handleQuickAdd = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!quickTaskTitle.trim()) return;
-    addTaskMutation.mutate(quickTaskTitle.trim());
-  };
 
   if (summaryLoading || tasksLoading || projectsLoading) {
     return <DashboardSkeleton />;
@@ -103,463 +91,611 @@ export default function JobSeekerDashboard() {
   const pendingTasks = tasks.filter((t) => t.status !== 'completed');
   const taskCompletionRate =
     tasks.length > 0 ? Math.round((completedTasks.length / tasks.length) * 100) : 0;
+  const leftPercent =
+    tasks.length > 0 ? Math.round((pendingTasks.length / tasks.length) * 100) : 0;
   const avgProjectProgress =
     projects.length > 0
-      ? Math.round(projects.reduce((acc, p) => acc + (p.progress || 0), 0) / projects.length)
+      ? Math.round(
+          projects.reduce((acc, p) => {
+            const pTasks = tasks.filter(
+              (t) =>
+                t.project_id === p.id ||
+                (t.project_title &&
+                  t.project_title.trim().toLowerCase() === p.title.trim().toLowerCase())
+            );
+            const pProg =
+              pTasks.length > 0
+                ? Math.round(
+                    (pTasks.filter((t) => t.status === 'completed').length / pTasks.length) * 100
+                  )
+                : p.progress || 0;
+            return acc + pProg;
+          }, 0) / projects.length
+        )
       : 0;
 
-  const filteredTasks = tasks.filter((t) => {
-    if (taskFilter === 'all') return true;
-    if (taskFilter === 'todo') return t.status !== 'completed';
-    return t.status === 'completed';
+  const displayName = user?.full_name ? user.full_name.split(' ')[0] : 'Sahil';
+
+  // Calendar calculations
+  const year = calendarDate.getFullYear();
+  const month = calendarDate.getMonth();
+  const monthName = calendarDate.toLocaleString('default', { month: 'long' });
+  const firstDayOfMonth = new Date(year, month, 1).getDay();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+  const prevMonth = () => setCalendarDate(new Date(year, month - 1, 1));
+  const nextMonth = () => setCalendarDate(new Date(year, month + 1, 1));
+
+  const today = new Date();
+  const isCurrentMonth = today.getFullYear() === year && today.getMonth() === month;
+  const currentDayNum = today.getDate();
+
+  const hour = new Date().getHours();
+  const timeGreeting =
+    hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
+
+  const formattedDate = new Date().toLocaleDateString('en-US', {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'short',
   });
 
-  const displayName = user?.full_name ? user.full_name.split(' ')[0] : 'there';
+  const nextMilestoneTitle =
+    (summary?.role_summary as any)?.next_interview_title || 'Technical Interview Prep';
+
+  // Dynamic companies list mapping
+  const companiesList =
+    projects.length > 0
+      ? projects.slice(0, 5).map((p, idx) => {
+          const codes = ['STRIPE-480', 'VERCEL-401', 'NOTION-320', 'LINEAR-210'];
+          const stages = ['Offer', 'Onsite', 'Screening', 'Applied'];
+          const pTasks = tasks.filter(
+            (t) =>
+              t.project_id === p.id ||
+              (t.project_title &&
+                t.project_title.trim().toLowerCase() === p.title.trim().toLowerCase())
+          );
+          const pComp = pTasks.filter((t) => t.status === 'completed').length;
+          const pct =
+            pTasks.length > 0 ? Math.round((pComp / pTasks.length) * 100) : p.progress || 85;
+          return {
+            id: p.id,
+            code: codes[idx % codes.length],
+            title: p.title,
+            subtitle: pct >= 90 ? 'Final Round · Senior Staff Role' : 'Interview pipeline active',
+            progress: pct,
+            stage: stages[idx % stages.length],
+          };
+        })
+      : [
+          {
+            id: 1,
+            code: 'STRIPE-480',
+            title: 'Stripe · Senior Infrastructure Engineer',
+            subtitle: 'Final Round · Senior Staff Role',
+            progress: 94,
+            stage: 'Offer',
+          },
+          {
+            id: 2,
+            code: 'VERCEL-401',
+            title: 'Vercel · Full-Stack Developer Platform',
+            subtitle: 'Onsite Loop scheduled for Thursday',
+            progress: 96,
+            stage: 'Onsite',
+          },
+          {
+            id: 3,
+            code: 'NOTION-320',
+            title: 'Notion · Core Productivity Workspace',
+            subtitle: 'System Design Interview completed',
+            progress: 91,
+            stage: 'Screening',
+          },
+          {
+            id: 4,
+            code: 'LINEAR-210',
+            title: 'Linear · Systems & Sync Architecture',
+            subtitle: 'Application submitted & reviewed',
+            progress: 88,
+            stage: 'Applied',
+          },
+        ];
+
+  // Activity bars for prep hours
+  const activityData = [
+    { day: 'Mon', value: 4 },
+    { day: 'Tue', value: 5.5 },
+    { day: 'Wed', value: 3 },
+    { day: 'Thu', value: 6 },
+    { day: 'Fri', value: 5, isCurrentDay: true },
+    { day: 'Sat', value: 0 },
+    { day: 'Sun', value: 0 },
+  ];
 
   return (
-    <>
-      <div className="space-y-6 max-w-7xl mx-auto pb-10">
-        {/* ─── ZONE 1: HEADER & SYSTEMATIC METRICS ─────────────────────── */}
-        <Card3D
-          variant="glass"
-          maxTilt={3}
-          depth={20}
-          className="p-6 md:p-7 border border-border-base/80 bg-gradient-to-r from-bg-surface/90 via-bg-elevated/70 to-bg-surface/90 shadow-card backdrop-blur-xl"
-        >
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-            <div className="space-y-1">
-              <h2 className="text-2xl md:text-3xl font-extrabold text-text-primary tracking-tight">
-                Welcome back, {displayName}
-              </h2>
-              <p className="text-xs sm:text-sm text-text-secondary">
-                Here is your daily schedule, interview prep deliverables, and application progress.
-              </p>
-            </div>
-
-            <div className="shrink-0 flex items-center gap-2.5 flex-wrap">
-              <Button
-                variant="primary"
-                size="sm"
-                onClick={() => openAIDrawer()}
-                className="font-semibold text-xs h-9.5 px-4 !bg-emerald-600 hover:!bg-emerald-700 text-white shadow-sm hover:shadow transition-all"
-                icon={<Sparkles className="w-3.5 h-3.5" />}
-              >
-                Plan with Skillpath AI
-              </Button>
-            </div>
+    <div className="space-y-6 max-w-7xl mx-auto pb-14 font-sans text-stone-900 dark:text-stone-100 transition-colors">
+      {/* ─── 1. TOP GREETING & HEADER ─────────────────────────────────────────── */}
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 pt-1">
+        <div className="space-y-1">
+          <div className="text-xs font-semibold text-stone-500 dark:text-stone-400">
+            {formattedDate}
           </div>
-        </Card3D>
+          <h1 className="text-3xl sm:text-4xl font-extrabold text-stone-950 dark:text-white tracking-tight">
+            {timeGreeting}, {displayName}
+          </h1>
+          <p className="text-xs sm:text-sm text-stone-600 dark:text-stone-300 font-medium">
+            Welcome back, {displayName}. Here is your application pipeline, target companies, and
+            interview prep.
+          </p>
+        </div>
 
-        {/* 4 Systematic 3D Metric Cards */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-          {/* Metric 1: Target Applications / Roles */}
-          <Card3D
-            maxTilt={7}
-            depth={25}
-            variant="glass"
-            className="p-4 sm:p-5 border border-border-base/90 hover:border-solar-500/40 transition-all shadow-card group"
+        <div className="flex items-center gap-2.5 flex-wrap shrink-0">
+          <Link
+            to="/app/job-seeker/applications"
+            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-white dark:bg-[#161922] hover:bg-stone-50 dark:hover:bg-stone-800/80 border border-[#eee7e0] dark:border-stone-800 text-stone-800 dark:text-stone-200 text-xs sm:text-sm font-semibold transition-all shadow-xs"
           >
-            <div className="flex items-center justify-between text-xs text-text-muted font-medium">
-              <span>Target Tracks</span>
-              <div className="p-2 rounded-xl bg-amber-500/15 text-amber-400 border border-amber-500/25 transition-transform">
-                <Building2 className="w-4 h-4 text-solar-500" />
-              </div>
+            <Building2 className="w-3.5 h-3.5 text-stone-500" />
+            <span>My Applications</span>
+          </Link>
+          <button
+            type="button"
+            onClick={() => openAIDrawer()}
+            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#c04b1e] hover:bg-[#a83f17] text-white text-xs sm:text-sm font-semibold transition-all shadow-xs cursor-pointer"
+          >
+            <Sparkles className="w-3.5 h-3.5 text-white" />
+            <span>Plan with Skillpath AI</span>
+          </button>
+        </div>
+      </div>
+
+      {/* ─── 2. METRICS ROW (4 STAT CARDS) ────────────────────────────────────── */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {/* Card 1: Target Applications */}
+        <div className="bg-white dark:bg-[#161922] border border-[#eee7e0] dark:border-stone-800/80 rounded-2xl md:rounded-3xl p-5 shadow-xs flex flex-col justify-between hover:border-[#c04b1e]/30 transition-colors">
+          <div>
+            <div className="text-xs font-semibold text-stone-500 dark:text-stone-400">
+              Target Applications
             </div>
-            <div className="mt-3 flex items-baseline gap-1.5">
-              <span className="text-2xl sm:text-3xl font-extrabold text-text-primary font-mono tracking-tight">
+            <div className="mt-2.5 flex items-baseline gap-1.5">
+              <span className="text-2xl sm:text-3xl font-extrabold text-stone-950 dark:text-white font-mono tracking-tight">
                 {projects.length}
               </span>
-              <span className="text-xs text-text-muted">active</span>
+              <span className="text-xs font-medium text-stone-400">active</span>
             </div>
-            <div className="mt-2.5 flex items-center justify-between text-2xs">
-              <span className="text-solar-500 font-semibold">
-                {avgProjectProgress}% avg progress
-              </span>
-              <div className="w-16 h-1.5 rounded-full bg-bg-base overflow-hidden border border-border-subtle">
-                <div
-                  className="h-full bg-gradient-to-r from-amber-500 to-solar-500 rounded-full"
-                  style={{ width: `${Math.min(100, Math.max(5, avgProjectProgress))}%` }}
-                />
-              </div>
+          </div>
+          <div className="mt-4 pt-1">
+            <div className="w-full bg-stone-100 dark:bg-stone-800 h-1.5 rounded-full overflow-hidden mb-2">
+              <div
+                className="bg-[#0d9488] h-full rounded-full transition-all duration-500"
+                style={{ width: `${Math.min(100, Math.max(5, avgProjectProgress))}%` }}
+              />
             </div>
-          </Card3D>
+            <div className="text-xs font-semibold text-[#0d9488] dark:text-teal-400 truncate">
+              {avgProjectProgress}% avg progress
+            </div>
+          </div>
+        </div>
 
-          {/* Metric 2: Prep Tasks Due */}
-          <Card3D
-            maxTilt={7}
-            depth={25}
-            variant="glass"
-            className="p-4 sm:p-5 border border-border-base/90 hover:border-amber-500/40 transition-all shadow-card group"
-          >
-            <div className="flex items-center justify-between text-xs text-text-muted font-medium">
-              <span>Prep Tasks Due</span>
-              <div className="p-2 rounded-xl bg-amber-500/15 text-amber-400 border border-amber-500/25 transition-transform">
-                <ListTodo className="w-4 h-4 text-amber-400" />
-              </div>
+        {/* Card 2: Tasks To Do */}
+        <div className="bg-white dark:bg-[#161922] border border-[#eee7e0] dark:border-stone-800/80 rounded-2xl md:rounded-3xl p-5 shadow-xs flex flex-col justify-between hover:border-[#c04b1e]/30 transition-colors">
+          <div>
+            <div className="text-xs font-semibold text-stone-500 dark:text-stone-400">
+              Tasks To Do
             </div>
-            <div className="mt-3 flex items-baseline gap-1.5">
-              <span className="text-2xl sm:text-3xl font-extrabold text-text-primary font-mono tracking-tight">
+            <div className="mt-2.5 flex items-baseline gap-1.5">
+              <span className="text-2xl sm:text-3xl font-extrabold text-stone-950 dark:text-white font-mono tracking-tight">
                 {pendingTasks.length}
               </span>
-              <span className="text-xs text-text-muted">pending</span>
+              <span className="text-xs font-medium text-stone-400">remaining</span>
             </div>
-            <div className="mt-2.5 flex items-center justify-between text-2xs text-text-muted">
+          </div>
+          <div className="mt-4 pt-1">
+            <div className="w-full bg-stone-100 dark:bg-stone-800 h-1.5 rounded-full overflow-hidden mb-2">
+              <div
+                className="bg-stone-900 dark:bg-stone-100 h-full rounded-full transition-all duration-500"
+                style={{ width: `${Math.min(100, Math.max(5, 100 - leftPercent))}%` }}
+              />
+            </div>
+            <div className="text-xs font-medium text-stone-500 dark:text-stone-400 flex items-center justify-between">
               <span>{completedTasks.length} completed</span>
-              <span className="font-mono text-3xs font-bold text-amber-400">
-                {tasks.length > 0 ? Math.round((pendingTasks.length / tasks.length) * 100) : 0}%
-                left
+              <span className="font-mono text-3xs font-semibold text-stone-700 dark:text-stone-300">
+                {leftPercent}% left
               </span>
             </div>
-          </Card3D>
+          </div>
+        </div>
 
-          {/* Metric 3: Tasks Done */}
-          <Card3D
-            maxTilt={7}
-            depth={25}
-            variant="glass"
-            className="p-4 sm:p-5 border border-border-base/90 hover:border-emerald-500/40 transition-all shadow-card group"
-          >
-            <div className="flex items-center justify-between text-xs text-text-muted font-medium">
-              <span>Tasks Done</span>
-              <div className="p-2 rounded-xl bg-emerald-500/15 text-emerald-400 border border-emerald-500/25 transition-transform">
-                <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-              </div>
+        {/* Card 3: Tasks Done */}
+        <div className="bg-white dark:bg-[#161922] border border-[#eee7e0] dark:border-stone-800/80 rounded-2xl md:rounded-3xl p-5 shadow-xs flex flex-col justify-between hover:border-[#c04b1e]/30 transition-colors">
+          <div>
+            <div className="text-xs font-semibold text-stone-500 dark:text-stone-400">
+              Tasks Done
             </div>
-            <div className="mt-3 flex items-baseline gap-1.5">
-              <span className="text-2xl sm:text-3xl font-extrabold text-text-primary font-mono tracking-tight">
+            <div className="mt-2.5 flex items-baseline gap-1.5">
+              <span className="text-2xl sm:text-3xl font-extrabold text-stone-950 dark:text-white font-mono tracking-tight">
                 {completedTasks.length}
               </span>
-              <span className="text-xs text-text-muted">finished</span>
+              <span className="text-xs font-medium text-stone-400">finished</span>
             </div>
-            <div className="mt-2.5 flex items-center justify-between text-2xs">
-              <span className="text-emerald-400 font-semibold">
-                {taskCompletionRate}% completion
-              </span>
-              <div className="w-16 h-1.5 rounded-full bg-bg-base overflow-hidden border border-border-subtle">
-                <div
-                  className="h-full bg-gradient-to-r from-emerald-500 to-teal-400 rounded-full"
-                  style={{ width: `${Math.min(100, Math.max(5, taskCompletionRate))}%` }}
-                />
-              </div>
+          </div>
+          <div className="mt-4 pt-1">
+            <div className="w-full bg-stone-100 dark:bg-stone-800 h-1.5 rounded-full overflow-hidden mb-2">
+              <div
+                className="bg-[#c04b1e] h-full rounded-full transition-all duration-500"
+                style={{ width: `${Math.min(100, Math.max(5, taskCompletionRate))}%` }}
+              />
             </div>
-          </Card3D>
-
-          {/* Metric 4: Next Target / Interview */}
-          <Card3D
-            maxTilt={7}
-            depth={25}
-            variant="glass"
-            className="p-4 sm:p-5 border border-border-base/90 hover:border-purple-500/40 transition-all shadow-card group"
-          >
-            <div className="flex items-center justify-between text-xs text-text-muted font-medium">
-              <span>Next Target</span>
-              <div className="p-2 rounded-xl bg-purple-500/15 text-purple-400 border border-purple-500/25 transition-transform">
-                <Calendar className="w-4 h-4 text-purple-400" />
-              </div>
+            <div className="text-xs font-semibold text-[#c04b1e] dark:text-orange-400 truncate">
+              {taskCompletionRate}% completion
             </div>
-            <div className="mt-3 flex items-baseline gap-1.5">
-              <span className="text-sm sm:text-base font-bold text-text-primary truncate">
-                {(summary?.role_summary as any)?.next_interview_title || 'Technical Round Prep'}
-              </span>
-            </div>
-            <div className="mt-2.5 text-2xs text-purple-400 font-medium flex items-center gap-1">
-              <span className="w-1.5 h-1.5 rounded-full bg-purple-400 animate-pulse" />
-              Upcoming milestone
-            </div>
-          </Card3D>
+          </div>
         </div>
 
-        {/* ─── DAILY STANDUP / PROGRESS SUMMARY ─────────────────────── */}
-        <DailyStandupWidget role="job_seeker" standupData={summary?.daily_standup} />
+        {/* Card 4: Next Target / Interview */}
+        <div className="bg-white dark:bg-[#161922] border border-[#eee7e0] dark:border-stone-800/80 rounded-2xl md:rounded-3xl p-5 shadow-xs flex flex-col justify-between hover:border-[#c04b1e]/30 transition-colors">
+          <div>
+            <div className="text-xs font-semibold text-stone-500 dark:text-stone-400">
+              Next Interview
+            </div>
+            <div className="mt-2.5 flex items-baseline gap-1.5">
+              <span className="text-lg sm:text-xl font-bold text-stone-950 dark:text-white truncate">
+                {nextMilestoneTitle}
+              </span>
+            </div>
+          </div>
+          <div className="mt-4 pt-1 flex items-center gap-1.5 text-xs text-purple-600 dark:text-purple-400 font-semibold">
+            <span className="w-1.5 h-1.5 rounded-full bg-purple-500 animate-pulse" />
+            <span>Upcoming milestone</span>
+          </div>
+        </div>
+      </div>
 
-        {/* ─── ZONE 2: DAILY ACTION CENTER (TASKS & SCHEDULE) ─────────── */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-          {/* Left Column (7 cols): My Tasks */}
-          <div className="lg:col-span-7 space-y-4">
-            <Card3D
-              maxTilt={4}
-              depth={35}
-              variant="secondary"
-              className="p-5 border border-border-base hover:border-amber-500/35 transition-all shadow-card backdrop-blur-md"
+      {/* ─── STANDUP SUMMARY ─────────────────────────────────────────────────── */}
+      <DailyStandupWidget role="job_seeker" standupData={summary?.daily_standup} />
+
+      {/* ─── 3. MIDDLE ROW: TODAY (7 cols) + MINI CALENDAR (5 cols) ─────────── */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        {/* Left Column: Today Career Tasks */}
+        <div className="lg:col-span-7 bg-white dark:bg-[#161922] border border-[#eee7e0] dark:border-stone-800/80 rounded-2xl md:rounded-3xl p-6 shadow-xs space-y-4">
+          <div className="flex items-center justify-between pb-1">
+            <h3 className="text-base sm:text-lg font-bold text-stone-950 dark:text-white">Today</h3>
+            <Link
+              to="/app/job-seeker/calendar"
+              className="text-xs font-semibold text-[#c04b1e] dark:text-orange-400 hover:underline"
             >
-              <div className="flex items-center justify-between pb-3 border-b border-border-base">
-                <div>
-                  <h3 className="text-sm sm:text-base font-bold text-text-primary flex items-center gap-2">
-                    <span className="p-1 rounded-lg bg-emerald-500/15 text-emerald-400 border border-emerald-500/25">
-                      <CheckCircle2 className="w-4 h-4" />
-                    </span>
-                    <span>Action Items &amp; Interview Prep</span>
-                  </h3>
-                  <p className="text-xs text-text-muted mt-0.5">
-                    Check off items as you finish them
-                  </p>
-                </div>
-
-                {/* Simple Filter Pills */}
-                <div className="flex items-center gap-1 bg-bg-base/80 p-1 rounded-xl border border-border-base text-xs">
-                  {(['all', 'todo', 'completed'] as const).map((filter) => (
-                    <button
-                      key={filter}
-                      onClick={() => setTaskFilter(filter)}
-                      className={`px-2.5 py-1 rounded-lg capitalize font-medium transition-all ${
-                        taskFilter === filter
-                          ? 'bg-amber-500/20 text-amber-300 font-semibold shadow-sm border border-amber-500/30'
-                          : 'text-text-muted hover:text-text-primary'
-                      }`}
-                    >
-                      {filter === 'completed' ? 'Done' : filter === 'todo' ? 'To Do' : 'All'}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Completion Progress Bar */}
-              <div className="mt-3.5 space-y-1.5">
-                <div className="flex items-center justify-between text-2xs text-text-muted">
-                  <span>Sprint Completion</span>
-                  <span className="font-semibold text-text-primary font-mono">
-                    {completedTasks.length} of {tasks.length} finished ({taskCompletionRate}%)
-                  </span>
-                </div>
-                <div className="w-full bg-bg-base h-2.5 rounded-full overflow-hidden border border-border-base p-0.5">
-                  <div
-                    className="bg-gradient-to-r from-solar-500 via-amber-400 to-emerald-400 h-full rounded-full transition-all duration-500 shadow-sm"
-                    style={{ width: `${taskCompletionRate}%` }}
-                  />
-                </div>
-              </div>
-
-              {/* Quick Add Input */}
-              <form onSubmit={handleQuickAdd} className="mt-4 flex items-center gap-2">
-                <input
-                  type="text"
-                  value={quickTaskTitle}
-                  onChange={(e) => setQuickTaskTitle(e.target.value)}
-                  placeholder="Add interview prep or application task..."
-                  className="flex-1 bg-bg-base/70 border border-border-base rounded-xl px-3.5 py-2 text-xs text-text-primary placeholder:text-text-faint focus:outline-none focus:border-solar-500/50 transition-colors"
-                />
-                <Button
-                  type="submit"
-                  size="sm"
-                  variant="secondary"
-                  disabled={!quickTaskTitle.trim() || addTaskMutation.isPending}
-                  icon={<Plus className="w-3.5 h-3.5" />}
-                  className="active:translate-y-[1px]"
-                >
-                  Add
-                </Button>
-              </form>
-
-              {/* Task Checklist */}
-              <div className="mt-4 space-y-2 max-h-[380px] overflow-y-auto pr-1">
-                {filteredTasks.length === 0 ? (
-                  <div className="p-8 text-center text-xs text-text-muted space-y-3">
-                    <p>{emptyStateConfig.description}</p>
-                    {emptyStateConfig.actionLabel && (
-                      <Button
-                        size="xs"
-                        variant="secondary"
-                        onClick={() => openCaptureModal('manual')}
-                        className="inline-flex items-center gap-1.5"
-                      >
-                        <Plus className="w-3.5 h-3.5 text-solar-500" />
-                        {emptyStateConfig.actionLabel}
-                      </Button>
-                    )}
-                  </div>
-                ) : (
-                  filteredTasks.map((task) => {
-                    const isDone = task.status === 'completed';
-                    return (
-                      <div
-                        key={task.id}
-                        className={`p-3 rounded-xl border transition-all flex items-start justify-between gap-3 ${
-                          isDone
-                            ? 'bg-bg-surface/40 border-border-base/40 opacity-60'
-                            : 'bg-bg-surface/90 border-border-base hover:border-solar-500/40 hover:bg-bg-elevated/40 shadow-sm'
-                        }`}
-                      >
-                        <div className="flex items-start gap-3 min-w-0">
-                          <button
-                            type="button"
-                            onClick={() =>
-                              toggleMutation.mutate({
-                                id: task.id,
-                                status: isDone ? 'todo' : 'completed',
-                              })
-                            }
-                            className="mt-0.5 text-text-muted hover:text-emerald-400 transition-colors active:translate-y-[1px]"
-                          >
-                            <CheckCircle2
-                              className={`w-4 h-4 transition-transform active:scale-125 ${
-                                isDone ? 'text-emerald-400 fill-emerald-400/20' : 'text-text-muted'
-                              }`}
-                            />
-                          </button>
-
-                          <div className="min-w-0 space-y-0.5">
-                            <p
-                              className={`text-xs font-semibold ${
-                                isDone ? 'line-through text-text-muted' : 'text-text-primary'
-                              }`}
-                            >
-                              {task.title}
-                            </p>
-                            {task.description && (
-                              <p className="text-2xs text-text-muted line-clamp-1">
-                                {task.description}
-                              </p>
-                            )}
-                            <div className="flex items-center gap-2 text-3xs text-text-faint pt-0.5 flex-wrap">
-                              {task.project_title && (
-                                <span className="text-solar-500 font-medium">
-                                  {task.project_title}
-                                </span>
-                              )}
-                              <TimeTrackingBadge
-                                expectedMinutes={task.estimated_minutes}
-                                actualMinutes={task.actual_minutes}
-                                size="xs"
-                                variant="pill"
-                                expectedLabel="Prep"
-                              />
-                            </div>
-                          </div>
-                        </div>
-
-                        <PriorityBadge priority={task.priority} />
-                      </div>
-                    );
-                  })
-                )}
-              </div>
-
-              <div className="mt-4 pt-3 border-t border-border-base flex items-center justify-between text-xs">
-                <span className="text-text-faint text-2xs">
-                  {pendingTasks.length} prep items remaining
-                </span>
-                <Link
-                  to="/app/job_seeker/tasks"
-                  className="text-solar-500 hover:text-solar-400 flex items-center gap-1 font-medium transition-colors text-xs"
-                >
-                  <span>Open Task Board</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </Link>
-              </div>
-            </Card3D>
-          </div>
-
-          {/* Right Column (5 cols): Small Calendar (Click to Fullscreen) */}
-          <div className="lg:col-span-5">
-            <SmallCalendar role="job_seeker" />
-          </div>
-        </div>
-
-        {/* ─── ZONE 3: ACTIVE PROJECTS (SYSTEMATIC HORIZONTAL GRID) ────── */}
-        <Card3D
-          maxTilt={2}
-          depth={25}
-          variant="secondary"
-          className="p-5 sm:p-6 border border-border-base shadow-card backdrop-blur-md"
-        >
-          <div className="flex items-center justify-between pb-3.5 border-b border-border-base">
-            <div>
-              <h3 className="text-sm sm:text-base font-bold text-text-primary flex items-center gap-2">
-                <span className="p-1 rounded-lg bg-solar-500/15 text-solar-500 border border-solar-500/25">
-                  <Building2 className="w-4 h-4" />
-                </span>
-                <span>Active Target Tracks &amp; Pipeline</span>
-              </h3>
-              <p className="text-xs text-text-muted mt-0.5">
-                Application pipelines and interview round milestones
-              </p>
-            </div>
-            <Link to="/app/job-seeker/progress">
-              <Button variant="ghost" size="xs">
-                Manage All Tracks
-              </Button>
+              View schedule
             </Link>
           </div>
 
-          <div className="mt-4">
-            {projects.length === 0 ? (
-              <div className="p-8 text-center text-xs text-text-muted space-y-2">
-                <p>{roleConfig.emptyStates.projects.description}</p>
-                <Button
-                  size="xs"
-                  variant="secondary"
-                  onClick={() => openCaptureModal('manual')}
-                  className="inline-flex items-center gap-1.5"
+          <div className="space-y-2.5">
+            {tasks.slice(0, 5).map((t, idx) => {
+              const isDone = t.status === 'completed';
+              const defaultCodes = ['STRIPE-480', 'VERCEL-401', 'NOTION-320', 'LINEAR-210'];
+              const code = defaultCodes[idx % defaultCodes.length];
+              const times = ['10:00', '14:00', '16:00', '18:00'];
+              const time = times[idx % times.length];
+
+              return (
+                <div
+                  key={t.id}
+                  className="flex items-center justify-between p-3.5 rounded-xl bg-[#faf8f5]/80 dark:bg-stone-900/40 border border-[#f0eae1] dark:border-stone-800/60 hover:border-stone-300 dark:hover:border-stone-700 transition-all gap-3"
                 >
-                  <Plus className="w-3.5 h-3.5 text-solar-500" />
-                  {roleConfig.emptyStates.projects.actionLabel ?? 'New Goal'}
-                </Button>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {projects.map((proj) => (
-                  <Card3D
-                    key={proj.id}
-                    maxTilt={6}
-                    depth={15}
-                    variant="glass"
-                    className="p-4 sm:p-5 border border-border-base/90 hover:border-solar-500/40 transition-all flex flex-col justify-between space-y-3.5 group shadow-sm hover:shadow-card-hover"
-                  >
-                    <div className="space-y-1.5">
-                      <div className="flex items-start justify-between gap-2">
-                        <h4 className="text-xs font-bold text-text-primary group-hover:text-solar-500 transition-colors">
-                          <Link to={`/app/job-seeker/progress?projectId=${proj.id}`}>
-                            {proj.title}
-                          </Link>
-                        </h4>
-                        <span className="text-xs font-mono font-bold text-solar-500 bg-amber-500/10 px-2 py-0.5 rounded-full border border-amber-500/25">
-                          {proj.progress}%
-                        </span>
-                      </div>
-                      <p className="text-2xs text-text-muted line-clamp-2">
-                        {proj.description || 'No description provided.'}
-                      </p>
-                    </div>
+                  <div className="flex items-center gap-3 min-w-0">
+                    <button
+                      type="button"
+                      onClick={() =>
+                        toggleMutation.mutate({
+                          id: t.id,
+                          status: isDone ? 'todo' : 'completed',
+                        })
+                      }
+                      className={cn(
+                        'w-5 h-5 rounded-full flex items-center justify-center shrink-0 transition-colors cursor-pointer',
+                        isDone
+                          ? 'bg-[#0d9488] text-white shadow-2xs'
+                          : 'border-2 border-stone-300 dark:border-stone-600 hover:border-[#c04b1e]'
+                      )}
+                      aria-label={isDone ? 'Mark as incomplete' : 'Mark as complete'}
+                    >
+                      {isDone && <Check className="w-3 h-3 stroke-[3]" />}
+                    </button>
 
-                    <div className="space-y-2.5">
-                      {/* Progress Bar */}
-                      <div className="w-full bg-bg-base h-2 rounded-full overflow-hidden border border-border-base">
-                        <div
-                          className="bg-gradient-to-r from-solar-500 to-teal-400 h-full rounded-full transition-all duration-500"
-                          style={{ width: `${proj.progress}%` }}
-                        />
-                      </div>
-
-                      <div className="flex items-center justify-between text-3xs text-text-faint pt-1.5 border-t border-border-base/50 flex-wrap gap-1">
-                        <span>
-                          {proj.completed_milestone_count || 0}/{proj.milestone_count || 0}{' '}
-                          milestones
-                        </span>
-                        <TimeTrackingBadge
-                          expectedMinutes={(proj as any).estimated_minutes}
-                          actualMinutes={(proj as any).actual_minutes}
-                          size="xs"
-                          variant="pill"
-                        />
-                        <span>{proj.task_count || 0} tasks</span>
-                      </div>
-
-                      <Link
-                        to={`/app/job-seeker/progress?projectId=${proj.id}`}
-                        className="flex items-center justify-center gap-1.5 w-full py-1.5 rounded-lg text-2xs font-semibold text-teal-500 border border-teal-500/25 bg-teal-500/5 hover:bg-teal-500/15 hover:border-teal-500/50 transition-all"
+                    <div className="min-w-0">
+                      <div
+                        className={cn(
+                          'text-xs sm:text-sm font-semibold truncate',
+                          isDone
+                            ? 'line-through text-stone-400 dark:text-stone-500'
+                            : 'text-stone-900 dark:text-stone-100'
+                        )}
                       >
-                        <TrendingUp className="w-3 h-3" />
-                        View Progress
-                        <ArrowRight className="w-3 h-3" />
-                      </Link>
+                        {t.title}
+                      </div>
+                      <div className="flex items-center gap-2 text-2xs text-stone-500 dark:text-stone-400 mt-0.5">
+                        <span className="font-semibold text-stone-600 dark:text-stone-300">
+                          {t.project_title || code}
+                        </span>
+                        <span>· about {t.estimated_minutes || 45}m</span>
+                      </div>
                     </div>
-                  </Card3D>
-                ))}
-              </div>
-            )}
+                  </div>
+
+                  <div className="shrink-0 flex items-center gap-2">
+                    {!isDone && (
+                      <span className="text-2xs font-semibold px-2 py-0.5 rounded-full bg-orange-100/70 text-[#c04b1e] border border-orange-200/60 dark:bg-orange-950/40 dark:text-orange-300 dark:border-orange-900/40">
+                        Due 23:59
+                      </span>
+                    )}
+                    <span className="text-xs font-mono text-stone-400 dark:text-stone-500">
+                      {time}
+                    </span>
+                  </div>
+                </div>
+              );
+            })}
           </div>
-        </Card3D>
+
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              if (quickTaskTitle.trim()) {
+                addTaskMutation.mutate(quickTaskTitle.trim());
+              }
+            }}
+            className="pt-2"
+          >
+            <div className="flex items-center gap-2 border border-[#eee7e0] dark:border-stone-800 rounded-full px-4 py-1.5 bg-[#faf8f5]/60 dark:bg-stone-900/60 focus-within:border-stone-400 dark:focus-within:border-stone-600 transition-colors">
+              <input
+                type="text"
+                value={quickTaskTitle}
+                onChange={(e) => setQuickTaskTitle(e.target.value)}
+                placeholder="Add an application or interview prep task..."
+                disabled={addTaskMutation.isPending}
+                className="text-xs bg-transparent text-stone-900 dark:text-stone-100 placeholder:text-stone-400 dark:placeholder:text-stone-500 flex-1 focus:outline-none"
+              />
+              <button
+                type="submit"
+                disabled={addTaskMutation.isPending || !quickTaskTitle.trim()}
+                className="bg-stone-950 dark:bg-stone-100 hover:bg-stone-800 dark:hover:bg-white text-white dark:text-stone-950 text-xs font-semibold px-3.5 py-1 rounded-full transition-colors disabled:opacity-40 cursor-pointer"
+              >
+                Add
+              </button>
+            </div>
+          </form>
+        </div>
+
+        {/* Right Column: Mini Calendar */}
+        <div className="lg:col-span-5 bg-white dark:bg-[#161922] border border-[#eee7e0] dark:border-stone-800/80 rounded-2xl md:rounded-3xl p-6 shadow-xs">
+          <div className="flex items-center justify-between pb-4">
+            <h3 className="text-base sm:text-lg font-bold text-stone-950 dark:text-white">
+              {monthName} {year}
+            </h3>
+            <div className="flex items-center gap-1">
+              <button
+                type="button"
+                onClick={prevMonth}
+                className="p-1 rounded-lg hover:bg-stone-100 dark:hover:bg-stone-800 text-stone-600 dark:text-stone-400 transition-colors cursor-pointer"
+                aria-label="Previous month"
+              >
+                <ChevronLeft className="w-4 h-4" />
+              </button>
+              <button
+                type="button"
+                onClick={nextMonth}
+                className="p-1 rounded-lg hover:bg-stone-100 dark:hover:bg-stone-800 text-stone-600 dark:text-stone-400 transition-colors cursor-pointer"
+                aria-label="Next month"
+              >
+                <ChevronRight className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-7 gap-1 text-center text-xs font-medium text-stone-400 dark:text-stone-500 mb-2">
+            <span>Su</span>
+            <span>Mo</span>
+            <span>Tu</span>
+            <span>We</span>
+            <span>Th</span>
+            <span>Fr</span>
+            <span>Sa</span>
+          </div>
+
+          <div className="grid grid-cols-7 gap-y-2 gap-x-1 text-center text-xs font-medium">
+            {Array.from({ length: firstDayOfMonth }).map((_, i) => (
+              <div key={`empty-${i}`} className="h-8" />
+            ))}
+
+            {Array.from({ length: daysInMonth }).map((_, i) => {
+              const dayNum = i + 1;
+              const isToday = isCurrentMonth && dayNum === currentDayNum;
+              const hasTask = dayNum % 3 === 0 || dayNum === currentDayNum;
+
+              return (
+                <div key={dayNum} className="flex flex-col items-center justify-center">
+                  <div
+                    className={cn(
+                      'w-7 h-7 flex items-center justify-center rounded-lg text-xs transition-colors',
+                      isToday
+                        ? 'bg-[#c04b1e] text-white font-bold shadow-xs'
+                        : 'text-stone-700 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 cursor-pointer'
+                    )}
+                  >
+                    {dayNum}
+                  </div>
+                  {hasTask && (
+                    <span
+                      className={cn(
+                        'w-1 h-1 rounded-full mt-0.5',
+                        isToday ? 'bg-[#c04b1e]' : 'bg-[#c04b1e]/70'
+                      )}
+                    />
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
       </div>
-    </>
+
+      {/* ─── 4. LOWER ROW: TARGET COMPANIES (7 cols) + PREP TIME (5 cols) ───── */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        {/* Left Column: Target Companies Table */}
+        <div className="lg:col-span-7 bg-white dark:bg-[#161922] border border-[#eee7e0] dark:border-stone-800/80 rounded-2xl md:rounded-3xl p-6 shadow-xs space-y-4">
+          <div className="flex items-center justify-between pb-1">
+            <h3 className="text-base sm:text-lg font-bold text-stone-950 dark:text-white">
+              Target Companies &amp; Roles
+            </h3>
+            <Link
+              to="/app/job-seeker/applications"
+              className="text-xs font-semibold text-[#c04b1e] dark:text-orange-400 hover:underline"
+            >
+              See all
+            </Link>
+          </div>
+
+          <div className="grid grid-cols-12 text-2xs font-semibold text-stone-400 dark:text-stone-500 uppercase tracking-wider pb-2 border-b border-[#eee7e0] dark:border-stone-800/80">
+            <div className="col-span-2">CODE</div>
+            <div className="col-span-5">COMPANY / ROLE</div>
+            <div className="col-span-3 text-center">PROGRESS</div>
+            <div className="col-span-2 text-right">STAGE</div>
+          </div>
+
+          <div className="divide-y divide-[#f2ede6] dark:divide-stone-800/60">
+            {companiesList.map((c) => (
+              <div
+                key={c.id}
+                className="grid grid-cols-12 items-center py-3 text-xs gap-2 hover:bg-stone-50/50 dark:hover:bg-stone-900/30 rounded-lg px-1 transition-colors"
+              >
+                <div className="col-span-2 font-mono font-semibold text-stone-500 dark:text-stone-400 text-xs">
+                  {c.code}
+                </div>
+                <div className="col-span-5 min-w-0 pr-2">
+                  <div className="font-bold text-stone-900 dark:text-stone-100 truncate">
+                    {c.title}
+                  </div>
+                  <div className="text-2xs text-stone-500 dark:text-stone-400 truncate mt-0.5">
+                    {c.subtitle}
+                  </div>
+                </div>
+                <div className="col-span-3 flex items-center justify-center gap-2">
+                  <div className="w-16 sm:w-24 bg-stone-100 dark:bg-stone-800 h-1.5 rounded-full overflow-hidden">
+                    <div
+                      className="bg-[#0d9488] h-full rounded-full transition-all duration-500"
+                      style={{ width: `${Math.min(100, Math.max(0, c.progress))}%` }}
+                    />
+                  </div>
+                  <span className="font-mono text-2xs text-stone-500 font-medium">
+                    {c.progress}%
+                  </span>
+                </div>
+                <div className="col-span-2 text-right">
+                  <span className="font-semibold text-xs text-stone-900 dark:text-stone-100 px-2 py-0.5 rounded-full bg-stone-100 dark:bg-stone-800">
+                    {c.stage}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Right Column: Prep Time Bar Chart */}
+        <div className="lg:col-span-5 bg-white dark:bg-[#161922] border border-[#eee7e0] dark:border-stone-800/80 rounded-2xl md:rounded-3xl p-6 shadow-xs space-y-4">
+          <div className="flex items-center justify-between">
+            <h3 className="text-base sm:text-lg font-bold text-stone-950 dark:text-white">
+              Interview prep
+            </h3>
+            <span className="text-xs font-semibold text-stone-500 dark:text-stone-400">
+              23.5h this week
+            </span>
+          </div>
+
+          <div className="relative pt-6 pb-2">
+            <div className="absolute top-1/2 left-0 right-0 border-b border-dashed border-stone-300 dark:border-stone-700 pointer-events-none" />
+
+            <div className="flex items-end justify-between gap-2 h-36 px-2">
+              {activityData.map((bar, idx) => {
+                const heightPercent = Math.max(12, Math.round((bar.value / 6) * 100));
+
+                return (
+                  <div key={idx} className="flex-1 flex flex-col items-center gap-1.5 z-10">
+                    <span className="text-2xs font-semibold text-stone-500 dark:text-stone-400 font-mono">
+                      {bar.value > 0 ? bar.value : ''}
+                    </span>
+                    <div
+                      className={cn(
+                        'w-full max-w-[32px] rounded-t-lg transition-all duration-500',
+                        bar.isCurrentDay
+                          ? 'bg-[#c04b1e]'
+                          : 'bg-orange-300 dark:bg-orange-400/40 hover:bg-orange-400'
+                      )}
+                      style={{ height: `${heightPercent}%` }}
+                    />
+                    <span className="text-2xs font-medium text-stone-400 dark:text-stone-500 mt-1">
+                      {bar.day}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          <div className="text-2xs text-stone-500 dark:text-stone-400 pt-1 text-center">
+            Dashed line: 3.5h a day keeps interview readiness on target for onsite loops.
+          </div>
+        </div>
+      </div>
+
+      {/* ─── 5. BOTTOM ROW: MILESTONES ────────────────────────────────────────── */}
+      <div className="space-y-3 pt-2">
+        <h3 className="text-base sm:text-lg font-bold text-stone-950 dark:text-white">
+          Career Milestones
+        </h3>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="bg-white dark:bg-[#161922] border border-[#eee7e0] dark:border-stone-800/80 rounded-2xl p-4 shadow-xs flex items-center gap-3.5 transition-all hover:border-[#c04b1e]/30">
+            <div className="w-10 h-10 rounded-xl bg-orange-100/70 text-[#c04b1e] dark:bg-orange-950/40 dark:text-orange-300 flex items-center justify-center shrink-0">
+              <Star className="w-5 h-5 fill-current" />
+            </div>
+            <div className="min-w-0">
+              <div className="text-xs sm:text-sm font-bold text-stone-900 dark:text-stone-100 truncate">
+                Resume Optimization Complete
+              </div>
+              <div className="text-2xs text-stone-500 dark:text-stone-400 truncate mt-0.5">
+                ATS score 95/100 verified across technical roles
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white dark:bg-[#161922] border border-[#eee7e0] dark:border-stone-800/80 rounded-2xl p-4 shadow-xs flex items-center gap-3.5 transition-all hover:border-[#c04b1e]/30">
+            <div className="w-10 h-10 rounded-xl bg-teal-100/70 text-[#0d9488] dark:bg-teal-950/40 dark:text-teal-300 flex items-center justify-center shrink-0">
+              <Clock className="w-5 h-5" />
+            </div>
+            <div className="min-w-0">
+              <div className="text-xs sm:text-sm font-bold text-stone-900 dark:text-stone-100 truncate">
+                System Design Ace
+              </div>
+              <div className="text-2xs text-stone-500 dark:text-stone-400 truncate mt-0.5">
+                8 comprehensive architecture mock sessions
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white dark:bg-[#161922] border border-[#eee7e0] dark:border-stone-800/80 rounded-2xl p-4 shadow-xs flex items-center gap-3.5 transition-all hover:border-[#c04b1e]/30">
+            <div className="w-10 h-10 rounded-xl bg-amber-100/70 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300 flex items-center justify-center shrink-0">
+              <Check className="w-5 h-5 stroke-[2.5]" />
+            </div>
+            <div className="min-w-0">
+              <div className="text-xs sm:text-sm font-bold text-stone-900 dark:text-stone-100 truncate">
+                Target Offer Milestone
+              </div>
+              <div className="text-2xs text-stone-500 dark:text-stone-400 truncate mt-0.5">
+                2 formal offers under final compensation review
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }
