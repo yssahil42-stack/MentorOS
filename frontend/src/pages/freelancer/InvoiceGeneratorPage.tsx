@@ -38,6 +38,7 @@ import { Select } from '../../components/ui/Select';
 import { LoadingSkeleton } from '../../components/ui/LoadingSkeleton';
 import { Modal } from '../../components/ui/Modal';
 import { CurrencyConverter } from '../../components/ui/CurrencyConverter';
+import { CurrencySelect } from '../../components/ui/CurrencySelect';
 import { formatCurrency, formatDate } from '../../utils/dateUtils';
 import { cn } from '../../utils/cn';
 import type { Project } from '../../types/project';
@@ -607,19 +608,12 @@ export default function InvoiceGeneratorPage() {
                       Converter
                     </button>
                   </div>
-                  <Select
+                  <CurrencySelect
                     value={invoiceForm.currency}
-                    onValueChange={(v) => setInvoiceForm((prev) => ({ ...prev, currency: v }))}
-                    options={[
-                      { value: 'INR', label: 'INR (₹) - Indian Rupee' },
-                      { value: 'USD', label: 'USD ($) - US Dollar' },
-                      { value: 'EUR', label: 'EUR (€) - Euro' },
-                      { value: 'GBP', label: 'GBP (£) - British Pound' },
-                      { value: 'AED', label: 'AED (د.إ) - UAE Dirham' },
-                      { value: 'CAD', label: 'CAD ($) - Canadian Dollar' },
-                      { value: 'AUD', label: 'AUD ($) - Australian Dollar' },
-                      { value: 'SGD', label: 'SGD ($) - Singapore Dollar' },
-                    ]}
+                    onChange={(v) => setInvoiceForm((prev) => ({ ...prev, currency: v }))}
+                    format="full"
+                    className="w-full"
+                    buttonClassName="w-full bg-bg-surface border border-border-base rounded-xl px-3 py-2 text-xs font-semibold hover:border-amber-500/50"
                   />
                 </div>
               </div>

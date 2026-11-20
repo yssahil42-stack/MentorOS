@@ -17,6 +17,7 @@ import { Card } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
 import { Modal } from '../../components/ui/Modal';
 import { CurrencyConverter } from '../../components/ui/CurrencyConverter';
+import { CurrencySelect } from '../../components/ui/CurrencySelect';
 import { getCurrencySymbol, CURRENCY_OPTIONS } from '../../utils/currency';
 import { AppSettingsSection } from '../../components/settings/AppSettingsSection';
 import { api } from '../../services/api';
@@ -188,17 +189,13 @@ export default function FreelancerSettingsPage() {
                   Convert
                 </button>
               </div>
-              <select
+              <CurrencySelect
                 value={currency}
-                onChange={(e) => setCurrency(e.target.value)}
-                className="w-full bg-bg-surface border border-border-base rounded-xl px-3 py-2 text-xs text-text-primary focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition-all font-medium"
-              >
-                {CURRENCY_OPTIONS.map((c) => (
-                  <option key={c.value} value={c.value}>
-                    {c.label}
-                  </option>
-                ))}
-              </select>
+                onChange={(c) => setCurrency(c)}
+                format="full"
+                className="w-full"
+                buttonClassName="w-full bg-bg-surface border border-border-base rounded-xl px-3 py-2 text-xs text-text-primary focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition-all font-medium"
+              />
             </div>
 
             <div className="space-y-1.5">

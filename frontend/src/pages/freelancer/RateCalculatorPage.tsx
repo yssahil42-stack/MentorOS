@@ -15,6 +15,7 @@ import { Card3D } from '../../components/ui/Card3D';
 import { Button } from '../../components/ui/Button';
 import { Badge } from '../../components/ui/Badge';
 import { CurrencyConverter } from '../../components/ui/CurrencyConverter';
+import { CurrencySelect } from '../../components/ui/CurrencySelect';
 import { formatCurrency } from '../../utils/dateUtils';
 import { CURRENCY_OPTIONS, getCurrencySymbol, convertCurrency } from '../../utils/currency';
 import { cn } from '../../utils/cn';
@@ -141,17 +142,11 @@ export default function RateCalculatorPage() {
             <span className="text-2xs font-semibold text-text-muted uppercase tracking-wider">
               Currency:
             </span>
-            <select
+            <CurrencySelect
               value={inputs.currency}
-              onChange={(e) => handleCurrencyChange(e.target.value)}
-              className="bg-transparent text-xs font-bold text-text-primary focus:outline-none cursor-pointer"
-            >
-              {CURRENCY_OPTIONS.map((c) => (
-                <option key={c.value} value={c.value} className="bg-bg-surface text-text-primary">
-                  {c.flag} {c.value} ({c.symbol})
-                </option>
-              ))}
-            </select>
+              onChange={(newCurrency) => handleCurrencyChange(newCurrency)}
+              format="code-symbol"
+            />
           </div>
 
           <Button

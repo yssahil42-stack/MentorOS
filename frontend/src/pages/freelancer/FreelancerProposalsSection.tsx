@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
 import { Modal } from '../../components/ui/Modal';
+import { CurrencySelect } from '../../components/ui/CurrencySelect';
 import { useWorkspace } from '../../contexts/WorkspaceContext';
 import { formatCurrency } from '../../utils/dateUtils';
 import { getCurrencySymbol, CURRENCY_OPTIONS } from '../../utils/currency';
@@ -377,17 +378,13 @@ export function FreelancerProposalsSection({ projects = [] }: FreelancerProposal
                   <label className="block text-xs font-semibold text-text-secondary mb-1">
                     Currency
                   </label>
-                  <select
+                  <CurrencySelect
                     value={currency}
-                    onChange={(e) => setCurrency(e.target.value)}
-                    className="w-full px-3 py-2 text-xs rounded-xl bg-slate-50 dark:bg-bg-base border border-border-base focus:border-amber-500 focus:outline-none transition-colors font-medium"
-                  >
-                    {CURRENCY_OPTIONS.map((c) => (
-                      <option key={c.value} value={c.value}>
-                        {c.value} ({c.symbol})
-                      </option>
-                    ))}
-                  </select>
+                    onChange={(c) => setCurrency(c)}
+                    format="code-symbol"
+                    className="w-full"
+                    buttonClassName="w-full px-3 py-2 text-xs rounded-xl bg-slate-50 dark:bg-bg-base border border-border-base focus:border-amber-500 focus:outline-none transition-colors font-medium"
+                  />
                 </div>
               </div>
 

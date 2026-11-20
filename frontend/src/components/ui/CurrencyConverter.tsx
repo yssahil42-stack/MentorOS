@@ -15,6 +15,7 @@ import { Card } from './Card';
 import { Card3D } from './Card3D';
 import { Button } from './Button';
 import { Badge } from './Badge';
+import { CurrencySelect } from './CurrencySelect';
 import {
   SUPPORTED_CURRENCIES,
   CURRENCY_OPTIONS,
@@ -154,17 +155,13 @@ export const CurrencyConverter: React.FC<CurrencyConverterProps> = ({
               />
             </div>
 
-            <select
+            <CurrencySelect
               value={fromCurrency}
-              onChange={(e) => setFromCurrency(e.target.value)}
-              className="w-36 bg-bg-base border border-border-base rounded-xl px-3 py-2.5 text-xs font-bold text-text-primary focus:outline-none focus:border-amber-500/50 transition-colors cursor-pointer"
-            >
-              {CURRENCY_OPTIONS.map((c) => (
-                <option key={c.value} value={c.value}>
-                  {c.flag} {c.value}
-                </option>
-              ))}
-            </select>
+              onChange={(c) => setFromCurrency(c)}
+              format="code-symbol"
+              className="w-36 shrink-0"
+              buttonClassName="w-full bg-bg-base border border-border-base rounded-xl px-3 py-2.5 hover:border-amber-500/50"
+            />
           </div>
         </div>
 
@@ -174,7 +171,7 @@ export const CurrencyConverter: React.FC<CurrencyConverterProps> = ({
             type="button"
             onClick={handleSwap}
             title="Swap Currencies"
-            className="p-3 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-500 border border-amber-500/25 transition-all active:scale-95 group shadow-2xs"
+            className="p-3 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-500 border border-amber-500/25 transition-all active:scale-95 group shadow-2xs cursor-pointer"
           >
             <ArrowLeftRight className="w-4 h-4 group-hover:rotate-180 transition-transform duration-300" />
           </button>
@@ -184,17 +181,13 @@ export const CurrencyConverter: React.FC<CurrencyConverterProps> = ({
         <div className="md:col-span-5 space-y-2">
           <label className="block text-xs font-semibold text-text-secondary">Target Currency</label>
           <div className="flex gap-2">
-            <select
+            <CurrencySelect
               value={toCurrency}
-              onChange={(e) => setToCurrency(e.target.value)}
-              className="w-full bg-bg-base border border-border-base rounded-xl px-3 py-2.5 text-xs font-bold text-text-primary focus:outline-none focus:border-amber-500/50 transition-colors cursor-pointer"
-            >
-              {CURRENCY_OPTIONS.map((c) => (
-                <option key={c.value} value={c.value}>
-                  {c.flag} {c.label}
-                </option>
-              ))}
-            </select>
+              onChange={(c) => setToCurrency(c)}
+              format="full"
+              className="w-full"
+              buttonClassName="w-full bg-bg-base border border-border-base rounded-xl px-3 py-2.5 hover:border-amber-500/50"
+            />
           </div>
         </div>
       </div>
