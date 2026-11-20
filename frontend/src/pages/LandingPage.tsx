@@ -246,7 +246,7 @@ export default function LandingPage() {
               {/* Subheading */}
               <p className="text-sm sm:text-base text-stone-600 dark:text-stone-300 leading-relaxed max-w-xl">
                 MentorOS helps you organize project goals, projects, tasks, schedules and content.
-                Local AI assists with planning, you review every change, and updates sync across all
+                Plan with Skillpath AI, review every change, and sync updates across all
                 connected modules.
               </p>
 
@@ -412,7 +412,7 @@ export default function LandingPage() {
                       </h3>
                     </div>
                     <span className="text-[10px] font-mono text-[#c04b1e] font-semibold">
-                      AI Assistant
+                      Skillpath AI
                     </span>
                   </div>
                   <div className="p-2.5 rounded-lg bg-[#fbf5f0] dark:bg-orange-950/20 border border-[#f5e3d7] dark:border-orange-900/30 text-[11px] space-y-1">
@@ -552,7 +552,7 @@ export default function LandingPage() {
                   Generate roadmap
                 </h3>
                 <p className="text-xs text-stone-600 dark:text-stone-300 leading-relaxed">
-                  Local AI proposes structured milestones, daily schedules, and execution checklists
+                  Skillpath AI proposes structured milestones, daily schedules, and execution checklists
                   to hit your target date without guesswork.
                 </p>
               </div>
@@ -742,7 +742,7 @@ export default function LandingPage() {
               Plan it, track it and ship it from one workspace.
             </h2>
             <p className="text-xs sm:text-sm text-orange-100 max-w-lg mx-auto leading-relaxed">
-              Open your workspace and let local AI turn your next project goal into a clear,
+              Open your workspace and let Skillpath AI turn your next project goal into a clear,
               reviewable plan.
             </p>
             <div className="pt-3 flex flex-wrap items-center justify-center gap-3.5">

@@ -36,7 +36,7 @@ export function WorkflowGuide({ role = 'all' }: WorkflowGuideProps) {
       desc: 'AI builds milestone phases, focus subtasks, and study/build sessions.',
       icon: Zap,
       action: () => openAIDrawer(),
-      actionLabel: 'Plan with AI',
+      actionLabel: 'Plan with Skillpath AI',
     },
     {
       num: '03',
