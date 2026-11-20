@@ -84,6 +84,7 @@ export const CURRENCY_OPTIONS = Object.values(SUPPORTED_CURRENCIES).map((c) => (
   label: `${c.code} (${c.symbol}) - ${c.name}`,
   symbol: c.symbol,
   flag: c.flag,
+  name: c.name,
 }));
 
 /**
