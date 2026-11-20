@@ -23,6 +23,7 @@ import { Card3D } from '../../components/ui/Card3D';
 import { Button } from '../../components/ui/Button';
 import { Badge } from '../../components/ui/Badge';
 import { LoadingSkeleton } from '../../components/ui/LoadingSkeleton';
+import { TimeTrackingBadge } from '../../components/ui/TimeTrackingBadge';
 
 export default function FreelancerProgressPage() {
   const { showToast } = useWorkspace();
@@ -330,8 +331,8 @@ export default function FreelancerProgressPage() {
                     />
                   </div>
 
-                  <div className="flex flex-wrap items-center justify-between text-2xs text-text-muted pt-1">
-                    <div className="flex items-center gap-4">
+                  <div className="flex flex-wrap items-center justify-between text-2xs text-text-muted pt-1 gap-2">
+                    <div className="flex flex-wrap items-center gap-4">
                       <span className="flex items-center gap-1 font-mono">
                         <Flag className="w-3 h-3 text-amber-500" />
                         {compMilestones}/{projMilestones.length || proj.milestone_count || 0} milestones
@@ -340,6 +341,18 @@ export default function FreelancerProgressPage() {
                         <CheckSquare className="w-3 h-3 text-emerald-500" />
                         {compCount}/{totCount || proj.task_count || 0} tasks
                       </span>
+                      <TimeTrackingBadge
+                        expectedMinutes={
+                          projTasks.reduce((acc, t) => acc + (t.estimated_minutes || 0), 0) ||
+                          projMilestones.reduce((acc, m) => acc + (m.estimated_minutes || 0), 0)
+                        }
+                        actualMinutes={
+                          projTasks.reduce((acc, t) => acc + (t.actual_minutes || 0), 0) ||
+                          projMilestones.reduce((acc, m) => acc + (m.actual_minutes || 0), 0)
+                        }
+                        size="xs"
+                        variant="pill"
+                      />
                       {proj.target_date && (
                         <span className="flex items-center gap-1">
                           <Calendar className="w-3 h-3 text-text-muted" />
@@ -423,11 +436,16 @@ export default function FreelancerProgressPage() {
                       {task.description && (
                         <p className="text-2xs text-text-muted line-clamp-1">{task.description}</p>
                       )}
-                      <div className="flex items-center gap-2 text-3xs text-text-faint pt-0.5 font-mono">
+                      <div className="flex items-center gap-2 text-3xs text-text-faint pt-0.5 font-mono flex-wrap">
                         {task.project_title && (
                           <span className="text-amber-500 font-medium">{task.project_title}</span>
                         )}
-                        {task.estimated_minutes && <span>{task.estimated_minutes} min</span>}
+                        <TimeTrackingBadge
+                          expectedMinutes={task.estimated_minutes}
+                          actualMinutes={task.actual_minutes}
+                          size="xs"
+                          variant="pill"
+                        />
                         {task.due_date && <span>Due {new Date(task.due_date).toLocaleDateString()}</span>}
                       </div>
                     </div>

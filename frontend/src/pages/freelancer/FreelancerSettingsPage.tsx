@@ -8,11 +8,16 @@ import {
   Receipt,
   Bell,
   Building,
+  ArrowLeftRight,
+  IndianRupee,
 } from 'lucide-react';
 import { useWorkspace } from '../../contexts/WorkspaceContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { Card } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
+import { Modal } from '../../components/ui/Modal';
+import { CurrencyConverter } from '../../components/ui/CurrencyConverter';
+import { getCurrencySymbol, CURRENCY_OPTIONS } from '../../utils/currency';
 import { AppSettingsSection } from '../../components/settings/AppSettingsSection';
 import { api } from '../../services/api';
 
@@ -21,11 +26,12 @@ export default function FreelancerSettingsPage() {
   const { user, refreshUser } = useAuth();
 
   const [businessName, setBusinessName] = useState('Apex Creative & Code Studio');
-  const [hourlyRate, setHourlyRate] = useState('85');
-  const [currency, setCurrency] = useState('USD');
-  const [minProjectFee, setMinProjectFee] = useState('1500');
+  const [hourlyRate, setHourlyRate] = useState('2500');
+  const [currency, setCurrency] = useState('INR');
+  const [minProjectFee, setMinProjectFee] = useState('40000');
   const [paymentTerms, setPaymentTerms] = useState('Net 15');
   const [taxRate, setTaxRate] = useState('0');
+  const [showConverterModal, setShowConverterModal] = useState(false);
 
   const [weeklyCapacityHours, setWeeklyCapacityHours] = useState('30');
   const [trackInternalTime, setTrackInternalTime] = useState(true);
@@ -131,16 +137,26 @@ export default function FreelancerSettingsPage() {
       <form onSubmit={handleSave} className="space-y-5">
         {/* Business & Commercial Billing */}
         <Card className="p-5 space-y-4">
-          <div className="flex items-center gap-2.5 pb-2 border-b border-border-base">
-            <DollarSign className="w-5 h-5 text-orange-500" />
-            <div>
-              <h3 className="text-sm font-bold text-text-primary">
-                Commercial Rates &amp; Payment Terms
-              </h3>
-              <p className="text-xs text-text-muted">
-                Applied to proposal generation, invoice creation, and client contract scoping
-              </p>
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-2 border-b border-border-base gap-3">
+            <div className="flex items-center gap-2.5">
+              <IndianRupee className="w-5 h-5 text-orange-500" />
+              <div>
+                <h3 className="text-sm font-bold text-text-primary">
+                  Commercial Rates &amp; Payment Terms
+                </h3>
+                <p className="text-xs text-text-muted">
+                  Applied to proposal generation, invoice creation, and client contract scoping (Default: INR ₹)
+                </p>
+              </div>
             </div>
+            <button
+              type="button"
+              onClick={() => setShowConverterModal(true)}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-xl bg-orange-500/10 hover:bg-orange-500/20 text-orange-600 dark:text-orange-400 border border-orange-500/30 transition-all cursor-pointer self-start sm:self-auto"
+            >
+              <ArrowLeftRight className="w-3.5 h-3.5" />
+              <span>Currency Converter</span>
+            </button>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -158,20 +174,29 @@ export default function FreelancerSettingsPage() {
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-text-secondary block">
-                Billing Currency
-              </label>
+              <div className="flex items-center justify-between">
+                <label className="text-xs font-semibold text-text-secondary block">
+                  Billing Currency
+                </label>
+                <button
+                  type="button"
+                  onClick={() => setShowConverterModal(true)}
+                  className="text-3xs text-orange-600 dark:text-orange-400 font-semibold hover:underline flex items-center gap-1"
+                >
+                  <ArrowLeftRight className="w-3 h-3" />
+                  Convert
+                </button>
+              </div>
               <select
                 value={currency}
                 onChange={(e) => setCurrency(e.target.value)}
-                className="w-full bg-bg-surface border border-border-base rounded-xl px-3 py-2 text-xs text-text-primary focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition-all"
+                className="w-full bg-bg-surface border border-border-base rounded-xl px-3 py-2 text-xs text-text-primary focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition-all font-medium"
               >
-                <option value="USD">USD ($)</option>
-                <option value="EUR">EUR (€)</option>
-                <option value="GBP">GBP (£)</option>
-                <option value="CAD">CAD ($)</option>
-                <option value="AUD">AUD ($)</option>
-                <option value="INR">INR (₹)</option>
+                {CURRENCY_OPTIONS.map((c) => (
+                  <option key={c.value} value={c.value}>
+                    {c.label}
+                  </option>
+                ))}
               </select>
             </div>
 
@@ -179,26 +204,36 @@ export default function FreelancerSettingsPage() {
               <label className="text-xs font-semibold text-text-secondary block">
                 Standard Hourly Rate ({currency})
               </label>
-              <input
-                type="number"
-                value={hourlyRate}
-                onChange={(e) => setHourlyRate(e.target.value)}
-                placeholder="85"
-                className="w-full bg-bg-surface border border-border-base rounded-xl px-3 py-2 text-xs text-text-primary focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition-all"
-              />
+              <div className="relative">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-text-muted">
+                  {getCurrencySymbol(currency)}
+                </span>
+                <input
+                  type="number"
+                  value={hourlyRate}
+                  onChange={(e) => setHourlyRate(e.target.value)}
+                  placeholder={currency === 'INR' ? '2500' : '85'}
+                  className="w-full bg-bg-surface border border-border-base rounded-xl pl-8 pr-3 py-2 text-xs text-text-primary focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition-all font-mono"
+                />
+              </div>
             </div>
 
             <div className="space-y-1.5">
               <label className="text-xs font-semibold text-text-secondary block">
                 Minimum Project Fee ({currency})
               </label>
-              <input
-                type="number"
-                value={minProjectFee}
-                onChange={(e) => setMinProjectFee(e.target.value)}
-                placeholder="1500"
-                className="w-full bg-bg-surface border border-border-base rounded-xl px-3 py-2 text-xs text-text-primary focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition-all"
-              />
+              <div className="relative">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-text-muted">
+                  {getCurrencySymbol(currency)}
+                </span>
+                <input
+                  type="number"
+                  value={minProjectFee}
+                  onChange={(e) => setMinProjectFee(e.target.value)}
+                  placeholder={currency === 'INR' ? '40000' : '1500'}
+                  className="w-full bg-bg-surface border border-border-base rounded-xl pl-8 pr-3 py-2 text-xs text-text-primary focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition-all font-mono"
+                />
+              </div>
             </div>
 
             <div className="space-y-1.5">
@@ -381,6 +416,31 @@ export default function FreelancerSettingsPage() {
           </Button>
         </div>
       </form>
+
+      {/* ─── CURRENCY CONVERTER MODAL ─────────────────────────────────────── */}
+      {showConverterModal && (
+        <Modal
+          isOpen={showConverterModal}
+          onClose={() => setShowConverterModal(false)}
+          title="Currency Converter & Rate Exchange"
+          size="xl"
+        >
+          <div className="p-2 sm:p-4">
+            <CurrencyConverter
+              initialAmount={Number(hourlyRate) || 2500}
+              initialFromCurrency={currency}
+              initialToCurrency={currency === 'INR' ? 'USD' : 'INR'}
+              onApplyRate={(convertedAmount, targetCurr) => {
+                setHourlyRate(String(Math.round(convertedAmount)));
+                setCurrency(targetCurr);
+                showToast(`Standard rate set to ${getCurrencySymbol(targetCurr)}${Math.round(convertedAmount).toLocaleString()}/hr (${targetCurr})`, 'success');
+                setShowConverterModal(false);
+              }}
+              variant="modal"
+            />
+          </div>
+        </Modal>
+      )}
     </div>
   );
 }

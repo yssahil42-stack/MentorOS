@@ -51,7 +51,11 @@ class Settings(BaseModel):
     # Google Identity Services / OAuth Credentials
     GOOGLE_CLIENT_ID: str = os.getenv("GOOGLE_CLIENT_ID", "")
     GOOGLE_CLIENT_SECRET: str = os.getenv("GOOGLE_CLIENT_SECRET", "")
-    # GitHub Integration
+    # GitLab Integration
+    GITLAB_PERSONAL_ACCESS_TOKEN: str = os.getenv("GITLAB_PERSONAL_ACCESS_TOKEN", "")
+    GITLAB_USERNAME: str = os.getenv("GITLAB_USERNAME", "")
+    GITLAB_API_BASE: str = os.getenv("GITLAB_API_BASE", "https://gitlab.com/api/v4")
+    # Legacy GitHub Integration (disabled for sync)
     GITHUB_PERSONAL_ACCESS_TOKEN: str = os.getenv("GITHUB_PERSONAL_ACCESS_TOKEN", "")
     GITHUB_USERNAME: str = os.getenv("GITHUB_USERNAME", "")
 

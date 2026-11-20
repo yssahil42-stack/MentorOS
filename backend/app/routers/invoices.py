@@ -219,7 +219,7 @@ def create_invoice(
         tax_rate=tax_rate,
         tax_amount=tax_amount,
         total=total,
-        currency=invoice_in.currency or "USD",
+        currency=invoice_in.currency or "INR",
         notes=invoice_in.notes,
         client_name=invoice_in.client_name,
         client_email=invoice_in.client_email,
@@ -312,6 +312,11 @@ def generate_invoice_preview(
     source_milestones: List[int] = []
     source_tasks: List[int] = []
 
+    curr = (req.currency or "INR").upper()
+    milestone_rate = 40000.0 if curr == "INR" else 500.0
+    hourly_rate = 2500.0 if curr == "INR" else 75.0
+    default_service_price = 50000.0 if curr == "INR" else 1000.0
+
     if req.include_completed_milestones:
         for m in project.milestones:
             if m.status == "completed":
@@ -319,8 +324,8 @@ def generate_invoice_preview(
                 line_items.append({
                     "description": f"Milestone: {m.title}",
                     "quantity": 1.0,
-                    "unit_price": 500.0,
-                    "total": 500.0,
+                    "unit_price": milestone_rate,
+                    "total": milestone_rate,
                     "sort_order": len(line_items),
                     "source_type": "milestone",
                     "source_id": m.id,
@@ -331,7 +336,7 @@ def generate_invoice_preview(
             if t.status == "completed":
                 source_tasks.append(t.id)
                 hours = round((t.actual_minutes or t.estimated_minutes or 60) / 60.0, 2)
-                rate = 75.0
+                rate = hourly_rate
                 line_items.append({
                     "description": f"Task: {t.title}",
                     "quantity": hours,
@@ -346,8 +351,8 @@ def generate_invoice_preview(
         line_items.append({
             "description": f"Services for {project.title}",
             "quantity": 1.0,
-            "unit_price": 1000.0,
-            "total": 1000.0,
+            "unit_price": default_service_price,
+            "total": default_service_price,
             "sort_order": 0,
             "source_type": "custom",
             "source_id": None,
@@ -379,7 +384,7 @@ def generate_invoice_preview(
         "tax_rate": tax_rate,
         "tax_amount": tax_amount,
         "total": total,
-        "currency": req.currency or "USD",
+        "currency": req.currency or "INR",
         "notes": req.notes or f"Generated for {project.title}",
         "client_name": project.title.split("-")[0].strip() if "-" in project.title else project.title,
         "client_email": "client@example.com",
@@ -459,16 +464,18 @@ def download_invoice_pdf(
         "Line Items:",
     ]
 
+    sym = "₹" if invoice.currency == "INR" else ("€" if invoice.currency == "EUR" else ("£" if invoice.currency == "GBP" else "$"))
+
     for item in invoice.line_items:
         lines.append(
-            f" - {item.description}: {item.quantity} x ${item.unit_price:.2f} = ${item.total:.2f}"
+            f" - {item.description}: {item.quantity} x {sym}{item.unit_price:.2f} = {sym}{item.total:.2f}"
         )
 
     lines.extend([
         "----------------------------------------------------------------",
-        f"Subtotal: ${invoice.subtotal:.2f}",
-        f"Tax ({invoice.tax_rate}%): ${invoice.tax_amount:.2f}",
-        f"Total Due: ${invoice.total:.2f} {invoice.currency}",
+        f"Subtotal: {sym}{invoice.subtotal:.2f} {invoice.currency}",
+        f"Tax ({invoice.tax_rate}%): {sym}{invoice.tax_amount:.2f}",
+        f"Total Due: {sym}{invoice.total:.2f} {invoice.currency}",
         "----------------------------------------------------------------",
         f"Notes: {invoice.notes or 'Thank you for your business!'}",
     ])

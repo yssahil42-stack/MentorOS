@@ -38,8 +38,12 @@ export function getRoleRoutePrefix(role: UserRole): string {
 
 export function isRouteAllowedForRole(role: UserRole, pathname: string): boolean {
   const prefix = ROLE_CONFIGS[role].routePrefix;
+  const isAskAllowed = role !== 'job_seeker' && pathname === '/app/ask';
   return (
-    pathname.startsWith(prefix) || pathname === '/app/settings' || pathname === '/app/unauthorized'
+    pathname.startsWith(prefix) ||
+    pathname === '/app/settings' ||
+    pathname === '/app/unauthorized' ||
+    isAskAllowed
   );
 }
 

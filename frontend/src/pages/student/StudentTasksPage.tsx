@@ -28,6 +28,7 @@ import { Button } from '../../components/ui/Button';
 import { PriorityBadge, StatusBadge } from '../../components/ui/Badge';
 import { Modal } from '../../components/ui/Modal';
 import { LoadingSkeleton } from '../../components/ui/LoadingSkeleton';
+import { TimeTrackingBadge } from '../../components/ui/TimeTrackingBadge';
 import type { Task, TaskPriority, TaskStatus } from '../../types/task';
 import type { Project } from '../../types/project';
 
@@ -524,10 +525,12 @@ export default function StudentTasksPage() {
                   </div>
 
                   <div className="flex items-center justify-between text-2xs text-text-faint pt-1 border-t border-border-base/50">
-                    <span className="flex items-center gap-1">
-                      <Clock className="w-3 h-3 text-student-400" />
-                      {task.estimated_minutes || 60}m
-                    </span>
+                    <TimeTrackingBadge
+                      expectedMinutes={task.estimated_minutes}
+                      actualMinutes={task.actual_minutes}
+                      size="xs"
+                      variant="pill"
+                    />
                     {task.due_date && (
                       <span className="flex items-center gap-1">
                         <Calendar className="w-3 h-3 text-amber-400" />
@@ -607,10 +610,12 @@ export default function StudentTasksPage() {
                   </div>
 
                   <div className="flex items-center justify-between text-2xs text-text-faint pt-1 border-t border-border-base/50">
-                    <span className="flex items-center gap-1 text-student-400">
-                      <Clock className="w-3 h-3" />
-                      {task.estimated_minutes || 60}m focus
-                    </span>
+                    <TimeTrackingBadge
+                      expectedMinutes={task.estimated_minutes}
+                      actualMinutes={task.actual_minutes}
+                      size="xs"
+                      variant="pill"
+                    />
                     {task.due_date && (
                       <span className="flex items-center gap-1">
                         <Calendar className="w-3 h-3 text-amber-400" />
@@ -919,10 +924,12 @@ export default function StudentTasksPage() {
                                           {new Date(task.due_date).toLocaleDateString()}
                                         </span>
                                       )}
-                                      <span className="flex items-center gap-1 text-student-400">
-                                        <Clock className="w-3 h-3" />
-                                        {task.estimated_minutes || 60}m
-                                      </span>
+                                      <TimeTrackingBadge
+                                        expectedMinutes={task.estimated_minutes}
+                                        actualMinutes={task.actual_minutes}
+                                        size="xs"
+                                        variant="pill"
+                                      />
                                     </div>
                                   </div>
                                 </div>

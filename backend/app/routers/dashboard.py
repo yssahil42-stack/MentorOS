@@ -233,6 +233,8 @@ def get_dashboard_summary(
             "target_date": next_ms_target.target_date,
             "status": next_ms_target.status,
             "days_remaining": days_rem,
+            "estimated_minutes": getattr(next_ms_target, "estimated_minutes", 0) or 0,
+            "actual_minutes": getattr(next_ms_target, "actual_minutes", 0) or 0,
         }
 
     daily_standup = {
@@ -243,6 +245,8 @@ def get_dashboard_summary(
                 "project_title": t.project.title if t.project else None,
                 "completed_at": t.completed_at.isoformat() if t.completed_at else None,
                 "is_yesterday": t.completed_at.date() == yesterday if t.completed_at else False,
+                "estimated_minutes": t.estimated_minutes,
+                "actual_minutes": t.actual_minutes,
             }
             for t in recent_completed
         ],
@@ -263,6 +267,8 @@ def get_dashboard_summary(
                 "title": t.title,
                 "project_title": t.project.title if t.project else None,
                 "priority": t.priority,
+                "estimated_minutes": t.estimated_minutes,
+                "actual_minutes": t.actual_minutes,
             }
             for t in tasks_due_today[:5]
         ],

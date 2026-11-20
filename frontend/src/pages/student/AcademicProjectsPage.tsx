@@ -38,6 +38,8 @@ import { Button } from '../../components/ui/Button';
 import { Badge, PriorityBadge } from '../../components/ui/Badge';
 import { Modal } from '../../components/ui/Modal';
 import { LoadingSkeleton } from '../../components/ui/LoadingSkeleton';
+import { TimeTrackingBadge } from '../../components/ui/TimeTrackingBadge';
+import { getMilestoneTimeTotals } from '../../utils/timeTracking';
 import type { Project, ProjectPriority, Milestone } from '../../types/project';
 import type { TaskStatus } from '../../types/task';
 
@@ -70,6 +72,8 @@ export default function AcademicProjectsPage() {
   const [activeProjectForMilestone, setActiveProjectForMilestone] = useState<number | null>(null);
   const [milestoneTitle, setMilestoneTitle] = useState('');
   const [milestoneTargetDate, setMilestoneTargetDate] = useState('');
+  const [milestoneEstimatedMinutes, setMilestoneEstimatedMinutes] = useState<number>(60);
+  const [milestoneActualMinutes, setMilestoneActualMinutes] = useState<number>(0);
 
   // Phase Expansion & Quick Task State
   const [expandedMilestoneIds, setExpandedMilestoneIds] = useState<Record<number, boolean>>({});
@@ -144,6 +148,8 @@ export default function AcademicProjectsPage() {
         project_id: activeProjectForMilestone,
         title: milestoneTitle,
         target_date: milestoneTargetDate,
+        estimated_minutes: milestoneEstimatedMinutes,
+        actual_minutes: milestoneActualMinutes,
         role: 'student',
       });
     },
@@ -151,6 +157,8 @@ export default function AcademicProjectsPage() {
       setIsMilestoneModalOpen(false);
       setMilestoneTitle('');
       setMilestoneTargetDate('');
+      setMilestoneEstimatedMinutes(60);
+      setMilestoneActualMinutes(0);
       setActiveProjectForMilestone(null);
       queryClient.invalidateQueries({ queryKey: ['milestones'] });
       queryClient.invalidateQueries({ queryKey: ['projects'] });
@@ -546,6 +554,12 @@ export default function AcademicProjectsPage() {
                       <FileText className="w-3.5 h-3.5 text-amber-400" />
                       {projectMilestones.length} milestones
                     </span>
+                    <TimeTrackingBadge
+                      expectedMinutes={projTasks.reduce((s, t) => s + (t.estimated_minutes || 0), 0)}
+                      actualMinutes={projTasks.reduce((s, t) => s + (t.actual_minutes || 0), 0)}
+                      size="xs"
+                      variant="pill"
+                    />
                   </div>
 
                   {/* Milestones Preview or Expand */}
@@ -613,6 +627,7 @@ export default function AcademicProjectsPage() {
                               (sum, t) => sum + (Number(t.estimated_minutes) || 60),
                               0
                             );
+                            const { expectedMinutes, actualMinutes } = getMilestoneTimeTotals(m, tasks, milestones);
 
                             const isMilestoneExpanded = !!expandedMilestoneIds[m.id];
 
@@ -673,10 +688,12 @@ export default function AcademicProjectsPage() {
                                   </div>
 
                                   <div className="flex items-center gap-2 shrink-0">
-                                    <span className="flex items-center gap-1 text-3xs font-semibold text-student-700 dark:text-student-300 bg-student-500/10 px-2.5 py-0.5 rounded-md border border-student-500/20">
-                                      <Clock className="w-3 h-3 text-student-500" />
-                                      <span>{formatPhaseTime(phaseMinutes)}</span>
-                                    </span>
+                                    <TimeTrackingBadge
+                                      expectedMinutes={expectedMinutes}
+                                      actualMinutes={actualMinutes}
+                                      size="xs"
+                                      variant="pill"
+                                    />
                                     <span className="text-3xs font-mono font-bold text-student-400 bg-student-500/10 px-2 py-0.5 rounded-md border border-student-500/20">
                                       {phaseProgress}%
                                     </span>
@@ -780,12 +797,12 @@ export default function AcademicProjectsPage() {
                                               </div>
 
                                               <div className="flex items-center gap-2 shrink-0">
-                                                {task.estimated_minutes ? (
-                                                  <span className="text-3xs text-text-muted flex items-center gap-1 bg-slate-100 dark:bg-bg-elevated px-2 py-0.5 rounded-md border border-border-subtle font-mono">
-                                                    <Clock className="w-3 h-3 text-student-400" />
-                                                    {task.estimated_minutes}m
-                                                  </span>
-                                                ) : null}
+                                                <TimeTrackingBadge
+                                                  expectedMinutes={task.estimated_minutes}
+                                                  actualMinutes={task.actual_minutes}
+                                                  size="xs"
+                                                  variant="pill"
+                                                />
                                                 {task.priority && task.priority !== 'medium' && (
                                                   <PriorityBadge priority={task.priority} />
                                                 )}
@@ -1086,12 +1103,12 @@ export default function AcademicProjectsPage() {
                 </div>
 
                 <div className="flex items-center gap-2 shrink-0">
-                  {task.estimated_minutes ? (
-                    <span className="text-3xs text-text-muted flex items-center gap-1 bg-slate-100 dark:bg-bg-elevated px-2 py-0.5 rounded-md border border-border-subtle font-mono">
-                      <Clock className="w-3 h-3 text-student-400" />
-                      {task.estimated_minutes}m
-                    </span>
-                  ) : null}
+                  <TimeTrackingBadge
+                    expectedMinutes={task.estimated_minutes}
+                    actualMinutes={task.actual_minutes}
+                    size="xs"
+                    variant="pill"
+                  />
                   {task.priority && task.priority !== 'medium' && (
                     <PriorityBadge priority={task.priority} />
                   )}
@@ -1238,14 +1255,42 @@ export default function AcademicProjectsPage() {
             />
           </div>
 
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="block text-xs font-semibold text-text-secondary mb-1">
+                Target Deadline
+              </label>
+              <input
+                type="date"
+                value={milestoneTargetDate}
+                onChange={(e) => setMilestoneTargetDate(e.target.value)}
+                className="w-full bg-bg-surface border border-border-base rounded-xl px-3 py-2 text-xs text-text-primary focus:outline-none focus:border-student-500"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-text-secondary mb-1">
+                Expected Time (Mins)
+              </label>
+              <input
+                type="number"
+                min={0}
+                value={milestoneEstimatedMinutes}
+                onChange={(e) => setMilestoneEstimatedMinutes(Math.max(0, parseInt(e.target.value) || 0))}
+                className="w-full bg-bg-surface border border-border-base rounded-xl px-3 py-2 text-xs text-text-primary focus:outline-none focus:border-student-500"
+              />
+            </div>
+          </div>
+
           <div>
             <label className="block text-xs font-semibold text-text-secondary mb-1">
-              Target Deadline
+              Actual Time Taken (Mins)
             </label>
             <input
-              type="date"
-              value={milestoneTargetDate}
-              onChange={(e) => setMilestoneTargetDate(e.target.value)}
+              type="number"
+              min={0}
+              value={milestoneActualMinutes}
+              onChange={(e) => setMilestoneActualMinutes(Math.max(0, parseInt(e.target.value) || 0))}
               className="w-full bg-bg-surface border border-border-base rounded-xl px-3 py-2 text-xs text-text-primary focus:outline-none focus:border-student-500"
             />
           </div>

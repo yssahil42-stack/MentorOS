@@ -153,3 +153,44 @@ export async function approveProposalItems(
     throw err;
   }
 }
+
+// ─── Conversational AI "Ask" Chatbot Service ─────────────────────────────────
+
+export interface ChatMessage {
+  id?: string;
+  role: 'user' | 'assistant' | 'system';
+  content: string;
+  timestamp?: string;
+  isStreaming?: boolean;
+}
+
+export interface AskChatbotRequest {
+  message: string;
+  history?: ChatMessage[];
+  role?: string;
+}
+
+export interface AskChatbotResponse {
+  reply: string;
+  provider: string;
+  model: string;
+}
+
+export async function askChatbot(
+  req: AskChatbotRequest,
+  signal?: AbortSignal
+): Promise<AskChatbotResponse> {
+  const cleanHistory = (req.history || []).map((h) => ({
+    role: h.role,
+    content: h.content,
+  }));
+  return api.post<AskChatbotResponse>(
+    '/ai/ask',
+    {
+      message: req.message,
+      history: cleanHistory,
+      role: req.role || 'developer',
+    },
+    { signal }
+  );
+}

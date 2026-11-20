@@ -74,6 +74,8 @@ export interface StandupCompletedTask {
   project_title?: string | null;
   completed_at?: string | null;
   is_yesterday: boolean;
+  estimated_minutes?: number | null;
+  actual_minutes?: number | null;
 }
 
 export interface StandupScheduledEvent {
@@ -90,6 +92,8 @@ export interface StandupTaskDueToday {
   title: string;
   project_title?: string | null;
   priority: string;
+  estimated_minutes?: number | null;
+  actual_minutes?: number | null;
 }
 
 export interface StandupNextMilestone {
@@ -100,6 +104,8 @@ export interface StandupNextMilestone {
   target_date?: string | null;
   status: string;
   days_remaining?: number | null;
+  estimated_minutes?: number | null;
+  actual_minutes?: number | null;
 }
 
 export interface DailyStandupData {

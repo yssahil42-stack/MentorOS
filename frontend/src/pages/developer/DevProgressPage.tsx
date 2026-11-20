@@ -20,6 +20,8 @@ import { fetchMilestones, fetchProjects } from '../../services/projectService';
 import { Card } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
 import { LoadingSkeleton } from '../../components/ui/LoadingSkeleton';
+import { TimeTrackingBadge } from '../../components/ui/TimeTrackingBadge';
+import { getMilestoneTimeTotals } from '../../utils/timeTracking';
 
 export default function DevProgressPage() {
   const { openAIDrawer } = useWorkspace();
@@ -249,6 +251,55 @@ export default function DevProgressPage() {
         </div>
       </Card>
 
+      {/* Milestones for Selected Project */}
+      {selectedProject && projectMilestones.length > 0 && (
+        <Card className="p-6 space-y-4">
+          <div className="flex items-center justify-between pb-3 border-b border-border-base">
+            <div>
+              <h3 className="text-sm font-bold text-text-primary flex items-center gap-2">
+                <Flag className="w-4 h-4 text-amber-400" />
+                Project Milestones ({projectMilestones.length})
+              </h3>
+              <p className="text-xs text-text-muted mt-0.5">
+                Key release gates and architectural checkpoints
+              </p>
+            </div>
+            <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-500 border border-amber-500/20">
+              {completedMilestones.length}/{projectMilestones.length} Completed
+            </span>
+          </div>
+
+          <div className="space-y-2">
+            {projectMilestones.map((m) => {
+              const { expectedMinutes, actualMinutes } = getMilestoneTimeTotals(m, tasks, milestones);
+              const isDone = m.status === 'completed';
+              return (
+                <div
+                  key={m.id}
+                  className={`p-3 rounded-xl border transition-all flex items-center justify-between gap-3 text-xs ${
+                    isDone
+                      ? 'bg-bg-surface/50 border-border-base/50 opacity-60'
+                      : 'bg-bg-surface border-border-base'
+                  }`}
+                >
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    <Flag className={`w-4 h-4 shrink-0 ${isDone ? 'text-emerald-400' : 'text-amber-400'}`} />
+                    <span className={`font-semibold truncate ${isDone ? 'line-through text-text-muted' : 'text-text-primary'}`}>
+                      {m.title}
+                    </span>
+                  </div>
+                  <TimeTrackingBadge
+                    expectedMinutes={expectedMinutes}
+                    actualMinutes={actualMinutes}
+                    size="xs"
+                  />
+                </div>
+              );
+            })}
+          </div>
+        </Card>
+      )}
+
       {/* Task List for Selected Project */}
       {selectedProject && (
         <Card className="p-6 space-y-4">
@@ -297,11 +348,12 @@ export default function DevProgressPage() {
                       </div>
                     </div>
                     <div className="flex items-center gap-2 shrink-0">
-                      {task.estimated_minutes ? (
-                        <span className="text-3xs font-mono text-text-muted bg-bg-elevated px-2 py-0.5 rounded border border-border-subtle">
-                          {task.estimated_minutes}m
-                        </span>
-                      ) : null}
+                      <TimeTrackingBadge
+                        expectedMinutes={task.estimated_minutes}
+                        actualMinutes={task.actual_minutes}
+                        size="xs"
+                        variant="pill"
+                      />
                       <span
                         className={`text-3xs px-2 py-0.5 rounded-full font-semibold uppercase ${
                           isDone

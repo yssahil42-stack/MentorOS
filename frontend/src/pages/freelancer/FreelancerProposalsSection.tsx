@@ -11,9 +11,13 @@ import {
   Send,
   FileSpreadsheet,
   X,
+  IndianRupee,
 } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
+import { Modal } from '../../components/ui/Modal';
 import { useWorkspace } from '../../contexts/WorkspaceContext';
+import { formatCurrency } from '../../utils/dateUtils';
+import { getCurrencySymbol, CURRENCY_OPTIONS } from '../../utils/currency';
 
 export interface WorkProposal {
   id: string;
@@ -21,6 +25,7 @@ export interface WorkProposal {
   client: string;
   scope: string;
   budget: number;
+  currency?: string;
   timeline: string;
   status: 'draft' | 'sent' | 'accepted';
   created_at: string;
@@ -32,7 +37,8 @@ const DEFAULT_PROPOSALS: WorkProposal[] = [
     title: 'Full-Stack Design System & Next.js App Shell',
     client: 'Acme Brand Portal',
     scope: 'Component tokens, responsive layouts, automated QA suite, and dark mode theming.',
-    budget: 4800,
+    budget: 180000,
+    currency: 'INR',
     timeline: '3 Weeks',
     status: 'accepted',
     created_at: new Date(Date.now() - 5 * 86400000).toISOString(),
@@ -42,7 +48,8 @@ const DEFAULT_PROPOSALS: WorkProposal[] = [
     title: 'REST API Endpoints & Auth Migration',
     client: 'Nexus Cloud Services',
     scope: 'JWT authentication, PostgreSQL migrations, role-based access control, and Swagger docs.',
-    budget: 2400,
+    budget: 95000,
+    currency: 'INR',
     timeline: '2 Weeks',
     status: 'sent',
     created_at: new Date(Date.now() - 2 * 86400000).toISOString(),
@@ -52,7 +59,8 @@ const DEFAULT_PROPOSALS: WorkProposal[] = [
     title: 'Mobile UI Audit & Performance Optimization',
     client: 'Horizon Labs',
     scope: 'Core Web Vitals remediation, bundle minimization, asset lazy loading, and accessibility.',
-    budget: 1600,
+    budget: 45000,
+    currency: 'INR',
     timeline: '10 Days',
     status: 'draft',
     created_at: new Date().toISOString(),
@@ -78,7 +86,8 @@ export function FreelancerProposalsSection({ projects = [] }: FreelancerProposal
 
   const [title, setTitle] = useState('');
   const [client, setClient] = useState('');
-  const [budget, setBudget] = useState(2500);
+  const [budget, setBudget] = useState(75000);
+  const [currency, setCurrency] = useState('INR');
   const [scope, setScope] = useState('');
   const [timeline, setTimeline] = useState('2 Weeks');
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -100,7 +109,8 @@ export function FreelancerProposalsSection({ projects = [] }: FreelancerProposal
       title: title.trim(),
       client: client.trim() || (projects[0]?.title ?? 'Direct Client'),
       scope: scope.trim() || 'Milestone deliverables, scope agreement, and technical handover.',
-      budget: Number(budget) || 1500,
+      budget: Number(budget) || 50000,
+      currency: currency || 'INR',
       timeline: timeline.trim() || '2 Weeks',
       status: 'draft',
       created_at: new Date().toISOString(),
@@ -209,9 +219,9 @@ export function FreelancerProposalsSection({ projects = [] }: FreelancerProposal
         </div>
 
         <div className="rounded-xl border border-border-base/80 dark:border-white/[0.08] bg-white dark:bg-bg-surface p-4 shadow-2xs hover:shadow-sm transition-all">
-          <span className="text-3xs font-semibold text-text-muted uppercase tracking-wider">Pipeline Value</span>
+          <span className="text-3xs font-semibold text-text-muted uppercase tracking-wider">Pipeline Value (INR)</span>
           <div className="mt-1 text-2xl font-black text-amber-600 dark:text-amber-400 font-mono">
-            ${(totalValue / 1000).toFixed(1)}k
+            {formatCurrency(totalValue, 'INR')}
           </div>
           <span className="text-3xs text-text-muted mt-0.5 block">Sent &amp; accepted contracts</span>
         </div>
@@ -268,7 +278,7 @@ export function FreelancerProposalsSection({ projects = [] }: FreelancerProposal
             <div className="mt-4 pt-3.5 border-t border-border-base/70 flex items-center justify-between gap-2 text-xs">
               <div className="flex items-baseline gap-1.5">
                 <span className="text-base font-extrabold text-text-primary font-mono">
-                  ${prop.budget.toLocaleString()}
+                  {formatCurrency(prop.budget, prop.currency || 'INR')}
                 </span>
                 <span className="text-2xs text-text-muted font-medium">/ {prop.timeline}</span>
               </div>
@@ -345,30 +355,54 @@ export function FreelancerProposalsSection({ projects = [] }: FreelancerProposal
                 </div>
                 <div>
                   <label className="block text-xs font-semibold text-text-secondary mb-1">
-                    Budget Estimate ($)
+                    Currency
                   </label>
-                  <input
-                    type="number"
-                    min="100"
-                    step="50"
-                    value={budget}
-                    onChange={(e) => setBudget(Number(e.target.value))}
-                    className="w-full px-3.5 py-2 text-xs rounded-xl bg-slate-50 dark:bg-bg-base border border-border-base focus:border-amber-500 focus:outline-none transition-colors font-mono"
-                  />
+                  <select
+                    value={currency}
+                    onChange={(e) => setCurrency(e.target.value)}
+                    className="w-full px-3 py-2 text-xs rounded-xl bg-slate-50 dark:bg-bg-base border border-border-base focus:border-amber-500 focus:outline-none transition-colors font-medium"
+                  >
+                    {CURRENCY_OPTIONS.map((c) => (
+                      <option key={c.value} value={c.value}>
+                        {c.value} ({c.symbol})
+                      </option>
+                    ))}
+                  </select>
                 </div>
               </div>
 
-              <div>
-                <label className="block text-xs font-semibold text-text-secondary mb-1">
-                  Timeline / Delivery
-                </label>
-                <input
-                  type="text"
-                  placeholder="e.g. 2 Weeks (80 Hours)"
-                  value={timeline}
-                  onChange={(e) => setTimeline(e.target.value)}
-                  className="w-full px-3.5 py-2 text-xs rounded-xl bg-slate-50 dark:bg-bg-base border border-border-base focus:border-amber-500 focus:outline-none transition-colors"
-                />
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                <div>
+                  <label className="block text-xs font-semibold text-text-secondary mb-1">
+                    Budget Estimate ({currency})
+                  </label>
+                  <div className="relative">
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-text-muted">
+                      {getCurrencySymbol(currency)}
+                    </span>
+                    <input
+                      type="number"
+                      min="100"
+                      step={currency === 'INR' ? '1000' : '50'}
+                      value={budget}
+                      onChange={(e) => setBudget(Number(e.target.value))}
+                      className="w-full pl-8 pr-3 py-2 text-xs rounded-xl bg-slate-50 dark:bg-bg-base border border-border-base focus:border-amber-500 focus:outline-none transition-colors font-mono"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-text-secondary mb-1">
+                    Timeline / Delivery
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="e.g. 2 Weeks (80 Hours)"
+                    value={timeline}
+                    onChange={(e) => setTimeline(e.target.value)}
+                    className="w-full px-3.5 py-2 text-xs rounded-xl bg-slate-50 dark:bg-bg-base border border-border-base focus:border-amber-500 focus:outline-none transition-colors"
+                  />
+                </div>
               </div>
 
               <div>

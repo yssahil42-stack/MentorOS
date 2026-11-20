@@ -68,6 +68,8 @@ class Milestone(Base):
     description = Column(Text, nullable=True)
     status = Column(String(50), default="pending")  # pending, in_progress, completed
     target_date = Column(String(50), nullable=True)
+    estimated_minutes = Column(Integer, default=0, nullable=True)
+    actual_minutes = Column(Integer, default=0, nullable=True)
     completed_at = Column(DateTime, nullable=True)
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)

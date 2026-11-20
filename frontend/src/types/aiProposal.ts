@@ -25,6 +25,8 @@ export interface AIProposedMilestone {
   title: string;
   description?: string;
   target_date?: string;
+  estimated_minutes?: number;
+  actual_minutes?: number;
 }
 
 export interface AIProposedTask {
@@ -33,6 +35,7 @@ export interface AIProposedTask {
   priority?: string;
   due_date?: string;
   estimated_minutes?: number;
+  actual_minutes?: number;
   project_title?: string;
 }
 

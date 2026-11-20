@@ -12,6 +12,7 @@ import {
   Trash2,
   Calendar,
   DollarSign,
+  Coins,
   Building2,
   PieChart,
   Search,
@@ -51,7 +52,9 @@ import { useDebounce } from '../../hooks/useDebounce';
 import { LoadingSkeleton } from '../../components/ui/LoadingSkeleton';
 import { Input } from '../../components/ui/Input';
 import { Select } from '../../components/ui/Select';
-import { formatDate } from '../../utils/dateUtils';
+import { TimeTrackingBadge } from '../../components/ui/TimeTrackingBadge';
+import { getMilestoneTimeTotals } from '../../utils/timeTracking';
+import { formatDate, formatCurrency } from '../../utils/dateUtils';
 
 import type { Project, ProjectStatus, ProjectPriority, Milestone } from '../../types/project';
 import type { Task, TaskStatus, TaskPriority } from '../../types/task';
@@ -86,6 +89,8 @@ export default function FreelancerProjectsPage() {
   const [quickDeliverableTitle, setQuickDeliverableTitle] = useState('');
   const [quickDeliverableProjectId, setQuickDeliverableProjectId] = useState<number | undefined>(undefined);
   const [quickDeliverableDate, setQuickDeliverableDate] = useState('');
+  const [quickDeliverableMinutes, setQuickDeliverableMinutes] = useState(120);
+  const [quickDeliverableActualMinutes, setQuickDeliverableActualMinutes] = useState(0);
 
   // ─── Task Form State ──────────────────────────────────────────────────────
   const [taskViewMode, setTaskViewMode] = useState<'kanban' | 'list'>('kanban');
@@ -183,12 +188,16 @@ export default function FreelancerProjectsPage() {
         project_id: quickDeliverableProjectId || projects[0]?.id || 1,
         title: quickDeliverableTitle.trim(),
         target_date: quickDeliverableDate || undefined,
+        estimated_minutes: quickDeliverableMinutes,
+        actual_minutes: quickDeliverableActualMinutes,
         role: 'freelancer',
       });
     },
     onSuccess: () => {
       setQuickDeliverableTitle('');
       setQuickDeliverableDate('');
+      setQuickDeliverableMinutes(120);
+      setQuickDeliverableActualMinutes(0);
       queryClient.invalidateQueries({ queryKey: ['milestones'] });
       queryClient.invalidateQueries({ queryKey: ['projects'] });
       showToast('Deliverable added! 🎯', 'success');
@@ -307,7 +316,7 @@ export default function FreelancerProjectsPage() {
   const completedTasksCount = tasks.filter((t) => t.status === 'completed').length;
 
   const totalRevenue = projects.reduce((acc, p) => {
-    const rate = 85;
+    const rate = 2500; // INR hourly benchmark
     const hours = p.progress ? (p.progress / 100) * 40 : 10;
     return acc + rate * hours;
   }, 0);
@@ -512,14 +521,14 @@ export default function FreelancerProjectsPage() {
 
         <Card3D maxTilt={5} depth={20} variant="glass" className="p-4 sm:p-5 border border-border-base/90 shadow-card">
           <div className="flex items-center justify-between text-xs text-text-muted font-medium">
-            <span>Pipeline Value</span>
+            <span>Pipeline Value (INR)</span>
             <div className="p-2 rounded-xl bg-purple-500/15 text-purple-500 border border-purple-500/25">
-              <DollarSign className="w-4 h-4" />
+              <Coins className="w-4 h-4" />
             </div>
           </div>
           <div className="mt-3 flex items-baseline gap-1.5">
             <span className="text-2xl sm:text-3xl font-extrabold text-text-primary font-mono tracking-tight">
-              ${(totalRevenue / 1000).toFixed(1)}k
+              {formatCurrency(totalRevenue, 'INR')}
             </span>
           </div>
         </Card3D>
@@ -861,6 +870,7 @@ export default function FreelancerProjectsPage() {
               milestones.map((m) => {
                 const isDone = m.status === 'completed';
                 const project = projects.find((p) => p.id === m.project_id);
+                const { expectedMinutes, actualMinutes } = getMilestoneTimeTotals(m, tasks, milestones);
                 return (
                   <div
                     key={m.id}
@@ -914,6 +924,11 @@ export default function FreelancerProjectsPage() {
                     </div>
 
                     <div className="flex items-center gap-3 shrink-0">
+                      <TimeTrackingBadge
+                        expectedMinutes={expectedMinutes}
+                        actualMinutes={actualMinutes}
+                        size="xs"
+                      />
                       {m.target_date && (
                         <span className="text-xs text-text-muted flex items-center gap-1 font-mono">
                           <Calendar className="w-3.5 h-3.5 text-amber-500" />
@@ -1088,7 +1103,12 @@ export default function FreelancerProjectsPage() {
                               </div>
 
                               <div className="pt-2 border-t border-border-subtle flex items-center justify-between gap-1 text-3xs">
-                                <span className="text-text-muted font-mono">{t.estimated_minutes || 60}m</span>
+                                <TimeTrackingBadge
+                                  expectedMinutes={t.estimated_minutes}
+                                  actualMinutes={t.actual_minutes}
+                                  size="xs"
+                                  variant="pill"
+                                />
                                 <div className="flex items-center gap-1">
                                   {col.id !== 'todo' && (
                                     <button
@@ -1192,7 +1212,12 @@ export default function FreelancerProjectsPage() {
 
                       <div className="flex items-center gap-2.5 shrink-0">
                         <PriorityBadge priority={t.priority || 'medium'} />
-                        <span className="text-3xs text-text-muted font-mono">{t.estimated_minutes || 60}m</span>
+                        <TimeTrackingBadge
+                          expectedMinutes={t.estimated_minutes}
+                          actualMinutes={t.actual_minutes}
+                          size="xs"
+                          variant="pill"
+                        />
                         <button
                           type="button"
                           onClick={() => deleteTaskMutation.mutate(t.id)}

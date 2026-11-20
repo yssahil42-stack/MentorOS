@@ -1,6 +1,7 @@
 import React from 'react';
 import { ChevronDown, ChevronRight, Plus } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
+import { TimeTrackingBadge } from '../../components/ui/TimeTrackingBadge';
 import { TaskList } from './TaskList';
 import type { Project } from '../../types/project';
 import type { Task, TaskStatus } from '../../types/task';
@@ -122,6 +123,12 @@ export const CourseAccordion: React.FC<CourseAccordionProps> = ({
                     {dynProgress}%
                   </span>
                 </div>
+                <TimeTrackingBadge
+                  expectedMinutes={allTasks.reduce((sum, t) => sum + (t.estimated_minutes || 0), 0)}
+                  actualMinutes={allTasks.reduce((sum, t) => sum + (t.actual_minutes || 0), 0)}
+                  size="xs"
+                  variant="pill"
+                />
                 <span className="text-2xs font-semibold px-2 py-0.5 rounded-full bg-blue-500/10 text-orange-600 dark:text-orange-400 border border-blue-500/20">
                   {doneCount}/{allTasks.length} done
                 </span>

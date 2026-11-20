@@ -1,6 +1,7 @@
 import React from 'react';
 import { CheckCircle2, Clock, Calendar } from 'lucide-react';
 import { PriorityBadge } from '../../components/ui/Badge';
+import { TimeTrackingBadge } from '../../components/ui/TimeTrackingBadge';
 import type { Task, TaskStatus } from '../../types/task';
 
 interface FreelancerTaskListProps {
@@ -66,11 +67,14 @@ export const FreelancerTaskList: React.FC<FreelancerTaskListProps> = ({
                   <p className="text-2xs text-text-muted line-clamp-1">{task.description}</p>
                 )}
                 <div className="flex items-center gap-3 text-3xs text-text-muted pt-0.5 flex-wrap">
-                  {task.estimated_minutes && (
-                    <span className="inline-flex items-center gap-1 font-mono text-amber-700 dark:text-amber-400 font-semibold bg-amber-500/10 px-1.5 py-0.5 rounded border border-amber-500/20">
-                      <Clock className="w-2.5 h-2.5 shrink-0" />
-                      <span>{task.estimated_minutes}m billable</span>
-                    </span>
+                  {(task.estimated_minutes != null || task.actual_minutes != null) && (
+                    <TimeTrackingBadge
+                      expectedMinutes={task.estimated_minutes}
+                      actualMinutes={task.actual_minutes}
+                      size="xs"
+                      variant="pill"
+                      expectedLabel="Billable"
+                    />
                   )}
                   {task.due_date && (
                     <span className="inline-flex items-center gap-1 font-mono text-text-secondary">

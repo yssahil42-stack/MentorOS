@@ -24,6 +24,7 @@ import { Card } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
 import { PriorityBadge, StatusBadge } from '../../components/ui/Badge';
 import { LoadingSkeleton } from '../../components/ui/LoadingSkeleton';
+import { TimeTrackingBadge } from '../../components/ui/TimeTrackingBadge';
 import { cn } from '../../utils/cn';
 import type { Task, TaskPriority, TaskStatus } from '../../types/task';
 import type { Project } from '../../types/project';
@@ -602,12 +603,12 @@ export default function AssignmentsPage() {
                                         <span>Due: {task.due_date}</span>
                                       </span>
                                     )}
-                                    {task.estimated_minutes && (
-                                      <span className="flex items-center gap-1">
-                                        <Clock className="w-3.5 h-3.5" />
-                                        <span>Est: {task.estimated_minutes}m</span>
-                                      </span>
-                                    )}
+                                    <TimeTrackingBadge
+                                      expectedMinutes={task.estimated_minutes}
+                                      actualMinutes={task.actual_minutes}
+                                      size="xs"
+                                      variant="pill"
+                                    />
                                   </div>
                                 </div>
                               </div>

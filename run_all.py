@@ -9,6 +9,7 @@ import subprocess
 import sys
 import time
 import os
+import socket
 import webbrowser
 from pathlib import Path
 
@@ -83,9 +84,25 @@ def start_frontend() -> subprocess.Popen:
     return subprocess.Popen("npm run dev", cwd=FRONTEND, **kwargs)
 
 
+def wait_for_service(port: int, service_name: str, timeout: float = 30.0) -> bool:
+    """Wait until a service is accepting TCP connections on port 127.0.0.1 or localhost."""
+    start_time = time.time()
+    while time.time() - start_time < timeout:
+        for host in ("127.0.0.1", "localhost"):
+            try:
+                with socket.create_connection((host, port), timeout=0.5):
+                    return True
+            except (OSError, ConnectionRefusedError):
+                pass
+        time.sleep(0.3)
+    print(f"[WARNING] Timed out waiting for {service_name} on port {port} after {timeout}s", flush=True)
+    return False
+
+
 def run_tests():
-    step("Waiting 5 s for services to start before running e2e tests...")
-    time.sleep(5)
+    step("Waiting for services before running e2e tests...")
+    wait_for_service(8000, "Backend API")
+    wait_for_service(5173, "Frontend Vite server")
     step("Running e2e test suite...")
     result = subprocess.run([str(PYTHON), str(ROOT / "test_e2e_suite.py")])
     return result.returncode
@@ -97,6 +114,10 @@ def main():
     be = start_backend()
     fe = start_frontend()
 
+    step("Waiting for backend (port 8000) and frontend (port 5173) to be fully ready...")
+    be_ready = wait_for_service(8000, "Backend API")
+    fe_ready = wait_for_service(5173, "Frontend Vite server")
+
     print()
     print("=" * 60)
     print("  MentorOS Services Online!")
@@ -107,11 +128,16 @@ def main():
     print()
 
     if not NO_OPEN and not RUN_TEST:
-        time.sleep(2)
-        try:
-            webbrowser.open("http://localhost:5173")
-        except Exception:
-            pass
+        if fe_ready:
+            # Brief 0.5s pause so Vite completes internal route registration before browser hits it
+            time.sleep(0.5)
+            step("Opening http://localhost:5173 in default browser...")
+            try:
+                webbrowser.open("http://localhost:5173")
+            except Exception:
+                pass
+        else:
+            print("[WARNING] Could not auto-open browser: Frontend port 5173 was not ready.")
 
     if RUN_TEST:
         code = run_tests()

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { FileText, Plus, Search, Sparkles, Pin, Trash2, BookOpen, Calendar } from 'lucide-react';
+import { FileText, Plus, Search, Sparkles, Pin, Trash2, BookOpen, Calendar, Bot, MessageSquare } from 'lucide-react';
 import { useWorkspace } from '../../contexts/WorkspaceContext';
 import { fetchNotes, createNote, deleteNote, updateNote } from '../../services/noteService';
 import { Card } from '../../components/ui/Card';
@@ -8,15 +8,18 @@ import { Button } from '../../components/ui/Button';
 import { Badge } from '../../components/ui/Badge';
 import { Modal } from '../../components/ui/Modal';
 import { LoadingSkeleton } from '../../components/ui/LoadingSkeleton';
+import { MarkdownRenderer } from '../../components/ui/MarkdownRenderer';
+import { DocumentationGeneratorModal } from '../../components/ai/DocumentationGeneratorModal';
 import type { Note } from '../../types/aiProposal';
 
 export default function DevNotesPage() {
-  const { openAIDrawer, showToast } = useWorkspace();
+  const { openAIDrawer, openAsk, showToast } = useWorkspace();
   const queryClient = useQueryClient();
 
   const [search, setSearch] = useState('');
   const [selectedNote, setSelectedNote] = useState<Note | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isAskDocModalOpen, setIsAskDocModalOpen] = useState(false);
 
   // Form State
   const [title, setTitle] = useState('');
@@ -29,8 +32,16 @@ export default function DevNotesPage() {
   });
 
   const createMutation = useMutation({
-    mutationFn: async () => {
-      return createNote({ title, content, is_pinned: isPinned, role: 'developer' });
+    mutationFn: async (noteData?: { title: string; content: string; is_pinned?: boolean }) => {
+      const noteTitle = noteData?.title ?? title;
+      const noteContent = noteData?.content ?? content;
+      const notePinned = noteData?.is_pinned ?? isPinned;
+      return createNote({
+        title: noteTitle,
+        content: noteContent,
+        is_pinned: notePinned,
+        role: 'developer',
+      });
     },
     onSuccess: (newN) => {
       setIsModalOpen(false);
@@ -105,7 +116,16 @@ export default function DevNotesPage() {
           </p>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
+          <Button
+            variant="secondary"
+            size="sm"
+            className="!bg-gradient-to-r !from-indigo-600 !to-purple-600 hover:!from-indigo-700 hover:!to-purple-700 text-white font-semibold shadow-xs"
+            onClick={() => setIsAskDocModalOpen(true)}
+            icon={<Sparkles className="w-4 h-4 text-amber-300 animate-pulse" />}
+          >
+            Draft with Ask AI
+          </Button>
           <Button
             variant="primary"
             size="sm"
@@ -226,6 +246,18 @@ export default function DevNotesPage() {
                   <Button
                     variant="ghost"
                     size="xs"
+                    onClick={() => {
+                      const query = `Here is our documentation note on "${activeNote.title}":\n\n${activeNote.content}\n\nCould you review this documentation, suggest refinements, identify missing edge cases, and propose next steps?`;
+                      openAsk(query);
+                    }}
+                    icon={<Bot className="w-3.5 h-3.5 text-solar-500" />}
+                    title="Discuss or refine this document in Ask Chatbot"
+                  >
+                    Ask AI Review
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="xs"
                     onClick={() =>
                       togglePinMutation.mutate({
                         id: activeNote.id,
@@ -248,9 +280,9 @@ export default function DevNotesPage() {
                 </div>
               </div>
 
-              {/* Note Content display */}
-              <div className="prose prose-invert max-w-none text-xs text-text-secondary leading-relaxed space-y-3 whitespace-pre-wrap font-sans">
-                {activeNote.content}
+              {/* Note Content display (Markdown rendered) */}
+              <div className="pt-2">
+                <MarkdownRenderer content={activeNote.content} />
               </div>
             </Card>
           ) : (
@@ -331,6 +363,20 @@ export default function DevNotesPage() {
           </div>
         </form>
       </Modal>
+
+      {/* ─── Documentation through Chatbot Ask Modal ─────────── */}
+      <DocumentationGeneratorModal
+        isOpen={isAskDocModalOpen}
+        onClose={() => setIsAskDocModalOpen(false)}
+        role="developer"
+        onSaveToNotes={(doc) => {
+          createMutation.mutate({
+            title: doc.title,
+            content: doc.content,
+            is_pinned: false,
+          });
+        }}
+      />
     </div>
   );
 }

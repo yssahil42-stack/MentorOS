@@ -54,12 +54,12 @@ class GitIsolationTests(unittest.TestCase):
         CONNECTED_REPOS[self.repo_id] = {
             "id": self.repo_id,
             "user_id": self.u1.id,
-            "provider": "github",
+            "provider": "gitlab",
             "name": "alice-secret-repo",
             "full_name": "alice/alice-secret-repo",
             "description": "Confidential repository",
             "private": True,
-            "url": "https://github.com/alice/alice-secret-repo",
+            "url": "https://gitlab.com/alice/alice-secret-repo",
             "sync_status": "synced"
         }
 

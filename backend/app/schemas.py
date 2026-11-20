@@ -186,6 +186,8 @@ class MilestoneCreate(InputModel):
     title: str = Field(min_length=1, max_length=255)
     description: Optional[str] = Field(default=None, max_length=5000)
     target_date: Optional[str] = Field(default=None, max_length=50)
+    estimated_minutes: Optional[int] = Field(default=None, ge=0, le=100_000)
+    actual_minutes: Optional[int] = Field(default=None, ge=0, le=100_000)
     role: Optional[WorkspaceRole] = None
 
 class MilestoneUpdate(InputModel):
@@ -193,6 +195,8 @@ class MilestoneUpdate(InputModel):
     description: Optional[str] = Field(default=None, max_length=5000)
     status: Optional[Literal["pending", "in_progress", "completed"]] = None
     target_date: Optional[str] = Field(default=None, max_length=50)
+    estimated_minutes: Optional[int] = Field(default=None, ge=0, le=100_000)
+    actual_minutes: Optional[int] = Field(default=None, ge=0, le=100_000)
 
 class MilestoneOut(BaseModel):
     id: int
@@ -203,6 +207,8 @@ class MilestoneOut(BaseModel):
     description: Optional[str] = None
     status: str
     target_date: Optional[str] = None
+    estimated_minutes: Optional[int] = None
+    actual_minutes: Optional[int] = None
     completed_at: Optional[datetime] = None
     created_at: datetime
     updated_at: datetime
@@ -353,6 +359,28 @@ class AIProposalOut(BaseModel):
 
     class Config:
         from_attributes = True
+
+class ChatMessage(BaseModel):
+    role: str
+    content: str
+
+class AskRequest(InputModel):
+    message: str = Field(min_length=1, max_length=4000)
+    history: Optional[List[ChatMessage]] = Field(default_factory=list)
+    role: Optional[str] = Field(default="developer", max_length=50)
+
+    @field_validator("message")
+    @classmethod
+    def message_not_blank(cls, v: str) -> str:
+        s = v.strip()
+        if not s:
+            raise ValueError("Message must not be blank.")
+        return s
+
+class AskResponse(BaseModel):
+    reply: str
+    provider: str
+    model: str
 
 class AIProposalItemOverride(InputModel):
     title: Optional[str] = Field(default=None, min_length=1, max_length=255)

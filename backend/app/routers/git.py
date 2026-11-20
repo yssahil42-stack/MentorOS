@@ -1,5 +1,6 @@
 import datetime
 import logging
+import urllib.parse
 from typing import Optional, List, Dict, Any
 import httpx
 from fastapi import APIRouter, Depends, HTTPException, Query
@@ -25,7 +26,7 @@ DEFAULT_SYNC_SETTINGS = {
     "auto_sync": True,
     "sync_interval": 15,
     "sync_issues": True,
-    "sync_prs": True,
+    "sync_prs": True,  # In GitLab these represent Merge Requests (MRs)
     "sync_commits": False,
     "sync_milestones": True,
     "create_tasks_for_issues": True,
@@ -36,7 +37,7 @@ DEFAULT_SYNC_SETTINGS = {
 }
 
 class ConnectRepoRequest(BaseModel):
-    provider: str = "github"
+    provider: str = "gitlab"
     access_token: Optional[str] = None
     repository: str
     sync_settings: Optional[Dict[str, Any]] = None
@@ -50,15 +51,29 @@ class CreateTaskFromIssueRequest(BaseModel):
     project_id: Optional[int] = None
     priority: Optional[str] = "medium"
 
-def _get_github_headers(token: Optional[str] = None) -> Dict[str, str]:
-    auth_token = token or settings.GITHUB_PERSONAL_ACCESS_TOKEN
+def _get_gitlab_headers(token: Optional[str] = None) -> Dict[str, str]:
+    """Generates GitLab v4 authorization and content headers."""
+    auth_token = token or settings.GITLAB_PERSONAL_ACCESS_TOKEN
     headers = {
         "User-Agent": "MentorOS",
-        "Accept": "application/vnd.github.v3+json",
+        "Accept": "application/json",
     }
     if auth_token:
-        headers["Authorization"] = f"Bearer {auth_token}"
+        # GitLab standard PAT header
+        headers["PRIVATE-TOKEN"] = auth_token
     return headers
+
+def _normalize_gitlab_project_identifier(repo_input: str) -> str:
+    """Normalizes project URL or path string to owner/project."""
+    cleaned = repo_input.strip()
+    if cleaned.startswith("https://gitlab.com/"):
+        cleaned = cleaned.replace("https://gitlab.com/", "")
+    elif cleaned.startswith("http://gitlab.com/"):
+        cleaned = cleaned.replace("http://gitlab.com/", "")
+    cleaned = cleaned.rstrip("/").rstrip(".git")
+    if "/" not in cleaned and settings.GITLAB_USERNAME and not cleaned.isdigit():
+        cleaned = f"{settings.GITLAB_USERNAME}/{cleaned}"
+    return cleaned
 
 def _require_owned_repo(repo_id: int, user_id: int) -> Dict[str, Any]:
     repo = CONNECTED_REPOS.get(repo_id)
@@ -70,7 +85,7 @@ def _require_owned_repo(repo_id: int, user_id: int) -> Dict[str, Any]:
 async def list_repositories(
     current_user: User = Depends(get_current_user),
 ):
-    """Returns connected repositories belonging strictly to the authenticated user."""
+    """Returns connected GitLab repositories belonging strictly to the authenticated user."""
     return [r for r in CONNECTED_REPOS.values() if r.get("user_id") == current_user.id]
 
 @router.post("/repositories")
@@ -78,72 +93,72 @@ async def connect_repository(
     req: ConnectRepoRequest,
     current_user: User = Depends(get_current_user),
 ):
-    """Connect a repository via GitHub API using PAT."""
-    token = req.access_token or settings.GITHUB_PERSONAL_ACCESS_TOKEN
-    headers = _get_github_headers(token)
-    repo_name = req.repository.strip()
+    """Connect a repository via GitLab API using PAT."""
+    token = req.access_token or settings.GITLAB_PERSONAL_ACCESS_TOKEN
+    headers = _get_gitlab_headers(token)
+    project_path = _normalize_gitlab_project_identifier(req.repository)
+    encoded_project = urllib.parse.quote(project_path, safe="")
 
-    if "/" not in repo_name and settings.GITHUB_USERNAME:
-        repo_name = f"{settings.GITHUB_USERNAME}/{repo_name}"
-
-    gh_repo = {}
+    gl_repo: Dict[str, Any] = {}
+    api_base = settings.GITLAB_API_BASE.rstrip("/")
     async with httpx.AsyncClient(timeout=10.0) as client:
         try:
             resp = await client.get(
-                f"https://api.github.com/repos/{repo_name}",
+                f"{api_base}/projects/{encoded_project}",
                 headers=headers,
             )
             if resp.status_code == 200:
-                gh_repo = resp.json()
+                gl_repo = resp.json()
             else:
-                logger.warning("GitHub API returned %s for %s", resp.status_code, repo_name)
-                gh_repo = {
-                    "id": abs(hash(repo_name)) % 1000000,
-                    "name": repo_name.split("/")[-1],
-                    "full_name": repo_name,
-                    "description": f"Connected GitHub repository ({repo_name})",
-                    "private": True,
-                    "html_url": f"https://github.com/{repo_name}",
+                logger.warning("GitLab API returned %s for %s", resp.status_code, project_path)
+                gl_repo = {
+                    "id": abs(hash(project_path)) % 1000000,
+                    "name": project_path.split("/")[-1],
+                    "path_with_namespace": project_path,
+                    "description": f"Connected GitLab repository ({project_path})",
+                    "visibility": "private",
+                    "web_url": f"https://gitlab.com/{project_path}",
                     "default_branch": "main",
-                    "stargazers_count": 0,
+                    "star_count": 0,
                     "forks_count": 0,
                     "open_issues_count": 0,
-                    "language": "TypeScript",
                 }
         except Exception as e:
-            logger.warning("Could not reach GitHub API for %s: %s", repo_name, e)
-            gh_repo = {
-                "id": abs(hash(repo_name)) % 1000000,
-                "name": repo_name.split("/")[-1],
-                "full_name": repo_name,
-                "description": f"Connected GitHub repository ({repo_name})",
-                "private": True,
-                "html_url": f"https://github.com/{repo_name}",
+            logger.warning("Could not reach GitLab API for %s: %s", project_path, e)
+            gl_repo = {
+                "id": abs(hash(project_path)) % 1000000,
+                "name": project_path.split("/")[-1],
+                "path_with_namespace": project_path,
+                "description": f"Connected GitLab repository ({project_path})",
+                "visibility": "private",
+                "web_url": f"https://gitlab.com/{project_path}",
                 "default_branch": "main",
-                "stargazers_count": 0,
+                "star_count": 0,
                 "forks_count": 0,
                 "open_issues_count": 0,
-                "language": "TypeScript",
             }
 
-    repo_id = gh_repo.get("id", len(CONNECTED_REPOS) + 1)
+    repo_id = gl_repo.get("id", len(CONNECTED_REPOS) + 1)
     now = datetime.datetime.utcnow().isoformat() + "Z"
 
     repo_obj = {
         "id": repo_id,
         "user_id": current_user.id,
-        "provider": "github",
-        "external_id": str(gh_repo.get("id")),
-        "name": gh_repo.get("name"),
-        "full_name": gh_repo.get("full_name"),
-        "description": gh_repo.get("description"),
-        "private": gh_repo.get("private", False),
-        "html_url": gh_repo.get("html_url"),
-        "default_branch": gh_repo.get("default_branch", "main"),
-        "language": gh_repo.get("language") or "TypeScript",
-        "stargazers_count": gh_repo.get("stargazers_count", 0),
-        "forks_count": gh_repo.get("forks_count", 0),
-        "open_issues_count": gh_repo.get("open_issues_count", 0),
+        "provider": "gitlab",
+        "external_id": str(gl_repo.get("id")),
+        "name": gl_repo.get("name") or project_path.split("/")[-1],
+        "full_name": gl_repo.get("path_with_namespace") or project_path,
+        "description": gl_repo.get("description"),
+        "private": gl_repo.get("visibility", "private") != "public",
+        "html_url": gl_repo.get("web_url") or f"https://gitlab.com/{project_path}",
+        "default_branch": gl_repo.get("default_branch", "main"),
+        "language": "TypeScript",
+        "stargazers_count": gl_repo.get("star_count", 0),
+        "stars": gl_repo.get("star_count", 0),
+        "forks_count": gl_repo.get("forks_count", 0),
+        "forks": gl_repo.get("forks_count", 0),
+        "open_issues_count": gl_repo.get("open_issues_count", 0),
+        "open_issues": gl_repo.get("open_issues_count", 0),
         "last_sync_at": now,
         "created_at": now,
         "updated_at": now,
@@ -243,38 +258,69 @@ async def get_repository_issues(
     state: str = Query("open"),
     current_user: User = Depends(get_current_user),
 ):
+    """Fetches GitLab issues."""
     repo = _require_owned_repo(repo_id, current_user.id)
-    headers = _get_github_headers()
+    headers = _get_gitlab_headers()
+    api_base = settings.GITLAB_API_BASE.rstrip("/")
+    project_identifier = urllib.parse.quote(str(repo.get("full_name") or repo_id), safe="")
+
+    gl_state = "opened" if state == "open" else state
+    params = {}
+    if gl_state in ("opened", "closed"):
+        params["state"] = gl_state
+
     async with httpx.AsyncClient(timeout=10.0) as client:
         try:
             resp = await client.get(
-                f"https://api.github.com/repos/{repo['full_name']}/issues",
+                f"{api_base}/projects/{project_identifier}/issues",
                 headers=headers,
-                params={"state": state},
+                params=params,
             )
             if resp.status_code == 200:
                 raw_issues = resp.json()
                 issues = []
                 for idx, item in enumerate(raw_issues):
-                    if "pull_request" in item:
-                        continue
+                    labels_raw = item.get("labels", [])
+                    formatted_labels = []
+                    for l_idx, lbl in enumerate(labels_raw):
+                        if isinstance(lbl, str):
+                            formatted_labels.append({"id": l_idx + 1, "name": lbl, "color": "6366F1"})
+                        elif isinstance(lbl, dict):
+                            formatted_labels.append({
+                                "id": lbl.get("id", l_idx + 1),
+                                "name": lbl.get("name", ""),
+                                "color": lbl.get("color", "6366F1").lstrip("#")
+                            })
+
+                    assignees_raw = item.get("assignees", []) or ([item.get("assignee")] if item.get("assignee") else [])
+                    formatted_assignees = []
+                    for a in assignees_raw:
+                        if a:
+                            formatted_assignees.append({
+                                "id": a.get("id", 1),
+                                "login": a.get("username", "user"),
+                                "avatar_url": a.get("avatar_url", ""),
+                                "html_url": a.get("web_url", ""),
+                            })
+
+                    issue_state = "open" if item.get("state") == "opened" else "closed"
                     issues.append({
                         "id": item.get("id", idx + 1),
                         "repository_id": repo_id,
-                        "external_id": item.get("number"),
+                        "external_id": item.get("iid", item.get("id")),
                         "title": item.get("title"),
-                        "body": item.get("body"),
-                        "state": item.get("state"),
+                        "body": item.get("description"),
+                        "state": issue_state,
                         "type": "issue",
-                        "html_url": item.get("html_url"),
-                        "labels": [{"id": l["id"], "name": l["name"], "color": l["color"]} for l in item.get("labels", [])],
-                        "assignees": [{"id": a["id"], "login": a["login"], "avatar_url": a["avatar_url"], "html_url": a["html_url"]} for a in item.get("assignees", [])],
+                        "html_url": item.get("web_url"),
+                        "labels": formatted_labels,
+                        "assignees": formatted_assignees,
                         "created_at": item.get("created_at"),
                         "updated_at": item.get("updated_at"),
                     })
                 return issues
         except Exception as e:
-            logger.warning("Could not fetch issues for %s: %s", repo.get("full_name"), e)
+            logger.warning("Could not fetch GitLab issues for %s: %s", repo.get("full_name"), e)
 
     return []
 
@@ -284,30 +330,40 @@ async def get_repository_prs(
     state: str = Query("open"),
     current_user: User = Depends(get_current_user),
 ):
+    """Fetches GitLab Merge Requests (equivalent to Pull Requests)."""
     repo = _require_owned_repo(repo_id, current_user.id)
-    headers = _get_github_headers()
+    headers = _get_gitlab_headers()
+    api_base = settings.GITLAB_API_BASE.rstrip("/")
+    project_identifier = urllib.parse.quote(str(repo.get("full_name") or repo_id), safe="")
+
+    gl_state = "opened" if state == "open" else state
+    params = {}
+    if gl_state in ("opened", "closed", "merged"):
+        params["state"] = gl_state
+
     async with httpx.AsyncClient(timeout=10.0) as client:
         try:
             resp = await client.get(
-                f"https://api.github.com/repos/{repo['full_name']}/pulls",
+                f"{api_base}/projects/{project_identifier}/merge_requests",
                 headers=headers,
-                params={"state": state},
+                params=params,
             )
             if resp.status_code == 200:
-                raw_prs = resp.json()
+                raw_mrs = resp.json()
                 prs = []
-                for idx, item in enumerate(raw_prs):
+                for idx, item in enumerate(raw_mrs):
+                    mr_state = "open" if item.get("state") == "opened" else item.get("state", "open")
                     prs.append({
                         "id": item.get("id", idx + 1),
                         "repository_id": repo_id,
-                        "external_id": item.get("number"),
+                        "external_id": item.get("iid", item.get("id")),
                         "title": item.get("title"),
-                        "body": item.get("body"),
-                        "state": item.get("state"),
-                        "html_url": item.get("html_url"),
-                        "head_branch": item.get("head", {}).get("ref", "feature"),
-                        "base_branch": item.get("base", {}).get("ref", "main"),
-                        "draft": item.get("draft", False),
+                        "body": item.get("description"),
+                        "state": mr_state,
+                        "html_url": item.get("web_url"),
+                        "head_branch": item.get("source_branch", "feature"),
+                        "base_branch": item.get("target_branch", "main"),
+                        "draft": item.get("work_in_progress", False) or item.get("draft", False),
                         "labels": [],
                         "assignees": [],
                         "requested_reviewers": [],
@@ -316,7 +372,7 @@ async def get_repository_prs(
                     })
                 return prs
         except Exception as e:
-            logger.warning("Could not fetch PRs for %s: %s", repo.get("full_name"), e)
+            logger.warning("Could not fetch GitLab MRs for %s: %s", repo.get("full_name"), e)
 
     return []
 
@@ -325,12 +381,16 @@ async def get_repository_commits(
     repo_id: int,
     current_user: User = Depends(get_current_user),
 ):
+    """Fetches GitLab repository commits."""
     repo = _require_owned_repo(repo_id, current_user.id)
-    headers = _get_github_headers()
+    headers = _get_gitlab_headers()
+    api_base = settings.GITLAB_API_BASE.rstrip("/")
+    project_identifier = urllib.parse.quote(str(repo.get("full_name") or repo_id), safe="")
+
     async with httpx.AsyncClient(timeout=10.0) as client:
         try:
             resp = await client.get(
-                f"https://api.github.com/repos/{repo['full_name']}/commits",
+                f"{api_base}/projects/{project_identifier}/repository/commits",
                 headers=headers,
                 params={"per_page": 10},
             )
@@ -339,16 +399,16 @@ async def get_repository_commits(
                 commits = []
                 for item in raw_commits:
                     commits.append({
-                        "id": item.get("sha", "")[:7],
-                        "sha": item.get("sha"),
-                        "message": item.get("commit", {}).get("message"),
-                        "author_name": item.get("commit", {}).get("author", {}).get("name"),
-                        "author_date": item.get("commit", {}).get("author", {}).get("date"),
-                        "html_url": item.get("html_url"),
+                        "id": item.get("short_id") or item.get("id", "")[:7],
+                        "sha": item.get("id"),
+                        "message": item.get("title") or item.get("message"),
+                        "author_name": item.get("author_name"),
+                        "author_date": item.get("authored_date"),
+                        "html_url": item.get("web_url"),
                     })
                 return commits
         except Exception as e:
-            logger.warning("Could not fetch commits: %s", e)
+            logger.warning("Could not fetch GitLab commits: %s", e)
 
     return []
 
@@ -371,8 +431,8 @@ async def create_task_from_issue(
 
     task = Task(
         user_id=current_user.id,
-        title=f"GitHub Issue #{req.issue_id}",
-        description="Synced from GitHub issue",
+        title=f"GitLab Issue #{req.issue_id}",
+        description="Synced from GitLab issue",
         status="todo",
         priority=req.priority or "medium",
         role="developer",

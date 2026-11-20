@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { Badge } from '../ui/Badge';
 import { Button } from '../ui/Button';
+import { TimeTrackingBadge } from '../ui/TimeTrackingBadge';
 import type { DailyStandupData } from '../../types/dashboard';
 import { useWorkspace } from '../../contexts/WorkspaceContext';
 
@@ -143,11 +144,19 @@ export function DailyStandupWidget({ role = 'student', standupData }: DailyStand
                         <p className="text-xs font-medium text-text-secondary line-through opacity-75 truncate leading-snug">
                           {item.title}
                         </p>
-                        {item.project_title && (
-                          <span className="inline-block text-[10px] font-medium text-text-muted mt-1 bg-slate-100 dark:bg-bg-elevated px-2 py-0.5 rounded-md truncate max-w-full">
-                            {item.project_title}
-                          </span>
-                        )}
+                        <div className="flex items-center gap-2 mt-1 flex-wrap">
+                          {item.project_title && (
+                            <span className="inline-block text-[10px] font-medium text-text-muted bg-slate-100 dark:bg-bg-elevated px-2 py-0.5 rounded-md truncate max-w-full">
+                              {item.project_title}
+                            </span>
+                          )}
+                          <TimeTrackingBadge
+                            expectedMinutes={item.estimated_minutes}
+                            actualMinutes={item.actual_minutes}
+                            size="xs"
+                            variant="pill"
+                          />
+                        </div>
                       </div>
                     </div>
                   ))
@@ -218,11 +227,19 @@ export function DailyStandupWidget({ role = 'student', standupData }: DailyStand
                       >
                         <div className="min-w-0">
                           <p className="text-xs font-semibold text-text-primary truncate">{task.title}</p>
-                          {task.project_title && (
-                            <span className="inline-block text-[10px] font-medium text-text-muted mt-1 bg-slate-100 dark:bg-bg-elevated px-2 py-0.5 rounded-md truncate max-w-full">
-                              {task.project_title}
-                            </span>
-                          )}
+                          <div className="flex items-center gap-2 mt-1 flex-wrap">
+                            {task.project_title && (
+                              <span className="inline-block text-[10px] font-medium text-text-muted bg-slate-100 dark:bg-bg-elevated px-2 py-0.5 rounded-md truncate max-w-full">
+                                {task.project_title}
+                              </span>
+                            )}
+                            <TimeTrackingBadge
+                              expectedMinutes={task.estimated_minutes}
+                              actualMinutes={task.actual_minutes}
+                              size="xs"
+                              variant="pill"
+                            />
+                          </div>
                         </div>
                         <span className="text-[10px] font-semibold text-amber-700 dark:text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded-md shrink-0 border border-amber-500/20">
                           Due Today
@@ -311,6 +328,14 @@ export function DailyStandupWidget({ role = 'student', standupData }: DailyStand
                           Roadmap: {nextMilestone.project_title}
                         </p>
                       )}
+                      <div className="pt-1">
+                        <TimeTrackingBadge
+                          expectedMinutes={nextMilestone.estimated_minutes}
+                          actualMinutes={nextMilestone.actual_minutes}
+                          size="xs"
+                          variant="pill"
+                        />
+                      </div>
                     </div>
 
                     {nextMilestone.target_date && (

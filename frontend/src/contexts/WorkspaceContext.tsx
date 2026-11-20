@@ -31,11 +31,18 @@ interface WorkspaceContextValue {
   showToast: (message: string, type?: ToastType, optionsOrDuration?: number | ToastOptions) => void;
   dismissToast: (id: string) => void;
 
-  // AI Drawer
+  // AI Drawer (Roadmap Generator)
   isAIDrawerOpen: boolean;
   aiDrawerPrompt: string;
   openAIDrawer: (prompt?: string) => void;
   closeAIDrawer: () => void;
+
+  // Ask Chatbot (Conversational AI - Q&A, Queries & Mentorship)
+  isAskOpen: boolean;
+  askInitialQuery: string;
+  openAsk: (query?: string) => void;
+  closeAsk: () => void;
+  toggleAsk: (query?: string) => void;
 
   // Command Palette
   isCommandPaletteOpen: boolean;
@@ -73,6 +80,8 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
   const [toasts, setToasts] = useState<Toast[]>([]);
   const [isAIDrawerOpen, setIsAIDrawerOpen] = useState(false);
   const [aiDrawerPrompt, setAiDrawerPrompt] = useState('');
+  const [isAskOpen, setIsAskOpen] = useState(false);
+  const [askInitialQuery, setAskInitialQuery] = useState('');
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const [isCaptureModalOpen, setIsCaptureModalOpen] = useState(false);
@@ -128,6 +137,7 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
       if (e.key === 'Escape') {
         setIsCommandPaletteOpen(false);
         setIsAIDrawerOpen(false);
+        setIsAskOpen(false);
         setIsMobileSidebarOpen(false);
         setIsCaptureModalOpen(false);
         setIsProfileModalOpen(false);
@@ -215,6 +225,21 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
   const openMobileSidebar = useCallback(() => setIsMobileSidebarOpen(true), []);
   const closeMobileSidebar = useCallback(() => setIsMobileSidebarOpen(false), []);
 
+  // ─── Ask Chatbot (Conversational AI) ────────────────────────
+  const openAsk = useCallback((query = '') => {
+    if (query) setAskInitialQuery(query);
+    setIsAskOpen(true);
+  }, []);
+  const closeAsk = useCallback(() => {
+    setIsAskOpen(false);
+  }, []);
+  const toggleAsk = useCallback((query = '') => {
+    setIsAskOpen((prev) => {
+      if (!prev && query) setAskInitialQuery(query);
+      return !prev;
+    });
+  }, []);
+
   return (
     <WorkspaceContext.Provider
       value={{
@@ -225,6 +250,11 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
         aiDrawerPrompt,
         openAIDrawer,
         closeAIDrawer,
+        isAskOpen,
+        askInitialQuery,
+        openAsk,
+        closeAsk,
+        toggleAsk,
         isCaptureModalOpen,
         captureDefaultTab,
         openCaptureModal,

@@ -2,7 +2,9 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   ArrowRight,
+  ArrowLeftRight,
   DollarSign,
+  Coins,
   Plus,
   Minus,
   Trash2,
@@ -35,6 +37,7 @@ import { Input } from '../../components/ui/Input';
 import { Select } from '../../components/ui/Select';
 import { LoadingSkeleton } from '../../components/ui/LoadingSkeleton';
 import { Modal } from '../../components/ui/Modal';
+import { CurrencyConverter } from '../../components/ui/CurrencyConverter';
 import { formatCurrency, formatDate } from '../../utils/dateUtils';
 import { cn } from '../../utils/cn';
 import type { Project } from '../../types/project';
@@ -60,13 +63,14 @@ export default function InvoiceGeneratorPage() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
   const [showPreviewModal, setShowPreviewModal] = useState(false);
+  const [showConverterModal, setShowConverterModal] = useState(false);
   const [editingLineItems, setEditingLineItems] = useState<InvoiceLineItem[]>([]);
   const [invoiceForm, setInvoiceForm] = useState({
     issue_date: new Date().toISOString().split('T')[0],
     due_date: '',
     payment_terms: 'net_30' as PaymentTerms,
     tax_rate: 0,
-    currency: 'USD',
+    currency: 'INR',
     notes: '',
     client_name: '',
     client_email: '',
@@ -327,6 +331,17 @@ export default function InvoiceGeneratorPage() {
           </p>
         </div>
 
+        <div className="flex items-center gap-3">
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={() => setShowConverterModal(true)}
+            className="border-amber-500/30 text-amber-500 hover:bg-amber-500/10 font-semibold"
+            icon={<ArrowLeftRight className="w-4 h-4" />}
+          >
+            Currency Converter
+          </Button>
+        </div>
       </div>
 
       {/* ─── STEP 1: SELECT PROJECT ───────────────────────────────────────────── */}
@@ -581,16 +596,29 @@ export default function InvoiceGeneratorPage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-text-muted mb-1">Currency</label>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="block text-xs font-medium text-text-muted">Currency</label>
+                    <button
+                      type="button"
+                      onClick={() => setShowConverterModal(true)}
+                      className="text-3xs text-amber-500 hover:underline flex items-center gap-1 font-mono"
+                    >
+                      <ArrowLeftRight className="w-3 h-3" />
+                      Converter
+                    </button>
+                  </div>
                   <Select
                     value={invoiceForm.currency}
                     onValueChange={(v) => setInvoiceForm((prev) => ({ ...prev, currency: v }))}
                     options={[
-                      { value: 'USD', label: 'USD ($)' },
-                      { value: 'EUR', label: 'EUR (€)' },
-                      { value: 'GBP', label: 'GBP (£)' },
-                      { value: 'CAD', label: 'CAD ($)' },
-                      { value: 'AUD', label: 'AUD ($)' },
+                      { value: 'INR', label: 'INR (₹) - Indian Rupee' },
+                      { value: 'USD', label: 'USD ($) - US Dollar' },
+                      { value: 'EUR', label: 'EUR (€) - Euro' },
+                      { value: 'GBP', label: 'GBP (£) - British Pound' },
+                      { value: 'AED', label: 'AED (د.إ) - UAE Dirham' },
+                      { value: 'CAD', label: 'CAD ($) - Canadian Dollar' },
+                      { value: 'AUD', label: 'AUD ($) - Australian Dollar' },
+                      { value: 'SGD', label: 'SGD ($) - Singapore Dollar' },
                     ]}
                   />
                 </div>
@@ -897,6 +925,31 @@ export default function InvoiceGeneratorPage() {
           </div>
         )}
       </Modal>
+
+      {/* ─── CURRENCY CONVERTER MODAL ─────────────────────────────────────── */}
+      {showConverterModal && (
+        <Modal
+          isOpen={showConverterModal}
+          onClose={() => setShowConverterModal(false)}
+          title="Freelance Currency Converter"
+          size="lg"
+        >
+          <div className="p-1">
+            <CurrencyConverter
+              initialAmount={preview ? preview.invoice.total : 25000}
+              initialFromCurrency={invoiceForm.currency}
+              initialToCurrency={invoiceForm.currency === 'INR' ? 'USD' : 'INR'}
+              onApplyRate={(_amount, curr) => {
+                setInvoiceForm((prev) => ({ ...prev, currency: curr }));
+                setShowConverterModal(false);
+                showToast(`Switched invoice currency to ${curr}`, 'success');
+              }}
+              applyButtonLabel="Use Selected Currency"
+              variant="modal"
+            />
+          </div>
+        </Modal>
+      )}
     </div>
   );
 }

@@ -236,13 +236,18 @@ export function isSameDay(a: Date, b: Date): boolean {
   return a.toDateString() === b.toDateString();
 }
 
-export function formatCurrency(amount: number, currency: string = 'USD'): string {
+export function formatCurrency(amount: number, currency: string = 'INR'): string {
+  const code = (currency || 'INR').toUpperCase();
+  const locale = code === 'INR' ? 'en-IN' : 'en-US';
+  const hideDecimals = amount % 1 === 0;
   try {
-    return new Intl.NumberFormat('en-US', {
+    return new Intl.NumberFormat(locale, {
       style: 'currency',
-      currency: currency || 'USD',
+      currency: code,
+      maximumFractionDigits: hideDecimals ? 0 : 2,
     }).format(amount);
   } catch {
-    return `$${amount.toFixed(2)}`;
+    const symbol = code === 'INR' ? '₹' : code === 'EUR' ? '€' : code === 'GBP' ? '£' : '$';
+    return `${symbol}${amount.toLocaleString(locale)}`;
   }
 }

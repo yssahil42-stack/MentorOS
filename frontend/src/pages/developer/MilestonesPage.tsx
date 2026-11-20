@@ -25,6 +25,8 @@ import { Button } from '../../components/ui/Button';
 import { Badge } from '../../components/ui/Badge';
 import { Modal } from '../../components/ui/Modal';
 import { LoadingSkeleton } from '../../components/ui/LoadingSkeleton';
+import { TimeTrackingBadge } from '../../components/ui/TimeTrackingBadge';
+import { getMilestoneTimeTotals } from '../../utils/timeTracking';
 import type { Milestone, MilestoneStatus } from '../../types/project';
 
 export default function MilestonesPage() {
@@ -39,6 +41,8 @@ export default function MilestonesPage() {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [targetDate, setTargetDate] = useState('');
+  const [estimatedMinutes, setEstimatedMinutes] = useState<number>(120);
+  const [actualMinutes, setActualMinutes] = useState<number>(0);
 
   const { data: milestones = [], isLoading } = useQuery({
     queryKey: ['milestones', 'developer'],
@@ -62,6 +66,8 @@ export default function MilestonesPage() {
         title,
         description,
         target_date: targetDate,
+        estimated_minutes: estimatedMinutes,
+        actual_minutes: actualMinutes,
         role: 'developer',
       });
     },
@@ -69,6 +75,8 @@ export default function MilestonesPage() {
       setIsModalOpen(false);
       setTitle('');
       setDescription('');
+      setEstimatedMinutes(120);
+      setActualMinutes(0);
       queryClient.invalidateQueries({ queryKey: ['milestones'] });
       queryClient.invalidateQueries({ queryKey: ['projects'] });
       queryClient.invalidateQueries({ queryKey: ['tasks'] });
@@ -212,6 +220,7 @@ export default function MilestonesPage() {
                       : isCompleted
                         ? 100
                         : 0;
+                  const { expectedMinutes, actualMinutes } = getMilestoneTimeTotals(m, tasks, milestones);
 
                   return (
                     <Card className="p-4 border border-border-base hover:border-amber-500/40 transition-all flex flex-col gap-3">
@@ -253,6 +262,11 @@ export default function MilestonesPage() {
                               >
                                 {m.status.replace('_', ' ')}
                               </Badge>
+                              <TimeTrackingBadge
+                                expectedMinutes={expectedMinutes}
+                                actualMinutes={actualMinutes}
+                                size="xs"
+                              />
                             </div>
 
                             {m.description && (
@@ -280,18 +294,45 @@ export default function MilestonesPage() {
                         </div>
                       </div>
 
-                      {/* Milestone Subtask Progress Bar */}
+                      {/* Milestone Subtask Progress Bar and Task Items */}
                       {phaseTasks.length > 0 && (
-                        <div className="pt-2 border-t border-border-subtle flex items-center justify-between gap-3 text-3xs text-text-muted font-mono">
-                          <div className="flex-1 bg-bg-base h-1.5 rounded-full overflow-hidden border border-border-subtle">
-                            <div
-                              className="bg-gradient-to-r from-amber-500 to-emerald-400 h-full rounded-full transition-all duration-300"
-                              style={{ width: `${phaseProgress}%` }}
-                            />
+                        <div className="pt-2 border-t border-border-subtle space-y-2">
+                          <div className="flex items-center justify-between gap-3 text-3xs text-text-muted font-mono">
+                            <div className="flex-1 bg-bg-base h-1.5 rounded-full overflow-hidden border border-border-subtle">
+                              <div
+                                className="bg-gradient-to-r from-amber-500 to-emerald-400 h-full rounded-full transition-all duration-300"
+                                style={{ width: `${phaseProgress}%` }}
+                              />
+                            </div>
+                            <span className="shrink-0 font-semibold text-amber-400">
+                              {phaseCompleted}/{phaseTasks.length} tasks ({phaseProgress}%)
+                            </span>
                           </div>
-                          <span className="shrink-0 font-semibold text-amber-400">
-                            {phaseCompleted}/{phaseTasks.length} tasks ({phaseProgress}%)
-                          </span>
+
+                          <div className="space-y-1.5 pt-1">
+                            {phaseTasks.map((t) => (
+                              <div
+                                key={t.id}
+                                className="flex items-center justify-between gap-2 px-2.5 py-1.5 rounded-lg bg-bg-base/60 border border-border-subtle text-3xs"
+                              >
+                                <span
+                                  className={`truncate ${
+                                    t.status === 'completed'
+                                      ? 'line-through text-text-faint'
+                                      : 'text-text-secondary'
+                                  }`}
+                                >
+                                  {t.title}
+                                </span>
+                                <TimeTrackingBadge
+                                  expectedMinutes={t.estimated_minutes}
+                                  actualMinutes={t.actual_minutes}
+                                  size="xs"
+                                  variant="pill"
+                                />
+                              </div>
+                            ))}
+                          </div>
                         </div>
                       )}
                     </Card>
@@ -360,14 +401,42 @@ export default function MilestonesPage() {
             />
           </div>
 
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-1">
+              <label className="text-xs font-semibold text-text-secondary block">
+                Target Date
+              </label>
+              <input
+                type="date"
+                value={targetDate}
+                onChange={(e) => setTargetDate(e.target.value)}
+                className="w-full bg-bg-base border border-border-base rounded-xl px-3 py-2 text-xs text-text-primary focus:outline-none"
+              />
+            </div>
+
+            <div className="space-y-1">
+              <label className="text-xs font-semibold text-text-secondary block">
+                Expected Time (Minutes)
+              </label>
+              <input
+                type="number"
+                min={0}
+                value={estimatedMinutes}
+                onChange={(e) => setEstimatedMinutes(Math.max(0, parseInt(e.target.value) || 0))}
+                className="w-full bg-bg-base border border-border-base rounded-xl px-3 py-2 text-xs text-text-primary focus:outline-none"
+              />
+            </div>
+          </div>
+
           <div className="space-y-1">
             <label className="text-xs font-semibold text-text-secondary block">
-              Target Completion Date
+              Actual Time Taken (Minutes)
             </label>
             <input
-              type="date"
-              value={targetDate}
-              onChange={(e) => setTargetDate(e.target.value)}
+              type="number"
+              min={0}
+              value={actualMinutes}
+              onChange={(e) => setActualMinutes(Math.max(0, parseInt(e.target.value) || 0))}
               className="w-full bg-bg-base border border-border-base rounded-xl px-3 py-2 text-xs text-text-primary focus:outline-none"
             />
           </div>

@@ -22,6 +22,7 @@ import { Card } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
 import { Badge } from '../../components/ui/Badge';
 import { LoadingSkeleton } from '../../components/ui/LoadingSkeleton';
+import { TimeTrackingBadge } from '../../components/ui/TimeTrackingBadge';
 import { cn } from '../../utils/cn';
 
 export default function StudyPlanPage() {
@@ -86,10 +87,10 @@ export default function StudyPlanPage() {
       totalHoursTarget: 24,
       hoursCompleted: 16.5,
       milestones: [
-        { title: 'Paxos vs Raft Comparison & Election Safety', status: 'completed' },
-        { title: 'Log Replication & Committed Entry Rules', status: 'in_progress' },
-        { title: 'Network Partition Scenarios & Byzantine Tolerance', status: 'pending' },
-        { title: 'Practice Midterm Paper 2025', status: 'pending' },
+        { title: 'Paxos vs Raft Comparison & Election Safety', status: 'completed', estimated_minutes: 90, actual_minutes: 95 },
+        { title: 'Log Replication & Committed Entry Rules', status: 'in_progress', estimated_minutes: 120, actual_minutes: 60 },
+        { title: 'Network Partition Scenarios & Byzantine Tolerance', status: 'pending', estimated_minutes: 90, actual_minutes: 0 },
+        { title: 'Practice Midterm Paper 2025', status: 'pending', estimated_minutes: 120, actual_minutes: 0 },
       ],
     },
     {
@@ -101,10 +102,10 @@ export default function StudyPlanPage() {
       totalHoursTarget: 18,
       hoursCompleted: 7.5,
       milestones: [
-        { title: 'Double & Triple Integrals over General Regions', status: 'completed' },
-        { title: 'Green’s Theorem Problem Set Mastery', status: 'in_progress' },
-        { title: 'Surface Integrals & Flux Computations', status: 'pending' },
-        { title: 'Stokes’ & Divergence Theorem Review', status: 'pending' },
+        { title: 'Double & Triple Integrals over General Regions', status: 'completed', estimated_minutes: 90, actual_minutes: 85 },
+        { title: 'Green’s Theorem Problem Set Mastery', status: 'in_progress', estimated_minutes: 90, actual_minutes: 45 },
+        { title: 'Surface Integrals & Flux Computations', status: 'pending', estimated_minutes: 75, actual_minutes: 0 },
+        { title: 'Stokes’ & Divergence Theorem Review', status: 'pending', estimated_minutes: 90, actual_minutes: 0 },
       ],
     },
   ];
@@ -311,9 +312,17 @@ export default function StudyPlanPage() {
                         />
                         <span className="truncate">{m.title}</span>
                       </div>
-                      <span className="text-3xs font-mono uppercase px-2 py-0.5 rounded-md border shrink-0">
-                        {m.status.replace('_', ' ')}
-                      </span>
+                      <div className="flex items-center gap-2 shrink-0">
+                        <TimeTrackingBadge
+                          expectedMinutes={(m as any).estimated_minutes || 60}
+                          actualMinutes={(m as any).actual_minutes || 0}
+                          size="xs"
+                          variant="pill"
+                        />
+                        <span className="text-3xs font-mono uppercase px-2 py-0.5 rounded-md border shrink-0">
+                          {m.status.replace('_', ' ')}
+                        </span>
+                      </div>
                     </div>
                   ))}
                 </div>

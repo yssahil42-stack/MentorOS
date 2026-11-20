@@ -20,6 +20,7 @@ import { Card } from '../../components/ui/Card';
 import { Card3D } from '../../components/ui/Card3D';
 import { Button } from '../../components/ui/Button';
 import { PriorityBadge } from '../../components/ui/Badge';
+import { TimeTrackingBadge } from '../../components/ui/TimeTrackingBadge';
 import { DashboardSkeleton } from '../../components/ui/LoadingSkeleton';
 import { SmallCalendar } from '../../components/ui/SmallCalendar';
 import { DailyStandupWidget } from '../../components/dashboard/DailyStandupWidget';
@@ -409,15 +410,19 @@ export default function JobSeekerDashboard() {
                                 {task.description}
                               </p>
                             )}
-                            <div className="flex items-center gap-2 text-3xs text-text-faint pt-0.5">
+                            <div className="flex items-center gap-2 text-3xs text-text-faint pt-0.5 flex-wrap">
                               {task.project_title && (
                                 <span className="text-solar-500 font-medium">
                                   {task.project_title}
                                 </span>
                               )}
-                              {task.estimated_minutes && (
-                                <span>{task.estimated_minutes} min prep</span>
-                              )}
+                              <TimeTrackingBadge
+                                expectedMinutes={task.estimated_minutes}
+                                actualMinutes={task.actual_minutes}
+                                size="xs"
+                                variant="pill"
+                                expectedLabel="Prep"
+                              />
                             </div>
                           </div>
                         </div>
@@ -523,11 +528,17 @@ export default function JobSeekerDashboard() {
                         />
                       </div>
 
-                      <div className="flex items-center justify-between text-3xs text-text-faint pt-1.5 border-t border-border-base/50">
+                      <div className="flex items-center justify-between text-3xs text-text-faint pt-1.5 border-t border-border-base/50 flex-wrap gap-1">
                         <span>
                           {proj.completed_milestone_count || 0}/{proj.milestone_count || 0}{' '}
                           milestones
                         </span>
+                        <TimeTrackingBadge
+                          expectedMinutes={(proj as any).estimated_minutes}
+                          actualMinutes={(proj as any).actual_minutes}
+                          size="xs"
+                          variant="pill"
+                        />
                         <span>{proj.task_count || 0} tasks</span>
                       </div>
 

@@ -20,6 +20,7 @@ import { Button } from '../../components/ui/Button';
 import { Badge, PriorityBadge, StatusBadge } from '../../components/ui/Badge';
 import { Modal } from '../../components/ui/Modal';
 import { LoadingSkeleton } from '../../components/ui/LoadingSkeleton';
+import { TimeTrackingBadge } from '../../components/ui/TimeTrackingBadge';
 import type { Task, TaskPriority, TaskStatus } from '../../types/task';
 
 export default function DevTasksPage() {
@@ -38,6 +39,7 @@ export default function DevTasksPage() {
   const [priority, setPriority] = useState<TaskPriority>('medium');
   const [dueDate, setDueDate] = useState('');
   const [estimatedMinutes, setEstimatedMinutes] = useState<number>(60);
+  const [actualMinutes, setActualMinutes] = useState<number>(0);
 
   const { data: tasks = [], isLoading } = useQuery({
     queryKey: ['tasks', 'developer'],
@@ -253,15 +255,14 @@ export default function DevTasksPage() {
                         </span>
                       )}
 
-                      {task.estimated_minutes && (
-                        <span className="flex items-center gap-1">
-                          <Clock className="w-3 h-3" />
-                          {task.estimated_minutes} min
-                        </span>
-                      )}
+                      <TimeTrackingBadge
+                        expectedMinutes={task.estimated_minutes}
+                        actualMinutes={task.actual_minutes}
+                        size="xs"
+                      />
 
                       {task.due_date && (
-                        <span className="flex items-center gap-1">
+                        <span className="flex items-center gap-1 font-mono">
                           <Calendar className="w-3 h-3" />
                           {new Date(task.due_date).toLocaleDateString()}
                         </span>
@@ -362,7 +363,7 @@ export default function DevTasksPage() {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-3 gap-3">
             <div className="space-y-1">
               <label className="text-xs font-semibold text-text-secondary block">Due Date</label>
               <input
@@ -381,7 +382,21 @@ export default function DevTasksPage() {
                 type="number"
                 value={estimatedMinutes}
                 onChange={(e) => setEstimatedMinutes(Number(e.target.value))}
-                min={5}
+                min={0}
+                step={15}
+                className="w-full bg-bg-base border border-border-base rounded-xl px-3 py-2 text-xs text-text-primary focus:outline-none"
+              />
+            </div>
+
+            <div className="space-y-1">
+              <label className="text-xs font-semibold text-text-secondary block">
+                Actual Minutes
+              </label>
+              <input
+                type="number"
+                value={actualMinutes}
+                onChange={(e) => setActualMinutes(Number(e.target.value))}
+                min={0}
                 step={15}
                 className="w-full bg-bg-base border border-border-base rounded-xl px-3 py-2 text-xs text-text-primary focus:outline-none"
               />

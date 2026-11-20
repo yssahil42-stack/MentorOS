@@ -21,6 +21,9 @@ const NotFoundPage = lazy(() => import('../pages/NotFoundPage'));
 const CapturePage = lazy(() => import('../pages/CapturePage'));
 const InboxPage = lazy(() => import('../pages/InboxPage'));
 
+// AI Chatbot Page
+const AskChatbotPage = lazy(() => import('../pages/ai/AskChatbotPage'));
+
 // ── App Shell ──
 const AppShell = lazy(() => import('../components/layout/AppShell'));
 
@@ -207,7 +210,8 @@ export function AppRouter() {
               <Route path="api-keys" element={<DevApiKeysPage />} />
               <Route path="progress" element={<DevProgressPage />} />
               <Route path="settings" element={<DevSettingsPage />} />
-              <Route path="github-sync" element={<GitHubSyncPage />} />
+              <Route path="gitlab-sync" element={<GitHubSyncPage />} />
+              <Route path="github-sync" element={<Navigate to="/app/developer/gitlab-sync" replace />} />
               <Route path="deploy-preview" element={<DeployPreviewPage />} />
               <Route path="portfolio-generator" element={<PortfolioGeneratorPage />} />
             </Route>
@@ -231,6 +235,9 @@ export function AppRouter() {
             {/* Quick Capture (accessible within app) */}
             <Route path="capture" element={<CapturePage />} />
             <Route path="inbox" element={<InboxPage />} />
+
+            {/* AI Conversational Assistant (Ask) */}
+            <Route path="ask" element={<AskChatbotPage />} />
             <Route
               path="settings"
               element={

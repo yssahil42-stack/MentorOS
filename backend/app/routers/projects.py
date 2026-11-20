@@ -118,9 +118,36 @@ def get_project(
     for task_output, task in zip(task_outputs, tasks):
         task_output.project_title = project.title
 
+    ms_outputs = []
+    for m_idx, ms in enumerate(milestones):
+        out_ms = schemas.MilestoneOut.from_orm(ms)
+        if tasks:
+            phase_num = m_idx + 1
+            ms_title_lower = (ms.title or "").lower()
+            assoc = [
+                t for t in tasks
+                if (f"phase {phase_num}" in (t.description or "").lower()
+                    or f"phase {phase_num}" in (t.title or "").lower()
+                    or (ms_title_lower and ms_title_lower in (t.title or "").lower()))
+            ]
+            if not assoc and milestones:
+                chunk = max(1, (len(tasks) + len(milestones) - 1) // len(milestones))
+                start_i = m_idx * chunk
+                end_i = min(start_i + chunk, len(tasks))
+                assoc = tasks[start_i:end_i] if start_i < len(tasks) else []
+
+            if assoc:
+                calc_est = sum(t.estimated_minutes or 0 for t in assoc)
+                calc_act = sum(t.actual_minutes or 0 for t in assoc)
+                if not out_ms.estimated_minutes:
+                    out_ms.estimated_minutes = calc_est
+                if not out_ms.actual_minutes:
+                    out_ms.actual_minutes = calc_act
+        ms_outputs.append(out_ms)
+
     return {
         **project_out.dict(),
-        "milestones": milestones,
+        "milestones": ms_outputs,
         "tasks": task_outputs,
     }
 
@@ -199,7 +226,54 @@ def get_milestones(
     query = query.filter(models.Milestone.role == target_role)
     if project_id:
         query = query.filter(models.Milestone.project_id == project_id)
-    return query.order_by(models.Milestone.created_at.asc()).all()
+    milestones = query.order_by(models.Milestone.created_at.asc()).all()
+
+    p_ids = {m.project_id for m in milestones if m.project_id}
+    tasks_by_proj = {}
+    if p_ids:
+        all_tasks = db.query(models.Task).filter(
+            models.Task.project_id.in_(p_ids),
+            models.Task.user_id == current_user.id,
+        ).all()
+        for t in all_tasks:
+            tasks_by_proj.setdefault(t.project_id, []).append(t)
+
+    result = []
+    for ms in milestones:
+        out = schemas.MilestoneOut.from_orm(ms)
+        proj_tasks = tasks_by_proj.get(ms.project_id, [])
+        if proj_tasks:
+            ms_title_lower = (ms.title or "").lower()
+            all_ms_in_proj = [m for m in milestones if m.project_id == ms.project_id]
+            m_idx = all_ms_in_proj.index(ms) if ms in all_ms_in_proj else 0
+            phase_num = m_idx + 1
+
+            explicit_tasks = [
+                t for t in proj_tasks
+                if (f"phase {phase_num}" in (t.description or "").lower()
+                    or f"phase {phase_num}" in (t.title or "").lower()
+                    or (ms_title_lower and ms_title_lower in (t.title or "").lower()))
+            ]
+            if explicit_tasks:
+                assoc = explicit_tasks
+            elif all_ms_in_proj:
+                chunk = max(1, (len(proj_tasks) + len(all_ms_in_proj) - 1) // len(all_ms_in_proj))
+                start_i = m_idx * chunk
+                end_i = min(start_i + chunk, len(proj_tasks))
+                assoc = proj_tasks[start_i:end_i] if start_i < len(proj_tasks) else []
+            else:
+                assoc = []
+
+            if assoc:
+                task_est = sum(t.estimated_minutes or 0 for t in assoc)
+                task_act = sum(t.actual_minutes or 0 for t in assoc)
+                if not out.estimated_minutes:
+                    out.estimated_minutes = task_est
+                if not out.actual_minutes:
+                    out.actual_minutes = task_act
+        result.append(out)
+
+    return result
 
 @router.post("/milestones", response_model=schemas.MilestoneOut)
 def create_milestone(
@@ -219,6 +293,8 @@ def create_milestone(
         title=ms_in.title,
         description=ms_in.description,
         target_date=ms_in.target_date,
+        estimated_minutes=ms_in.estimated_minutes or 0,
+        actual_minutes=ms_in.actual_minutes or 0,
         status="pending",
     )
     db.add(ms)
@@ -305,14 +381,37 @@ def get_public_client_portal(
     if not token or not (token == f"public-{project_id}" or token.startswith("public-")):
         raise HTTPException(status_code=403, detail="Valid client portal share token is required")
 
-    milestones = [
-        schemas.MilestoneOut.from_orm(m)
-        for m in (project.milestones or [])
-    ]
     tasks = [
         schemas.TaskOut.from_orm(t)
         for t in (project.tasks or [])
     ]
+    raw_milestones = list(project.milestones or [])
+    milestones = []
+    for m_idx, m in enumerate(raw_milestones):
+        out_m = schemas.MilestoneOut.from_orm(m)
+        if tasks:
+            phase_num = m_idx + 1
+            ms_title_lower = (m.title or "").lower()
+            assoc = [
+                t for t in tasks
+                if (f"phase {phase_num}" in (t.description or "").lower()
+                    or f"phase {phase_num}" in (t.title or "").lower()
+                    or (ms_title_lower and ms_title_lower in (t.title or "").lower()))
+            ]
+            if not assoc and raw_milestones:
+                chunk = max(1, (len(tasks) + len(raw_milestones) - 1) // len(raw_milestones))
+                start_i = m_idx * chunk
+                end_i = min(start_i + chunk, len(tasks))
+                assoc = tasks[start_i:end_i] if start_i < len(tasks) else []
+
+            if assoc:
+                calc_est = sum(t.estimated_minutes or 0 for t in assoc)
+                calc_act = sum(t.actual_minutes or 0 for t in assoc)
+                if not out_m.estimated_minutes:
+                    out_m.estimated_minutes = calc_est
+                if not out_m.actual_minutes:
+                    out_m.actual_minutes = calc_act
+        milestones.append(out_m)
 
     total_tasks = len(tasks)
     completed_tasks = sum(1 for t in tasks if t.status == "completed")

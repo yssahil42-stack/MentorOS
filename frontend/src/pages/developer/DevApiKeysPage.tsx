@@ -136,7 +136,7 @@ export default function DevApiKeysPage() {
             API Keys & Access Tokens
           </h1>
           <p className="text-xs md:text-sm text-text-muted mt-1">
-            Manage credentials for LLM endpoints, GitHub CI/CD webhooks, and local code synthesis
+            Manage credentials for LLM endpoints, GitLab CI/CD webhooks, and local code synthesis
             runners.
           </p>
         </div>
@@ -205,8 +205,8 @@ export default function DevApiKeysPage() {
                     <option value="Ollama Local LLM">Ollama Local LLM</option>
                   </optgroup>
                   <optgroup label="Developer Tools & CI/CD">
-                    <option value="GitHub CI/CD & PAT">GitHub CI/CD &amp; PAT</option>
-                    <option value="GitLab CI/CD">GitLab CI/CD</option>
+                    <option value="GitLab CI/CD & PAT">GitLab CI/CD &amp; PAT</option>
+                    <option value="GitLab Webhook">GitLab Webhook</option>
                     <option value="Vercel Deployment">Vercel Deployment</option>
                     <option value="Supabase / Backend">Supabase / Backend</option>
                     <option value="MentorOS CLI Runner">MentorOS CLI Runner</option>

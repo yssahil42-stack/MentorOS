@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import type { AIProposalItem, AIProposalItemType } from '../../types/aiProposal';
 import { Badge } from '../ui/Badge';
+import { TimeTrackingBadge } from '../ui/TimeTrackingBadge';
 import { cn } from '../../utils/cn';
 
 interface ProposalReviewPanelProps {
@@ -178,11 +179,13 @@ export function ProposalReviewPanel({
                         </span>
                       )}
 
-                    {payload.estimated_minutes && (
-                      <span className="flex items-center gap-1">
-                        <Clock className="w-3 h-3" />
-                        {payload.estimated_minutes} min
-                      </span>
+                    {(payload.estimated_minutes != null || payload.actual_minutes != null) && (
+                      <TimeTrackingBadge
+                        expectedMinutes={payload.estimated_minutes}
+                        actualMinutes={payload.actual_minutes}
+                        size="xs"
+                        variant="pill"
+                      />
                     )}
 
                     {payload.target_date && (

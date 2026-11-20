@@ -915,6 +915,217 @@ async def ai_health():
         "speed": "instant",
     }
 
+
+def generate_conversational_reply(
+    prompt: str, role: str = "developer", history: Optional[List[schemas.ChatMessage]] = None
+) -> str:
+    """Conversational fallback responder for queries, Q&A, and interactive mentorship (NOT a roadmap generator).
+    Produces small, reasonable responses grounded in MentorOS workflows.
+    """
+    p_lower = prompt.lower().strip()
+
+    # Greetings & Introductions
+    if (
+        any(
+            p_lower.startswith(g)
+            for g in ["hi", "hello", "hey", "greetings", "good morning", "good evening", "good afternoon"]
+        )
+        and len(p_lower.split()) <= 4
+    ):
+        return (
+            f"Hello! I am **Ask**, your mentor in **MentorOS**. "
+            f"I'm here to answer queries, debug code, and guide your {role.replace('_', ' ')} workspace. "
+            f"How can I help you today?"
+        )
+
+    # Questions asking about MentorOS or Ask AI
+    if any(k in p_lower for k in ["mentoros", "who are you", "what can you do", "what is ask"]):
+        return (
+            "I am **Ask**, the conversational mentor in **MentorOS** (tailored for Developer, Freelancer, and Student workspaces).\n\n"
+            "- **Supported Workspaces**: Focused guidance for Developers, Freelancers, and Students.\n"
+            "- **Time & Milestone Tracking**: Every module tracks expected vs actual hours to optimize delivery.\n"
+            "- **Direct Mentorship**: Ask me coding questions, architectural trade-offs, or workflow guidance."
+        )
+
+    # Time tracking / Expected vs actual time
+    if any(k in p_lower for k in ["expected time", "actual time", "variance", "time tracking"]):
+        return (
+            "In **MentorOS**, every task and milestone tracks **Expected Time** and **Actual Time**:\n\n"
+            "- **Expected Time**: Target effort planned upfront.\n"
+            "- **Actual Time**: Real hours logged during execution.\n"
+            "- **Variance**: Monitored across all modules to spot bottlenecks and ensure timely completion."
+        )
+
+    # GitLab sync / Repositories
+    if any(k in p_lower for k in ["gitlab", "repo", "git sync", "merge request"]):
+        return (
+            "In the **MentorOS Developer Workspace**, **GitLab Sync** connects directly with GitLab projects:\n\n"
+            "- Synchronizes repository commits, open issues, and merge requests.\n"
+            "- Easily convert GitLab issues into MentorOS tasks with tracked expected hours.\n"
+            "- Configure your token in *GitLab Sync* in the developer navigation."
+        )
+
+    # Documentation / Dev Notes
+    if any(k in p_lower for k in ["doc", "documentation", "notes", "adr", "tech spec"]):
+        return (
+            "In **MentorOS**, documentation is managed under **Developer Notes**:\n\n"
+            "- Click **Draft with Ask AI** to generate technical specs (ADRs, Architecture Specs, Runbooks).\n"
+            "- Customize target audience, detail level, and stack constraints directly in the modal.\n"
+            "- Review, edit, and save with live Markdown rendering."
+        )
+
+    # Freelancing / Rates / Invoices / Client handling / Scope creep
+    if role == "freelancer" or any(w in p_lower for w in ["client", "rate", "invoice", "proposal", "contract", "scope creep"]):
+        if "scope creep" in p_lower:
+            return (
+                "**Handling Scope Creep in MentorOS**:\n\n"
+                "- Acknowledge the request: *\"That's a great addition! It falls outside our current milestone scope, so I can schedule it for Phase 2 or prepare an addendum quote.\"*\n"
+                "- In MentorOS, log the extra scope as a separate billable milestone with its own expected hours rather than overextending active deliverables."
+            )
+        return (
+            "**MentorOS Freelancer Guidance**:\n\n"
+            "- **Rate Calculator**: Access static INR market benchmarks with the built-in currency converter under *Rate Calculator*.\n"
+            "- **Milestone Invoicing**: Break project proposals into measurable milestones with tracked expected and actual hours.\n"
+            "- **Payment Terms**: Standard practice is 30% upfront deposit, 40% midway milestone, and 30% upon completion."
+        )
+
+    # Student / CS / Study methods / DSA
+    if role == "student" or any(w in p_lower for w in ["study", "exam", "dsa", "algorithm", "college", "course"]):
+        return (
+            "**MentorOS Study Guidance**:\n\n"
+            "- **Active Recall**: Test your understanding by coding from an empty editor instead of passively reading.\n"
+            "- **Spaced Repetition**: Review difficult concepts at 1, 3, and 7-day intervals.\n"
+            "- **Study Plan**: Organize focused revision sessions in your MentorOS *Study Plan* with tracked expected hours."
+        )
+
+    # Job Seeker / Interview prep / Resume
+    if role == "job_seeker" or any(w in p_lower for w in ["interview", "resume", "salary", "job", "offer", "star"]):
+        return (
+            "**MentorOS Career Guidance**:\n\n"
+            "- **STAR Framework**: Answer behavioral questions using Situation, Task, Action, and measurable Result.\n"
+            "- **Impact Bullets**: Use *\"Accomplished [X], measured by [Y], by doing [Z]\"*.\n"
+            "- **Application Pipeline**: Track interviews and follow-up milestones in your MentorOS Job Seeker dashboard."
+        )
+
+    # React / Frontend questions
+    if (
+        "react" in p_lower
+        or "useeffect" in p_lower
+        or "usememo" in p_lower
+        or "usestate" in p_lower
+        or "re-render" in p_lower
+        or "hook" in p_lower
+    ):
+        return (
+            "**React Best Practice in MentorOS**:\n\n"
+            "- **`useMemo`**: Caches computed values to avoid heavy recalculations during re-renders.\n"
+            "- **`useCallback`**: Caches callback function references to avoid re-rendering memoized child components.\n"
+            "- **State Locality**: Keep state local to where it's needed to prevent unnecessary parent tree re-renders."
+        )
+
+    # Python / Backend questions
+    if (
+        "python" in p_lower
+        or ("async" in p_lower and "python" in p_lower)
+        or "fastapi" in p_lower
+        or "pydantic" in p_lower
+    ):
+        return (
+            "**Python & FastAPI Practice in MentorOS**:\n\n"
+            "- Use `async def` for I/O operations (network, async DB) and standard `def` for synchronous DB drivers.\n"
+            "- Enforce type safety with Pydantic v2 schemas using `.model_dump()`.\n"
+            "- Structure endpoints into modular routers matching your domain models."
+        )
+
+    # SQL / Database questions
+    if "sql" in p_lower or "database" in p_lower or "postgres" in p_lower or "index" in p_lower:
+        return (
+            "**Database Optimization in MentorOS**:\n\n"
+            "- **Composite Indexes**: Follow the leftmost prefix rule for compound query filters.\n"
+            "- **N+1 Avoidance**: Use eager loading (`joinedload`/`selectinload`) when querying models with relationships.\n"
+            "- **Transactions**: Keep DB transactions concise to prevent locking shared connections."
+        )
+
+    # Default general concise conversational answer
+    return (
+        f"**MentorOS Insight on: {prompt.strip()}**\n\n"
+        f"- Focus on breaking the problem into clear, measurable steps matching your {role.replace('_', ' ')} workspace.\n"
+        f"- Track expected vs actual progress in MentorOS to maintain clarity and avoid bottlenecks.\n"
+        f"- Feel free to ask a specific follow-up query or paste code for quick debugging!"
+    )
+
+
+@router.post("/ask", response_model=schemas.AskResponse)
+async def ask_chatbot(
+    req: schemas.AskRequest,
+    current_user: models.User = Depends(get_current_user),
+):
+    """
+    Conversational AI Assistant 'Ask' for queries, Q&A, and general conversation.
+    Explicitly NOT a roadmap or project proposal generator.
+    """
+    role = req.role or current_user.role or "developer"
+    user_msg = req.message.strip()
+
+    # If Groq API key is configured, call Groq LLM
+    if settings.GROQ_API_KEY:
+        system_prompt = f"""You are "Ask", the conversational AI mentor inside MentorOS.
+The user's current workspace role is: {role}.
+
+CRITICAL GUIDELINES:
+1. SMALL AND REASONABLE:
+   - Keep answers short, direct, and reasonable in length (strictly under 100-140 words or 2-3 concise bullet points).
+   - Never generate essays, bloated introductions, repeated greetings, or boilerplate summaries. Get straight to the point.
+2. BASED ON MENTOROS:
+   - Ground answers in MentorOS features, workspaces, and workflows:
+     * Time Tracking: Every task and milestone across all modules displays Expected vs Actual Time with variance metrics.
+     * Developer: GitLab repository sync (commits, issues, MRs), Build Plan, Documentation (Dev Notes drafted with Ask AI).
+     * Freelancer: Client Portal, Proposals, Invoices, Milestones with time tracking, Rate Calculator (static benchmarks in INR with currency converter).
+     * Student: Academic Courses, Assignments, Study Plans with time estimates.
+   - Note: Ask AI is exclusively tailored for Student, Freelancer, and Developer workspaces (not Job Seeker).
+   - You are a direct conversational Q&A assistant in MentorOS — NOT a roadmap generator.
+3. Clean, crisp GitHub-flavored Markdown."""
+
+        messages: List[Dict[str, str]] = [{"role": "system", "content": system_prompt}]
+        if req.history:
+            # Append up to the last 8 turns of conversation for contextual continuity
+            for msg in req.history[-8:]:
+                if msg.role in ("user", "assistant"):
+                    messages.append({"role": msg.role, "content": msg.content})
+
+        messages.append({"role": "user", "content": user_msg})
+
+        try:
+            async with httpx.AsyncClient(timeout=settings.AI_TIMEOUT) as client:
+                res = await client.post(
+                    "https://api.groq.com/openai/v1/chat/completions",
+                    headers={"Authorization": f"Bearer {settings.GROQ_API_KEY}"},
+                    json={
+                        "model": settings.GROQ_MODEL,
+                        "messages": messages,
+                        "temperature": 0.5,
+                        "max_tokens": 350,
+                    },
+                )
+                if res.status_code == 200:
+                    reply_text = res.json()["choices"][0]["message"]["content"]
+                    return schemas.AskResponse(
+                        reply=reply_text,
+                        provider="groq",
+                        model=settings.GROQ_MODEL,
+                    )
+        except Exception:
+            # Fall back to local conversational synthesis if network/API fails
+            pass
+
+    # Built-in conversational response engine
+    fallback_reply = generate_conversational_reply(user_msg, role=role, history=req.history)
+    return schemas.AskResponse(
+        reply=fallback_reply,
+        provider="local_fallback",
+        model="MentorOS Conversational AI (Ask)",
+    )
+
 @router.post("/propose", response_model=schemas.AIProposalOut)
 async def generate_ai_proposal(
     req: schemas.AIProposalRequest,
@@ -1246,6 +1457,8 @@ def approve_proposal(
                 title=payload.get("title", "New Milestone"),
                 description=payload.get("description"),
                 target_date=payload.get("target_date"),
+                estimated_minutes=payload.get("estimated_minutes", 0),
+                actual_minutes=payload.get("actual_minutes", 0),
                 status="pending",
             )
             db.add(m)
@@ -1266,6 +1479,7 @@ def approve_proposal(
                 priority=payload.get("priority", "medium"),
                 due_date=payload.get("due_date"),
                 estimated_minutes=payload.get("estimated_minutes", 60),
+                actual_minutes=payload.get("actual_minutes", 0),
                 status="todo",
             )
             db.add(t)

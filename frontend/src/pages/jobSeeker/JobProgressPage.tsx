@@ -20,6 +20,7 @@ import { fetchMilestones, fetchProjects, fetchProject } from '../../services/pro
 import { Card } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
 import { LoadingSkeleton } from '../../components/ui/LoadingSkeleton';
+import { TimeTrackingBadge } from '../../components/ui/TimeTrackingBadge';
 
 export const DEFAULT_JOB_TRACKS = [
   {
@@ -37,6 +38,8 @@ export const DEFAULT_JOB_TRACKS = [
         description: 'Clean MovieLens dataset and implement baseline matrix factorization',
         status: 'completed',
         target_date: '2026-11-15',
+        estimated_minutes: 180,
+        actual_minutes: 160,
       },
       {
         id: 102,
@@ -45,6 +48,8 @@ export const DEFAULT_JOB_TRACKS = [
         description: 'Implement collaborative filtering with user-item embeddings',
         status: 'pending',
         target_date: '2026-11-25',
+        estimated_minutes: 240,
+        actual_minutes: 0,
       },
       {
         id: 103,
@@ -53,6 +58,8 @@ export const DEFAULT_JOB_TRACKS = [
         description: 'Package recommendations into a FastAPI endpoint with interactive UI',
         status: 'pending',
         target_date: '2026-12-05',
+        estimated_minutes: 300,
+        actual_minutes: 0,
       },
     ],
     tasks: [
@@ -63,6 +70,7 @@ export const DEFAULT_JOB_TRACKS = [
         description: 'Normalize sparse matrix and remove cold-start anomalies',
         status: 'completed',
         estimated_minutes: 45,
+        actual_minutes: 40,
       },
       {
         id: 1002,
@@ -71,6 +79,7 @@ export const DEFAULT_JOB_TRACKS = [
         description: 'Compute latent feature representations using Scikit-Learn / PyTorch',
         status: 'completed',
         estimated_minutes: 90,
+        actual_minutes: 85,
       },
       {
         id: 1003,
@@ -79,6 +88,7 @@ export const DEFAULT_JOB_TRACKS = [
         description: 'Generate top-N candidate recommendations with cosine similarity',
         status: 'todo',
         estimated_minutes: 60,
+        actual_minutes: 0,
       },
       {
         id: 1004,
@@ -87,6 +97,7 @@ export const DEFAULT_JOB_TRACKS = [
         description: 'Benchmark offline accuracy against standard train/test split',
         status: 'todo',
         estimated_minutes: 45,
+        actual_minutes: 0,
       },
       {
         id: 1005,
@@ -95,6 +106,7 @@ export const DEFAULT_JOB_TRACKS = [
         description: 'Expose recommendations via REST endpoint with swagger docs',
         status: 'todo',
         estimated_minutes: 75,
+        actual_minutes: 0,
       },
     ],
   },
@@ -113,6 +125,8 @@ export const DEFAULT_JOB_TRACKS = [
         description: 'Data modeling with fact and dimension tables',
         status: 'completed',
         target_date: '2026-11-10',
+        estimated_minutes: 180,
+        actual_minutes: 170,
       },
       {
         id: 202,
@@ -121,6 +135,8 @@ export const DEFAULT_JOB_TRACKS = [
         description: 'Interactive dashboard published to Tableau Public',
         status: 'completed',
         target_date: '2026-11-20',
+        estimated_minutes: 240,
+        actual_minutes: 250,
       },
       {
         id: 203,
@@ -129,6 +145,8 @@ export const DEFAULT_JOB_TRACKS = [
         description: 'Targeted outreach to talent acquisition leads',
         status: 'pending',
         target_date: '2026-11-30',
+        estimated_minutes: 120,
+        actual_minutes: 0,
       },
     ],
     tasks: [
@@ -139,6 +157,7 @@ export const DEFAULT_JOB_TRACKS = [
         description: 'Analyze user cohort progression over monthly active periods',
         status: 'completed',
         estimated_minutes: 60,
+        actual_minutes: 55,
       },
       {
         id: 2002,
@@ -147,6 +166,7 @@ export const DEFAULT_JOB_TRACKS = [
         description: 'Model transactions and dimensions for fast aggregation',
         status: 'completed',
         estimated_minutes: 90,
+        actual_minutes: 90,
       },
       {
         id: 2003,
@@ -155,6 +175,7 @@ export const DEFAULT_JOB_TRACKS = [
         description: 'Live interactive dashboard with drill-down filters',
         status: 'completed',
         estimated_minutes: 120,
+        actual_minutes: 130,
       },
       {
         id: 2004,
@@ -163,6 +184,7 @@ export const DEFAULT_JOB_TRACKS = [
         description: 'Personalized messages referencing the portfolio project',
         status: 'todo',
         estimated_minutes: 45,
+        actual_minutes: 0,
       },
     ],
   },
@@ -552,11 +574,19 @@ export default function JobProgressPage() {
                         style={{ width: `${dynamicP}%` }}
                       />
                     </div>
-                    <div className="flex items-center justify-between text-2xs text-text-faint">
+                    <div className="flex items-center justify-between text-2xs text-text-faint flex-wrap gap-2">
                       <span>{proj.description || 'Target track pipeline'}</span>
-                      <span>
-                        {thisComp}/{thisTot} tasks completed
-                      </span>
+                      <div className="flex items-center gap-2">
+                        <TimeTrackingBadge
+                          expectedMinutes={thisProjTasks.reduce((sum: number, t: any) => sum + (t.estimated_minutes || 0), 0)}
+                          actualMinutes={thisProjTasks.reduce((sum: number, t: any) => sum + (t.actual_minutes || 0), 0)}
+                          size="xs"
+                          variant="pill"
+                        />
+                        <span>
+                          {thisComp}/{thisTot} tasks completed
+                        </span>
+                      </div>
                     </div>
                   </div>
                 );
@@ -618,12 +648,20 @@ export default function JobProgressPage() {
                         {ms.description && (
                           <p className="text-2xs text-text-muted mt-0.5">{ms.description}</p>
                         )}
-                        {ms.target_date && (
-                          <span className="inline-flex items-center gap-1 text-[10px] text-text-faint mt-1">
-                            <Calendar className="w-2.5 h-2.5" />
-                            Target: {ms.target_date}
-                          </span>
-                        )}
+                        <div className="flex items-center gap-2 mt-1 flex-wrap">
+                          <TimeTrackingBadge
+                            expectedMinutes={ms.estimated_minutes}
+                            actualMinutes={ms.actual_minutes}
+                            size="xs"
+                            variant="pill"
+                          />
+                          {ms.target_date && (
+                            <span className="inline-flex items-center gap-1 text-[10px] text-text-faint">
+                              <Calendar className="w-2.5 h-2.5" />
+                              Target: {ms.target_date}
+                            </span>
+                          )}
+                        </div>
                       </div>
                     </div>
                     <span
@@ -709,12 +747,13 @@ export default function JobProgressPage() {
                         )}
                       </div>
                     </div>
-                    <div className="flex items-center gap-2 shrink-0">
-                      {task.estimated_minutes ? (
-                        <span className="text-3xs font-mono text-text-muted bg-bg-elevated px-2 py-0.5 rounded border border-border-subtle">
-                          {task.estimated_minutes}m
-                        </span>
-                      ) : null}
+                    <div className="flex items-center gap-2 shrink-0 flex-wrap">
+                      <TimeTrackingBadge
+                        expectedMinutes={task.estimated_minutes}
+                        actualMinutes={task.actual_minutes}
+                        size="xs"
+                        variant="pill"
+                      />
                       <span
                         className={`text-3xs px-2 py-0.5 rounded-full font-semibold uppercase ${
                           isDone

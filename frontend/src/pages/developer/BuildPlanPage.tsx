@@ -31,6 +31,8 @@ import { Button } from '../../components/ui/Button';
 import { Badge } from '../../components/ui/Badge';
 import { Modal } from '../../components/ui/Modal';
 import { LoadingSkeleton } from '../../components/ui/LoadingSkeleton';
+import { TimeTrackingBadge } from '../../components/ui/TimeTrackingBadge';
+import { getMilestoneTimeTotals } from '../../utils/timeTracking';
 import type { Milestone, MilestoneStatus } from '../../types/project';
 import type { Task } from '../../types/task';
 
@@ -50,6 +52,8 @@ export default function BuildPlanPage() {
   const [newDescription, setNewDescription] = useState('');
   const [newProjectId, setNewProjectId] = useState<number | undefined>(undefined);
   const [newTargetDate, setNewTargetDate] = useState('');
+  const [newEstimatedMinutes, setNewEstimatedMinutes] = useState<number>(120);
+  const [newActualMinutes, setNewActualMinutes] = useState<number>(0);
 
   // Queries
   const { data: projects = [], isLoading: projectsLoading } = useQuery({
@@ -91,6 +95,8 @@ export default function BuildPlanPage() {
         title: newTitle.trim(),
         description: newDescription.trim() || undefined,
         target_date: newTargetDate || undefined,
+        estimated_minutes: newEstimatedMinutes,
+        actual_minutes: newActualMinutes,
       });
     },
     onSuccess: () => {
@@ -98,6 +104,8 @@ export default function BuildPlanPage() {
       setNewTitle('');
       setNewDescription('');
       setNewTargetDate('');
+      setNewEstimatedMinutes(120);
+      setNewActualMinutes(0);
       queryClient.invalidateQueries({ queryKey: ['milestones'] });
       queryClient.invalidateQueries({ queryKey: ['projects'] });
       queryClient.invalidateQueries({ queryKey: ['dashboard'] });
@@ -329,6 +337,7 @@ export default function BuildPlanPage() {
                   ? 100
                   : 0;
 
+            const { expectedMinutes, actualMinutes } = getMilestoneTimeTotals(m, tasks, milestones);
             const quickTitle = quickAddTitles[m.project_id] || '';
 
             return (
@@ -388,6 +397,12 @@ export default function BuildPlanPage() {
                         >
                           {m.status.replace('_', ' ')}
                         </Badge>
+
+                        <TimeTrackingBadge
+                          expectedMinutes={expectedMinutes}
+                          actualMinutes={actualMinutes}
+                          size="xs"
+                        />
                       </div>
 
                       {m.description && (
@@ -497,12 +512,12 @@ export default function BuildPlanPage() {
                               </div>
 
                               <div className="flex items-center gap-2 shrink-0">
-                                {task.estimated_minutes && (
-                                  <span className="text-3xs font-mono text-text-muted flex items-center gap-1">
-                                    <Clock className="w-3 h-3 text-indigo-500" />
-                                    {task.estimated_minutes}m
-                                  </span>
-                                )}
+                                <TimeTrackingBadge
+                                  expectedMinutes={task.estimated_minutes}
+                                  actualMinutes={task.actual_minutes}
+                                  size="xs"
+                                  variant="pill"
+                                />
                                 <span className="text-3xs uppercase font-mono px-2 py-0.5 rounded bg-slate-100 dark:bg-bg-elevated text-text-muted">
                                   {task.priority}
                                 </span>
@@ -614,14 +629,42 @@ export default function BuildPlanPage() {
             />
           </div>
 
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="block text-xs font-semibold text-text-secondary mb-1">
+                Target Date
+              </label>
+              <input
+                type="date"
+                value={newTargetDate}
+                onChange={(e) => setNewTargetDate(e.target.value)}
+                className="w-full bg-bg-surface border border-border-base rounded-xl px-3 py-2 text-xs text-text-primary focus:outline-none focus:border-indigo-500"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-text-secondary mb-1">
+                Expected Time (Minutes)
+              </label>
+              <input
+                type="number"
+                min={0}
+                value={newEstimatedMinutes}
+                onChange={(e) => setNewEstimatedMinutes(Math.max(0, parseInt(e.target.value) || 0))}
+                className="w-full bg-bg-surface border border-border-base rounded-xl px-3 py-2 text-xs text-text-primary focus:outline-none focus:border-indigo-500"
+              />
+            </div>
+          </div>
+
           <div>
             <label className="block text-xs font-semibold text-text-secondary mb-1">
-              Target Completion Date
+              Actual Time Taken (Minutes)
             </label>
             <input
-              type="date"
-              value={newTargetDate}
-              onChange={(e) => setNewTargetDate(e.target.value)}
+              type="number"
+              min={0}
+              value={newActualMinutes}
+              onChange={(e) => setNewActualMinutes(Math.max(0, parseInt(e.target.value) || 0))}
               className="w-full bg-bg-surface border border-border-base rounded-xl px-3 py-2 text-xs text-text-primary focus:outline-none focus:border-indigo-500"
             />
           </div>

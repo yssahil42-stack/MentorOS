@@ -1,918 +1,811 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { LazyMotion, domMax, m, AnimatePresence } from 'framer-motion';
 import {
-  Sparkles,
   Layers,
+  ArrowRight,
   Shield,
   CheckCircle2,
-  Calendar,
-  CheckSquare,
-  BookOpen,
-  FileText,
-  LogOut,
-  ArrowRight,
-  Clock,
-  Check,
   Database,
-  GraduationCap,
-  Code2,
-  Briefcase,
-  Search,
+  Check,
 } from 'lucide-react';
 import { cn } from '../utils/cn';
 import { ThemeToggle } from '../components/ui/ThemeToggle';
 import { useAuth } from '../contexts/AuthContext';
 import { useSeoMeta } from '../utils/useSeoMeta';
 
-// ─── Clean Non-Tech Friendly Step Component ───────────────────────────────────
-
-function WorkflowStep({
-  n,
-  title,
-  subtitle,
-  description,
-  example,
-}: {
-  n: number;
-  title: string;
-  subtitle: string;
-  description: string;
-  example: string;
-}) {
-  return (
-    <article className="group relative rounded-2xl p-6 flex flex-col justify-between text-left gap-5 bg-white/95 dark:bg-bg-surface/90 border border-border-base/80 dark:border-white/[0.08] shadow-sm hover:shadow-xl hover:border-solar-500/40 hover:-translate-y-1 transition-all duration-300">
-      <div>
-        <div className="flex items-center justify-between mb-4">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-solar-500/15 to-solar-500/5 border border-solar-500/30 flex items-center justify-center text-solar-600 dark:text-solar-400 font-extrabold text-sm shadow-2xs group-hover:scale-105 transition-transform duration-200">
-            {n}
-          </div>
-          <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-solar-600 dark:text-solar-400 bg-solar-500/10 px-2.5 py-1 rounded-full border border-solar-500/25">
-            {subtitle}
-          </span>
-        </div>
-        <h3 className="text-base font-bold text-text-primary tracking-tight group-hover:text-solar-500 transition-colors">
-          {title}
-        </h3>
-        <p className="text-xs text-text-secondary leading-relaxed mt-2">{description}</p>
-      </div>
-
-      <div className="pt-3.5 border-t border-border-subtle/80 bg-slate-50/90 dark:bg-bg-elevated/50 -mx-6 -mb-6 p-4 rounded-b-2xl">
-        <p className="text-[10px] font-bold uppercase tracking-wider text-text-muted mb-1 flex items-center gap-1.5">
-          <span className="w-1.5 h-1.5 rounded-full bg-solar-500/80" />
-          What Happens
-        </p>
-        <p className="text-xs text-text-primary font-medium leading-snug">{example}</p>
-      </div>
-    </article>
-  );
-}
-
-// ─── Role Showcase Configurations for Interactive Switcher ──────────────────
-
 type RoleKey = 'student' | 'developer' | 'freelancer' | 'job_seeker';
 
-const ROLE_KEYS: RoleKey[] = ['student', 'developer', 'freelancer', 'job_seeker'];
-
-interface RoleShowcaseData {
-  id: RoleKey;
-  name: string;
-  icon: React.ComponentType<{ className?: string }>;
-  color: string;
-  workspaceDb: string;
-  tagline: string;
-  route: string;
-  pillar1: {
-    tag: string;
-    title: string;
-    subtitle: string;
-    milestones: string;
-    progress: number;
-  };
-  pillar2: {
-    tag: string;
-    title: string;
-    tasks: { text: string; completed?: boolean; active?: boolean }[];
-    pacing: string;
-    completedCount: string;
-  };
-  pillar3: {
-    tag: string;
-    title: string;
-    badge: string;
-    draft: string;
-    source: string;
-  };
-  pillar4: {
-    tag: string;
-    title: string;
-    events: { name: string; time: string }[];
-    calendarLabel: string;
-  };
+interface RolePreviewContent {
+  planTitle: string;
+  planCount: string;
+  planSubtitle: string;
+  planProgress: number;
+  planProgressLabel: string;
+  trackTitle: string;
+  trackActiveCount: string;
+  trackBullets: { text: string; done?: boolean; active?: boolean }[];
+  trackFooter: string;
+  trackStatus: string;
+  proposalTag: string;
+  proposalQuote: string;
+  scheduleList: { name: string; time: string; highlight?: boolean }[];
+  scheduleFooter: string;
 }
 
-const ROLE_SHOWCASES: Record<RoleKey, RoleShowcaseData> = {
+const ROLE_PREVIEWS: Record<RoleKey, RolePreviewContent> = {
   student: {
-    id: 'student',
-    name: 'Student',
-    icon: GraduationCap,
-    color: '#F97316',
-    workspaceDb: 'student-workspace.db',
-    tagline: 'Coursework goals, research projects & exam schedules',
-    route: '/app/student/dashboard',
-    pillar1: {
-      tag: '1. Plan',
-      title: 'Plan & Create',
-      subtitle: 'Coursework goals, exam dates, and AI study roadmaps',
-      milestones: '3 Milestones Planned',
-      progress: 75,
-    },
-    pillar2: {
-      tag: '2. Build',
-      title: 'Study & Track',
-      tasks: [
-        { text: 'Literature review synthesis', completed: true },
-        { text: 'Consensus algorithm simulation', active: true },
-        { text: 'Final thesis bibliography format', completed: false },
-      ],
-      pacing: 'Pomodoro focus blocks',
-      completedCount: '2 Completed',
-    },
-    pillar3: {
-      tag: '3. Content',
-      title: 'Generate Content',
-      badge: 'Study Notes & Summary',
-      draft:
-        '"Executive thesis summary: Consensus safety and recovery mechanisms in distributed networks..."',
-      source: 'From Research Notes',
-    },
-    pillar4: {
-      tag: '4. Schedule',
-      title: 'Schedule & Review',
-      events: [
-        { name: 'Paper Draft Submission', time: 'Thursday 14:00' },
-        { name: 'Oral Defense Checkpoint', time: 'Monday 10:00' },
-      ],
-      calendarLabel: 'On Academic Calendar',
-    },
+    planTitle: 'Plan & Create',
+    planCount: '21 Tasks',
+    planSubtitle: 'Set academic goals, subject topics, and exam roadmap.',
+    planProgress: 70,
+    planProgressLabel: '21/30 topics covered',
+    trackTitle: 'Study & Track',
+    trackActiveCount: '4 Active',
+    trackBullets: [
+      { text: 'Literature review & theory completed', done: true },
+      { text: 'Core search algorithm simulation', active: true },
+      { text: 'Final report presentation draft', active: false },
+    ],
+    trackFooter: 'Semester sprint on track',
+    trackStatus: '2/3 completed',
+    proposalTag: 'AI PROPOSAL: Study Roadmap',
+    proposalQuote: '“Break down task summary: Distributed systems consensus algorithms and fault tolerance proofs.”',
+    scheduleList: [
+      { name: 'Research Paper Draft Submission', time: 'Tomorrow 14:00', highlight: true },
+      { name: 'Oral Defense Checkpoint', time: 'Monday 10:00' },
+    ],
+    scheduleFooter: 'All Milestones on Track',
   },
   developer: {
-    id: 'developer',
-    name: 'Developer',
-    icon: Code2,
-    color: '#6366F1',
-    workspaceDb: 'developer-workspace.db',
-    tagline: 'Architecture specs, implementation tasks & dev logs',
-    route: '/app/developer/dashboard',
-    pillar1: {
-      tag: '1. Plan',
-      title: 'Plan & Create',
-      subtitle: 'Sprint goals, tech stack decisions, and feature roadmaps',
-      milestones: '4 Sprints Planned',
-      progress: 80,
-    },
-    pillar2: {
-      tag: '2. Build',
-      title: 'Build & Track',
-      tasks: [
-        { text: 'Async TCP connection pool', completed: true },
-        { text: 'AOF persistence engine', active: true },
-        { text: 'Run 100k req/s benchmark', completed: false },
-      ],
-      pacing: 'Sprint velocity',
-      completedCount: '3 Completed',
-    },
-    pillar3: {
-      tag: '3. Content',
-      title: 'Generate Content',
-      badge: 'README & Dev Log',
-      draft:
-        '"Engineered a zero-allocation key-value store in Rust handling 120k QPS with Tokio async IO..."',
-      source: 'From Git Commits & Notes',
-    },
-    pillar4: {
-      tag: '4. Schedule',
-      title: 'Schedule & Review',
-      events: [
-        { name: 'v0.9 Beta Launch', time: 'Thursday 18:00' },
-        { name: 'Architecture Review', time: 'Friday 14:00' },
-      ],
-      calendarLabel: 'On Release Calendar',
-    },
+    planTitle: 'Plan & Create',
+    planCount: '28 Tasks',
+    planSubtitle: 'Set project architecture, tech stack, and sprint roadmap.',
+    planProgress: 75,
+    planProgressLabel: '28/36 stories shipped',
+    trackTitle: 'Build & Track',
+    trackActiveCount: '5 Active',
+    trackBullets: [
+      { text: 'PostgreSQL schema & migrations', done: true },
+      { text: 'Implement Redis cache-aside invalidation', active: true },
+      { text: 'End-to-end integration tests & CI', active: false },
+    ],
+    trackFooter: 'Sprint 14 velocity 94%',
+    trackStatus: '3/4 completed',
+    proposalTag: 'AI PROPOSAL: Architecture Plan',
+    proposalQuote: '“Draft ADR on state management: Zustand vs TanStack Query cache invalidation trade-offs.”',
+    scheduleList: [
+      { name: 'Staging Release Deployment', time: 'Today 18:00', highlight: true },
+      { name: 'Architecture Review Meeting', time: 'Thursday 11:30' },
+    ],
+    scheduleFooter: 'Production Release on Schedule',
   },
   freelancer: {
-    id: 'freelancer',
-    name: 'Freelancer',
-    icon: Briefcase,
-    color: '#0284C7',
-    workspaceDb: 'freelancer-workspace.db',
-    tagline: 'Client deliverables, milestone pacing & case studies',
-    route: '/app/freelancer/dashboard',
-    pillar1: {
-      tag: '1. Plan',
-      title: 'Plan & Create',
-      subtitle: 'Client deliverables, scope agreements, and milestone plans',
-      milestones: '3 Milestones Planned',
-      progress: 65,
-    },
-    pillar2: {
-      tag: '2. Build',
-      title: 'Deliver & Track',
-      tasks: [
-        { text: 'Interactive Figma design tokens', completed: true },
-        { text: 'Client review revisions', active: true },
-        { text: 'Production asset handoff bundle', completed: false },
-      ],
-      pacing: 'Milestone pacing',
-      completedCount: '2 Completed',
-    },
-    pillar3: {
-      tag: '3. Content',
-      title: 'Generate Content',
-      badge: 'Client Case Study',
-      draft:
-        '"Delivered a 34% increase in user retention through modern component redesign and micro-interactions..."',
-      source: 'From Deliverable Archive',
-    },
-    pillar4: {
-      tag: '4. Schedule',
-      title: 'Schedule & Review',
-      events: [
-        { name: 'Stakeholder Demo Call', time: 'Wednesday 11:00' },
-        { name: 'Deliverable Handover', time: 'Friday 17:00' },
-      ],
-      calendarLabel: 'On Delivery Calendar',
-    },
+    planTitle: 'Plan & Create',
+    planCount: '16 Milestones',
+    planSubtitle: 'Set client deliverables, project scope, and invoice milestones.',
+    planProgress: 80,
+    planProgressLabel: '₹1,85,000 / ₹2,40,000 billed',
+    trackTitle: 'Deliver & Track',
+    trackActiveCount: '3 Active',
+    trackBullets: [
+      { text: 'Initial design sign-off & 30% deposit', done: true },
+      { text: 'Core application checkout integration', active: true },
+      { text: 'Client handoff & admin portal demo', active: false },
+    ],
+    trackFooter: 'Client milestone sign-off pending',
+    trackStatus: '2/3 delivered',
+    proposalTag: 'AI PROPOSAL: Scope Revision',
+    proposalQuote: '“Polite client response draft for handling out-of-scope feature requests without friction.”',
+    scheduleList: [
+      { name: 'Milestone 2 Sign-off & Demo', time: 'Friday 15:00', highlight: true },
+      { name: 'Net-15 Invoice Due Date', time: 'Nov 28' },
+    ],
+    scheduleFooter: 'All Invoices & Milestones Synced',
   },
   job_seeker: {
-    id: 'job_seeker',
-    name: 'Job Seeker',
-    icon: Search,
-    color: '#10B981',
-    workspaceDb: 'jobseeker-workspace.db',
-    tagline: 'Application pipeline, interview prep & portfolio case studies',
-    route: '/app/job-seeker/dashboard',
-    pillar1: {
-      tag: '1. Plan',
-      title: 'Plan & Create',
-      subtitle: 'Target company pipeline, interview targets, and CV roadmaps',
-      milestones: '4 Milestones Planned',
-      progress: 85,
-    },
-    pillar2: {
-      tag: '2. Build',
-      title: 'Prep & Track',
-      tasks: [
-        { text: 'Deploy full-stack portfolio app', completed: true },
-        { text: 'System design mock interview', active: true },
-        { text: 'Tailor resume for tier-1 teams', completed: false },
-      ],
-      pacing: 'Daily application goal',
-      completedCount: '4 Completed',
-    },
-    pillar3: {
-      tag: '3. Content',
-      title: 'Generate Content',
-      badge: 'Portfolio Case Study',
-      draft:
-        '"How I architected a distributed queue with 99.99% uptime and zero message loss for real-time analytics..."',
-      source: 'From Portfolio Projects',
-    },
-    pillar4: {
-      tag: '4. Schedule',
-      title: 'Schedule & Review',
-      events: [
-        { name: 'Technical Screen Interview', time: 'Tuesday 14:00' },
-        { name: 'System Design Onsite', time: 'Thursday 16:30' },
-      ],
-      calendarLabel: 'On Interview Calendar',
-    },
+    planTitle: 'Plan & Create',
+    planCount: '18 Steps',
+    planSubtitle: 'Set target companies, portfolio projects, and interview schedule.',
+    planProgress: 65,
+    planProgressLabel: '14/20 applications sent',
+    trackTitle: 'Apply & Track',
+    trackActiveCount: '6 Active',
+    trackBullets: [
+      { text: 'Resume ATS optimization & portfolio live', done: true },
+      { text: 'System design interview preparation', active: true },
+      { text: 'Full-stack take-home challenge review', active: false },
+    ],
+    trackFooter: '3 active hiring loops',
+    trackStatus: '3 interviews scheduled',
+    proposalTag: 'AI PROPOSAL: Interview Pitch',
+    proposalQuote: '“Tailored STAR response for microservice scalability and database indexing questions.”',
+    scheduleList: [
+      { name: 'Technical Round 2 (Staff Eng)', time: 'Wednesday 16:30', highlight: true },
+      { name: 'Founder & Culture Fit Chat', time: 'Friday 11:00' },
+    ],
+    scheduleFooter: 'Application Pipeline Active',
   },
 };
 
-// ─── Main Landing Page ────────────────────────────────────────────────────────
-
 export default function LandingPage() {
-  const { user, isAuthenticated, logout } = useAuth();
-  const [activeRole, setActiveRole] = useState<RoleKey>(() => user?.role ?? 'student');
-  const currentShowcase = ROLE_SHOWCASES[activeRole];
+  const { user, isAuthenticated } = useAuth();
+  const [activeRole, setActiveRole] = useState<RoleKey>('student');
+  const preview = ROLE_PREVIEWS[activeRole];
 
   useSeoMeta({
-    title: 'MentorOS — AI Powered Productivity & Workspace Management',
+    title: 'MentorOS — One workspace for your goals, tasks, schedules and content',
     description:
-      'MentorOS — AI powered productivity and workspace management tool where users organize project goals, projects, tasks, schedules, and content.',
+      'MentorOS helps you organize project goals, projects, tasks, schedules and content with private local AI assistance.',
     url: 'https://mentoros.app',
   });
 
-  const handleTabKeyDown = (e: React.KeyboardEvent<HTMLButtonElement>, currentIndex: number) => {
-    let nextIndex = currentIndex;
-
-    switch (e.key) {
-      case 'ArrowRight':
-        nextIndex = (currentIndex + 1) % ROLE_KEYS.length;
-        break;
-      case 'ArrowLeft':
-        nextIndex = (currentIndex - 1 + ROLE_KEYS.length) % ROLE_KEYS.length;
-        break;
-      case 'Home':
-        nextIndex = 0;
-        break;
-      case 'End':
-        nextIndex = ROLE_KEYS.length - 1;
-        break;
-      default:
-        return;
-    }
-
-    e.preventDefault();
-    const nextKey = ROLE_KEYS[nextIndex];
-    setActiveRole(nextKey);
-    const targetBtn = document.getElementById(`role-btn-${nextKey}`);
-    targetBtn?.focus();
-  };
-
   return (
-    <div className="min-h-screen bg-[#FAFAFC] dark:bg-[#0A0D14] text-text-primary overflow-x-hidden selection:bg-solar-500/25 selection:text-solar-500 transition-colors relative">
-      {/* ─── Ambient Background Pattern & Mesh Glow ────────────────────── */}
+    <div className="min-h-screen bg-[#faf8f5] dark:bg-[#0c0e14] text-stone-900 dark:text-stone-100 font-sans selection:bg-[#c04b1e]/20 selection:text-[#c04b1e] transition-colors relative overflow-x-hidden">
+      {/* ─── Subtle Top-Right Ambient Peach Glow ─────────────────────────── */}
       <div
-        className="absolute inset-0 bg-dot-grid opacity-50 dark:opacity-25 pointer-events-none [mask-image:radial-gradient(ellipse_75%_55%_at_50%_0%,#000_60%,transparent_100%)]"
+        className="absolute top-0 right-0 w-[550px] h-[550px] bg-gradient-to-br from-orange-200/35 via-amber-100/25 to-transparent blur-[130px] rounded-full pointer-events-none"
         aria-hidden="true"
       />
 
-      {/* ─── Header Navigation ──────────────────────────────────────────── */}
-      <header role="banner">
+      {/* ─── Top Navigation Header ──────────────────────────────────────── */}
+      <header role="banner" className="sticky top-0 z-50 bg-[#faf8f5]/90 dark:bg-[#0c0e14]/90 backdrop-blur-md border-b border-[#eee7e0] dark:border-stone-800/80 transition-colors">
         <nav
-          className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 md:px-12 h-16 glass border-b border-border-base/80 dark:border-white/[0.08] backdrop-blur-xl transition-colors"
+          className="max-w-7xl mx-auto flex items-center justify-between px-6 md:px-12 h-16"
           aria-label="Site navigation"
         >
+          {/* Brand Logo */}
           <Link
             to="/"
-            id="navbar-brand-mentoros"
             onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-            className="flex items-center gap-3 group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus rounded-xl"
-            title="MentorOS - First page"
+            className="flex items-center gap-2.5 group"
             aria-label="MentorOS Home"
           >
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-solar-500/20 to-solar-500/5 border border-solar-500/30 flex items-center justify-center shadow-2xs group-hover:scale-105 group-hover:shadow-glow-solar transition-all duration-200">
-              <Layers className="h-5 w-5 text-solar-500" aria-hidden="true" />
+            <div className="w-8 h-8 rounded-lg bg-[#c04b1e] text-white flex items-center justify-center font-bold shadow-xs group-hover:bg-[#a83f17] transition-colors">
+              <Layers className="w-4 h-4 text-white" />
             </div>
-            <div className="flex items-center gap-2">
-              <span className="text-base font-extrabold tracking-tight text-text-primary group-hover:text-solar-500 transition-colors">
-                MentorOS
-              </span>
-            </div>
+            <span className="text-base font-bold text-stone-950 dark:text-white tracking-tight">
+              MentorOS
+            </span>
           </Link>
 
-          {/* Right Navigation Actions */}
-          <div className="flex items-center gap-3">
-            {/* Theme Switcher */}
+          {/* Center Links */}
+          <div className="hidden md:flex items-center gap-8 text-xs sm:text-sm font-medium text-stone-600 dark:text-stone-300">
+            <a
+              href="#how-it-works"
+              className="hover:text-[#c04b1e] dark:hover:text-orange-400 transition-colors"
+            >
+              How it works
+            </a>
+            <a
+              href="#privacy"
+              className="hover:text-[#c04b1e] dark:hover:text-orange-400 transition-colors"
+            >
+              Privacy
+            </a>
+            <Link
+              to={isAuthenticated && user ? `/app/${user.role.replace('_', '-')}/dashboard` : '/login'}
+              className="hover:text-[#c04b1e] dark:hover:text-orange-400 transition-colors"
+            >
+              Workspace
+            </Link>
+          </div>
+
+          {/* Right Navigation CTAs */}
+          <div className="flex items-center gap-3.5">
             <ThemeToggle size="sm" variant="icon" />
 
             {isAuthenticated && user ? (
-              <>
-                <span className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold border shadow-2xs bg-solar-500/10 text-solar-600 dark:text-solar-400 border-solar-500/30">
-                  <span className="w-1.5 h-1.5 rounded-full bg-solar-500 animate-pulse" />
-                  {user.full_name}
-                </span>
-
-                <Link
-                  to={currentShowcase.route}
-                  className="px-4 py-2 rounded-xl text-xs md:text-sm font-semibold text-white bg-solar-500 hover:bg-solar-600 transition-all shadow-sm hover:shadow-glow-solar focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus active:translate-y-[1px] flex items-center gap-1.5"
-                >
-                  <span>Go to Workspace</span>
-                  <ArrowRight className="h-3.5 w-3.5" />
-                </Link>
-
-                <button
-                  onClick={logout}
-                  className="p-2 rounded-xl text-xs font-semibold text-text-muted hover:text-text-primary hover:bg-bg-elevated transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus active:translate-y-[1px]"
-                  title="Sign out"
-                  aria-label="Sign out"
-                >
-                  <LogOut className="h-4 w-4" />
-                </button>
-              </>
-            ) : (
               <Link
-                to="/login"
-                className="px-4 py-2 rounded-xl text-xs md:text-sm font-semibold text-white bg-solar-500 hover:bg-solar-600 transition-all shadow-sm hover:shadow-glow-solar focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus active:translate-y-[1px]"
+                to={`/app/${user.role.replace('_', '-')}/dashboard`}
+                className="bg-[#c04b1e] hover:bg-[#a83f17] text-white text-xs sm:text-sm font-semibold px-4 py-2 rounded-lg transition-colors shadow-xs flex items-center gap-1.5"
               >
-                Sign In
+                <span>Workspace</span>
+                <ArrowRight className="w-3.5 h-3.5" />
               </Link>
+            ) : (
+              <>
+                <Link
+                  to="/login"
+                  className="text-xs sm:text-sm font-medium text-stone-700 dark:text-stone-200 hover:text-stone-950 dark:hover:text-white transition-colors"
+                >
+                  Sign in
+                </Link>
+                <Link
+                  to="/register"
+                  className="bg-[#c04b1e] hover:bg-[#a83f17] text-white text-xs sm:text-sm font-semibold px-4 py-2 rounded-lg transition-colors shadow-xs"
+                >
+                  Get started
+                </Link>
+              </>
             )}
           </div>
         </nav>
       </header>
 
-      {/* ─── Main Content ─────────────────────────────────────────── */}
+      {/* ─── Main Content ───────────────────────────────────────────────── */}
       <main id="main-content" role="main">
-        {/* ─── Hero Section ─────────────────────────────────────────── */}
+        {/* ─── Hero Section ─────────────────────────────────────────────── */}
         <section
-          className="relative min-h-[85vh] flex flex-col items-center justify-start pt-32 pb-20 overflow-hidden"
-          aria-label="Hero section"
+          className="relative max-w-7xl mx-auto px-6 md:px-12 pt-12 md:pt-16 pb-20 md:pb-28"
+          aria-label="Hero"
         >
-          {/* Dynamic Ambient Glow matching selected role */}
-          <div
-            className="absolute top-12 left-1/2 -translate-x-1/2 w-[650px] h-[450px] rounded-full blur-[140px] pointer-events-none opacity-20 dark:opacity-25 transition-all duration-700"
-            style={{ backgroundColor: currentShowcase.color }}
-            aria-hidden="true"
-          />
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-14 items-center">
+            {/* Left Column: Headline & Content (7 cols) */}
+            <div className="lg:col-span-7 space-y-6">
+              {/* Badge */}
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#fbeee6] dark:bg-orange-950/40 border border-[#f5d5c5] dark:border-orange-900/40 text-[#a03d15] dark:text-orange-300 text-xs font-semibold">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#c04b1e]" />
+                <span>All project details stay on your device/workspace</span>
+              </div>
 
-          {/* ─── Hero Content ──────────────────────────────────── */}
-          <div className="relative z-10 flex flex-col items-center text-center px-6 max-w-3xl mb-8">
-            {/* Label chip */}
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-solar-500/10 border border-solar-500/25 text-solar-600 dark:text-solar-400 text-xs font-semibold mb-6 shadow-2xs backdrop-blur-md">
-              <Sparkles className="h-3.5 w-3.5 text-solar-500" aria-hidden="true" />
-              <span>AI powered productivity and workspace management</span>
-            </div>
+              {/* Main Headline */}
+              <h1 className="text-4xl sm:text-5xl lg:text-[54px] font-extrabold text-stone-950 dark:text-white tracking-tight leading-[1.12]">
+                One workspace for your goals, tasks, schedules and content.
+              </h1>
 
-            {/* Headline */}
-            <h1 className="text-5xl sm:text-7xl font-black tracking-tight mb-5 text-balance">
-              <span className="bg-gradient-to-r from-orange-600 via-amber-500 to-orange-500 dark:from-amber-200 dark:via-orange-400 dark:to-amber-400 bg-clip-text text-transparent">
-                MentorOS
-              </span>
-            </h1>
+              {/* Subheading */}
+              <p className="text-sm sm:text-base text-stone-600 dark:text-stone-300 leading-relaxed max-w-xl">
+                MentorOS helps you organize project goals, projects, tasks, schedules and content.
+                Local AI assists with planning, you review every change, and updates sync across all
+                connected modules.
+              </p>
 
-            {/* Description */}
-            <p className="text-base sm:text-lg text-text-secondary leading-relaxed max-w-2xl text-balance">
-              An AI powered productivity and workspace management tool where users organize project
-              goals, projects, tasks, schedules, and content. The application delivers a unified
-              workspace experience, with local AI assistance for planning, human review, and automatic
-              updates across all connected modules.
-            </p>
-          </div>
+              {/* Call to action buttons */}
+              <div className="flex flex-wrap items-center gap-3.5 pt-2">
+                <Link
+                  to={
+                    isAuthenticated && user
+                      ? `/app/${user.role.replace('_', '-')}/dashboard`
+                      : '/register'
+                  }
+                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-xs sm:text-sm text-white bg-[#c04b1e] hover:bg-[#a83f17] shadow-sm transition-all"
+                >
+                  <span>Open your workspace</span>
+                  <ArrowRight className="w-4 h-4" />
+                </Link>
+                <a
+                  href="#how-it-works"
+                  className="px-5 py-2.5 rounded-xl font-semibold text-xs sm:text-sm text-stone-700 dark:text-stone-200 bg-white dark:bg-bg-elevated border border-stone-300 dark:border-stone-700 hover:bg-stone-50 dark:hover:bg-bg-surface transition-all shadow-2xs"
+                >
+                  See how it works
+                </a>
+              </div>
 
-          <LazyMotion features={domMax}>
-            {/* ─── Four Interactive Role Buttons Above Connected Workspace ──── */}
-            <div className="relative z-10 flex flex-col items-center mb-8 px-4">
-              <div
-                className="flex flex-wrap items-center justify-center gap-2 sm:gap-3 p-1.5 rounded-2xl bg-white/95 dark:bg-bg-surface/90 border border-border-base/80 dark:border-white/[0.08] backdrop-blur-xl shadow-sm"
-                role="tablist"
-                aria-orientation="horizontal"
-                aria-label="Workspace Role Views"
-              >
-                {ROLE_KEYS.map((key, index) => {
-                  const role = ROLE_SHOWCASES[key];
-                  const isSelected = activeRole === key;
-                  const Icon = role.icon;
+              {/* Built for: role selector */}
+              <div className="pt-4 flex items-center gap-2.5 flex-wrap text-xs text-stone-500 dark:text-stone-400">
+                <span className="font-medium text-stone-700 dark:text-stone-200">Built for:</span>
+                {[
+                  { key: 'student' as RoleKey, label: 'Students' },
+                  { key: 'developer' as RoleKey, label: 'Developers' },
+                  { key: 'freelancer' as RoleKey, label: 'Freelancers' },
+                  { key: 'job_seeker' as RoleKey, label: 'Job seekers' },
+                ].map((item) => {
+                  const isSelected = activeRole === item.key;
                   return (
                     <button
-                      key={key}
-                      id={`role-btn-${key}`}
+                      key={item.key}
                       type="button"
-                      onClick={() => setActiveRole(key)}
-                      onKeyDown={(e) => handleTabKeyDown(e, index)}
+                      onClick={() => setActiveRole(item.key)}
                       className={cn(
-                        'relative flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus select-none',
+                        'px-3 py-1 rounded-full text-xs font-semibold border transition-all cursor-pointer',
                         isSelected
-                          ? 'text-text-primary shadow-sm'
-                          : 'text-text-muted hover:text-text-primary hover:bg-bg-elevated/60'
+                          ? 'bg-[#c04b1e]/10 text-[#c04b1e] border-[#c04b1e]/40 shadow-xs'
+                          : 'bg-white/80 dark:bg-bg-surface/80 text-stone-600 dark:text-stone-400 border-stone-200 dark:border-stone-800 hover:border-stone-300'
                       )}
-                      role="tab"
-                      tabIndex={isSelected ? 0 : -1}
-                      aria-selected={isSelected}
-                      aria-controls="connected-workspace-window"
                     >
-                      {isSelected && (
-                        <m.div
-                          layoutId="activeLandingRole"
-                          className="absolute inset-0 rounded-xl bg-bg-elevated border"
-                          style={{
-                            borderColor: `${role.color}45`,
-                            boxShadow: `0 0 16px -2px ${role.color}25`,
-                          }}
-                          transition={{ type: 'spring', bounce: 0.15, duration: 0.4 }}
-                        />
-                      )}
-                      <span
-                        className="relative z-10 w-6 h-6 rounded-lg flex items-center justify-center transition-colors"
-                        style={{
-                          backgroundColor: isSelected ? `${role.color}20` : 'transparent',
-                          color: isSelected ? role.color : 'currentColor',
-                        }}
-                      >
-                        <Icon className="w-4 h-4" />
-                      </span>
-                      <span className="relative z-10">{role.name}</span>
-                      {isSelected && (
-                        <span
-                          className="relative z-10 w-1.5 h-1.5 rounded-full animate-pulse"
-                          style={{ backgroundColor: role.color }}
-                        />
-                      )}
+                      {item.label}
                     </button>
                   );
                 })}
               </div>
             </div>
 
-            {/* ─── Calm, Unified 4-Pillar Showcase Window ────────────────── */}
-            <div
-              className="w-full max-w-5xl px-4 sm:px-6 relative z-10"
-              id="connected-workspace-window"
-            >
-              <m.div
-                className="w-full rounded-2xl md:rounded-3xl border bg-white/95 dark:bg-bg-surface/95 backdrop-blur-xl framer-window-shadow overflow-hidden transition-all duration-300"
-                style={{ borderColor: `${currentShowcase.color}40` }}
-              >
-                {/* Window Frame Header */}
-                <div className="px-5 py-3.5 bg-slate-50/90 dark:bg-bg-elevated/70 border-b border-border-base/80 flex items-center justify-between gap-3 select-none">
-                  <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 rounded-full bg-[#FF5F56] border border-[#E0443E]/50" />
-                    <div className="w-3 h-3 rounded-full bg-[#FFBD2E] border border-[#DEA123]/50" />
-                    <div className="w-3 h-3 rounded-full bg-[#27C93F] border border-[#1AAB29]/50" />
-                    <div className="hidden sm:flex items-center gap-2 ml-4 font-mono text-[11px] text-text-muted bg-white/80 dark:bg-bg-base/70 px-2.5 py-1 rounded-lg border border-border-subtle/80">
-                      <Database className="w-3 h-3" style={{ color: currentShowcase.color }} />
-                      <span>{currentShowcase.workspaceDb}</span>
-                      <span className="text-emerald-500 font-semibold flex items-center gap-1">
-                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                        • Synced
-                      </span>
+            {/* Right Column: macOS Window Mockup (5 cols) */}
+            <div className="lg:col-span-5">
+              <div className="relative rounded-2xl border border-stone-200/90 dark:border-stone-800 bg-white dark:bg-bg-surface shadow-2xl p-4 sm:p-5 space-y-3.5 max-w-lg mx-auto">
+                {/* Window Top Header */}
+                <div className="flex items-center justify-between pb-3 border-b border-stone-100 dark:border-stone-800 text-[11px] text-stone-400 font-mono">
+                  <div className="flex items-center gap-1.5">
+                    <span className="w-2.5 h-2.5 rounded-full bg-red-400" />
+                    <span className="w-2.5 h-2.5 rounded-full bg-amber-400" />
+                    <span className="w-2.5 h-2.5 rounded-full bg-emerald-400" />
+                    <span className="ml-2 text-stone-500 font-medium">
+                      • Local Store: SQLite (Active)
+                    </span>
+                  </div>
+                  <span className="hidden sm:inline text-3xs text-stone-400">
+                    Connected Workspaces: [Student] [Dev] [Free]
+                  </span>
+                </div>
+
+                {/* Content Card 1: Plan & Create */}
+                <div className="p-3.5 rounded-xl border border-stone-200/80 dark:border-stone-800 bg-white dark:bg-bg-elevated/40 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <div className="w-5 h-5 rounded bg-orange-100 dark:bg-orange-950/60 text-[#c04b1e] flex items-center justify-center font-bold text-xs">
+                        📋
+                      </div>
+                      <h3 className="text-xs font-bold text-stone-900 dark:text-white">
+                        {preview.planTitle}
+                      </h3>
+                    </div>
+                    <span className="text-[10px] font-mono text-stone-500 font-medium">
+                      {preview.planCount}
+                    </span>
+                  </div>
+                  <p className="text-[11px] text-stone-500 dark:text-stone-400 leading-snug">
+                    {preview.planSubtitle}
+                  </p>
+                  <div className="space-y-1 pt-1">
+                    <div className="w-full h-1.5 rounded-full bg-stone-100 dark:bg-stone-800 overflow-hidden">
+                      <div
+                        className="h-full bg-[#c04b1e] rounded-full transition-all duration-500"
+                        style={{ width: `${preview.planProgress}%` }}
+                      />
+                    </div>
+                    <div className="flex justify-between text-[10px] text-stone-400 font-mono">
+                      <span>Milestones</span>
+                      <span>{preview.planProgressLabel}</span>
                     </div>
                   </div>
-
-                  <h2 className="flex items-center gap-2 text-2xs font-semibold text-text-muted">
-                    <span
-                      className="w-2 h-2 rounded-full"
-                      style={{ backgroundColor: currentShowcase.color }}
-                    />
-                    <span>Connected Workspace ({currentShowcase.name})</span>
-                  </h2>
                 </div>
 
-                {/* Showcase 4-Pillar Grid */}
-                <div className="p-6 sm:p-8 bg-dot-grid">
-                  <AnimatePresence mode="wait">
-                    <m.div
-                      key={activeRole}
-                      initial={{ opacity: 0, y: 8 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -8 }}
-                      transition={{ duration: 0.2 }}
-                      className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4"
-                    >
-                      {/* Pillar 1: Projects & Plan */}
-                      <div
-                        className="rounded-2xl border bg-white/90 dark:bg-bg-elevated/40 p-5 shadow-xs flex flex-col justify-between hover:shadow-md transition-shadow"
-                        style={{ borderColor: `${currentShowcase.color}35` }}
-                      >
-                        <div>
-                          <div className="flex items-center justify-between mb-3">
-                            <div
-                              className="w-8 h-8 rounded-xl border flex items-center justify-center shadow-2xs"
-                              style={{
-                                backgroundColor: `${currentShowcase.color}15`,
-                                borderColor: `${currentShowcase.color}30`,
-                                color: currentShowcase.color,
-                              }}
-                            >
-                              <BookOpen className="w-4 h-4" />
-                            </div>
-                            <span
-                              className="text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full border"
-                              style={{
-                                color: currentShowcase.color,
-                                backgroundColor: `${currentShowcase.color}10`,
-                                borderColor: `${currentShowcase.color}25`,
-                              }}
-                            >
-                              {currentShowcase.pillar1.tag}
-                            </span>
-                          </div>
-                          <h3 className="text-sm font-bold text-text-primary">
-                            {currentShowcase.pillar1.title}
-                          </h3>
-                          <p className="text-xs text-text-muted mt-1 leading-snug">
-                            {currentShowcase.pillar1.subtitle}
-                          </p>
-                        </div>
-
-                        <div className="mt-4 pt-3 border-t border-border-subtle/80">
-                          <div className="flex items-center justify-between text-2xs font-semibold text-text-secondary mb-1.5">
-                            <span>Milestones</span>
-                            <span style={{ color: currentShowcase.color }}>
-                              {currentShowcase.pillar1.milestones}
-                            </span>
-                          </div>
-                          <div className="w-full h-1.5 rounded-full bg-slate-100 dark:bg-bg-base overflow-hidden">
-                            <div
-                              className="h-full rounded-full transition-all duration-500"
-                              style={{
-                                width: `${currentShowcase.pillar1.progress}%`,
-                                backgroundColor: currentShowcase.color,
-                              }}
-                            />
-                          </div>
-                        </div>
+                {/* Content Card 2: Study / Build & Track */}
+                <div className="p-3.5 rounded-xl border border-stone-200/80 dark:border-stone-800 bg-white dark:bg-bg-elevated/40 space-y-2.5">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <div className="w-5 h-5 rounded bg-orange-100 dark:bg-orange-950/60 text-[#c04b1e] flex items-center justify-center font-bold text-xs">
+                        🎯
                       </div>
-
-                      {/* Pillar 2: Build & Track */}
-                      <div
-                        className="rounded-2xl border bg-white/90 dark:bg-bg-elevated/40 p-5 shadow-xs flex flex-col justify-between hover:shadow-md transition-shadow"
-                        style={{ borderColor: `${currentShowcase.color}35` }}
-                      >
-                        <div>
-                          <div className="flex items-center justify-between mb-3">
-                            <div
-                              className="w-8 h-8 rounded-xl border flex items-center justify-center shadow-2xs"
-                              style={{
-                                backgroundColor: `${currentShowcase.color}15`,
-                                borderColor: `${currentShowcase.color}30`,
-                                color: currentShowcase.color,
-                              }}
-                            >
-                              <CheckSquare className="w-4 h-4" />
-                            </div>
-                            <span
-                              className="text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full border"
-                              style={{
-                                color: currentShowcase.color,
-                                backgroundColor: `${currentShowcase.color}10`,
-                                borderColor: `${currentShowcase.color}25`,
-                              }}
-                            >
-                              {currentShowcase.pillar2.tag}
-                            </span>
-                          </div>
-                          <h3 className="text-sm font-bold text-text-primary">
-                            {currentShowcase.pillar2.title}
-                          </h3>
-                          <div className="mt-2.5 space-y-1.5">
-                            {currentShowcase.pillar2.tasks.map((task, idx) => (
-                              <div
-                                key={idx}
-                                className="flex items-center gap-1.5 text-xs text-text-secondary"
-                              >
-                                {task.completed ? (
-                                  <Check className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
-                                ) : task.active ? (
-                                  <div
-                                    className="w-2 h-2 rounded-full shrink-0 animate-pulse"
-                                    style={{ backgroundColor: currentShowcase.color }}
-                                  />
-                                ) : (
-                                  <div className="w-2 h-2 rounded-full bg-border-strong shrink-0" />
-                                )}
-                                <span
-                                  className={task.completed ? 'line-through text-text-muted' : ''}
-                                >
-                                  {task.text}
-                                </span>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-
-                        <div className="mt-4 pt-3 border-t border-border-subtle/80 flex items-center justify-between text-2xs text-text-muted">
-                          <span className="flex items-center gap-1">
-                            <Clock className="w-3 h-3" style={{ color: currentShowcase.color }} />
-                            {currentShowcase.pillar2.pacing}
+                      <h3 className="text-xs font-bold text-stone-900 dark:text-white">
+                        {preview.trackTitle}
+                      </h3>
+                    </div>
+                    <span className="text-[10px] font-mono text-emerald-600 dark:text-emerald-400 font-semibold">
+                      {preview.trackActiveCount}
+                    </span>
+                  </div>
+                  <div className="space-y-1.5 text-[11px] text-stone-600 dark:text-stone-300">
+                    {preview.trackBullets.map((bullet, idx) => (
+                      <div key={idx} className="flex items-center gap-2">
+                        {bullet.done ? (
+                          <span className="w-3.5 h-3.5 rounded-full bg-emerald-500/15 text-emerald-600 flex items-center justify-center text-[10px] font-bold shrink-0">
+                            ✓
                           </span>
-                          <span className="text-emerald-500 font-semibold">
-                            {currentShowcase.pillar2.completedCount}
+                        ) : bullet.active ? (
+                          <span className="w-3.5 h-3.5 rounded-full bg-[#c04b1e]/15 text-[#c04b1e] flex items-center justify-center text-[10px] font-bold shrink-0">
+                            •
                           </span>
-                        </div>
+                        ) : (
+                          <span className="w-3.5 h-3.5 rounded-full bg-stone-200 dark:bg-stone-800 text-stone-400 flex items-center justify-center text-[10px] shrink-0">
+                            •
+                          </span>
+                        )}
+                        <span
+                          className={cn(
+                            bullet.done && 'line-through text-stone-400 dark:text-stone-500',
+                            bullet.active && 'font-medium text-stone-900 dark:text-stone-100'
+                          )}
+                        >
+                          {bullet.text}
+                        </span>
                       </div>
-
-                      {/* Pillar 3: Generate Content */}
-                      <div
-                        className="rounded-2xl border bg-white/90 dark:bg-bg-elevated/40 p-5 shadow-xs flex flex-col justify-between hover:shadow-md transition-shadow"
-                        style={{ borderColor: `${currentShowcase.color}35` }}
-                      >
-                        <div>
-                          <div className="flex items-center justify-between mb-3">
-                            <div
-                              className="w-8 h-8 rounded-xl border flex items-center justify-center shadow-2xs"
-                              style={{
-                                backgroundColor: `${currentShowcase.color}15`,
-                                borderColor: `${currentShowcase.color}30`,
-                                color: currentShowcase.color,
-                              }}
-                            >
-                              <FileText className="w-4 h-4" />
-                            </div>
-                            <span
-                              className="text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full border"
-                              style={{
-                                color: currentShowcase.color,
-                                backgroundColor: `${currentShowcase.color}10`,
-                                borderColor: `${currentShowcase.color}25`,
-                              }}
-                            >
-                              {currentShowcase.pillar3.tag}
-                            </span>
-                          </div>
-                          <h3 className="text-sm font-bold text-text-primary">
-                            {currentShowcase.pillar3.title}
-                          </h3>
-                          <div className="mt-2.5 p-2 rounded-xl bg-slate-50/90 dark:bg-bg-base/80 border border-border-subtle/80 text-xs space-y-1">
-                            <div className="flex items-center justify-between">
-                              <span
-                                className="text-3xs font-bold uppercase tracking-wider"
-                                style={{ color: currentShowcase.color }}
-                              >
-                                {currentShowcase.pillar3.badge}
-                              </span>
-                              <span className="text-3xs text-emerald-500 font-semibold">
-                                ✓ Draft Ready
-                              </span>
-                            </div>
-                            <p className="text-2xs text-text-secondary line-clamp-2">
-                              {currentShowcase.pillar3.draft}
-                            </p>
-                          </div>
-                        </div>
-
-                        <div className="mt-4 pt-3 border-t border-border-subtle/80 flex items-center justify-between text-2xs text-text-muted">
-                          <span>{currentShowcase.pillar3.source}</span>
-                          <span className="font-semibold" style={{ color: currentShowcase.color }}>
-                            Ready to Edit
-                          </span>
-                        </div>
-                      </div>
-
-                      {/* Pillar 4: Schedule & Review */}
-                      <div
-                        className="rounded-2xl border bg-white/90 dark:bg-bg-elevated/40 p-5 shadow-xs flex flex-col justify-between hover:shadow-md transition-shadow"
-                        style={{ borderColor: `${currentShowcase.color}35` }}
-                      >
-                        <div>
-                          <div className="flex items-center justify-between mb-3">
-                            <div
-                              className="w-8 h-8 rounded-xl border flex items-center justify-center shadow-2xs"
-                              style={{
-                                backgroundColor: `${currentShowcase.color}15`,
-                                borderColor: `${currentShowcase.color}30`,
-                                color: currentShowcase.color,
-                              }}
-                            >
-                              <Calendar className="w-4 h-4" />
-                            </div>
-                            <span
-                              className="text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full border"
-                              style={{
-                                color: currentShowcase.color,
-                                backgroundColor: `${currentShowcase.color}10`,
-                                borderColor: `${currentShowcase.color}25`,
-                              }}
-                            >
-                              {currentShowcase.pillar4.tag}
-                            </span>
-                          </div>
-                          <h3 className="text-sm font-bold text-text-primary">
-                            {currentShowcase.pillar4.title}
-                          </h3>
-                          <div className="mt-2.5 space-y-1.5 text-xs">
-                            {currentShowcase.pillar4.events.map((evt, idx) => (
-                              <div
-                                key={idx}
-                                className="p-1.5 rounded-lg bg-slate-50/90 dark:bg-bg-base/80 border border-border-subtle/80 flex items-center justify-between"
-                              >
-                                <span className="font-medium text-text-primary truncate">
-                                  {evt.name}
-                                </span>
-                                <span
-                                  className="text-2xs font-semibold shrink-0 ml-1"
-                                  style={{ color: currentShowcase.color }}
-                                >
-                                  {evt.time}
-                                </span>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-
-                        <div className="mt-4 pt-3 border-t border-border-subtle/80 flex items-center justify-between text-2xs text-text-muted">
-                          <span>{currentShowcase.pillar4.calendarLabel}</span>
-                          <span className="font-semibold" style={{ color: currentShowcase.color }}>
-                            Synced
-                          </span>
-                        </div>
-                      </div>
-                    </m.div>
-                  </AnimatePresence>
-
-                  {/* Window action footer */}
-                  <div className="mt-6 pt-4 border-t border-border-base/70 flex items-center justify-end">
-                    <Link
-                      to={isAuthenticated ? currentShowcase.route : '/login'}
-                      className="inline-flex items-center gap-1.5 font-bold text-xs hover:underline transition-colors"
-                      style={{ color: currentShowcase.color }}
-                    >
-                      <span>Open {currentShowcase.name} Workspace</span>
-                      <ArrowRight className="w-3.5 h-3.5" />
-                    </Link>
+                    ))}
+                  </div>
+                  <div className="pt-1 flex justify-between text-[10px] text-stone-400 border-t border-stone-100 dark:border-stone-800">
+                    <span>{preview.trackFooter}</span>
+                    <span className="text-emerald-600 dark:text-emerald-400 font-semibold">
+                      {preview.trackStatus}
+                    </span>
                   </div>
                 </div>
-              </m.div>
+
+                {/* Content Card 3: Generate Content */}
+                <div className="p-3.5 rounded-xl border border-stone-200/80 dark:border-stone-800 bg-white dark:bg-bg-elevated/40 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <div className="w-5 h-5 rounded bg-orange-100 dark:bg-orange-950/60 text-[#c04b1e] flex items-center justify-center font-bold text-xs">
+                        ✨
+                      </div>
+                      <h3 className="text-xs font-bold text-stone-900 dark:text-white">
+                        Generate Content
+                      </h3>
+                    </div>
+                    <span className="text-[10px] font-mono text-[#c04b1e] font-semibold">
+                      AI Assistant
+                    </span>
+                  </div>
+                  <div className="p-2.5 rounded-lg bg-[#fbf5f0] dark:bg-orange-950/20 border border-[#f5e3d7] dark:border-orange-900/30 text-[11px] space-y-1">
+                    <div className="flex items-center justify-between">
+                      <span className="font-mono text-[9px] font-bold uppercase text-[#c04b1e] bg-orange-100/80 dark:bg-orange-900/50 px-1.5 py-0.5 rounded">
+                        {preview.proposalTag}
+                      </span>
+                      <span className="text-[10px] text-emerald-600 font-semibold">
+                        Ready to apply
+                      </span>
+                    </div>
+                    <p className="text-stone-700 dark:text-stone-300 italic text-[11px] leading-relaxed">
+                      {preview.proposalQuote}
+                    </p>
+                  </div>
+                  <div className="flex justify-between text-[10px] text-stone-400">
+                    <span className="text-[#c04b1e] font-medium hover:underline cursor-pointer">
+                      View Proposal details
+                    </span>
+                    <span>Today, 2:15 PM</span>
+                  </div>
+                </div>
+
+                {/* Content Card 4: Schedule & Review */}
+                <div className="p-3.5 rounded-xl border border-stone-200/80 dark:border-stone-800 bg-white dark:bg-bg-elevated/40 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <div className="w-5 h-5 rounded bg-orange-100 dark:bg-orange-950/60 text-[#c04b1e] flex items-center justify-center font-bold text-xs">
+                        📅
+                      </div>
+                      <h3 className="text-xs font-bold text-stone-900 dark:text-white">
+                        Schedule &amp; Review
+                      </h3>
+                    </div>
+                    <span className="text-[10px] font-mono text-stone-500 font-medium">
+                      Calendar Sync
+                    </span>
+                  </div>
+                  <div className="space-y-1.5 text-[11px]">
+                    {preview.scheduleList.map((item, idx) => (
+                      <div
+                        key={idx}
+                        className="p-1.5 rounded-lg bg-stone-50 dark:bg-stone-900/50 flex items-center justify-between"
+                      >
+                        <span className="font-medium text-stone-800 dark:text-stone-200">
+                          {item.name}
+                        </span>
+                        <span
+                          className={cn(
+                            'text-[10px] font-mono font-bold',
+                            item.highlight ? 'text-[#c04b1e]' : 'text-stone-500'
+                          )}
+                        >
+                          {item.time}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="flex justify-between text-[10px] text-stone-400 pt-1 border-t border-stone-100 dark:border-stone-800">
+                    <span>{preview.scheduleFooter}</span>
+                    <span className="text-emerald-600 dark:text-emerald-400 font-semibold">
+                      Synced ✓
+                    </span>
+                  </div>
+                </div>
+              </div>
             </div>
-          </LazyMotion>
+          </div>
         </section>
 
-        {/* ─── 5-Step Simple Workflow ─────────────────────────────────── */}
+        {/* ─── 5 Simple Steps Section ───────────────────────────────────── */}
         <section
-          aria-labelledby="workflow-section-title"
-          className="py-24 px-6 max-w-6xl mx-auto border-t border-border-base/80"
+          id="how-it-works"
+          aria-labelledby="steps-section-title"
+          className="py-20 md:py-28 px-6 md:px-12 max-w-6xl mx-auto border-t border-stone-200/70 dark:border-stone-800/80"
         >
-          <div className="text-center mb-16">
-            <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-solar-500/10 text-solar-600 dark:text-solar-400 border border-solar-500/20 text-xs font-semibold uppercase tracking-wider mb-3">
-              Non-Tech Friendly Workflow
+          {/* Eyebrow and Section Header */}
+          <div className="text-center mb-16 space-y-3">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#fbeee6] dark:bg-orange-950/40 border border-[#f5d5c5] dark:border-orange-900/40 text-[#a03d15] dark:text-orange-300 text-[11px] font-bold uppercase tracking-wider">
+              NON-TECH FRIENDLY WORKFLOW
             </div>
             <h2
-              id="workflow-section-title"
-              className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-text-primary mb-3.5 tracking-tight"
+              id="steps-section-title"
+              className="text-3xl sm:text-4xl font-extrabold text-stone-950 dark:text-white tracking-tight"
             >
-              How MentorOS Works in 5 Simple Steps
+              How MentorOS works in 5 simple steps
             </h2>
-            <p className="text-xs sm:text-sm text-text-muted max-w-xl mx-auto leading-relaxed">
-              From initial project planning to execution, scheduling, and review — clear, automated,
-              and completely under your control.
+            <p className="text-xs sm:text-sm text-stone-600 dark:text-stone-300 max-w-xl mx-auto leading-relaxed">
+              From initial project planning to execution, scheduling, and review: clear,
+              automated, and completely under your control.
             </p>
           </div>
 
+          {/* 5 Grid Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <WorkflowStep
-              n={1}
-              title="1. Plan and Create"
-              subtitle="Goal & Deadline"
-              description="Start by defining your project goals, scope, and target deadline. The system saves your project details securely in your database."
-              example="System safely saves your project plan and target deadline to your database."
-            />
-            <WorkflowStep
-              n={2}
-              title="2. Generate Roadmap"
-              subtitle="AI Roadmaps"
-              description="Local AI proposes structured milestones, daily subtasks, and a realistic schedule to hit your target date without guesswork."
-              example="AI proposes milestones, actionable subtasks, and a clear daily timeline."
-            />
-            <WorkflowStep
-              n={3}
-              title="3. Build & Track"
-              subtitle="Visual Task Board"
-              description="Work through your visual task board, ticking off tasks as you go. Your overall project progress automatically updates in real time."
-              example="Check off tasks on your board as you work, updating completion status instantly."
-            />
-            <WorkflowStep
-              n={4}
-              title="4. Schedule"
-              subtitle="Calendar & Milestones"
-              description="Organize your upcoming deadlines, review checkpoints, and scheduled tasks directly into your visual calendar."
-              example="Add deadlines and deliverables directly to your project calendar."
-            />
-            <WorkflowStep
-              n={5}
-              title="5. Review Dashboard"
-              subtitle="Unified Overview"
-              description="Your home dashboard displays completed project milestones alongside upcoming scheduled tasks and deadlines in one clean view."
-              example="Dashboard highlights your active projects, finished milestones, and upcoming deliverables."
-            />
+            {/* Step 1 */}
+            <div className="rounded-2xl border border-stone-200/80 dark:border-stone-800 bg-white dark:bg-bg-surface p-5 flex flex-col justify-between shadow-xs hover:shadow-md transition-shadow">
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="w-8 h-8 rounded-full bg-[#c04b1e] text-white flex items-center justify-center font-bold text-sm shadow-xs">
+                    1
+                  </div>
+                  <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#c04b1e]">
+                    GOAL &amp; TECH STACK
+                  </span>
+                </div>
+                <h3 className="text-base font-bold text-stone-950 dark:text-white">
+                  Plan and create
+                </h3>
+                <p className="text-xs text-stone-600 dark:text-stone-300 leading-relaxed">
+                  Quickly outline your project goals, scope, and target deadline. The system safely
+                  saves your project details securely in your database.
+                </p>
+              </div>
+              <div className="mt-5 p-3 rounded-xl bg-[#fbf5f0] dark:bg-stone-900/60 border border-[#f5e3d7] dark:border-stone-800 text-xs space-y-1">
+                <span className="text-[10px] font-mono font-bold uppercase text-[#c04b1e]">
+                  WHAT HAPPENS
+                </span>
+                <p className="text-[11px] text-stone-700 dark:text-stone-300 leading-relaxed">
+                  System safely saves your project plan and target deadlines in your database.
+                </p>
+              </div>
+            </div>
+
+            {/* Step 2 */}
+            <div className="rounded-2xl border border-stone-200/80 dark:border-stone-800 bg-white dark:bg-bg-surface p-5 flex flex-col justify-between shadow-xs hover:shadow-md transition-shadow">
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="w-8 h-8 rounded-full bg-[#c04b1e] text-white flex items-center justify-center font-bold text-sm shadow-xs">
+                    2
+                  </div>
+                  <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#c04b1e]">
+                    AI ROADMAPS
+                  </span>
+                </div>
+                <h3 className="text-base font-bold text-stone-950 dark:text-white">
+                  Generate roadmap
+                </h3>
+                <p className="text-xs text-stone-600 dark:text-stone-300 leading-relaxed">
+                  Local AI proposes structured milestones, daily schedules, and execution checklists
+                  to hit your target date without guesswork.
+                </p>
+              </div>
+              <div className="mt-5 p-3 rounded-xl bg-[#fbf5f0] dark:bg-stone-900/60 border border-[#f5e3d7] dark:border-stone-800 text-xs space-y-1">
+                <span className="text-[10px] font-mono font-bold uppercase text-[#c04b1e]">
+                  WHAT HAPPENS
+                </span>
+                <p className="text-[11px] text-stone-700 dark:text-stone-300 leading-relaxed">
+                  AI proposes milestones, actionable schedules, and milestones checklists.
+                </p>
+              </div>
+            </div>
+
+            {/* Step 3 */}
+            <div className="rounded-2xl border border-stone-200/80 dark:border-stone-800 bg-white dark:bg-bg-surface p-5 flex flex-col justify-between shadow-xs hover:shadow-md transition-shadow">
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="w-8 h-8 rounded-full bg-[#c04b1e] text-white flex items-center justify-center font-bold text-sm shadow-xs">
+                    3
+                  </div>
+                  <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#c04b1e]">
+                    VISUAL TASK BOARD
+                  </span>
+                </div>
+                <h3 className="text-base font-bold text-stone-950 dark:text-white">
+                  Build and track
+                </h3>
+                <p className="text-xs text-stone-600 dark:text-stone-300 leading-relaxed">
+                  Work through your visual task board, ticking off tasks as you go. Your overall
+                  project progress automatically updates in real time.
+                </p>
+              </div>
+              <div className="mt-5 p-3 rounded-xl bg-[#fbf5f0] dark:bg-stone-900/60 border border-[#f5e3d7] dark:border-stone-800 text-xs space-y-1">
+                <span className="text-[10px] font-mono font-bold uppercase text-[#c04b1e]">
+                  WHAT HAPPENS
+                </span>
+                <p className="text-[11px] text-stone-700 dark:text-stone-300 leading-relaxed">
+                  Check off tasks on your board as you work; updating completion status instantly.
+                </p>
+              </div>
+            </div>
+
+            {/* Step 4 */}
+            <div className="rounded-2xl border border-stone-200/80 dark:border-stone-800 bg-white dark:bg-bg-surface p-5 flex flex-col justify-between shadow-xs hover:shadow-md transition-shadow">
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="w-8 h-8 rounded-full bg-[#c04b1e] text-white flex items-center justify-center font-bold text-sm shadow-xs">
+                    4
+                  </div>
+                  <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#c04b1e]">
+                    DEADLINES &amp; MILESTONES
+                  </span>
+                </div>
+                <h3 className="text-base font-bold text-stone-950 dark:text-white">Schedule</h3>
+                <p className="text-xs text-stone-600 dark:text-stone-300 leading-relaxed">
+                  Organize your upcoming deadlines, review checkpoints, and scheduled items directly
+                  into your visual calendar.
+                </p>
+              </div>
+              <div className="mt-5 p-3 rounded-xl bg-[#fbf5f0] dark:bg-stone-900/60 border border-[#f5e3d7] dark:border-stone-800 text-xs space-y-1">
+                <span className="text-[10px] font-mono font-bold uppercase text-[#c04b1e]">
+                  WHAT HAPPENS
+                </span>
+                <p className="text-[11px] text-stone-700 dark:text-stone-300 leading-relaxed">
+                  Add steps into and deliverables directly to your project calendar.
+                </p>
+              </div>
+            </div>
+
+            {/* Step 5 */}
+            <div className="rounded-2xl border border-stone-200/80 dark:border-stone-800 bg-white dark:bg-bg-surface p-5 flex flex-col justify-between shadow-xs hover:shadow-md transition-shadow md:col-span-2 lg:col-span-1">
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="w-8 h-8 rounded-full bg-[#c04b1e] text-white flex items-center justify-center font-bold text-sm shadow-xs">
+                    5
+                  </div>
+                  <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#c04b1e]">
+                    MUTUAL WORKSPACE
+                  </span>
+                </div>
+                <h3 className="text-base font-bold text-stone-950 dark:text-white">
+                  Review dashboard
+                </h3>
+                <p className="text-xs text-stone-600 dark:text-stone-300 leading-relaxed">
+                  Your home dashboard displays completed project milestones alongside upcoming
+                  scheduled tasks and deadlines in one clean view.
+                </p>
+              </div>
+              <div className="mt-5 p-3 rounded-xl bg-[#fbf5f0] dark:bg-stone-900/60 border border-[#f5e3d7] dark:border-stone-800 text-xs space-y-1">
+                <span className="text-[10px] font-mono font-bold uppercase text-[#c04b1e]">
+                  WHAT HAPPENS
+                </span>
+                <p className="text-[11px] text-stone-700 dark:text-stone-300 leading-relaxed">
+                  Dashboard highlights your active progress, finished milestones, and upcoming
+                  deliverables.
+                </p>
+              </div>
+            </div>
           </div>
         </section>
 
-        {/* ─── Local AI Privacy Highlight ───────────────────── */}
+        {/* ─── Zero Telemetry / Privacy Section ─────────────────────────── */}
         <section
-          aria-labelledby="privacy-section-title"
-          className="py-20 px-6 max-w-3xl mx-auto text-center"
+          id="privacy"
+          aria-labelledby="privacy-heading"
+          className="py-16 px-6 md:px-12 max-w-5xl mx-auto"
         >
-          <div className="relative rounded-3xl p-8 sm:p-10 overflow-hidden border border-border-base/80 dark:border-white/[0.08] bg-white/95 dark:bg-bg-surface/95 backdrop-blur-xl framer-window-shadow">
-            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-solar-500/15 to-solar-500/5 border border-solar-500/30 flex items-center justify-center mx-auto mb-5 text-solar-500 shadow-2xs">
-              <Shield className="h-7 w-7 text-solar-500" aria-hidden="true" />
+          <div className="rounded-3xl border border-stone-200/90 dark:border-stone-800 bg-white dark:bg-bg-surface p-8 sm:p-12 shadow-sm grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-center">
+            {/* Left Content (6 cols) */}
+            <div className="lg:col-span-6 space-y-4">
+              <div className="w-10 h-10 rounded-full bg-[#fbeee6] dark:bg-orange-950/60 text-[#c04b1e] flex items-center justify-center">
+                <Shield className="w-5 h-5 text-[#c04b1e]" />
+              </div>
+              <h2
+                id="privacy-heading"
+                className="text-2xl sm:text-3xl font-extrabold text-stone-950 dark:text-white tracking-tight leading-tight"
+              >
+                Zero telemetry. <br className="hidden sm:inline" />
+                Local private AI.
+              </h2>
+              <p className="text-xs sm:text-sm text-stone-600 dark:text-stone-300 leading-relaxed max-w-md">
+                Your notes, project details, and goals remain safely stored on your local workspace.
+                AI suggestions run securely and never silently modify your data without explicit approval.
+              </p>
+              <div className="pt-2">
+                <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 text-emerald-800 dark:text-emerald-300 text-xs font-semibold shadow-2xs">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                  <span>100% offline-capable with local database storage</span>
+                </div>
+              </div>
             </div>
-            <h2
-              id="privacy-section-title"
-              className="text-2xl sm:text-3xl font-extrabold text-text-primary mb-3 tracking-tight"
-            >
-              Zero Telemetry. Local Private AI.
-            </h2>
-            <p className="text-xs sm:text-sm text-text-muted leading-relaxed max-w-xl mx-auto mb-6">
-              Your notes, project details, and goals remain safely stored on your local workspace. AI
-              suggestions run securely and never silently modify your data without explicit approval.
-            </p>
 
-            <div className="inline-flex items-center gap-2 text-xs font-semibold text-text-secondary bg-slate-50/90 dark:bg-bg-elevated/80 px-4 py-2.5 rounded-xl border border-border-base/80 shadow-2xs">
-              <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-              <span>100% offline capable with local database storage</span>
+            {/* Right Feature Blocks (6 cols) */}
+            <div className="lg:col-span-6 space-y-3">
+              {/* Feature 1 */}
+              <div className="p-4 rounded-2xl bg-[#faf6f2] dark:bg-stone-900/60 border border-stone-200/80 dark:border-stone-800 flex items-start gap-3.5">
+                <div className="w-8 h-8 rounded-lg bg-[#f0e3d8] dark:bg-orange-950/50 text-[#c04b1e] flex items-center justify-center shrink-0 mt-0.5">
+                  <Database className="w-4 h-4 text-[#c04b1e]" />
+                </div>
+                <div>
+                  <h4 className="text-xs sm:text-sm font-bold text-stone-950 dark:text-white">
+                    Stored locally
+                  </h4>
+                  <p className="text-xs text-stone-600 dark:text-stone-300 mt-0.5 leading-relaxed">
+                    Notes, project details, and goals stay in your local workspace database.
+                  </p>
+                </div>
+              </div>
+
+              {/* Feature 2 */}
+              <div className="p-4 rounded-2xl bg-[#faf6f2] dark:bg-stone-900/60 border border-stone-200/80 dark:border-stone-800 flex items-start gap-3.5">
+                <div className="w-8 h-8 rounded-lg bg-[#f0e3d8] dark:bg-orange-950/50 text-[#c04b1e] flex items-center justify-center shrink-0 mt-0.5">
+                  <Check className="w-4 h-4 text-[#c04b1e]" />
+                </div>
+                <div>
+                  <h4 className="text-xs sm:text-sm font-bold text-stone-950 dark:text-white">
+                    You approve every change
+                  </h4>
+                  <p className="text-xs text-stone-600 dark:text-stone-300 mt-0.5 leading-relaxed">
+                    AI suggestions never silently modify your data without explicit approval.
+                  </p>
+                </div>
+              </div>
+
+              {/* Feature 3 */}
+              <div className="p-4 rounded-2xl bg-[#faf6f2] dark:bg-stone-900/60 border border-stone-200/80 dark:border-stone-800 flex items-start gap-3.5">
+                <div className="w-8 h-8 rounded-lg bg-[#f0e3d8] dark:bg-orange-950/50 text-[#c04b1e] flex items-center justify-center shrink-0 mt-0.5">
+                  <Shield className="w-4 h-4 text-[#c04b1e]" />
+                </div>
+                <div>
+                  <h4 className="text-xs sm:text-sm font-bold text-stone-950 dark:text-white">
+                    No tracking
+                  </h4>
+                  <p className="text-xs text-stone-600 dark:text-stone-300 mt-0.5 leading-relaxed">
+                    Zero telemetry, and no metrics collection on your own machine.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ─── Call To Action Banner ────────────────────────────────────── */}
+        <section className="py-16 px-6 md:px-12 max-w-5xl mx-auto">
+          <div className="rounded-3xl bg-gradient-to-r from-[#ba4317] via-[#c65220] to-[#b83e14] text-white p-10 sm:p-14 text-center shadow-xl space-y-4">
+            <h2 className="text-2xl sm:text-4xl font-extrabold tracking-tight">
+              Plan it, track it and ship it from one workspace.
+            </h2>
+            <p className="text-xs sm:text-sm text-orange-100 max-w-lg mx-auto leading-relaxed">
+              Open your workspace and let local AI turn your next project goal into a clear,
+              reviewable plan.
+            </p>
+            <div className="pt-3 flex flex-wrap items-center justify-center gap-3.5">
+              <Link
+                to={
+                  isAuthenticated && user
+                    ? `/app/${user.role.replace('_', '-')}/dashboard`
+                    : '/register'
+                }
+                className="bg-white hover:bg-stone-100 text-[#c04b1e] font-bold text-xs sm:text-sm px-6 py-2.5 rounded-xl shadow-xs transition-colors"
+              >
+                Get started
+              </Link>
+              <Link
+                to={
+                  isAuthenticated && user
+                    ? `/app/${user.role.replace('_', '-')}/dashboard`
+                    : '/login'
+                }
+                className="bg-black/20 hover:bg-black/30 text-white border border-white/25 font-semibold text-xs sm:text-sm px-6 py-2.5 rounded-xl transition-colors"
+              >
+                Sign In
+              </Link>
             </div>
           </div>
         </section>
       </main>
 
-      {/* ─── Footer ───────────────────────────────────────── */}
+      {/* ─── Footer ─────────────────────────────────────────────────────── */}
       <footer
         role="contentinfo"
-        className="border-t border-border-base/80 py-12 px-6 md:px-12 flex flex-col sm:flex-row items-center justify-between gap-6 text-xs text-text-muted bg-white/40 dark:bg-bg-surface/20 backdrop-blur-sm"
+        className="border-t border-stone-200 dark:border-stone-800/80 py-8 px-6 md:px-12 bg-white dark:bg-[#0c0e14] text-xs text-stone-500 transition-colors"
       >
-        <div className="flex items-center gap-2.5 select-none">
-          <Layers className="h-4 w-4 text-solar-500" aria-hidden="true" />
-          <span className="font-bold text-text-primary">MentorOS</span>
-          <span>• AI Powered Productivity and Workspace Management</span>
-        </div>
-
-        <div className="flex items-center gap-6">
-          <ThemeToggle size="sm" variant="pill" showLabel />
-          <Link to="/login" className="hover:text-text-primary transition-colors font-medium">
-            Sign In
-          </Link>
+        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="flex items-center gap-2.5 flex-wrap">
+            <div className="w-5 h-5 rounded bg-[#c04b1e] text-white flex items-center justify-center font-bold text-[10px]">
+              M
+            </div>
+            <span className="font-bold text-stone-950 dark:text-white">MentorOS</span>
+            <span className="text-stone-400">
+              • All your goals, productivity and workspaces kept sync-free
+            </span>
+          </div>
+          <div className="flex items-center gap-6">
+            <a
+              href="#how-it-works"
+              className="hover:text-stone-900 dark:hover:text-white transition-colors"
+            >
+              How it works
+            </a>
+            <a
+              href="#privacy"
+              className="hover:text-stone-900 dark:hover:text-white transition-colors"
+            >
+              Privacy
+            </a>
+            <Link
+              to="/login"
+              className="hover:text-stone-900 dark:hover:text-white transition-colors"
+            >
+              Sign in
+            </Link>
+          </div>
         </div>
       </footer>
     </div>

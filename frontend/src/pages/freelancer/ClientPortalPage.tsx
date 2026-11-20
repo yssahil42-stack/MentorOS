@@ -19,6 +19,7 @@ import { Card3D } from '../../components/ui/Card3D';
 import { Button } from '../../components/ui/Button';
 import { Badge } from '../../components/ui/Badge';
 import { LoadingSkeleton } from '../../components/ui/LoadingSkeleton';
+import { TimeTrackingBadge } from '../../components/ui/TimeTrackingBadge';
 import {
   fetchProjects,
   fetchMilestones,
@@ -380,6 +381,8 @@ interface MilestoneCardProps {
     status: string;
     target_date?: string;
     completed_at?: string;
+    estimated_minutes?: number | null;
+    actual_minutes?: number | null;
   };
   isPublicView: boolean;
 }
@@ -410,7 +413,7 @@ function MilestoneCard({ milestone, isPublicView }: MilestoneCardProps) {
     <Card className="p-4 border-border-base/50">
       <div className="flex items-start justify-between gap-4">
         <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 mb-1">
+          <div className="flex items-center gap-2 mb-1 flex-wrap">
             <span
               className={cn(
                 'inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium uppercase tracking-wider border',
@@ -420,6 +423,12 @@ function MilestoneCard({ milestone, isPublicView }: MilestoneCardProps) {
               {config.icon}
               {config.label}
             </span>
+            <TimeTrackingBadge
+              expectedMinutes={milestone.estimated_minutes}
+              actualMinutes={milestone.actual_minutes}
+              size="xs"
+              variant="pill"
+            />
             {milestone.target_date && (
               <span className="text-xs text-text-muted flex items-center gap-1">
                 <Calendar className="w-3 h-3" />
@@ -451,6 +460,8 @@ interface TaskCardProps {
     status: string;
     priority: string;
     updated_at: string;
+    estimated_minutes?: number | null;
+    actual_minutes?: number | null;
   };
   isPublicView: boolean;
 }
@@ -467,7 +478,7 @@ function TaskCard({ task, isPublicView }: TaskCardProps) {
   return (
     <Card className="p-3 border-border-base/50">
       <div className="flex items-center justify-between gap-3">
-        <div className="flex items-center gap-2 flex-1 min-w-0">
+        <div className="flex items-center gap-2 flex-1 min-w-0 flex-wrap">
           <span
             className={cn(
               'inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium uppercase tracking-wider border',
@@ -477,6 +488,12 @@ function TaskCard({ task, isPublicView }: TaskCardProps) {
             {config.label}
           </span>
           <h4 className="font-medium text-text-primary truncate">{task.title}</h4>
+          <TimeTrackingBadge
+            expectedMinutes={task.estimated_minutes}
+            actualMinutes={task.actual_minutes}
+            size="xs"
+            variant="pill"
+          />
         </div>
         <div className="flex items-center gap-2 shrink-0">
           <span className="text-[10px] text-text-muted">

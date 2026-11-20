@@ -56,6 +56,8 @@ export interface Milestone {
   description?: string;
   status: MilestoneStatus;
   target_date?: string;
+  estimated_minutes?: number | null;
+  actual_minutes?: number | null;
   completed_at?: string;
   created_at: string;
   updated_at: string;
@@ -66,6 +68,8 @@ export interface CreateMilestoneRequest {
   title: string;
   description?: string;
   target_date?: string;
+  estimated_minutes?: number | null;
+  actual_minutes?: number | null;
   role?: string;
 }
 
@@ -74,4 +78,6 @@ export interface UpdateMilestoneRequest {
   description?: string;
   status?: MilestoneStatus;
   target_date?: string;
+  estimated_minutes?: number | null;
+  actual_minutes?: number | null;
 }

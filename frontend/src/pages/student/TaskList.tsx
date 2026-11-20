@@ -1,5 +1,6 @@
 import React from 'react';
 import { CheckCircle2 } from 'lucide-react';
+import { TimeTrackingBadge } from '../../components/ui/TimeTrackingBadge';
 import type { Task, TaskStatus } from '../../types/task';
 
 interface TaskListProps {
@@ -73,11 +74,13 @@ export const TaskList: React.FC<TaskListProps> = ({
                 >
                   {task.title}
                 </p>
-                {task.estimated_minutes && (
-                  <p className="text-3xs text-text-faint mt-0.5">
-                    {task.estimated_minutes} min study
-                  </p>
-                )}
+                <TimeTrackingBadge
+                  expectedMinutes={task.estimated_minutes}
+                  actualMinutes={task.actual_minutes}
+                  size="xs"
+                  variant="pill"
+                  className="mt-1"
+                />
               </div>
             </div>
           </div>

@@ -79,7 +79,7 @@ export default function GitHubSyncPage() {
   const [showConnectModal, setShowConnectModal] = useState(false);
   const [showSettingsModal, setShowSettingsModal] = useState(false);
   const [connectForm, setConnectForm] = useState<ConnectRepositoryRequest>({
-    provider: 'github',
+    provider: 'gitlab',
     access_token: '',
     repository: '',
     sync_settings: {
@@ -168,7 +168,7 @@ export default function GitHubSyncPage() {
       showToast(`Connected ${data.repository.full_name}`, 'success');
       setShowConnectModal(false);
       setConnectForm({
-        provider: 'github',
+        provider: 'gitlab',
         access_token: '',
         repository: '',
         sync_settings: {
@@ -388,14 +388,14 @@ export default function GitHubSyncPage() {
               <FolderGit2 className="w-5 h-5" />
             </span>
             <span className="text-xs font-mono font-semibold px-2 py-0.5 rounded-full bg-purple-500/10 text-purple-400 border border-purple-500/20">
-              GIT SYNC
+              GITLAB SYNC
             </span>
           </div>
           <h1 className="text-2xl md:text-3xl font-extrabold text-text-primary">
-            GitHub / GitLab Sync
+            GitLab Sync
           </h1>
           <p className="text-xs md:text-sm text-text-secondary max-w-2xl">
-            Sync repositories, issues, and PRs. Auto-create tasks from GitHub/GitLab activity.
+            Sync GitLab projects, issues, and merge requests. Auto-create tasks from GitLab activity.
           </p>
         </div>
 
@@ -406,7 +406,7 @@ export default function GitHubSyncPage() {
             onClick={() => setShowConnectModal(true)}
             icon={<Plus className="w-4 h-4" />}
           >
-            Connect Repository
+            Connect GitLab Project
           </Button>
         </div>
       </div>
@@ -429,7 +429,7 @@ export default function GitHubSyncPage() {
             {tab === 'prs' && <GitPullRequestIcon className="w-4 h-4 mr-2 inline" />}
             {tab === 'logs' && <Zap className="w-4 h-4 mr-2 inline" />}
             {tab === 'settings' && <Settings className="w-4 h-4 mr-2 inline" />}
-            {tab.charAt(0).toUpperCase() + tab.slice(1)}
+            {tab === 'prs' ? 'Merge Requests' : tab.charAt(0).toUpperCase() + tab.slice(1)}
           </button>
         ))}
       </div>
@@ -443,10 +443,10 @@ export default function GitHubSyncPage() {
                 <FolderGit2 className="w-16 h-16 text-text-faint mx-auto" />
               </div>
               <h3 className="text-xl font-semibold text-text-primary mb-2">
-                No repositories connected
+                No GitLab projects connected
               </h3>
               <p className="text-sm text-text-muted mb-6 max-w-md mx-auto">
-                Connect your GitHub or GitLab repositories to sync issues, PRs, and milestones with
+                Connect your GitLab projects to sync issues, merge requests, and milestones with
                 your projects.
               </p>
               <Button
@@ -454,7 +454,7 @@ export default function GitHubSyncPage() {
                 icon={<Plus className="w-4 h-4" />}
                 size="lg"
               >
-                Connect Your First Repository
+                Connect Your First GitLab Project
               </Button>
             </Card>
           ) : (
@@ -820,6 +820,170 @@ export default function GitHubSyncPage() {
           )}
         </div>
       )}
+
+      {/* ─── Connect GitLab Project Modal ───────────────────────── */}
+      <Modal
+        isOpen={showConnectModal}
+        onClose={() => setShowConnectModal(false)}
+        title="Connect GitLab Project"
+        description="Connect a repository from GitLab using a Personal Access Token (PAT)."
+        size="lg"
+        footer={
+          <div className="flex items-center justify-end gap-2 w-full">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setShowConnectModal(false)}
+              disabled={isConnecting}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="primary"
+              size="sm"
+              onClick={handleConnect}
+              disabled={!connectForm.repository.trim() || isConnecting}
+              loading={isConnecting}
+              className="!bg-[#FC6D26] hover:!bg-[#E24329] text-white font-bold"
+              icon={<FolderGit2 className="w-4 h-4" />}
+            >
+              Connect GitLab Project
+            </Button>
+          </div>
+        }
+      >
+        <div className="space-y-4 py-2">
+          {/* Provider badge */}
+          <div className="flex items-center justify-between p-3 rounded-xl bg-bg-surface border border-border-base">
+            <div className="flex items-center gap-2.5">
+              <span className="w-8 h-8 rounded-lg bg-[#FC6D26]/15 text-[#FC6D26] flex items-center justify-center font-bold text-sm">
+                🦊
+              </span>
+              <div>
+                <p className="text-xs font-bold text-text-primary">GitLab Integration</p>
+                <p className="text-2xs text-text-muted">GitLab.com or Self-Hosted GitLab Instance</p>
+              </div>
+            </div>
+            <Badge variant="success" size="sm">Active Provider</Badge>
+          </div>
+
+          {/* Project Path / URL input */}
+          <div className="space-y-1.5">
+            <label className="block text-xs font-semibold text-text-primary">
+              GitLab Project Path or URL <span className="text-danger">*</span>
+            </label>
+            <Input
+              type="text"
+              placeholder="e.g. gitlab-org/gitlab or username/my-project"
+              value={connectForm.repository}
+              onChange={(e) =>
+                setConnectForm((prev) => ({ ...prev, repository: e.target.value }))
+              }
+              className="w-full text-xs"
+            />
+            <p className="text-3xs text-text-muted">
+              Enter the namespace and project name (e.g. <code>my-org/backend-service</code>) or full GitLab project URL.
+            </p>
+          </div>
+
+          {/* PAT Token input */}
+          <div className="space-y-1.5">
+            <label className="block text-xs font-semibold text-text-primary">
+              GitLab Personal Access Token (PAT)
+            </label>
+            <Input
+              type="password"
+              placeholder="glpat-xxxxxxxxxxxxxxxxxxxx"
+              value={connectForm.access_token || ''}
+              onChange={(e) =>
+                setConnectForm((prev) => ({ ...prev, access_token: e.target.value }))
+              }
+              className="w-full text-xs font-mono"
+            />
+            <p className="text-3xs text-text-muted">
+              Optional if server-wide <code>GITLAB_PERSONAL_ACCESS_TOKEN</code> is configured in environment. Required scope: <code>read_api</code> or <code>api</code>.
+            </p>
+          </div>
+
+          {/* Initial Sync Preferences */}
+          <div className="pt-2 border-t border-border-base space-y-3">
+            <h4 className="text-xs font-bold text-text-primary">Sync Preferences</h4>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={connectForm.sync_settings?.sync_issues ?? true}
+                  onChange={(e) =>
+                    setConnectForm((prev) => ({
+                      ...prev,
+                      sync_settings: {
+                        ...prev.sync_settings!,
+                        sync_issues: e.target.checked,
+                      },
+                    }))
+                  }
+                  className="rounded border-border-base text-purple-600 focus:ring-purple-500"
+                />
+                <span className="text-text-secondary">Sync GitLab Issues</span>
+              </label>
+
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={connectForm.sync_settings?.sync_prs ?? true}
+                  onChange={(e) =>
+                    setConnectForm((prev) => ({
+                      ...prev,
+                      sync_settings: {
+                        ...prev.sync_settings!,
+                        sync_prs: e.target.checked,
+                      },
+                    }))
+                  }
+                  className="rounded border-border-base text-purple-600 focus:ring-purple-500"
+                />
+                <span className="text-text-secondary">Sync Merge Requests (MRs)</span>
+              </label>
+
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={connectForm.sync_settings?.create_tasks_for_issues ?? true}
+                  onChange={(e) =>
+                    setConnectForm((prev) => ({
+                      ...prev,
+                      sync_settings: {
+                        ...prev.sync_settings!,
+                        create_tasks_for_issues: e.target.checked,
+                      },
+                    }))
+                  }
+                  className="rounded border-border-base text-purple-600 focus:ring-purple-500"
+                />
+                <span className="text-text-secondary">Auto-create tasks from issues</span>
+              </label>
+
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={connectForm.sync_settings?.auto_sync ?? true}
+                  onChange={(e) =>
+                    setConnectForm((prev) => ({
+                      ...prev,
+                      sync_settings: {
+                        ...prev.sync_settings!,
+                        auto_sync: e.target.checked,
+                      },
+                    }))
+                  }
+                  className="rounded border-border-base text-purple-600 focus:ring-purple-500"
+                />
+                <span className="text-text-secondary">Enable Auto-Sync</span>
+              </label>
+            </div>
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 }

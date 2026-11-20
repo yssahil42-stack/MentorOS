@@ -46,6 +46,8 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 .turbo
+*.pdf
+page_1_preview.png
 
 # Test & Audit Reports
 .lighthouseci/

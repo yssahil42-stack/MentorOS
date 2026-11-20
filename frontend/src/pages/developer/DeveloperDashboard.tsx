@@ -23,6 +23,7 @@ import { PriorityBadge } from '../../components/ui/Badge';
 import { DashboardSkeleton } from '../../components/ui/LoadingSkeleton';
 import { SmallCalendar } from '../../components/ui/SmallCalendar';
 import { DailyStandupWidget } from '../../components/dashboard/DailyStandupWidget';
+import { TimeTrackingBadge } from '../../components/ui/TimeTrackingBadge';
 import { ROLE_CONFIGS } from '../../config/roles';
 import type { TaskStatus } from '../../types/task';
 
@@ -152,14 +153,14 @@ export default function DeveloperDashboard() {
             </div>
 
             <div className="shrink-0 flex items-center gap-2.5 flex-wrap">
-              <Link to="/app/developer/github-sync">
+              <Link to="/app/developer/gitlab-sync">
                 <Button
                   variant="secondary"
                   size="sm"
                   className="font-medium px-3.5 h-9.5 transition-all active:translate-y-[1px] text-xs"
                   icon={<FolderGit2 className="w-3.5 h-3.5" />}
                 >
-                  GitHub Sync
+                  GitLab Sync
                 </Button>
               </Link>
               <Button
@@ -435,13 +436,18 @@ export default function DeveloperDashboard() {
                                 {task.description}
                               </p>
                             )}
-                            <div className="flex items-center gap-2 text-3xs text-text-faint pt-0.5">
+                            <div className="flex items-center gap-2 text-3xs text-text-faint pt-0.5 flex-wrap">
                               {task.project_title && (
                                 <span className="text-solar-500 font-medium">
                                   {task.project_title}
                                 </span>
                               )}
-                              {task.estimated_minutes && <span>{task.estimated_minutes} min</span>}
+                              <TimeTrackingBadge
+                                expectedMinutes={task.estimated_minutes}
+                                actualMinutes={task.actual_minutes}
+                                size="xs"
+                                variant="pill"
+                              />
                             </div>
                           </div>
                         </div>

@@ -21,6 +21,7 @@ import { Button } from '../../components/ui/Button';
 import { Badge, PriorityBadge } from '../../components/ui/Badge';
 import { Modal } from '../../components/ui/Modal';
 import { LoadingSkeleton } from '../../components/ui/LoadingSkeleton';
+import { TimeTrackingBadge } from '../../components/ui/TimeTrackingBadge';
 import type { Project, ProjectPriority } from '../../types/project';
 
 export default function DevProjectsPage() {
@@ -244,6 +245,16 @@ export default function DevProjectsPage() {
                           ? `${completedCount}/${totalCount} tasks`
                           : `${p.task_count || 0} tasks`}
                       </span>
+                    </div>
+
+                    <div className="flex items-center justify-between pt-1">
+                      <span className="text-3xs text-text-muted">Total Time:</span>
+                      <TimeTrackingBadge
+                        expectedMinutes={projTasks.reduce((s, t) => s + (t.estimated_minutes || 0), 0)}
+                        actualMinutes={projTasks.reduce((s, t) => s + (t.actual_minutes || 0), 0)}
+                        size="xs"
+                        variant="pill"
+                      />
                     </div>
 
                     <Link

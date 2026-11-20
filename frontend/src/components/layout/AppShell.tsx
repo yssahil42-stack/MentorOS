@@ -6,6 +6,7 @@ import { Breadcrumb } from '../ui/Breadcrumb';
 import { CommandPalette } from './CommandPalette';
 import { AIDrawer } from '../ai/AIDrawer';
 import { AICaptureModal } from '../ai/AICaptureModal';
+import { AskChatbotWidget } from '../ai/AskChatbotWidget';
 import { ProfileModal } from '../profile/ProfileModal';
 import { Spatial3DCanvas } from '../ui/Spatial3DCanvas';
 import { useWorkspace } from '../../contexts/WorkspaceContext';
@@ -108,6 +109,9 @@ export default function AppShell() {
 
       {/* Global AI Capture Work Modal (Manual + AI Assistant) */}
       <AICaptureModal />
+
+      {/* Ask AI Floating Chatbot (authenticated workspaces only) */}
+      <AskChatbotWidget />
 
       {/* Global User Profile Window */}
       <ProfileModal isOpen={isProfileModalOpen} onClose={closeProfileModal} />

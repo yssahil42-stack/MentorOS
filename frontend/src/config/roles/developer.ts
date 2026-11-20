@@ -15,6 +15,7 @@ export const developerConfig: RoleConfig = {
   navigation: [
     { to: '/app/developer/dashboard', label: 'Dashboard', icon: 'LayoutDashboard' },
     { to: '/app/developer/projects', label: 'Repositories', icon: 'FolderGit2' },
+    { to: '/app/developer/gitlab-sync', label: 'GitLab Sync', icon: 'FolderGit2' },
     { to: '/app/developer/build-plan', label: 'Build Plan', icon: 'GitPullRequest' },
     { to: '/app/developer/notes', label: 'Documentation', icon: 'FileText' },
     { to: '/app/developer/api-keys', label: 'API Keys', icon: 'Key' },

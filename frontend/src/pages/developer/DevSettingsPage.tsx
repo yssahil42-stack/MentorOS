@@ -11,7 +11,7 @@ export default function DevSettingsPage() {
   const { showToast } = useWorkspace();
   const { user, refreshUser } = useAuth();
 
-  const [gitProvider, setGitProvider] = useState('GitHub');
+  const [gitProvider, setGitProvider] = useState('GitLab');
   const [defaultBranch, setDefaultBranch] = useState('main');
   const [conventionalCommits, setConventionalCommits] = useState(true);
   const [autoBranchNaming, setAutoBranchNaming] = useState(true);
@@ -146,10 +146,9 @@ export default function DevSettingsPage() {
                 onChange={(e) => setGitProvider(e.target.value)}
                 className="w-full bg-bg-surface border border-border-base rounded-xl px-3 py-2 text-xs text-text-primary focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition-all"
               >
-                <option value="GitHub">GitHub</option>
-                <option value="GitLab">GitLab</option>
+                <option value="GitLab">GitLab (Recommended)</option>
+                <option value="Self-Hosted">Self-Hosted GitLab / Forge</option>
                 <option value="Bitbucket">Bitbucket</option>
-                <option value="Self-Hosted">Self-Hosted Gitea / Forge</option>
               </select>
             </div>
 

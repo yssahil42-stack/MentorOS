@@ -30,6 +30,7 @@ import { LoadingSkeleton } from '../../components/ui/LoadingSkeleton';
 import { Input } from '../../components/ui/Input';
 import { Select } from '../../components/ui/Select';
 import { PriorityBadge } from '../../components/ui/Badge';
+import { TimeTrackingBadge } from '../../components/ui/TimeTrackingBadge';
 import { formatDate } from '../../utils/dateUtils';
 
 import type { Task, TaskStatus, TaskPriority } from '../../types/task';
@@ -56,6 +57,7 @@ export default function FreelancerTasksPage() {
     priority: 'medium' as TaskPriority,
     due_date: '',
     estimated_minutes: 60,
+    actual_minutes: 0,
     project_id: null as number | null,
   });
 
@@ -148,6 +150,7 @@ export default function FreelancerTasksPage() {
       priority: 'medium',
       due_date: '',
       estimated_minutes: 60,
+      actual_minutes: 0,
       project_id: null,
     });
   };
@@ -175,6 +178,7 @@ export default function FreelancerTasksPage() {
       priority: task.priority,
       due_date: task.due_date ? new Date(task.due_date).toISOString().split('T')[0] : '',
       estimated_minutes: task.estimated_minutes || 60,
+      actual_minutes: task.actual_minutes || 0,
       project_id: task.project_id ?? null,
     });
   };
@@ -270,14 +274,14 @@ export default function FreelancerTasksPage() {
             Due: {formatDate(task.due_date, 'medium')}
           </span>
         )}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center justify-between gap-2 flex-wrap">
           <PriorityBadge priority={task.priority} />
-          {task.estimated_minutes && (
-            <span className="flex items-center gap-1">
-              <Clock className="w-3 h-3" />
-              {task.estimated_minutes} min
-            </span>
-          )}
+          <TimeTrackingBadge
+            expectedMinutes={task.estimated_minutes}
+            actualMinutes={task.actual_minutes}
+            size="xs"
+            variant="pill"
+          />
         </div>
       </div>
     </Card3D>
@@ -626,6 +630,9 @@ export default function FreelancerTasksPage() {
                   <th className="p-4 text-left text-xs font-semibold text-text-muted uppercase tracking-wider hidden lg:table-cell">
                     Due Date
                   </th>
+                  <th className="p-4 text-left text-xs font-semibold text-text-muted uppercase tracking-wider hidden sm:table-cell">
+                    Time
+                  </th>
                   <th className="p-4 text-left text-xs font-semibold text-text-muted uppercase tracking-wider">
                     Status
                   </th>
@@ -637,7 +644,7 @@ export default function FreelancerTasksPage() {
               <tbody>
                 {filteredTasks.length === 0 ? (
                   <tr>
-                    <td colSpan={6} className="p-12 text-center text-text-faint">
+                    <td colSpan={7} className="p-12 text-center text-text-faint">
                       No tasks found
                     </td>
                   </tr>
@@ -679,6 +686,14 @@ export default function FreelancerTasksPage() {
                         ) : (
                           <span className="text-xs text-text-faint">—</span>
                         )}
+                      </td>
+                      <td className="p-4 hidden sm:table-cell">
+                        <TimeTrackingBadge
+                          expectedMinutes={task.estimated_minutes}
+                          actualMinutes={task.actual_minutes}
+                          size="xs"
+                          variant="pill"
+                        />
                       </td>
                       <td className="p-4">
                         <Badge
@@ -832,6 +847,20 @@ export default function FreelancerTasksPage() {
                 </div>
                 <div>
                   <label className="block text-xs font-medium text-text-secondary mb-1">
+                    Due Date
+                  </label>
+                  <Input
+                    type="date"
+                    value={editForm.due_date}
+                    onChange={(e) => setEditForm({ ...editForm, due_date: e.target.value })}
+                    disabled={createTaskMutation.isPending || updateTaskMutation.isPending}
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-medium text-text-secondary mb-1">
                     Est. Minutes
                   </label>
                   <Input
@@ -845,18 +874,21 @@ export default function FreelancerTasksPage() {
                     disabled={createTaskMutation.isPending || updateTaskMutation.isPending}
                   />
                 </div>
-              </div>
-
-              <div>
-                <label className="block text-xs font-medium text-text-secondary mb-1">
-                  Due Date
-                </label>
-                <Input
-                  type="date"
-                  value={editForm.due_date}
-                  onChange={(e) => setEditForm({ ...editForm, due_date: e.target.value })}
-                  disabled={createTaskMutation.isPending || updateTaskMutation.isPending}
-                />
+                <div>
+                  <label className="block text-xs font-medium text-text-secondary mb-1">
+                    Actual Minutes
+                  </label>
+                  <Input
+                    type="number"
+                    value={editForm.actual_minutes}
+                    onChange={(e) =>
+                      setEditForm({ ...editForm, actual_minutes: parseInt(e.target.value) || 0 })
+                    }
+                    min={0}
+                    max={1440}
+                    disabled={createTaskMutation.isPending || updateTaskMutation.isPending}
+                  />
+                </div>
               </div>
 
               <div className="flex items-center justify-end gap-2 pt-2">

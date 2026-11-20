@@ -96,6 +96,7 @@ def seed_initial_data(db: Session) -> None:
                 status="in_progress",
                 due_date=(now + datetime.timedelta(days=5)).strftime("%Y-%m-%d"),
                 estimated_minutes=120,
+                actual_minutes=45,
             ),
             models.Task(
                 user_id=1,
@@ -107,6 +108,7 @@ def seed_initial_data(db: Session) -> None:
                 status="todo",
                 due_date=(now + datetime.timedelta(days=2)).strftime("%Y-%m-%d"),
                 estimated_minutes=90,
+                actual_minutes=0,
             ),
             models.Task(
                 user_id=1,
@@ -119,6 +121,7 @@ def seed_initial_data(db: Session) -> None:
                 due_date=(now - datetime.timedelta(days=1)).strftime("%Y-%m-%d"),
                 completed_at=now - datetime.timedelta(days=1),
                 estimated_minutes=60,
+                actual_minutes=55,
             ),
             models.Task(
                 user_id=1,
@@ -130,6 +133,7 @@ def seed_initial_data(db: Session) -> None:
                 status="todo",
                 due_date=(now + datetime.timedelta(days=8)).strftime("%Y-%m-%d"),
                 estimated_minutes=75,
+                actual_minutes=0,
             ),
         ]
         for t in student_tasks:
@@ -144,6 +148,8 @@ def seed_initial_data(db: Session) -> None:
                 title="Milestone 1: Architecture Specification & RFC",
                 description="Design document approved by academic faculty mentor.",
                 target_date=(now - datetime.timedelta(days=5)).strftime("%Y-%m-%d"),
+                estimated_minutes=60,
+                actual_minutes=55,
                 status="completed",
             ),
             models.Milestone(
@@ -153,6 +159,8 @@ def seed_initial_data(db: Session) -> None:
                 title="Milestone 2: Alpha Prototype & Benchmarking",
                 description="Working messaging cluster with latency metrics.",
                 target_date=(now + datetime.timedelta(days=15)).strftime("%Y-%m-%d"),
+                estimated_minutes=120,
+                actual_minutes=45,
                 status="in_progress",
             ),
             models.Milestone(
@@ -162,6 +170,8 @@ def seed_initial_data(db: Session) -> None:
                 title="Milestone 3: Final Defense & Code Delivery",
                 description="Live presentation and code repository handover.",
                 target_date=(now + datetime.timedelta(days=40)).strftime("%Y-%m-%d"),
+                estimated_minutes=165,
+                actual_minutes=0,
                 status="pending",
             ),
         ]
@@ -241,6 +251,7 @@ def seed_initial_data(db: Session) -> None:
                 status="in_progress",
                 due_date=(now + datetime.timedelta(days=3)).strftime("%Y-%m-%d"),
                 estimated_minutes=90,
+                actual_minutes=50,
             ),
             models.Task(
                 user_id=2,
@@ -252,6 +263,7 @@ def seed_initial_data(db: Session) -> None:
                 status="todo",
                 due_date=(now + datetime.timedelta(days=6)).strftime("%Y-%m-%d"),
                 estimated_minutes=120,
+                actual_minutes=0,
             ),
         ]
         for dt in dev_tasks:
@@ -282,6 +294,7 @@ def seed_initial_data(db: Session) -> None:
                 status="in_progress",
                 due_date=(now + datetime.timedelta(days=4)).strftime("%Y-%m-%d"),
                 estimated_minutes=120,
+                actual_minutes=60,
             ),
         ]
         for ft in free_tasks:

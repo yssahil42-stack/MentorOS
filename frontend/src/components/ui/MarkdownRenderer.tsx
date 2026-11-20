@@ -371,7 +371,7 @@ export function MarkdownRenderer({
           type="button"
           onClick={handleCopy}
           className="absolute top-2 right-2 z-10 flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-2xs font-semibold bg-bg-surface/90 hover:bg-bg-elevated border border-border-base text-text-secondary hover:text-text-primary transition-all shadow-sm"
-          title="Copy Roadmap text"
+          title="Copy to clipboard"
         >
           {copied ? (
             <>
@@ -381,7 +381,7 @@ export function MarkdownRenderer({
           ) : (
             <>
               <Copy className="w-3 h-3" />
-              <span>Copy Roadmap</span>
+              <span>Copy</span>
             </>
           )}
         </button>
