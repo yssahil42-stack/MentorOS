@@ -150,8 +150,7 @@ export const TerracottaDashboardLayout: React.FC<TerracottaDashboardLayoutProps>
 
   // Time of day greeting
   const hour = new Date().getHours();
-  const timeGreeting =
-    hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
+  const timeGreeting = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
 
   const defaultDateStr = new Date().toLocaleDateString('en-US', {
     weekday: 'long',
@@ -267,9 +266,7 @@ export const TerracottaDashboardLayout: React.FC<TerracottaDashboardLayoutProps>
         {/* Left Column: Today Tasks */}
         <div className="lg:col-span-7 bg-white dark:bg-[#161922] border border-[#eee7e0] dark:border-stone-800/80 rounded-2xl md:rounded-3xl p-6 shadow-xs space-y-4">
           <div className="flex items-center justify-between pb-1">
-            <h2 className="text-base sm:text-lg font-bold text-stone-950 dark:text-white">
-              Today
-            </h2>
+            <h2 className="text-base sm:text-lg font-bold text-stone-950 dark:text-white">Today</h2>
             <Link
               to={calendarScheduleTo}
               className="text-xs font-semibold text-[#c04b1e] dark:text-orange-400 hover:underline"

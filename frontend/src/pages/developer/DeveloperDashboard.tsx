@@ -91,8 +91,7 @@ export default function DeveloperDashboard() {
   const pendingTasks = tasks.filter((t) => t.status !== 'completed');
   const taskCompletionRate =
     tasks.length > 0 ? Math.round((completedTasks.length / tasks.length) * 100) : 0;
-  const leftPercent =
-    tasks.length > 0 ? Math.round((pendingTasks.length / tasks.length) * 100) : 0;
+  const leftPercent = tasks.length > 0 ? Math.round((pendingTasks.length / tasks.length) * 100) : 0;
   const avgProjectProgress =
     projects.length > 0
       ? Math.round(
@@ -131,8 +130,7 @@ export default function DeveloperDashboard() {
   const currentDayNum = today.getDate();
 
   const hour = new Date().getHours();
-  const timeGreeting =
-    hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
+  const timeGreeting = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
 
   const formattedDate = new Date().toLocaleDateString('en-US', {
     weekday: 'long',

@@ -40,8 +40,7 @@ export const FreelancerMetrics: React.FC<FreelancerMetricsProps> = ({
     totalTaskCount > 0 ? Math.round((pendingTaskCount / totalTaskCount) * 100) : 0;
 
   const hour = new Date().getHours();
-  const timeGreeting =
-    hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
+  const timeGreeting = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
 
   const formattedDate = new Date().toLocaleDateString('en-US', {
     weekday: 'long',
