@@ -16,7 +16,6 @@ export const developerConfig: RoleConfig = {
     { to: '/app/developer/dashboard', label: 'Dashboard', icon: 'LayoutDashboard' },
     { to: '/app/developer/projects', label: 'Repositories', icon: 'FolderGit2' },
     { to: '/app/developer/gitlab-sync', label: 'GitLab Sync', icon: 'FolderGit2' },
-    { to: '/app/developer/build-plan', label: 'Build Plan', icon: 'GitPullRequest' },
     { to: '/app/developer/notes', label: 'Documentation', icon: 'FileText' },
     { to: '/app/developer/api-keys', label: 'API Keys', icon: 'Key' },
     { to: '/app/developer/settings', label: 'Settings', icon: 'Settings' },
@@ -97,12 +96,6 @@ export const developerConfig: RoleConfig = {
 
   quickActions: [
     { id: 'new-task', label: 'Add Dev Task', icon: 'Plus', href: '/app/developer/tasks' },
-    {
-      id: 'ai-build-plan',
-      label: 'Generate Build Plan',
-      icon: 'Sparkles',
-      promptStarter: 'Break my development goal into practical milestones and coding tasks.',
-    },
     { id: 'new-note', label: 'Dev Note', icon: 'FileText', href: '/app/developer/notes' },
     {
       id: 'readme-draft',
@@ -113,13 +106,6 @@ export const developerConfig: RoleConfig = {
   ],
 
   aiTemplates: [
-    {
-      id: 'build-plan',
-      label: 'Build Plan',
-      promptStarter: 'Break my development goal into practical milestones and coding tasks.',
-      icon: 'Map',
-      contextType: 'build_plan',
-    },
     {
       id: 'spec',
       label: 'Feature Spec',
