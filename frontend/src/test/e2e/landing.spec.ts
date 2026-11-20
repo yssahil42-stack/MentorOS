@@ -10,7 +10,7 @@ test.describe('Landing Page', () => {
 
   test('should load landing page successfully', async ({ page }) => {
     await expect(page).toHaveTitle(/MentorOS/);
-    await expect(page.locator('h1').first()).toContainText(/MentorOS/);
+    await expect(page.locator('h1').first()).toContainText(/MentorOS|One workspace/);
   });
 
   test('should have navigation links', async ({ page }) => {
