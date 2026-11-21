@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { AlertTriangle, RefreshCw, Send, Check, Home, ShieldAlert } from 'lucide-react';
 import { Button } from '../components/ui/Button';
+import { cn } from '../utils/cn';
 
 export interface ServerErrorPageProps {
   error?: Error | null;
@@ -17,6 +18,12 @@ export default function ServerErrorPage({
 }: ServerErrorPageProps) {
   const [internalReported, setInternalReported] = useState(false);
   const isReported = controlledReported ?? internalReported;
+
+  const isChunkError =
+    error?.message &&
+    /Failed to fetch dynamically imported module|Importing a module script failed/i.test(
+      error.message
+    );
 
   const handleReport = () => {
     if (onReport) {
@@ -53,15 +60,21 @@ export default function ServerErrorPage({
 
         {/* Status & Title */}
         <div className="space-y-2">
-          <span className="inline-block text-xs font-mono font-bold tracking-widest text-danger uppercase bg-danger/10 px-2.5 py-0.5 rounded-full">
-            Error 500
+          <span
+            className={cn(
+              'inline-block text-xs font-mono font-bold tracking-widest uppercase px-2.5 py-0.5 rounded-full',
+              isChunkError ? 'text-[#c04b1e] bg-[#c04b1e]/10' : 'text-danger bg-danger/10'
+            )}
+          >
+            {isChunkError ? 'New Version Deployed' : 'Error 500'}
           </span>
           <h1 className="text-2xl font-bold tracking-tight text-text-primary">
-            Something Went Wrong
+            {isChunkError ? 'MentorOS Has Been Updated' : 'Something Went Wrong'}
           </h1>
           <p className="text-sm text-text-secondary leading-relaxed">
-            MentorOS ran into an unexpected server or rendering error. You can report it to help us
-            fix the issue or reload to continue.
+            {isChunkError
+              ? 'A fresh update of MentorOS was just deployed to production. Reload the page to load the latest features and files.'
+              : 'MentorOS ran into an unexpected server or rendering error. You can report it to help us fix the issue or reload to continue.'}
           </p>
         </div>
 
