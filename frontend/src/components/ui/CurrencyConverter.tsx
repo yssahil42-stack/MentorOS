@@ -1,24 +1,10 @@
 import React, { useState, useMemo } from 'react';
-import {
-  ArrowLeftRight,
-  TrendingUp,
-  DollarSign,
-  Coins,
-  Check,
-  Copy,
-  Sparkles,
-  Calculator,
-  RefreshCw,
-  Info,
-} from 'lucide-react';
-import { Card } from './Card';
+import { ArrowLeftRight, Coins, Check, Copy, Calculator } from 'lucide-react';
 import { Card3D } from './Card3D';
 import { Button } from './Button';
 import { Badge } from './Badge';
 import { CurrencySelect } from './CurrencySelect';
 import {
-  SUPPORTED_CURRENCIES,
-  CURRENCY_OPTIONS,
   convertCurrency,
   getExchangeRate,
   formatCurrencyAmount,
@@ -49,9 +35,8 @@ export const CurrencyConverter: React.FC<CurrencyConverterProps> = ({
   const [fromCurrency, setFromCurrency] = useState<string>(initialFromCurrency);
   const [toCurrency, setToCurrency] = useState<string>(initialToCurrency);
   const [isCopied, setIsCopied] = useState<boolean>(false);
-  const [showBenchmarks, setShowBenchmarks] = useState<boolean>(true);
 
-  // Conversion calculations
+  // Conversion calculations for ONLY the selected currency pair
   const convertedAmount = useMemo(() => {
     return convertCurrency(amount, fromCurrency, toCurrency);
   }, [amount, fromCurrency, toCurrency]);
@@ -86,14 +71,6 @@ export const CurrencyConverter: React.FC<CurrencyConverterProps> = ({
     return [25, 50, 75, 100, 250, 500, 1000];
   }, [fromCurrency]);
 
-  // Market benchmarks in INR
-  const MARKET_BENCHMARKS = [
-    { title: 'Entry / Junior Freelancer', inrRate: 1200, note: 'Starter dev, QA, junior design' },
-    { title: 'Mid-Level Specialist', inrRate: 2500, note: 'Full-stack, UI/UX, data engineer' },
-    { title: 'Senior Consultant', inrRate: 4500, note: 'System design, AI/ML, cloud architect' },
-    { title: 'Principal / Lead Advisor', inrRate: 7500, note: 'Tech lead, fractional CTO' },
-  ];
-
   return (
     <Card3D
       maxTilt={variant === 'compact' ? 1 : 2}
@@ -116,11 +93,12 @@ export const CurrencyConverter: React.FC<CurrencyConverterProps> = ({
                 Freelance Currency Converter
               </h3>
               <Badge variant="warning" size="sm">
-                INR Base
+                Real-Time Rate
               </Badge>
             </div>
             <p className="text-xs text-text-muted mt-0.5">
-              Convert rates, hourly billing, and contract milestones in real time
+              Convert rates, hourly billing, and contract milestones between your selected
+              currencies
             </p>
           </div>
         </div>
@@ -161,6 +139,7 @@ export const CurrencyConverter: React.FC<CurrencyConverterProps> = ({
               format="code-symbol"
               className="w-36 shrink-0"
               buttonClassName="w-full bg-bg-base border border-border-base rounded-xl px-3 py-2.5 hover:border-amber-500/50"
+              excludeValues={[toCurrency]}
             />
           </div>
         </div>
@@ -187,6 +166,7 @@ export const CurrencyConverter: React.FC<CurrencyConverterProps> = ({
               format="full"
               className="w-full"
               buttonClassName="w-full bg-bg-base border border-border-base rounded-xl px-3 py-2.5 hover:border-amber-500/50"
+              excludeValues={[fromCurrency]}
             />
           </div>
         </div>
@@ -214,7 +194,7 @@ export const CurrencyConverter: React.FC<CurrencyConverterProps> = ({
         ))}
       </div>
 
-      {/* ── Converted Result Hero Card ────────────────────────────────────── */}
+      {/* ── Converted Result Hero Card (ONLY for the selected currency) ─────── */}
       <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-br from-amber-500/10 via-amber-500/5 to-emerald-500/5 border border-amber-500/25 relative overflow-hidden space-y-3">
         <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-2">
           <div>
@@ -234,7 +214,7 @@ export const CurrencyConverter: React.FC<CurrencyConverterProps> = ({
               variant="secondary"
               size="xs"
               onClick={handleCopy}
-              className="text-xs font-medium"
+              className="text-xs font-medium cursor-pointer"
               icon={
                 isCopied ? (
                   <Check className="w-3.5 h-3.5 text-emerald-500" />
@@ -252,7 +232,7 @@ export const CurrencyConverter: React.FC<CurrencyConverterProps> = ({
                 onClick={() =>
                   onApplyRate(toCurrency === 'INR' ? convertedAmount : amount, fromCurrency)
                 }
-                className="bg-amber-500 hover:bg-amber-600 text-stone-950 font-bold text-xs"
+                className="bg-amber-500 hover:bg-amber-600 text-stone-950 font-bold text-xs cursor-pointer"
                 icon={<Calculator className="w-3.5 h-3.5" />}
               >
                 {applyButtonLabel}
@@ -261,7 +241,7 @@ export const CurrencyConverter: React.FC<CurrencyConverterProps> = ({
           </div>
         </div>
 
-        {/* Rate Breakdown Details */}
+        {/* Rate Breakdown Details for Selected Pair */}
         <div className="pt-3 border-t border-amber-500/20 flex flex-wrap items-center justify-between gap-3 text-xs text-text-muted font-mono">
           <div className="flex items-center gap-4 flex-wrap">
             <span>
@@ -275,109 +255,6 @@ export const CurrencyConverter: React.FC<CurrencyConverterProps> = ({
             Formula: {amount.toLocaleString()} × {exchangeRate} = {convertedAmount.toLocaleString()}
           </span>
         </div>
-      </div>
-
-      {/* ── Multi-Currency Comparison Grid ─────────────────────────────────── */}
-      <div className="space-y-3">
-        <div className="flex items-center justify-between text-xs">
-          <span className="font-bold text-text-primary uppercase tracking-wider text-2xs flex items-center gap-1.5">
-            <TrendingUp className="w-3.5 h-3.5 text-amber-500" />
-            Global Currency Comparison Table
-          </span>
-          <span className="text-3xs text-text-faint">
-            Based on {formatCurrencyAmount(amount, fromCurrency)}
-          </span>
-        </div>
-
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
-          {Object.values(SUPPORTED_CURRENCIES).map((curr) => {
-            const converted = convertCurrency(amount, fromCurrency, curr.code);
-            const isSelected = curr.code === toCurrency || curr.code === fromCurrency;
-
-            return (
-              <button
-                key={curr.code}
-                type="button"
-                onClick={() => setToCurrency(curr.code)}
-                className={cn(
-                  'p-2.5 rounded-xl border text-left transition-all space-y-1',
-                  isSelected
-                    ? 'bg-amber-500/10 border-amber-500/40 shadow-2xs'
-                    : 'bg-bg-base/60 border-border-base hover:border-amber-500/30'
-                )}
-              >
-                <div className="flex items-center justify-between text-2xs">
-                  <span className="font-bold flex items-center gap-1">
-                    <span>{curr.flag}</span>
-                    <span className="font-mono">{curr.code}</span>
-                  </span>
-                  <span className="text-3xs text-text-muted">{curr.symbol}</span>
-                </div>
-                <p className="text-sm font-extrabold text-text-primary font-mono truncate">
-                  {formatCurrencyAmount(converted, curr.code)}
-                </p>
-                <p className="text-3xs text-text-muted truncate">
-                  1 {fromCurrency} = {getExchangeRate(fromCurrency, curr.code)} {curr.code}
-                </p>
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* ── India Freelancer Market Benchmarks ──────────────────────────────── */}
-      <div className="pt-2 border-t border-border-base space-y-3">
-        <div className="flex items-center justify-between text-xs">
-          <span className="font-bold text-text-primary uppercase tracking-wider text-2xs flex items-center gap-1.5">
-            <Sparkles className="w-3.5 h-3.5 text-amber-500" />
-            Indian Freelance Rate Benchmarks (INR)
-          </span>
-          <button
-            type="button"
-            onClick={() => setShowBenchmarks(!showBenchmarks)}
-            className="text-2xs text-amber-500 hover:underline"
-          >
-            {showBenchmarks ? 'Hide' : 'Show'}
-          </button>
-        </div>
-
-        {showBenchmarks && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-            {MARKET_BENCHMARKS.map((bm) => {
-              const usdEq = convertCurrency(bm.inrRate, 'INR', 'USD');
-              const eurEq = convertCurrency(bm.inrRate, 'INR', 'EUR');
-
-              return (
-                <div
-                  key={bm.title}
-                  onClick={() => {
-                    setFromCurrency('INR');
-                    setAmount(bm.inrRate);
-                  }}
-                  className="p-3 rounded-xl border border-border-base bg-bg-base/40 hover:border-amber-500/40 cursor-pointer transition-all flex items-center justify-between gap-3 group"
-                >
-                  <div className="min-w-0">
-                    <p className="text-xs font-semibold text-text-primary group-hover:text-amber-500 transition-colors">
-                      {bm.title}
-                    </p>
-                    <p className="text-3xs text-text-muted truncate">{bm.note}</p>
-                    <div className="flex items-center gap-2 text-3xs font-mono text-text-faint mt-1">
-                      <span>${usdEq}/hr</span>
-                      <span>•</span>
-                      <span>€{eurEq}/hr</span>
-                    </div>
-                  </div>
-                  <div className="text-right shrink-0">
-                    <span className="text-sm font-extrabold text-amber-600 dark:text-amber-400 font-mono block">
-                      ₹{bm.inrRate.toLocaleString()}
-                    </span>
-                    <span className="text-3xs text-text-muted">/hour</span>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        )}
       </div>
     </Card3D>
   );

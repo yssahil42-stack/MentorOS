@@ -13,6 +13,7 @@ export interface CurrencySelectProps {
   disabled?: boolean;
   align?: 'left' | 'right';
   id?: string;
+  excludeValues?: string[];
 }
 
 export const CurrencySelect: React.FC<CurrencySelectProps> = ({
@@ -25,6 +26,7 @@ export const CurrencySelect: React.FC<CurrencySelectProps> = ({
   disabled = false,
   align = 'left',
   id,
+  excludeValues,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -33,8 +35,12 @@ export const CurrencySelect: React.FC<CurrencySelectProps> = ({
   const normalizedValue = (value || 'INR').toUpperCase();
   const currentCurrency = SUPPORTED_CURRENCIES[normalizedValue] || SUPPORTED_CURRENCIES.INR;
 
-  // Filter out the currently selected currency so it never appears in the dropdown list
-  const availableOptions = CURRENCY_OPTIONS.filter((c) => c.value !== normalizedValue);
+  // Filter out the currently selected currency and any excluded currencies so they never appear in the dropdown list
+  const excludeSet = new Set<string>([
+    normalizedValue,
+    ...(excludeValues || []).map((v) => (v || '').toUpperCase()),
+  ]);
+  const availableOptions = CURRENCY_OPTIONS.filter((c) => !excludeSet.has(c.value));
 
   // Close on click outside or escape key
   useEffect(() => {
