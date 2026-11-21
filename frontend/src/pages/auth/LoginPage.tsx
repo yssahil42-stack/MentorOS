@@ -4,7 +4,6 @@ import { Eye, EyeOff, Layers, Loader2 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useWorkspace } from '../../contexts/WorkspaceContext';
 import { ThemeToggle } from '../../components/ui/ThemeToggle';
-import { Spatial3DCanvas } from '../../components/ui/Spatial3DCanvas';
 import { GoogleSignInButton } from '../../components/auth/GoogleSignInButton';
 import { cn } from '../../utils/cn';
 
@@ -68,51 +67,71 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-bg-base flex items-center justify-center px-4 py-12 relative overflow-y-auto">
-      {/* Floating Theme Toggle in corner */}
-      <div className="absolute top-6 right-6 z-20">
-        <ThemeToggle size="sm" variant="expanded" showLabel />
-      </div>
-
-      {/* Dynamic ambient backdrop glow */}
+    <div className="min-h-screen bg-[#faf8f5] dark:bg-[#0c0e14] text-stone-900 dark:text-stone-100 font-sans selection:bg-[#c04b1e]/20 selection:text-[#c04b1e] transition-colors relative overflow-x-hidden flex flex-col">
+      {/* ─── Ambient Peach Glow matching Landing Page ─────────────────────── */}
       <div
-        className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[450px] h-[450px] rounded-full bg-solar-500/15 blur-[140px] pointer-events-none"
+        className="absolute top-0 right-0 w-[550px] h-[550px] bg-gradient-to-br from-orange-200/35 via-amber-100/25 to-transparent blur-[130px] rounded-full pointer-events-none"
         aria-hidden="true"
       />
 
-      <Spatial3DCanvas defaultMode="2d" defaultPreset="standard" className="max-w-sm mx-auto">
-        <div className="relative w-full z-10">
-          {/* Brand */}
-          <div className="flex flex-col items-center gap-3 mb-8">
+      {/* ─── Header matching Landing Page ─────────────────────────────────── */}
+      <header className="sticky top-0 z-40 bg-[#faf8f5]/90 dark:bg-[#0c0e14]/90 backdrop-blur-md border-b border-[#eee7e0] dark:border-stone-800/80 transition-colors">
+        <div className="max-w-7xl mx-auto flex items-center justify-between px-6 md:px-12 h-16">
+          <Link
+            to="/"
+            className="flex items-center gap-2.5 group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 rounded-xl"
+            title="Back to home"
+          >
+            <div className="w-8 h-8 rounded-lg bg-[#c04b1e] text-white flex items-center justify-center font-bold shadow-xs group-hover:bg-[#a83f17] transition-colors">
+              <Layers className="w-4 h-4 text-white" />
+            </div>
+            <span className="text-base font-bold text-stone-950 dark:text-white tracking-tight">
+              MentorOS
+            </span>
+          </Link>
+
+          <div className="flex items-center gap-4 text-xs sm:text-sm">
+            <span className="hidden sm:inline text-stone-500 dark:text-stone-400 font-medium">
+              Don't have an account?
+            </span>
             <Link
-              to="/"
-              className="flex flex-col items-center gap-2.5 group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus rounded-2xl p-1"
-              title="Go to first page"
+              to="/register"
+              className="font-semibold text-stone-700 dark:text-stone-200 hover:text-[#c04b1e] dark:hover:text-orange-400 transition-colors"
             >
-              <div className="w-12 h-12 rounded-2xl bg-solar-500/15 border border-solar-500/35 flex items-center justify-center shadow-glow-solar group-hover:scale-105 transition-transform">
-                <Layers className="h-6 w-6 text-solar-500" aria-hidden="true" />
-              </div>
-              <h1 className="text-2xl font-extrabold text-text-primary group-hover:text-solar-500 transition-colors tracking-tight">
-                MentorOS
-              </h1>
+              Get started
             </Link>
-            <p className="text-xs text-text-muted">Sign in to your intelligent workspace</p>
+            <ThemeToggle size="sm" variant="icon" />
+          </div>
+        </div>
+      </header>
+
+      {/* ─── Main Content ─────────────────────────────────────────────────── */}
+      <main className="flex-1 flex items-center justify-center px-4 py-12 relative z-10">
+        <div className="w-full max-w-[420px] space-y-6">
+          {/* Brand & Heading */}
+          <div className="text-center space-y-1.5">
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-stone-950 dark:text-white tracking-tight">
+              Welcome back
+            </h1>
+            <p className="text-xs sm:text-sm text-stone-600 dark:text-stone-400 font-medium">
+              Sign in to your intelligent workspace
+            </p>
           </div>
 
           {/* Card */}
-          <div className="card p-6 md:p-7 shadow-card-hover border-border-base backdrop-blur-md">
-            {/* Error banner */}
+          <div className="bg-white dark:bg-[#161922] border border-[#eee7e0] dark:border-stone-800 rounded-3xl p-6 sm:p-8 shadow-xs space-y-5">
+            {/* Error Banner */}
             {error && (
               <div
                 role="alert"
-                className="mb-4 px-3.5 py-2.5 rounded-xl bg-danger/10 border border-danger/25 text-xs text-danger font-medium flex items-center gap-2"
+                className="px-3.5 py-2.5 rounded-xl bg-red-500/10 border border-red-500/25 text-xs text-red-600 dark:text-red-400 font-medium animate-in fade-in-50 duration-150"
               >
-                <span>{error}</span>
+                {error}
               </div>
             )}
 
             {/* Google Sign-In */}
-            <div className="mb-4">
+            <div>
               <GoogleSignInButton
                 onSuccess={handleGoogleSuccess}
                 onError={handleGoogleError}
@@ -122,23 +141,28 @@ export default function LoginPage() {
             </div>
 
             {/* Divider */}
-            <div className="relative my-4 flex items-center justify-center">
+            <div className="relative flex items-center justify-center my-2">
               <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-border-base" />
+                <div className="w-full border-t border-[#eee7e0] dark:border-stone-800" />
               </div>
-              <div className="relative bg-bg-surface px-3 text-2xs uppercase tracking-wider text-text-faint font-semibold">
-                or continue with email
+              <div className="relative bg-white dark:bg-[#161922] px-3 text-3xs uppercase tracking-widest text-stone-400 dark:text-stone-500 font-bold">
+                OR CONTINUE WITH EMAIL
               </div>
             </div>
 
-            <form onSubmit={handleSubmit} noValidate aria-label="Sign in form">
+            <form
+              onSubmit={handleSubmit}
+              noValidate
+              aria-label="Sign in form"
+              className="space-y-4"
+            >
               {/* Email */}
-              <div className="mb-4">
+              <div>
                 <label
                   htmlFor="login-email"
-                  className="block text-xs font-semibold text-text-secondary mb-1.5"
+                  className="block text-xs font-semibold text-stone-700 dark:text-stone-300 mb-1.5"
                 >
-                  Email Address
+                  Email address
                 </label>
                 <input
                   id="login-email"
@@ -150,27 +174,22 @@ export default function LoginPage() {
                   required
                   aria-required="true"
                   disabled={loading}
-                  className={cn(
-                    'w-full h-10 px-3.5 rounded-xl text-sm text-text-primary placeholder:text-text-faint',
-                    'bg-bg-elevated border border-border-base',
-                    'transition-all focus:outline-none focus:ring-2 focus:ring-focus focus:border-transparent',
-                    'disabled:opacity-50 shadow-sm'
-                  )}
+                  className="w-full h-10.5 px-3.5 rounded-xl text-xs sm:text-sm text-stone-900 dark:text-white placeholder:text-stone-400 bg-[#faf8f5]/60 dark:bg-stone-900/60 border border-[#eee7e0] dark:border-stone-800 focus:outline-none focus:border-[#c04b1e] focus:ring-1 focus:ring-[#c04b1e] transition-all shadow-2xs"
                 />
               </div>
 
               {/* Password */}
-              <div className="mb-5">
+              <div>
                 <div className="flex items-center justify-between mb-1.5">
                   <label
                     htmlFor="login-password"
-                    className="block text-xs font-semibold text-text-secondary"
+                    className="block text-xs font-semibold text-stone-700 dark:text-stone-300"
                   >
                     Password
                   </label>
                   <Link
                     to="/forgot-password"
-                    className="text-xs text-accent-primary hover:underline transition-colors font-medium"
+                    className="text-2xs text-[#c04b1e] hover:text-[#a83f17] font-medium transition-colors hover:underline"
                   >
                     Forgot password?
                   </Link>
@@ -186,16 +205,11 @@ export default function LoginPage() {
                     required
                     aria-required="true"
                     disabled={loading}
-                    className={cn(
-                      'w-full h-10 px-3.5 pr-10 rounded-xl text-sm text-text-primary placeholder:text-text-faint',
-                      'bg-bg-elevated border border-border-base',
-                      'transition-all focus:outline-none focus:ring-2 focus:ring-focus focus:border-transparent',
-                      'disabled:opacity-50 shadow-sm'
-                    )}
+                    className="w-full h-10.5 px-3.5 pr-10 rounded-xl text-xs sm:text-sm text-stone-900 dark:text-white placeholder:text-stone-400 bg-[#faf8f5]/60 dark:bg-stone-900/60 border border-[#eee7e0] dark:border-stone-800 focus:outline-none focus:border-[#c04b1e] focus:ring-1 focus:ring-[#c04b1e] transition-all shadow-2xs"
                   />
                   <button
                     type="button"
-                    className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-text-muted hover:text-text-primary transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-focus rounded-lg"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-700 dark:hover:text-stone-200 transition-colors cursor-pointer"
                     onClick={() => setShowPass((v) => !v)}
                     aria-label={showPass ? 'Hide password' : 'Show password'}
                   >
@@ -208,36 +222,32 @@ export default function LoginPage() {
                 </div>
               </div>
 
-              {/* Submit */}
-              <button
-                type="submit"
-                disabled={loading}
-                className={cn(
-                  'w-full h-10 rounded-xl text-sm font-bold text-white',
-                  'bg-solar-500 hover:bg-solar-600 shadow-md hover:shadow-glow-solar',
-                  'transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus',
-                  'disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98]',
-                  'flex items-center justify-center gap-2'
-                )}
-              >
-                {loading && <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />}
-                {loading ? 'Signing in…' : 'Sign in to MentorOS'}
-              </button>
+              {/* Submit Button */}
+              <div className="pt-2">
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full h-11 rounded-xl text-xs sm:text-sm font-bold text-white bg-[#c04b1e] hover:bg-[#a83f17] shadow-xs hover:shadow transition-all duration-150 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {loading && <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />}
+                  {loading ? 'Signing in…' : 'Sign in to MentorOS'}
+                </button>
+              </div>
             </form>
-          </div>
 
-          {/* Register link */}
-          <p className="mt-6 text-center text-xs text-text-muted">
-            No account yet?{' '}
-            <Link
-              to="/register"
-              className="text-student-500 hover:text-student-600 font-bold transition-colors focus-visible:outline-none focus-visible:underline"
-            >
-              Create an account
-            </Link>
-          </p>
+            {/* Footer */}
+            <div className="pt-1 text-center text-xs text-stone-600 dark:text-stone-400 font-medium">
+              Don't have an account?{' '}
+              <Link
+                to="/register"
+                className="text-[#c04b1e] hover:text-[#a83f17] font-semibold transition-colors hover:underline"
+              >
+                Create an account
+              </Link>
+            </div>
+          </div>
         </div>
-      </Spatial3DCanvas>
+      </main>
     </div>
   );
 }
