@@ -202,11 +202,6 @@ export default function RegisterPage() {
             ))}
           </div>
         </div>
-
-        {/* Bottom note */}
-        <div className="relative z-10 pt-4 text-xs text-stone-500 font-medium">
-          You can change your role later in Settings.
-        </div>
       </div>
 
       {/* ─── Right Panel: Create Workspace Registration Form ──────────────── */}
