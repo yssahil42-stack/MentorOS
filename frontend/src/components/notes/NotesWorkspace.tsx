@@ -267,7 +267,7 @@ Content-Type: application/json
 - Key pain points to solve:
 
 ### Key Milestones & Estimated Budget
-- **Budget Estimate:** \$X,XXX
+- **Budget Estimate:** $X,XXX
 - **Phase 1 Delivery:** Wireframes & Design System
 - **Phase 2 Delivery:** Full Responsive Frontend Build`,
       },
