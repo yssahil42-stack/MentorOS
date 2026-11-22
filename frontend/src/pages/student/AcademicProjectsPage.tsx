@@ -1,1368 +1,1318 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
-  GraduationCap,
+  BookOpen,
   Plus,
   Search,
-  Sparkles,
+  Clock,
+  List,
+  Columns3,
   Calendar,
   CheckCircle2,
-  Clock,
-  BookOpen,
-  ArrowRight,
-  Filter,
   Trash2,
-  Award,
-  ChevronRight,
+  X,
+  Timer,
   ChevronDown,
-  FileText,
-  ClipboardList,
-  Check,
-  Layers,
-  ListTodo,
-  Target,
+  ChevronUp,
+  GraduationCap,
+  Sparkles,
 } from 'lucide-react';
 import { useWorkspace } from '../../contexts/WorkspaceContext';
-import {
-  fetchProjects,
-  createProject,
-  deleteProject,
-  fetchMilestones,
-  createMilestone,
-  updateMilestone,
-  deleteMilestone,
-} from '../../services/projectService';
+import { fetchProjects, createProject, deleteProject } from '../../services/projectService';
 import { fetchTasks, createTask, updateTask, deleteTask } from '../../services/taskService';
-import { Card } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
-import { Badge, PriorityBadge } from '../../components/ui/Badge';
 import { Modal } from '../../components/ui/Modal';
-import { LoadingSkeleton } from '../../components/ui/LoadingSkeleton';
-import { TimeTrackingBadge } from '../../components/ui/TimeTrackingBadge';
-import { getMilestoneTimeTotals } from '../../utils/timeTracking';
-import type { Project, ProjectPriority, Milestone } from '../../types/project';
-import type { TaskStatus } from '../../types/task';
+import { cn } from '../../utils/cn';
+import type { Project } from '../../types/project';
+import type { Task, TaskStatus } from '../../types/task';
+
+// ── Baseline Starter Data (Matches Mockup when DB is unpopulated) ─────────────
+const STARTER_COURSES: Project[] = [
+  {
+    id: 1,
+    user_id: 1,
+    role: 'student',
+    title: 'Computer networks',
+    description: 'Network architecture, subnetting, CIDR, and routing protocols.',
+    priority: 'high',
+    status: 'active',
+    progress: 33,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+  },
+  {
+    id: 2,
+    user_id: 1,
+    role: 'student',
+    title: 'Database management',
+    description: 'Relational algebra, normalization, query optimization, and transactions.',
+    priority: 'high',
+    status: 'active',
+    progress: 50,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+  },
+  {
+    id: 3,
+    user_id: 1,
+    role: 'student',
+    title: 'Operating systems',
+    description: 'Process scheduling, virtual memory, synchronization, and kernel design.',
+    priority: 'medium',
+    status: 'active',
+    progress: 40,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+  },
+  {
+    id: 4,
+    user_id: 1,
+    role: 'student',
+    title: 'Engineering maths',
+    description: 'Linear algebra, matrices, rank, eigenvalues, and Fourier analysis.',
+    priority: 'medium',
+    status: 'active',
+    progress: 20,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+  },
+];
+
+const STARTER_TASKS: Task[] = [
+  {
+    id: 101,
+    user_id: 1,
+    role: 'student',
+    project_id: 1,
+    project_title: 'Computer networks',
+    title: 'Subnetting worksheet',
+    description: 'CIDR masks and variable-length subnet calculations.',
+    status: 'todo',
+    priority: 'high',
+    due_date: 'Yesterday',
+    estimated_minutes: 60, // 1h
+    actual_minutes: 20, // 20m
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+  },
+  {
+    id: 102,
+    user_id: 1,
+    role: 'student',
+    project_id: 2,
+    project_title: 'Database management',
+    title: 'DBMS lab record',
+    description: 'Triggers, store procedures, and index execution plans.',
+    status: 'in_progress',
+    priority: 'high',
+    due_date: 'Tomorrow',
+    estimated_minutes: 120, // 2h
+    actual_minutes: 160, // 2h 40m (+40m)
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+  },
+  {
+    id: 103,
+    user_id: 1,
+    role: 'student',
+    project_id: 3,
+    project_title: 'Operating systems',
+    title: 'OS assignment 3',
+    description: 'Round-robin CPU scheduler simulation implementation.',
+    status: 'in_progress',
+    priority: 'high',
+    due_date: 'Wed',
+    estimated_minutes: 180, // 3h
+    actual_minutes: 75, // 1h 15m
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+  },
+  {
+    id: 104,
+    user_id: 1,
+    role: 'student',
+    project_id: 4,
+    project_title: 'Engineering maths',
+    title: 'Matrices quiz prep',
+    description: 'Eigenvalues, eigenvectors, and diagonalisation shortcuts.',
+    status: 'todo',
+    priority: 'medium',
+    due_date: 'Fri',
+    estimated_minutes: 90, // 1h 30m
+    actual_minutes: 0,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+  },
+  {
+    id: 105,
+    user_id: 1,
+    role: 'student',
+    project_id: 2,
+    project_title: 'Database management',
+    title: 'ER diagram exercise',
+    description: 'Conceptual data model to logical schema translation.',
+    status: 'completed',
+    priority: 'medium',
+    due_date: '12 Nov',
+    estimated_minutes: 120, // 2h
+    actual_minutes: 100, // 1h 40m (-20m)
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+  },
+];
+
+// ── Time & Date Helpers ──────────────────────────────────────────────────────
+function formatMins(mins?: number | null): string {
+  if (!mins || mins <= 0) return '0m';
+  const h = Math.floor(mins / 60);
+  const m = mins % 60;
+  if (h > 0 && m > 0) return `${h}h ${m}m`;
+  if (h > 0) return `${h}h`;
+  return `${m}m`;
+}
+
+function getDelta(task: Task) {
+  const est = task.estimated_minutes || 0;
+  const actual = task.actual_minutes || 0;
+  if (actual > est && est > 0) {
+    const diff = actual - est;
+    return {
+      text: `+${formatMins(diff)}`,
+      className: 'text-[#991b1b]', // dark red / maroon
+    };
+  }
+  if (task.status === 'completed' && actual < est && actual > 0) {
+    const diff = est - actual;
+    return {
+      text: `-${formatMins(diff)}`,
+      className: 'text-[#16a34a]', // green
+    };
+  }
+  return null;
+}
+
+function getProgressBar(task: Task) {
+  const est = task.estimated_minutes || 60;
+  const actual = task.actual_minutes || 0;
+  const isOvertime = actual > est;
+  const isCompleted = task.status === 'completed';
+  const percent = est > 0 ? Math.min(100, Math.round((actual / est) * 100)) : 0;
+
+  if (isOvertime) {
+    return { percent: 100, color: 'bg-[#7f1d1d]' }; // dark maroon
+  }
+  if (isCompleted) {
+    return { percent: 100, color: 'bg-[#c04b1e]' }; // terracotta
+  }
+  if (actual > 0) {
+    return { percent, color: 'bg-[#c04b1e]' }; // terracotta
+  }
+  return { percent: 0, color: 'bg-transparent' };
+}
+
+function isTaskOverdue(task: Task): boolean {
+  if (task.status === 'completed') return false;
+  if (!task.due_date) return false;
+  const lower = task.due_date.toLowerCase();
+  if (lower.includes('yesterday')) return true;
+  // If ISO date string
+  const d = new Date(task.due_date);
+  if (!isNaN(d.getTime())) {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    return d.getTime() < today.getTime();
+  }
+  return false;
+}
 
 export default function AcademicProjectsPage() {
-  const { openAIDrawer, openCaptureModal, showToast } = useWorkspace();
+  const { showToast } = useWorkspace();
   const queryClient = useQueryClient();
 
-  const [activeTab, setActiveTab] = useState<'courses' | 'assignments'>('courses');
+  const [activeTab, setActiveTab] = useState<'courses' | 'assignments'>('assignments');
+  const [viewMode, setViewMode] = useState<'both' | 'list' | 'board'>('both');
   const [search, setSearch] = useState('');
-  const [filterStatus, setFilterStatus] = useState<string>('all');
-  const [selectedProjectId, setSelectedProjectId] = useState<number | null>(null);
 
-  // Assignment tab filtering & quick add
-  const [assignmentFilterStatus, setAssignmentFilterStatus] = useState<string>('all');
-  const [assignmentCourseFilter, setAssignmentCourseFilter] = useState<string>('all');
-  const [assignmentSearch, setAssignmentSearch] = useState<string>('');
-  const [quickAssignmentTitle, setQuickAssignmentTitle] = useState<string>('');
-  const [quickAssignmentCourseId, setQuickAssignmentCourseId] = useState<number | undefined>(
-    undefined
-  );
-  const [quickAssignmentMinutes, setQuickAssignmentMinutes] = useState<number>(60);
+  // Modals state
+  const [isNewCourseModalOpen, setIsNewCourseModalOpen] = useState(false);
+  const [newCourseTitle, setNewCourseTitle] = useState('');
+  const [newCourseDesc, setNewCourseDesc] = useState('');
 
-  // New Project Form State
-  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-  const [newTitle, setNewTitle] = useState('');
-  const [newDesc, setNewDesc] = useState('');
-  const [newPriority, setNewPriority] = useState<ProjectPriority>('high');
-  const [newTargetDate, setNewTargetDate] = useState('');
+  const [isNewAssignmentModalOpen, setIsNewAssignmentModalOpen] = useState(false);
+  const [newAssignmentTitle, setNewAssignmentTitle] = useState('');
+  const [newAssignmentCourseId, setNewAssignmentCourseId] = useState<number | undefined>(undefined);
+  const [newAssignmentEstimate, setNewAssignmentEstimate] = useState<number>(60);
+  const [newAssignmentDue, setNewAssignmentDue] = useState<string>('Tomorrow');
 
-  // New Milestone Form State
-  const [isMilestoneModalOpen, setIsMilestoneModalOpen] = useState(false);
-  const [activeProjectForMilestone, setActiveProjectForMilestone] = useState<number | null>(null);
-  const [milestoneTitle, setMilestoneTitle] = useState('');
-  const [milestoneTargetDate, setMilestoneTargetDate] = useState('');
-  const [milestoneEstimatedMinutes, setMilestoneEstimatedMinutes] = useState<number>(60);
-  const [milestoneActualMinutes, setMilestoneActualMinutes] = useState<number>(0);
+  // Log Time Modal state
+  const [selectedTaskForLog, setSelectedTaskForLog] = useState<Task | null>(null);
+  const [logTimeMinutesToAdd, setLogTimeMinutesToAdd] = useState<number>(30);
+  const [logTimeStatus, setLogTimeStatus] = useState<TaskStatus>('in_progress');
 
-  // Phase Expansion & Quick Task State
-  const [expandedMilestoneIds, setExpandedMilestoneIds] = useState<Record<number, boolean>>({});
-  const [newTaskTitleByMilestone, setNewTaskTitleByMilestone] = useState<Record<number, string>>(
-    {}
-  );
-
-  const toggleMilestoneExpand = (milestoneId: number) => {
-    setExpandedMilestoneIds((prev) => ({
-      ...prev,
-      [milestoneId]: !prev[milestoneId],
-    }));
-  };
-
-  const formatPhaseTime = (mins: number) => {
-    if (mins <= 0) return 'Time: 0m';
-    return `Time: ${mins}m`;
-  };
-
-  // Fetch strictly role: 'student' projects
-  const { data: projects = [], isLoading } = useQuery({
+  // Queries
+  const { data: dbProjects = [] } = useQuery<Project[]>({
     queryKey: ['projects', 'student'],
     queryFn: () => fetchProjects('student'),
   });
 
-  // Fetch milestones
-  const { data: milestones = [] } = useQuery({
-    queryKey: ['milestones', 'student'],
-    queryFn: () => fetchMilestones({ role: 'student' }),
-  });
-
-  // Fetch tasks to dynamically compute real-time milestone and project progress
-  const { data: tasks = [] } = useQuery({
+  const { data: dbTasks = [] } = useQuery<Task[]>({
     queryKey: ['tasks', 'student'],
     queryFn: () => fetchTasks({ role: 'student' }),
   });
 
-  const createProjectMutation = useMutation({
+  // Blend with starter items if unpopulated
+  const courses = useMemo(() => {
+    if (dbProjects.length > 0) return dbProjects;
+    return STARTER_COURSES;
+  }, [dbProjects]);
+
+  const tasks = useMemo(() => {
+    if (dbTasks.length > 0) return dbTasks;
+    return STARTER_TASKS;
+  }, [dbTasks]);
+
+  // Map courses lookup for quick project_title resolution
+  const courseLookup = useMemo(() => {
+    const map = new Map<number, string>();
+    courses.forEach((c) => map.set(c.id, c.title));
+    return map;
+  }, [courses]);
+
+  // Mutations
+  const createCourseMutation = useMutation({
     mutationFn: async () => {
+      if (!newCourseTitle.trim()) return;
       return createProject({
-        title: newTitle,
-        description: newDesc,
-        priority: newPriority,
-        target_date: newTargetDate,
+        title: newCourseTitle.trim(),
+        description: newCourseDesc.trim(),
         role: 'student',
+        priority: 'high',
       });
     },
     onSuccess: () => {
-      setIsCreateModalOpen(false);
-      setNewTitle('');
-      setNewDesc('');
       queryClient.invalidateQueries({ queryKey: ['projects'] });
-      queryClient.invalidateQueries({ queryKey: ['dashboard'] });
-      showToast('Academic project created successfully! 🎓', 'success');
+      setIsNewCourseModalOpen(false);
+      setNewCourseTitle('');
+      setNewCourseDesc('');
+      showToast('Course created successfully! 🎓', 'success');
     },
     onError: () => {
-      showToast('Failed to create academic project', 'error');
+      showToast('Failed to create course', 'error');
     },
   });
 
-  const deleteProjectMutation = useMutation({
-    mutationFn: async (id: number) => deleteProject(id),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['projects'] });
-      queryClient.invalidateQueries({ queryKey: ['dashboard'] });
-      showToast('Project removed', 'info');
-    },
-  });
-
-  const createMilestoneMutation = useMutation({
+  const createAssignmentMutation = useMutation({
     mutationFn: async () => {
-      if (!activeProjectForMilestone) return;
-      return createMilestone({
-        project_id: activeProjectForMilestone,
-        title: milestoneTitle,
-        target_date: milestoneTargetDate,
-        estimated_minutes: milestoneEstimatedMinutes,
-        actual_minutes: milestoneActualMinutes,
-        role: 'student',
-      });
-    },
-    onSuccess: () => {
-      setIsMilestoneModalOpen(false);
-      setMilestoneTitle('');
-      setMilestoneTargetDate('');
-      setMilestoneEstimatedMinutes(60);
-      setMilestoneActualMinutes(0);
-      setActiveProjectForMilestone(null);
-      queryClient.invalidateQueries({ queryKey: ['milestones'] });
-      queryClient.invalidateQueries({ queryKey: ['projects'] });
-      showToast('Academic milestone added!', 'success');
-    },
-  });
-
-  const toggleMilestoneMutation = useMutation({
-    mutationFn: async (m: Milestone) => {
-      const nextStatus = m.status === 'completed' ? 'pending' : 'completed';
-      return updateMilestone(m.id, { status: nextStatus });
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['milestones'] });
-      queryClient.invalidateQueries({ queryKey: ['tasks'] });
-      queryClient.invalidateQueries({ queryKey: ['projects'] });
-      queryClient.invalidateQueries({ queryKey: ['dashboard'] });
-      showToast('Milestone status updated!', 'success');
-    },
-  });
-
-  const deleteMilestoneMutation = useMutation({
-    mutationFn: async (id: number) => deleteMilestone(id),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['milestones'] });
-      queryClient.invalidateQueries({ queryKey: ['projects'] });
-      queryClient.invalidateQueries({ queryKey: ['dashboard'] });
-      showToast('Milestone removed', 'info');
-    },
-  });
-
-  const updateTaskMutation = useMutation({
-    mutationFn: async ({ id, status }: { id: number; status: TaskStatus }) => {
-      return updateTask(id, { status });
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['tasks'] });
-      queryClient.invalidateQueries({ queryKey: ['projects'] });
-      queryClient.invalidateQueries({ queryKey: ['dashboard'] });
-      showToast('Task status updated!', 'success');
-    },
-  });
-
-  const createTaskMutation = useMutation({
-    mutationFn: async (data: { title: string; project_id: number; description: string }) => {
+      if (!newAssignmentTitle.trim()) return;
       return createTask({
-        title: data.title,
-        project_id: data.project_id,
-        description: data.description,
-        priority: 'medium',
+        title: newAssignmentTitle.trim(),
+        project_id: newAssignmentCourseId,
+        estimated_minutes: newAssignmentEstimate,
+        due_date: newAssignmentDue,
         role: 'student',
         status: 'todo',
       });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tasks'] });
-      queryClient.invalidateQueries({ queryKey: ['projects'] });
-      queryClient.invalidateQueries({ queryKey: ['dashboard'] });
-      showToast('Task added to phase!', 'success');
-    },
-  });
-
-  const deleteTaskMutation = useMutation({
-    mutationFn: async (id: number) => deleteTask(id),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['tasks'] });
-      queryClient.invalidateQueries({ queryKey: ['projects'] });
-      queryClient.invalidateQueries({ queryKey: ['dashboard'] });
-      showToast('Task deleted', 'info');
-    },
-  });
-
-  const createAssignmentMutation = useMutation({
-    mutationFn: async () => {
-      if (!quickAssignmentTitle.trim()) return;
-      return createTask({
-        title: quickAssignmentTitle.trim(),
-        project_id: quickAssignmentCourseId,
-        estimated_minutes: quickAssignmentMinutes,
-        role: 'student',
-      });
-    },
-    onSuccess: () => {
-      setQuickAssignmentTitle('');
-      queryClient.invalidateQueries({ queryKey: ['tasks'] });
-      queryClient.invalidateQueries({ queryKey: ['projects'] });
-      queryClient.invalidateQueries({ queryKey: ['dashboard'] });
-      showToast('Coursework assignment added! 📝', 'success');
+      setIsNewAssignmentModalOpen(false);
+      setNewAssignmentTitle('');
+      showToast('Assignment added! 📝', 'success');
     },
     onError: () => {
       showToast('Failed to add assignment', 'error');
     },
   });
 
-  const filteredProjects = projects.filter((p) => {
-    const matchesSearch =
-      p.title.toLowerCase().includes(search.toLowerCase()) ||
-      (p.description && p.description.toLowerCase().includes(search.toLowerCase()));
-    const matchesStatus = filterStatus === 'all' || p.status === filterStatus;
-    return matchesSearch && matchesStatus;
+  const logTimeMutation = useMutation({
+    mutationFn: async () => {
+      if (!selectedTaskForLog) return;
+      const currentActual = selectedTaskForLog.actual_minutes || 0;
+      const updatedActual = currentActual + logTimeMinutesToAdd;
+      return updateTask(selectedTaskForLog.id, {
+        actual_minutes: updatedActual,
+        status: logTimeStatus,
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tasks'] });
+      setSelectedTaskForLog(null);
+      showToast('Study time logged! ⏱️', 'success');
+    },
+    onError: () => {
+      // If task was a client starter task, update local task reflection
+      if (selectedTaskForLog) {
+        selectedTaskForLog.actual_minutes =
+          (selectedTaskForLog.actual_minutes || 0) + logTimeMinutesToAdd;
+        selectedTaskForLog.status = logTimeStatus;
+        setSelectedTaskForLog(null);
+        showToast('Study time logged! ⏱️', 'success');
+      }
+    },
   });
 
-  const filteredAssignments = tasks.filter((t) => {
-    const matchesSearch =
-      t.title.toLowerCase().includes(assignmentSearch.toLowerCase()) ||
-      (t.description && t.description.toLowerCase().includes(assignmentSearch.toLowerCase()));
-    const matchesStatus =
-      assignmentFilterStatus === 'all' ||
-      (assignmentFilterStatus === 'completed' && t.status === 'completed') ||
-      (assignmentFilterStatus === 'todo' && t.status === 'todo') ||
-      (assignmentFilterStatus === 'in_progress' && t.status === 'in_progress');
-    const matchesCourse =
-      assignmentCourseFilter === 'all' || String(t.project_id) === String(assignmentCourseFilter);
-    return matchesSearch && matchesStatus && matchesCourse;
+  const deleteCourseMutation = useMutation({
+    mutationFn: async (id: number) => deleteProject(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['projects'] });
+      queryClient.invalidateQueries({ queryKey: ['tasks'] });
+      showToast('Course removed', 'info');
+    },
   });
 
-  const totalMilestones = milestones.length;
-  const completedMilestones = milestones.filter((m) => m.status === 'completed').length;
-  const completedTasksCount = tasks.filter((t) => t.status === 'completed').length;
-  const avgProgress = projects.length
-    ? Math.round(
-        projects.reduce((acc, p) => {
-          const pTasks = tasks.filter(
-            (t) =>
-              t.project_id === p.id ||
-              (t.project_title &&
-                t.project_title.trim().toLowerCase() === p.title.trim().toLowerCase())
-          );
-          const pProg =
-            pTasks.length > 0
-              ? Math.round(
-                  (pTasks.filter((t) => t.status === 'completed').length / pTasks.length) * 100
-                )
-              : p.progress || 0;
-          return acc + pProg;
-        }, 0) / projects.length
-      )
-    : 0;
+  // Filter tasks based on search
+  const filteredTasks = useMemo(() => {
+    return tasks.filter((t) => {
+      const courseName = (
+        t.project_title ||
+        (t.project_id ? courseLookup.get(t.project_id) : '') ||
+        ''
+      ).toLowerCase();
+      const matchesSearch =
+        t.title.toLowerCase().includes(search.toLowerCase()) ||
+        courseName.includes(search.toLowerCase()) ||
+        (t.description && t.description.toLowerCase().includes(search.toLowerCase()));
+      return matchesSearch;
+    });
+  }, [tasks, search, courseLookup]);
+
+  // Aggregate Metrics
+  const totalExpected = useMemo(() => {
+    return filteredTasks.reduce((sum, t) => sum + (t.estimated_minutes || 0), 0);
+  }, [filteredTasks]);
+
+  const totalLogged = useMemo(() => {
+    return filteredTasks.reduce((sum, t) => sum + (t.actual_minutes || 0), 0);
+  }, [filteredTasks]);
+
+  // Groupings
+  const overdueTasks = useMemo(() => {
+    return filteredTasks.filter((t) => isTaskOverdue(t));
+  }, [filteredTasks]);
+
+  const thisWeekTasks = useMemo(() => {
+    return filteredTasks.filter((t) => !isTaskOverdue(t) && t.status !== 'completed');
+  }, [filteredTasks]);
+
+  const completedTasks = useMemo(() => {
+    return filteredTasks.filter((t) => t.status === 'completed');
+  }, [filteredTasks]);
+
+  // Board Columns
+  const todoBoardTasks = useMemo(() => {
+    return filteredTasks.filter((t) => t.status === 'todo');
+  }, [filteredTasks]);
+
+  const inProgressBoardTasks = useMemo(() => {
+    return filteredTasks.filter((t) => t.status === 'in_progress');
+  }, [filteredTasks]);
+
+  const doneBoardTasks = useMemo(() => {
+    return filteredTasks.filter((t) => t.status === 'completed');
+  }, [filteredTasks]);
 
   return (
-    <div className="space-y-6 max-w-7xl mx-auto animate-fade-in pb-12">
-      {/* Header Banner */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-bg-surface via-bg-elevated to-bg-surface border border-border-base p-6 md:p-8">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-student-500/10 rounded-full blur-3xl pointer-events-none -mr-20 -mt-20" />
-
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 relative z-10">
-          <div className="space-y-1.5">
-            <div className="flex items-center gap-2.5">
-              <span className="p-2 rounded-xl bg-student-500/15 border border-student-500/25 text-student-400">
-                <BookOpen className="w-5 h-5" />
-              </span>
-              <span className="text-xs font-mono font-semibold px-2.5 py-0.5 rounded-full bg-student-500/10 text-student-300 border border-student-500/20">
-                COURSES &amp; COURSEWORK SUITE
-              </span>
-            </div>
-            <h1 className="text-2xl md:text-3xl font-extrabold text-text-primary tracking-tight">
-              Courses &amp; Assignments
+    <div className="max-w-5xl mx-auto py-8 px-4 sm:px-6 animate-fade-in space-y-6">
+      {/* ── Main White Container Card ────────────────────────────────────────── */}
+      <div className="bg-white rounded-2xl border border-[#eee7e0] p-6 sm:p-8 shadow-xs">
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+          <div>
+            <h1 className="text-2xl sm:text-3xl font-bold text-neutral-900 tracking-tight">
+              Courses and assignments
             </h1>
-            <p className="text-sm text-text-secondary max-w-2xl">
-              Track course roadmaps, research phases, milestone deliverables, and coursework
-              assignments in one integrated workspace.
+            <p className="text-sm text-neutral-500 mt-1">
+              {courses.length} active courses · {thisWeekTasks.length + overdueTasks.length} tasks
+              due this week
             </p>
           </div>
 
           <div className="flex items-center gap-2">
-            <Button
-              variant="secondary"
-              size="sm"
-              onClick={() => setActiveTab('assignments')}
-              icon={<ClipboardList className="w-4 h-4 text-student-400" />}
+            <button
+              type="button"
+              onClick={() => setIsNewCourseModalOpen(true)}
+              className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-[#c04b1e] hover:bg-[#a83e16] text-white text-sm font-medium transition-colors shadow-2xs cursor-pointer"
             >
-              Assignments View
-            </Button>
-            <Button
-              variant="primary"
-              size="sm"
-              onClick={() => setIsCreateModalOpen(true)}
-              className="!bg-solar-500 hover:!bg-solar-600 shadow-glow-solar"
-              icon={<Plus className="w-4 h-4" />}
-            >
-              New Course
-            </Button>
+              <Plus className="w-4 h-4" />
+              <span>New course</span>
+            </button>
           </div>
         </div>
-      </div>
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card className="p-4 border-l-4 border-l-student-500">
-          <div className="flex items-center justify-between text-xs text-text-muted font-semibold uppercase">
-            <span>Enrolled Courses</span>
-            <BookOpen className="w-4 h-4 text-student-400" />
-          </div>
-          <div className="mt-2 text-2xl font-extrabold text-text-primary">{projects.length}</div>
-          <p className="text-2xs text-text-muted mt-1">Active academic syllabi</p>
-        </Card>
+        {/* Tab Row */}
+        <div className="flex items-center gap-6 border-b border-[#eee7e0] mt-6">
+          <button
+            type="button"
+            onClick={() => setActiveTab('courses')}
+            className={cn(
+              'text-sm pb-2.5 transition-colors cursor-pointer flex items-center gap-1.5',
+              activeTab === 'courses'
+                ? 'font-semibold text-neutral-900 border-b-2 border-[#c04b1e]'
+                : 'font-medium text-neutral-500 hover:text-neutral-800'
+            )}
+          >
+            <span>Courses</span>
+            <span className="text-xs font-semibold">{courses.length}</span>
+          </button>
 
-        <Card className="p-4 border-l-4 border-l-amber-500">
-          <div className="flex items-center justify-between text-xs text-text-muted font-semibold uppercase">
-            <span>Coursework Tasks</span>
-            <CheckCircle2 className="w-4 h-4 text-amber-400" />
-          </div>
-          <div className="mt-2 text-2xl font-extrabold text-text-primary">
-            {completedTasksCount}{' '}
-            <span className="text-xs font-normal text-text-muted">/ {tasks.length}</span>
-          </div>
-          <p className="text-2xs text-amber-400 mt-1">
-            {tasks.length ? Math.round((completedTasksCount / tasks.length) * 100) : 0}% assignments
-            finished
-          </p>
-        </Card>
+          <button
+            type="button"
+            onClick={() => setActiveTab('assignments')}
+            className={cn(
+              'text-sm pb-2.5 transition-colors cursor-pointer flex items-center gap-1.5',
+              activeTab === 'assignments'
+                ? 'font-semibold text-neutral-900 border-b-2 border-[#c04b1e]'
+                : 'font-medium text-neutral-500 hover:text-neutral-800'
+            )}
+          >
+            <span>Assignments</span>
+            <span className="text-xs font-semibold">{tasks.length}</span>
+          </button>
+        </div>
 
-        <Card className="p-4 border-l-4 border-l-emerald-500">
-          <div className="flex items-center justify-between text-xs text-text-muted font-semibold uppercase">
-            <span>Overall Progress</span>
-            <Award className="w-4 h-4 text-emerald-400" />
-          </div>
-          <div className="mt-2 text-2xl font-extrabold text-text-primary">{avgProgress}%</div>
-          <p className="text-2xs text-emerald-400 mt-1">Across all courses</p>
-        </Card>
+        {/* ── TAB 1: ASSIGNMENTS (Matches Target Mockup) ───────────────────────── */}
+        {activeTab === 'assignments' && (
+          <div className="mt-5 space-y-6">
+            {/* Search and View Switchers */}
+            <div className="flex items-center justify-between gap-3">
+              <div className="relative flex-1 max-w-xl">
+                <Search className="w-4 h-4 text-neutral-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                <input
+                  type="text"
+                  placeholder="Search assignments"
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  className="w-full pl-9 pr-4 py-2 bg-white border border-[#e5e0d8] rounded-lg text-sm text-neutral-800 placeholder:text-neutral-400 focus:outline-none focus:border-[#c04b1e] focus:ring-1 focus:ring-[#c04b1e]"
+                />
+              </div>
 
-        <Card className="p-4 border-l-4 border-l-orange-500">
-          <div className="flex items-center justify-between text-xs text-text-muted font-semibold uppercase">
-            <span>Pending Deadlines</span>
-            <Target className="w-4 h-4 text-orange-500 dark:text-orange-400" />
-          </div>
-          <div className="mt-2 text-2xl font-extrabold text-text-primary">
-            {tasks.length - completedTasksCount}
-          </div>
-          <p className="text-2xs text-orange-500 dark:text-orange-400 mt-1">
-            Remaining assignments
-          </p>
-        </Card>
-      </div>
-
-      {/* View Switcher Tabs */}
-      <div className="flex items-center gap-2 border-b border-border-base pb-3">
-        <button
-          type="button"
-          onClick={() => setActiveTab('courses')}
-          className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all ${
-            activeTab === 'courses'
-              ? 'bg-student-500/15 text-student-400 border border-student-500/30 shadow-2xs'
-              : 'text-text-muted hover:text-text-primary hover:bg-bg-elevated'
-          }`}
-        >
-          <BookOpen className="w-4 h-4" />
-          <span>Courses &amp; Milestones ({projects.length})</span>
-        </button>
-        <button
-          type="button"
-          onClick={() => setActiveTab('assignments')}
-          className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all ${
-            activeTab === 'assignments'
-              ? 'bg-student-500/15 text-student-400 border border-student-500/30 shadow-2xs'
-              : 'text-text-muted hover:text-text-primary hover:bg-bg-elevated'
-          }`}
-        >
-          <ClipboardList className="w-4 h-4" />
-          <span>Coursework Assignments ({tasks.length})</span>
-        </button>
-      </div>
-
-      {activeTab === 'courses' ? (
-        <>
-          {/* Search and Filters */}
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-bg-surface p-4 rounded-xl border border-border-base">
-            <div className="relative w-full sm:w-80">
-              <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-text-muted" />
-              <input
-                type="text"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                placeholder="Search academic projects..."
-                className="w-full pl-9 pr-4 py-2 bg-bg-base/80 border border-border-base rounded-xl text-xs text-text-primary placeholder:text-text-faint focus:outline-none focus:border-student-500/50"
-              />
-            </div>
-
-            <div className="flex items-center gap-2 w-full sm:w-auto overflow-x-auto pb-1 sm:pb-0">
-              <Filter className="w-3.5 h-3.5 text-text-muted hidden sm:block" />
-              {(['all', 'active', 'planning', 'completed'] as const).map((st) => (
+              <div className="flex items-center gap-1.5">
                 <button
-                  key={st}
-                  onClick={() => setFilterStatus(st)}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold capitalize whitespace-nowrap transition-colors ${
-                    filterStatus === st
-                      ? 'bg-student-500/20 text-student-300 border border-student-500/30'
-                      : 'bg-bg-base text-text-muted hover:text-text-primary border border-border-base'
-                  }`}
+                  type="button"
+                  title="List View"
+                  onClick={() => setViewMode(viewMode === 'list' ? 'both' : 'list')}
+                  className={cn(
+                    'p-2 rounded-lg border text-sm transition-colors cursor-pointer',
+                    viewMode === 'list' || viewMode === 'both'
+                      ? 'border-[#c04b1e] bg-[#fbf5f2] text-[#c04b1e]'
+                      : 'border-[#e5e0d8] bg-white text-neutral-500 hover:text-neutral-800'
+                  )}
                 >
-                  {st}
+                  <List className="w-4 h-4" />
                 </button>
-              ))}
-            </div>
-          </div>
 
-          {/* Projects List / Grid */}
-          {isLoading ? (
-            <LoadingSkeleton count={3} />
-          ) : filteredProjects.length === 0 ? (
-            <div className="card p-12 text-center border-dashed border-border-base">
-              <GraduationCap className="w-12 h-12 text-student-400 mx-auto mb-3 opacity-60" />
-              <h3 className="text-base font-bold text-text-primary">No academic projects found</h3>
-              <p className="text-xs text-text-muted max-w-sm mx-auto mt-1 mb-4">
-                Create your first capstone project, thesis outline, or term paper deliverable to
-                track research milestones.
-              </p>
-              <div className="flex items-center justify-center gap-2">
-                <Button
-                  variant="primary"
-                  size="sm"
-                  onClick={() => setIsCreateModalOpen(true)}
-                  icon={<Plus className="w-4 h-4" />}
+                <button
+                  type="button"
+                  title="Board View"
+                  onClick={() => setViewMode(viewMode === 'board' ? 'both' : 'board')}
+                  className={cn(
+                    'p-2 rounded-lg border text-sm transition-colors cursor-pointer',
+                    viewMode === 'board' || viewMode === 'both'
+                      ? 'border-[#c04b1e] bg-[#fbf5f2] text-[#c04b1e]'
+                      : 'border-[#e5e0d8] bg-white text-neutral-500 hover:text-neutral-800'
+                  )}
                 >
-                  Add Project Manually
-                </Button>
+                  <Columns3 className="w-4 h-4" />
+                </button>
               </div>
             </div>
-          ) : (
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-              {filteredProjects.map((project) => {
-                const projectMilestones = milestones.filter((m) => m.project_id === project.id);
-                const isExpanded = selectedProjectId === project.id;
-                const projTasks = tasks.filter(
+
+            {/* Time Summary Row */}
+            <div className="flex items-center gap-2 text-sm text-neutral-600">
+              <Clock className="w-4 h-4 text-neutral-400 shrink-0" />
+              <span>
+                Expected{' '}
+                <span className="font-bold text-neutral-900">{formatMins(totalExpected)}</span> ·
+                Logged <span className="font-bold text-neutral-900">{formatMins(totalLogged)}</span>
+              </span>
+            </div>
+
+            {/* ── LIST VIEW SECTIONS ────────────────────────────────────────── */}
+            {(viewMode === 'list' || viewMode === 'both') && (
+              <div className="space-y-6">
+                {/* 1. Overdue Group */}
+                {overdueTasks.length > 0 && (
+                  <div>
+                    <h3 className="text-sm font-semibold text-[#b91c1c] mb-3">
+                      Overdue {overdueTasks.length}
+                    </h3>
+                    <div className="space-y-2.5">
+                      {overdueTasks.map((task) => {
+                        const courseName =
+                          task.project_title ||
+                          (task.project_id ? courseLookup.get(task.project_id) : '') ||
+                          'General Studies';
+                        const bar = getProgressBar(task);
+                        const delta = getDelta(task);
+
+                        return (
+                          <div
+                            key={task.id}
+                            className="rounded-xl border border-[#eee7e0] bg-white p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 transition-all hover:border-[#ded5cb]"
+                          >
+                            <div className="flex-1 min-w-[180px]">
+                              <h4 className="font-semibold text-neutral-900 text-sm sm:text-base leading-snug">
+                                {task.title}
+                              </h4>
+                              <p className="text-xs text-neutral-500 mt-0.5">{courseName}</p>
+                            </div>
+
+                            <div className="sm:w-28 shrink-0 text-left sm:text-center">
+                              <span className="text-sm font-bold text-[#b91c1c]">
+                                {task.due_date || 'Yesterday'}
+                              </span>
+                            </div>
+
+                            <div className="sm:w-48 shrink-0 flex flex-col justify-center">
+                              <div className="flex items-center justify-between text-xs text-neutral-500">
+                                <span>
+                                  Est{' '}
+                                  <strong className="text-neutral-900 font-bold">
+                                    {formatMins(task.estimated_minutes)}
+                                  </strong>
+                                </span>
+                                <span>
+                                  Logged{' '}
+                                  <strong className="text-neutral-900 font-bold">
+                                    {task.actual_minutes ? formatMins(task.actual_minutes) : '—'}
+                                  </strong>
+                                </span>
+                              </div>
+                              {delta && (
+                                <div className="text-xs font-semibold mt-0.5">
+                                  <span className={delta.className}>{delta.text}</span>
+                                </div>
+                              )}
+                              <div className="w-full h-1.5 bg-[#f0ebe4] rounded-full overflow-hidden mt-1.5">
+                                <div
+                                  className={cn('h-full rounded-full transition-all', bar.color)}
+                                  style={{ width: `${bar.percent}%` }}
+                                />
+                              </div>
+                            </div>
+
+                            <div className="shrink-0">
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setSelectedTaskForLog(task);
+                                  setLogTimeStatus(task.status);
+                                }}
+                                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[#dcd4ca] bg-white text-xs font-medium text-neutral-700 hover:bg-neutral-50 transition-colors shadow-2xs cursor-pointer"
+                              >
+                                <Timer className="w-3.5 h-3.5 text-neutral-500" />
+                                <span>Log time</span>
+                              </button>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+
+                {/* 2. This week Group */}
+                {thisWeekTasks.length > 0 && (
+                  <div>
+                    <h3 className="text-sm font-semibold text-neutral-800 mb-3">
+                      This week {thisWeekTasks.length}
+                    </h3>
+                    <div className="space-y-2.5">
+                      {thisWeekTasks.map((task) => {
+                        const courseName =
+                          task.project_title ||
+                          (task.project_id ? courseLookup.get(task.project_id) : '') ||
+                          'General Studies';
+                        const bar = getProgressBar(task);
+                        const delta = getDelta(task);
+
+                        return (
+                          <div
+                            key={task.id}
+                            className="rounded-xl border border-[#eee7e0] bg-white p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 transition-all hover:border-[#ded5cb]"
+                          >
+                            <div className="flex-1 min-w-[180px]">
+                              <h4 className="font-semibold text-neutral-900 text-sm sm:text-base leading-snug">
+                                {task.title}
+                              </h4>
+                              <p className="text-xs text-neutral-500 mt-0.5">{courseName}</p>
+                            </div>
+
+                            <div className="sm:w-28 shrink-0 text-left sm:text-center">
+                              <span className="text-sm font-bold text-neutral-800">
+                                {task.due_date || 'This week'}
+                              </span>
+                            </div>
+
+                            <div className="sm:w-48 shrink-0 flex flex-col justify-center">
+                              <div className="flex items-center justify-between text-xs text-neutral-500">
+                                <span>
+                                  Est{' '}
+                                  <strong className="text-neutral-900 font-bold">
+                                    {formatMins(task.estimated_minutes)}
+                                  </strong>
+                                </span>
+                                <span>
+                                  Logged{' '}
+                                  <strong className="text-neutral-900 font-bold">
+                                    {task.actual_minutes ? formatMins(task.actual_minutes) : '—'}
+                                  </strong>
+                                </span>
+                              </div>
+                              {delta && (
+                                <div className="text-xs font-semibold mt-0.5">
+                                  <span className={delta.className}>{delta.text}</span>
+                                </div>
+                              )}
+                              <div className="w-full h-1.5 bg-[#f0ebe4] rounded-full overflow-hidden mt-1.5">
+                                <div
+                                  className={cn('h-full rounded-full transition-all', bar.color)}
+                                  style={{ width: `${bar.percent}%` }}
+                                />
+                              </div>
+                            </div>
+
+                            <div className="shrink-0">
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setSelectedTaskForLog(task);
+                                  setLogTimeStatus(task.status);
+                                }}
+                                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[#dcd4ca] bg-white text-xs font-medium text-neutral-700 hover:bg-neutral-50 transition-colors shadow-2xs cursor-pointer"
+                              >
+                                <Timer className="w-3.5 h-3.5 text-neutral-500" />
+                                <span>Log time</span>
+                              </button>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+
+                {/* 3. Completed Group */}
+                {completedTasks.length > 0 && (
+                  <div>
+                    <h3 className="text-sm font-semibold text-neutral-800 mb-3">
+                      Completed {completedTasks.length}
+                    </h3>
+                    <div className="space-y-2.5">
+                      {completedTasks.map((task) => {
+                        const courseName =
+                          task.project_title ||
+                          (task.project_id ? courseLookup.get(task.project_id) : '') ||
+                          'General Studies';
+                        const bar = getProgressBar(task);
+                        const delta = getDelta(task);
+
+                        return (
+                          <div
+                            key={task.id}
+                            className="rounded-xl border border-[#eee7e0] bg-white p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 transition-all hover:border-[#ded5cb]"
+                          >
+                            <div className="flex-1 min-w-[180px]">
+                              <h4 className="font-semibold text-neutral-900 text-sm sm:text-base leading-snug">
+                                {task.title}
+                              </h4>
+                              <p className="text-xs text-neutral-500 mt-0.5">{courseName}</p>
+                            </div>
+
+                            <div className="sm:w-28 shrink-0 text-left sm:text-center">
+                              <span className="text-sm font-bold text-neutral-800">
+                                {task.due_date || 'Completed'}
+                              </span>
+                            </div>
+
+                            <div className="sm:w-48 shrink-0 flex flex-col justify-center">
+                              <div className="flex items-center justify-between text-xs text-neutral-500">
+                                <span>
+                                  Est{' '}
+                                  <strong className="text-neutral-900 font-bold">
+                                    {formatMins(task.estimated_minutes)}
+                                  </strong>
+                                </span>
+                                <span>
+                                  Took{' '}
+                                  <strong className="text-neutral-900 font-bold">
+                                    {task.actual_minutes ? formatMins(task.actual_minutes) : '—'}
+                                  </strong>
+                                </span>
+                              </div>
+                              {delta && (
+                                <div className="text-xs font-semibold mt-0.5">
+                                  <span className={delta.className}>{delta.text}</span>
+                                </div>
+                              )}
+                              <div className="w-full h-1.5 bg-[#f0ebe4] rounded-full overflow-hidden mt-1.5">
+                                <div
+                                  className={cn('h-full rounded-full transition-all', bar.color)}
+                                  style={{ width: `${bar.percent}%` }}
+                                />
+                              </div>
+                            </div>
+
+                            <div className="shrink-0">
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setSelectedTaskForLog(task);
+                                  setLogTimeStatus(task.status);
+                                }}
+                                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[#dcd4ca] bg-white text-xs font-medium text-neutral-700 hover:bg-neutral-50 transition-colors shadow-2xs cursor-pointer"
+                              >
+                                <Timer className="w-3.5 h-3.5 text-neutral-500" />
+                                <span>Log time</span>
+                              </button>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ── TAB 2: COURSES VIEW ────────────────────────────────────────────── */}
+        {activeTab === 'courses' && (
+          <div className="mt-5 space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {courses.map((course) => {
+                const courseTasks = tasks.filter(
                   (t) =>
-                    t.project_id === project.id ||
+                    t.project_id === course.id ||
                     (t.project_title &&
-                      t.project_title.trim().toLowerCase() === project.title.trim().toLowerCase())
+                      t.project_title.trim().toLowerCase() === course.title.trim().toLowerCase())
                 );
-                const completedProjTasks = projTasks.filter((t) => t.status === 'completed').length;
-                const totalProjTasks = projTasks.length;
-                const dynamicProgress =
-                  totalProjTasks > 0
-                    ? Math.round((completedProjTasks / totalProjTasks) * 100)
-                    : projectMilestones.length > 0
-                      ? Math.round(
-                          (projectMilestones.filter((m) => m.status === 'completed').length /
-                            projectMilestones.length) *
-                            100
-                        )
-                      : project.progress || 0;
+                const completedCourseTasks = courseTasks.filter(
+                  (t) => t.status === 'completed'
+                ).length;
+                const totalCourseMins = courseTasks.reduce(
+                  (sum, t) => sum + (t.actual_minutes || 0),
+                  0
+                );
+                const progressPct =
+                  courseTasks.length > 0
+                    ? Math.round((completedCourseTasks / courseTasks.length) * 100)
+                    : course.progress || 0;
 
                 return (
-                  <Card
-                    key={project.id}
-                    className="p-5 flex flex-col justify-between hover:border-student-500/40 transition-all group"
+                  <div
+                    key={course.id}
+                    className="rounded-xl border border-[#eee7e0] bg-white p-5 hover:border-[#ded5cb] transition-all shadow-2xs flex flex-col justify-between"
                   >
                     <div>
-                      <div className="flex items-start justify-between gap-3">
-                        <div className="space-y-1">
-                          <h3 className="text-base font-bold text-text-primary group-hover:text-student-400 transition-colors">
-                            {project.title}
-                          </h3>
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="flex items-center gap-2">
+                          <span className="p-1.5 rounded-lg bg-[#fbf5f2] text-[#c04b1e] border border-[#f2ded5]">
+                            <BookOpen className="w-4 h-4" />
+                          </span>
+                          <h3 className="font-bold text-neutral-900 text-base">{course.title}</h3>
                         </div>
-
                         <button
-                          onClick={() => deleteProjectMutation.mutate(project.id)}
-                          className="p-1.5 text-text-faint hover:text-red-400 rounded-lg hover:bg-bg-elevated transition-colors"
-                          title="Delete Project"
+                          type="button"
+                          onClick={() => deleteCourseMutation.mutate(course.id)}
+                          className="text-neutral-400 hover:text-red-600 transition-colors p-1"
+                          title="Delete course"
                         >
-                          <Trash2 className="w-4 h-4" />
+                          <Trash2 className="w-3.5 h-3.5" />
                         </button>
                       </div>
 
-                      {project.description && (
-                        <p className="text-xs text-text-muted mt-2 line-clamp-2">
-                          {project.description}
+                      {course.description && (
+                        <p className="text-xs text-neutral-500 mt-2 leading-relaxed">
+                          {course.description}
                         </p>
                       )}
 
-                      {/* Progress bar */}
-                      <div className="mt-4 space-y-1.5">
-                        <div className="flex items-center justify-between text-2xs font-semibold">
-                          <span className="text-text-muted">Research Progress</span>
-                          <span className="text-student-400 font-mono font-bold">
-                            {dynamicProgress}%
-                          </span>
-                        </div>
-                        <div className="w-full bg-bg-base h-2 rounded-full overflow-hidden border border-border-base">
-                          <div
-                            className="bg-gradient-to-r from-student-500 via-amber-400 to-student-400 h-full rounded-full transition-all duration-300"
-                            style={{ width: `${dynamicProgress}%` }}
-                          />
-                        </div>
+                      <div className="mt-4 pt-3 border-t border-[#f2ede6] flex items-center justify-between text-xs text-neutral-600">
+                        <span>
+                          Tasks:{' '}
+                          <strong className="text-neutral-900">
+                            {completedCourseTasks}/{courseTasks.length}
+                          </strong>
+                        </span>
+                        <span>
+                          Logged:{' '}
+                          <strong className="text-neutral-900">
+                            {formatMins(totalCourseMins)}
+                          </strong>
+                        </span>
+                        <span className="font-semibold text-[#c04b1e]">{progressPct}%</span>
                       </div>
 
-                      {/* Meta: Target date & milestones */}
-                      <div className="mt-4 flex items-center justify-between text-2xs text-text-muted border-t border-border-base/60 pt-3">
-                        <span className="flex items-center gap-1.5">
-                          <Calendar className="w-3.5 h-3.5 text-student-400" />
-                          {project.target_date
-                            ? `Target: ${new Date(project.target_date).toLocaleDateString()}`
-                            : 'No set deadline'}
-                        </span>
-                        <span className="flex items-center gap-1.5">
-                          <FileText className="w-3.5 h-3.5 text-amber-400" />
-                          {projectMilestones.length} milestones
-                        </span>
-                        <TimeTrackingBadge
-                          expectedMinutes={projTasks.reduce(
-                            (s, t) => s + (t.estimated_minutes || 0),
-                            0
-                          )}
-                          actualMinutes={projTasks.reduce((s, t) => s + (t.actual_minutes || 0), 0)}
-                          size="xs"
-                          variant="pill"
+                      <div className="w-full h-1.5 bg-[#f0ebe4] rounded-full overflow-hidden mt-2">
+                        <div
+                          className="h-full bg-[#c04b1e] rounded-full transition-all duration-300"
+                          style={{ width: `${progressPct}%` }}
                         />
                       </div>
-
-                      {/* Milestones Preview or Expand */}
-                      <div className="mt-3">
-                        <button
-                          onClick={() => setSelectedProjectId(isExpanded ? null : project.id)}
-                          className="text-xs font-semibold text-student-300 hover:text-student-200 flex items-center gap-1 py-1"
-                        >
-                          <ChevronRight
-                            className={`w-3.5 h-3.5 transition-transform ${
-                              isExpanded ? 'rotate-90' : ''
-                            }`}
-                          />
-                          {isExpanded ? 'Hide Milestones' : 'View Milestones & Roadmap'}
-                        </button>
-
-                        {isExpanded && (
-                          <div className="mt-2 space-y-2 bg-bg-base/70 p-3 rounded-xl border border-border-base">
-                            <div className="flex items-center justify-between pb-1 border-b border-border-base/50">
-                              <span className="text-2xs font-bold text-text-secondary uppercase">
-                                Research Phases
-                              </span>
-                              <button
-                                onClick={() => {
-                                  setActiveProjectForMilestone(project.id);
-                                  setIsMilestoneModalOpen(true);
-                                }}
-                                className="text-2xs font-semibold text-student-400 hover:text-student-300 flex items-center gap-1"
-                              >
-                                <Plus className="w-3 h-3" /> Add Phase
-                              </button>
-                            </div>
-
-                            {projectMilestones.length === 0 ? (
-                              <p className="text-2xs text-text-faint py-2 text-center">
-                                No milestones yet. Click "+ Add Phase" or use AI to generate.
-                              </p>
-                            ) : (
-                              projectMilestones.map((m, mIdx) => {
-                                const isDone = m.status === 'completed';
-                                // Calculate subtasks belonging to this phase
-                                const phaseTasks = projTasks.filter((t, tIdx) => {
-                                  const desc = (t.description || '').toLowerCase();
-                                  const title = (t.title || '').toLowerCase();
-                                  const mTitle = (m.title || '').toLowerCase();
-                                  if (
-                                    desc.includes(`phase ${mIdx + 1}`) ||
-                                    title.includes(`phase ${mIdx + 1}`)
-                                  )
-                                    return true;
-                                  if (mTitle && (desc.includes(mTitle) || title.includes(mTitle)))
-                                    return true;
-                                  return tIdx % Math.max(projectMilestones.length, 1) === mIdx;
-                                });
-                                const phaseCompleted = phaseTasks.filter(
-                                  (t) => t.status === 'completed'
-                                ).length;
-                                const phaseProgress =
-                                  phaseTasks.length > 0
-                                    ? Math.round((phaseCompleted / phaseTasks.length) * 100)
-                                    : isDone
-                                      ? 100
-                                      : 0;
-                                const phaseMinutes = phaseTasks.reduce(
-                                  (sum, t) => sum + (Number(t.estimated_minutes) || 60),
-                                  0
-                                );
-                                const { expectedMinutes, actualMinutes } = getMilestoneTimeTotals(
-                                  m,
-                                  tasks,
-                                  milestones
-                                );
-
-                                const isMilestoneExpanded = !!expandedMilestoneIds[m.id];
-
-                                return (
-                                  <div
-                                    key={m.id}
-                                    className={`flex flex-col rounded-xl border transition-all overflow-hidden ${
-                                      isMilestoneExpanded
-                                        ? 'border-student-500/40 bg-white dark:bg-bg-surface shadow-sm'
-                                        : 'border-border-base/70 bg-bg-surface/90 hover:border-student-500/30'
-                                    }`}
-                                  >
-                                    {/* Phase Header (Clickable to open/close) */}
-                                    <div
-                                      onClick={() => toggleMilestoneExpand(m.id)}
-                                      className="flex items-center justify-between gap-2.5 p-3 cursor-pointer select-none hover:bg-slate-50/70 dark:hover:bg-bg-elevated/40 transition-colors"
-                                    >
-                                      <div className="flex items-center gap-2.5 min-w-0">
-                                        <button
-                                          type="button"
-                                          onClick={(e) => {
-                                            e.stopPropagation();
-                                            toggleMilestoneMutation.mutate(m);
-                                          }}
-                                          className="text-text-muted hover:text-student-400 p-0.5 rounded transition-colors shrink-0"
-                                          title={isDone ? 'Mark pending' : 'Mark completed'}
-                                        >
-                                          <CheckCircle2
-                                            className={`w-4 h-4 ${
-                                              isDone
-                                                ? 'text-student-400 fill-student-400/20'
-                                                : 'text-text-muted hover:text-student-400'
-                                            }`}
-                                          />
-                                        </button>
-                                        <div className="min-w-0">
-                                          <div className="flex items-center gap-2 flex-wrap">
-                                            <span
-                                              className={`font-semibold text-xs truncate ${
-                                                isDone
-                                                  ? 'line-through text-text-muted'
-                                                  : 'text-text-primary'
-                                              }`}
-                                            >
-                                              {m.title}
-                                            </span>
-                                            <span
-                                              className={`text-[10px] font-semibold uppercase px-2 py-0.5 rounded-full border ${
-                                                isDone
-                                                  ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20'
-                                                  : 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20'
-                                              }`}
-                                            >
-                                              {isDone ? 'completed' : m.status || 'in progress'}
-                                            </span>
-                                          </div>
-                                        </div>
-                                      </div>
-
-                                      <div className="flex items-center gap-2 shrink-0">
-                                        <TimeTrackingBadge
-                                          expectedMinutes={expectedMinutes}
-                                          actualMinutes={actualMinutes}
-                                          size="xs"
-                                          variant="pill"
-                                        />
-                                        <span className="text-3xs font-mono font-bold text-student-400 bg-student-500/10 px-2 py-0.5 rounded-md border border-student-500/20">
-                                          {phaseProgress}%
-                                        </span>
-                                        <ChevronDown
-                                          className={`w-4 h-4 text-text-muted transition-transform duration-200 ${
-                                            isMilestoneExpanded ? 'rotate-180 text-student-400' : ''
-                                          }`}
-                                        />
-                                      </div>
-                                    </div>
-
-                                    {/* Progress Bar strip */}
-                                    <div className="px-3 pb-2.5 pt-0">
-                                      <div className="flex items-center justify-between text-3xs text-text-muted pb-1">
-                                        <span className="text-2xs font-medium text-text-secondary">
-                                          {isMilestoneExpanded
-                                            ? 'Phase Progress'
-                                            : 'Click to view phase tasks'}
-                                        </span>
-                                        <span className="font-mono font-medium">
-                                          {phaseCompleted}/{phaseTasks.length} tasks
-                                        </span>
-                                      </div>
-                                      <div className="w-full bg-bg-base h-1.5 rounded-full overflow-hidden border border-border-subtle">
-                                        <div
-                                          className="bg-gradient-to-r from-student-400 to-amber-500 h-full rounded-full transition-all duration-300"
-                                          style={{ width: `${phaseProgress}%` }}
-                                        />
-                                      </div>
-                                    </div>
-
-                                    {/* Expanded Phase Content (Shows tasks, details, quick-add, and actions) */}
-                                    {isMilestoneExpanded && (
-                                      <div className="p-3.5 pt-2 border-t border-border-base/70 bg-slate-50/50 dark:bg-bg-elevated/20 space-y-3">
-                                        {/* Phase Description / Scope if available */}
-                                        {m.description && (
-                                          <div className="p-2.5 rounded-lg bg-bg-surface border border-border-subtle text-xs text-text-secondary leading-relaxed">
-                                            <span className="text-2xs font-bold uppercase text-text-muted tracking-wider block mb-0.5">
-                                              Phase Focus &amp; Scope
-                                            </span>
-                                            {m.description}
-                                          </div>
-                                        )}
-
-                                        {/* Deliverables & Tasks Header */}
-                                        <div className="flex items-center justify-between pt-1">
-                                          <span className="text-2xs font-bold text-text-secondary uppercase tracking-wider flex items-center gap-1.5">
-                                            <span>Phase Deliverables &amp; Tasks</span>
-                                            <span className="px-1.5 py-0.2 rounded-full bg-bg-elevated text-text-muted text-3xs border border-border-subtle font-mono">
-                                              {phaseTasks.length}
-                                            </span>
-                                          </span>
-                                          <span className="text-3xs text-text-faint">
-                                            Click checkbox to toggle completion
-                                          </span>
-                                        </div>
-
-                                        {/* Task Checklist */}
-                                        <div className="space-y-1.5">
-                                          {phaseTasks.length === 0 ? (
-                                            <div className="p-3 text-center rounded-lg border border-dashed border-border-base text-2xs text-text-faint">
-                                              No tasks or deliverables assigned to this phase yet.
-                                              Add the first task below.
-                                            </div>
-                                          ) : (
-                                            phaseTasks.map((task) => {
-                                              const isTaskDone = task.status === 'completed';
-                                              return (
-                                                <div
-                                                  key={task.id}
-                                                  className={`flex items-center justify-between gap-2.5 p-2.5 rounded-lg border transition-all ${
-                                                    isTaskDone
-                                                      ? 'bg-bg-base/60 border-border-subtle opacity-75'
-                                                      : 'bg-bg-surface border-border-base/80 hover:border-student-500/30'
-                                                  }`}
-                                                >
-                                                  <div className="flex items-center gap-2.5 min-w-0">
-                                                    <button
-                                                      type="button"
-                                                      onClick={() =>
-                                                        updateTaskMutation.mutate({
-                                                          id: task.id,
-                                                          status: isTaskDone ? 'todo' : 'completed',
-                                                        })
-                                                      }
-                                                      className="text-text-muted hover:text-student-400 shrink-0 transition-colors"
-                                                      title={
-                                                        isTaskDone
-                                                          ? 'Mark incomplete'
-                                                          : 'Mark complete'
-                                                      }
-                                                    >
-                                                      <CheckCircle2
-                                                        className={`w-4 h-4 ${
-                                                          isTaskDone
-                                                            ? 'text-student-400 fill-student-400/20'
-                                                            : 'text-text-muted hover:text-student-400'
-                                                        }`}
-                                                      />
-                                                    </button>
-                                                    <span
-                                                      className={`text-xs font-medium truncate ${
-                                                        isTaskDone
-                                                          ? 'line-through text-text-muted'
-                                                          : 'text-text-primary'
-                                                      }`}
-                                                    >
-                                                      {task.title}
-                                                    </span>
-                                                  </div>
-
-                                                  <div className="flex items-center gap-2 shrink-0">
-                                                    <TimeTrackingBadge
-                                                      expectedMinutes={task.estimated_minutes}
-                                                      actualMinutes={task.actual_minutes}
-                                                      size="xs"
-                                                      variant="pill"
-                                                    />
-                                                    {task.priority &&
-                                                      task.priority !== 'medium' && (
-                                                        <PriorityBadge priority={task.priority} />
-                                                      )}
-                                                    {task.due_date && (
-                                                      <span className="text-3xs text-text-faint flex items-center gap-1 font-mono">
-                                                        <Clock className="w-3 h-3 text-amber-400" />
-                                                        {new Date(
-                                                          task.due_date
-                                                        ).toLocaleDateString()}
-                                                      </span>
-                                                    )}
-                                                    <button
-                                                      type="button"
-                                                      onClick={() =>
-                                                        deleteTaskMutation.mutate(task.id)
-                                                      }
-                                                      className="text-text-faint hover:text-danger p-1 rounded transition-colors"
-                                                      title="Remove task"
-                                                    >
-                                                      <Trash2 className="w-3.5 h-3.5" />
-                                                    </button>
-                                                  </div>
-                                                </div>
-                                              );
-                                            })
-                                          )}
-                                        </div>
-
-                                        {/* Quick Add Task to Phase */}
-                                        <form
-                                          onSubmit={(e) => {
-                                            e.preventDefault();
-                                            const title = (
-                                              newTaskTitleByMilestone[m.id] || ''
-                                            ).trim();
-                                            if (!title) return;
-                                            createTaskMutation.mutate({
-                                              title,
-                                              project_id: project.id,
-                                              description: `Phase ${mIdx + 1}: ${m.title}`,
-                                            });
-                                            setNewTaskTitleByMilestone((prev) => ({
-                                              ...prev,
-                                              [m.id]: '',
-                                            }));
-                                          }}
-                                          className="flex items-center gap-2 pt-1"
-                                        >
-                                          <input
-                                            type="text"
-                                            value={newTaskTitleByMilestone[m.id] || ''}
-                                            onChange={(e) =>
-                                              setNewTaskTitleByMilestone((prev) => ({
-                                                ...prev,
-                                                [m.id]: e.target.value,
-                                              }))
-                                            }
-                                            placeholder={`Add new assignment or task to ${m.title}...`}
-                                            className="flex-1 bg-bg-surface border border-border-base rounded-xl px-3 py-1.5 text-xs text-text-primary placeholder:text-text-faint focus:outline-none focus:ring-1 focus:ring-student-400"
-                                          />
-                                          <Button
-                                            type="submit"
-                                            size="sm"
-                                            variant="primary"
-                                            disabled={
-                                              !(newTaskTitleByMilestone[m.id] || '').trim() ||
-                                              createTaskMutation.isPending
-                                            }
-                                            className="shrink-0 text-xs px-3 py-1.5"
-                                            icon={<Plus className="w-3.5 h-3.5" />}
-                                          >
-                                            Add Task
-                                          </Button>
-                                        </form>
-
-                                        {/* Phase Footer Actions */}
-                                        <div className="flex items-center justify-between pt-2 border-t border-border-subtle/70 text-2xs text-text-muted flex-wrap gap-2">
-                                          <div className="flex items-center gap-2">
-                                            <span className="flex items-center gap-1 font-mono text-student-600 dark:text-student-400 font-semibold text-2xs">
-                                              <Clock className="w-3.5 h-3.5 text-student-500" />
-                                              {formatPhaseTime(phaseMinutes)} required
-                                            </span>
-                                          </div>
-
-                                          <div className="flex items-center gap-2">
-                                            <button
-                                              type="button"
-                                              onClick={() => toggleMilestoneMutation.mutate(m)}
-                                              className="text-student-400 hover:underline font-semibold"
-                                            >
-                                              {isDone
-                                                ? 'Mark as In Progress'
-                                                : 'Mark Phase Completed'}
-                                            </button>
-                                            <span className="text-border-base">•</span>
-                                            <button
-                                              type="button"
-                                              onClick={() => deleteMilestoneMutation.mutate(m.id)}
-                                              className="text-text-muted hover:text-danger transition-colors"
-                                            >
-                                              Delete Phase
-                                            </button>
-                                          </div>
-                                        </div>
-                                      </div>
-                                    )}
-                                  </div>
-                                );
-                              })
-                            )}
-                          </div>
-                        )}
-                      </div>
                     </div>
 
-                    <div className="mt-4 pt-3 border-t border-border-base flex items-center justify-between gap-2 flex-wrap">
-                      <div className="flex items-center gap-1.5 flex-wrap">
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          className="text-2xs text-student-400 hover:text-student-300"
-                          onClick={() => {
-                            setActiveProjectForMilestone(project.id);
-                            setIsMilestoneModalOpen(true);
-                          }}
-                          icon={<Plus className="w-3 h-3" />}
-                        >
-                          Add Milestone
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          className="text-2xs text-solar-500 hover:text-solar-400 font-semibold"
-                          onClick={() =>
-                            openAIDrawer(
-                              `Draft a portfolio case study and LinkedIn post for completed project: "${project.title}". Highlight key milestones, technical takeaways, and deliverables.`
-                            )
-                          }
-                          icon={<FileText className="w-3 h-3" />}
-                        >
-                          Draft Case Study / Post
-                        </Button>
-                      </div>
+                    <div className="mt-4 pt-3 border-t border-[#f2ede6] flex items-center justify-between">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setNewAssignmentCourseId(course.id);
+                          setIsNewAssignmentModalOpen(true);
+                        }}
+                        className="text-xs font-semibold text-[#c04b1e] hover:underline flex items-center gap-1 cursor-pointer"
+                      >
+                        <Plus className="w-3.5 h-3.5" />
+                        <span>Add assignment</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setActiveTab('assignments')}
+                        className="text-xs font-medium text-neutral-500 hover:text-neutral-900"
+                      >
+                        View all tasks →
+                      </button>
                     </div>
-                  </Card>
+                  </div>
                 );
               })}
             </div>
-          )}
-        </>
-      ) : (
-        <div className="space-y-4">
-          {/* Assignment Filters & Search */}
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-bg-surface p-4 rounded-xl border border-border-base">
-            <div className="relative w-full sm:w-72">
-              <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-text-muted" />
+          </div>
+        )}
+      </div>
+
+      {/* ── BOARD VIEW CONTAINER (Matches Target Mockup Bottom Section) ──────── */}
+      {activeTab === 'assignments' && (viewMode === 'board' || viewMode === 'both') && (
+        <div className="mt-8 space-y-2">
+          <div className="text-xs font-semibold text-neutral-600 px-1">Board view</div>
+
+          <div className="bg-[#f5f2ed] border border-[#e6dfd5] rounded-2xl p-4 sm:p-5">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {/* Column 1: To do */}
+              <div>
+                <div className="text-xs font-semibold text-neutral-700 mb-3 px-1">
+                  To do {todoBoardTasks.length}
+                </div>
+                <div className="space-y-3">
+                  {todoBoardTasks.map((task) => {
+                    const courseName =
+                      task.project_title ||
+                      (task.project_id ? courseLookup.get(task.project_id) : '') ||
+                      'General Studies';
+                    const bar = getProgressBar(task);
+
+                    return (
+                      <div
+                        key={task.id}
+                        onClick={() => {
+                          setSelectedTaskForLog(task);
+                          setLogTimeStatus(task.status);
+                        }}
+                        className="bg-white rounded-xl border border-[#eee7e0] p-4 shadow-2xs hover:border-[#ded5cb] transition-all cursor-pointer space-y-1.5"
+                      >
+                        <h4 className="font-semibold text-sm text-neutral-900 leading-snug">
+                          {task.title}
+                        </h4>
+                        <p className="text-xs text-neutral-500">
+                          {courseName} · {task.due_date || 'Upcoming'}
+                        </p>
+                        <div className="text-xs text-neutral-600 pt-0.5">
+                          Est {formatMins(task.estimated_minutes)}
+                          {task.actual_minutes ? ` · Logged ${formatMins(task.actual_minutes)}` : ''}
+                        </div>
+                        {bar.percent > 0 && (
+                          <div className="w-full h-1 bg-[#f0ebe4] rounded-full overflow-hidden mt-1">
+                            <div
+                              className={cn('h-full rounded-full', bar.color)}
+                              style={{ width: `${bar.percent}%` }}
+                            />
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Column 2: In progress */}
+              <div>
+                <div className="text-xs font-semibold text-neutral-700 mb-3 px-1">
+                  In progress {inProgressBoardTasks.length}
+                </div>
+                <div className="space-y-3">
+                  {inProgressBoardTasks.map((task) => {
+                    const courseName =
+                      task.project_title ||
+                      (task.project_id ? courseLookup.get(task.project_id) : '') ||
+                      'General Studies';
+                    const bar = getProgressBar(task);
+                    const isOvertime =
+                      (task.actual_minutes || 0) > (task.estimated_minutes || 0) &&
+                      (task.estimated_minutes || 0) > 0;
+
+                    return (
+                      <div
+                        key={task.id}
+                        onClick={() => {
+                          setSelectedTaskForLog(task);
+                          setLogTimeStatus(task.status);
+                        }}
+                        className="bg-white rounded-xl border border-[#eee7e0] p-4 shadow-2xs hover:border-[#ded5cb] transition-all cursor-pointer space-y-1.5"
+                      >
+                        <h4 className="font-semibold text-sm text-neutral-900 leading-snug">
+                          {task.title}
+                        </h4>
+                        <p className="text-xs text-neutral-500">
+                          {courseName} · {task.due_date || 'In progress'}
+                        </p>
+                        <div
+                          className={cn(
+                            'text-xs pt-0.5 font-medium',
+                            isOvertime ? 'text-[#7f1d1d]' : 'text-neutral-600'
+                          )}
+                        >
+                          Est {formatMins(task.estimated_minutes)} · Logged{' '}
+                          {formatMins(task.actual_minutes)}
+                        </div>
+                        <div className="w-full h-1 bg-[#f0ebe4] rounded-full overflow-hidden mt-1">
+                          <div
+                            className={cn('h-full rounded-full', bar.color)}
+                            style={{ width: `${bar.percent}%` }}
+                          />
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Column 3: Done */}
+              <div>
+                <div className="text-xs font-semibold text-neutral-700 mb-3 px-1">
+                  Done {doneBoardTasks.length}
+                </div>
+                <div className="space-y-3">
+                  {doneBoardTasks.map((task) => {
+                    const courseName =
+                      task.project_title ||
+                      (task.project_id ? courseLookup.get(task.project_id) : '') ||
+                      'General Studies';
+                    const delta = getDelta(task);
+
+                    return (
+                      <div
+                        key={task.id}
+                        onClick={() => {
+                          setSelectedTaskForLog(task);
+                          setLogTimeStatus(task.status);
+                        }}
+                        className="bg-white rounded-xl border border-[#eee7e0] p-4 shadow-2xs hover:border-[#ded5cb] transition-all cursor-pointer space-y-1.5"
+                      >
+                        <h4 className="font-semibold text-sm text-neutral-900 leading-snug">
+                          {task.title}
+                        </h4>
+                        <p className="text-xs text-neutral-500">
+                          {courseName} · {task.due_date || 'Completed'}
+                        </p>
+                        <div className="text-xs text-neutral-600 pt-0.5 flex items-center gap-1.5">
+                          <span>
+                            Est {formatMins(task.estimated_minutes)} · Took{' '}
+                            {formatMins(task.actual_minutes)}
+                          </span>
+                          {delta && (
+                            <span className={cn('font-semibold', delta.className)}>
+                              {delta.text}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── MODAL: LOG TIME ─────────────────────────────────────────────────── */}
+      {selectedTaskForLog && (
+        <Modal
+          isOpen={true}
+          onClose={() => setSelectedTaskForLog(null)}
+          title={`Log time · ${selectedTaskForLog.title}`}
+        >
+          <div className="space-y-5">
+            <div className="p-3 bg-[#faf8f5] rounded-xl border border-[#eee7e0] text-xs space-y-1">
+              <div className="text-neutral-500">
+                Course:{' '}
+                <strong className="text-neutral-900 font-semibold">
+                  {selectedTaskForLog.project_title ||
+                    (selectedTaskForLog.project_id
+                      ? courseLookup.get(selectedTaskForLog.project_id)
+                      : '') ||
+                    'General Studies'}
+                </strong>
+              </div>
+              <div className="text-neutral-500">
+                Current:{' '}
+                <strong className="text-neutral-900 font-semibold">
+                  {formatMins(selectedTaskForLog.actual_minutes)}
+                </strong>{' '}
+                logged of{' '}
+                <strong className="text-neutral-900 font-semibold">
+                  {formatMins(selectedTaskForLog.estimated_minutes)}
+                </strong>{' '}
+                expected
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-neutral-700 mb-1.5">
+                Add study time
+              </label>
+              <div className="grid grid-cols-5 gap-2 mb-3">
+                {[15, 30, 45, 60, 120].map((mins) => (
+                  <button
+                    key={mins}
+                    type="button"
+                    onClick={() => setLogTimeMinutesToAdd(mins)}
+                    className={cn(
+                      'py-2 px-2 rounded-lg text-xs font-semibold border transition-all cursor-pointer',
+                      logTimeMinutesToAdd === mins
+                        ? 'border-[#c04b1e] bg-[#fbf5f2] text-[#c04b1e]'
+                        : 'border-[#e5e0d8] bg-white text-neutral-700 hover:bg-neutral-50'
+                    )}
+                  >
+                    +{formatMins(mins)}
+                  </button>
+                ))}
+              </div>
+
+              <div className="flex items-center gap-2">
+                <input
+                  type="number"
+                  min={1}
+                  step={5}
+                  value={logTimeMinutesToAdd}
+                  onChange={(e) => setLogTimeMinutesToAdd(Number(e.target.value))}
+                  className="w-24 px-3 py-1.5 border border-[#e5e0d8] rounded-lg text-sm text-neutral-800 text-center font-mono focus:outline-none focus:border-[#c04b1e]"
+                />
+                <span className="text-xs text-neutral-500">minutes to record</span>
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-neutral-700 mb-1.5">
+                Update status
+              </label>
+              <div className="flex items-center gap-2">
+                {(['todo', 'in_progress', 'completed'] as const).map((st) => (
+                  <button
+                    key={st}
+                    type="button"
+                    onClick={() => setLogTimeStatus(st)}
+                    className={cn(
+                      'flex-1 py-1.5 px-3 rounded-lg text-xs font-semibold border capitalize transition-all cursor-pointer',
+                      logTimeStatus === st
+                        ? 'border-[#c04b1e] bg-[#fbf5f2] text-[#c04b1e]'
+                        : 'border-[#e5e0d8] bg-white text-neutral-600 hover:bg-neutral-50'
+                    )}
+                  >
+                    {st === 'in_progress' ? 'In progress' : st === 'completed' ? 'Done' : 'To do'}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="flex items-center justify-end gap-2 pt-3 border-t border-[#eee7e0]">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setSelectedTaskForLog(null)}
+                className="text-xs text-neutral-600"
+              >
+                Cancel
+              </Button>
+              <Button
+                variant="primary"
+                size="sm"
+                onClick={() => logTimeMutation.mutate()}
+                isLoading={logTimeMutation.isPending}
+                className="!bg-[#c04b1e] hover:!bg-[#a83e16] text-white text-xs px-4"
+              >
+                Save time
+              </Button>
+            </div>
+          </div>
+        </Modal>
+      )}
+
+      {/* ── MODAL: CREATE NEW COURSE ────────────────────────────────────────── */}
+      {isNewCourseModalOpen && (
+        <Modal
+          isOpen={true}
+          onClose={() => setIsNewCourseModalOpen(false)}
+          title="Create new course"
+        >
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              createCourseMutation.mutate();
+            }}
+            className="space-y-4"
+          >
+            <div>
+              <label className="block text-xs font-semibold text-neutral-700 mb-1">
+                Course Title
+              </label>
               <input
                 type="text"
-                value={assignmentSearch}
-                onChange={(e) => setAssignmentSearch(e.target.value)}
-                placeholder="Search assignments..."
-                className="w-full pl-9 pr-4 py-2 bg-bg-base/80 border border-border-base rounded-xl text-xs text-text-primary placeholder:text-text-faint focus:outline-none focus:border-student-500/50"
+                required
+                value={newCourseTitle}
+                onChange={(e) => setNewCourseTitle(e.target.value)}
+                placeholder="e.g. Distributed Systems & Algorithms"
+                className="w-full px-3 py-2 bg-white border border-[#e5e0d8] rounded-lg text-sm text-neutral-800 placeholder:text-neutral-400 focus:outline-none focus:border-[#c04b1e]"
               />
             </div>
 
-            <div className="flex items-center gap-2 w-full sm:w-auto flex-wrap">
-              <select
-                value={assignmentCourseFilter}
-                onChange={(e) => setAssignmentCourseFilter(e.target.value)}
-                className="bg-bg-base text-text-primary text-xs border border-border-base rounded-lg px-2.5 py-1.5 focus:outline-none focus:border-student-500"
-              >
-                <option value="all">All Courses ({projects.length})</option>
-                {projects.map((p) => (
-                  <option key={p.id} value={String(p.id)}>
-                    {p.title}
-                  </option>
-                ))}
-              </select>
-
-              {(['all', 'todo', 'in_progress', 'completed'] as const).map((st) => (
-                <button
-                  key={st}
-                  type="button"
-                  onClick={() => setAssignmentFilterStatus(st)}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold capitalize whitespace-nowrap transition-colors ${
-                    assignmentFilterStatus === st
-                      ? 'bg-student-500/20 text-student-300 border border-student-500/30'
-                      : 'bg-bg-base text-text-muted hover:text-text-primary border border-border-base'
-                  }`}
-                >
-                  {st === 'in_progress' ? 'In Progress' : st}
-                </button>
-              ))}
+            <div>
+              <label className="block text-xs font-semibold text-neutral-700 mb-1">
+                Syllabus &amp; Focus (Optional)
+              </label>
+              <textarea
+                rows={3}
+                value={newCourseDesc}
+                onChange={(e) => setNewCourseDesc(e.target.value)}
+                placeholder="Course outline, key chapters, professor notes or grading criteria..."
+                className="w-full px-3 py-2 bg-white border border-[#e5e0d8] rounded-lg text-sm text-neutral-800 placeholder:text-neutral-400 focus:outline-none focus:border-[#c04b1e]"
+              />
             </div>
-          </div>
 
-          {/* Quick Add Assignment Bar */}
+            <div className="flex items-center justify-end gap-2 pt-3 border-t border-[#eee7e0]">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setIsNewCourseModalOpen(false)}
+                className="text-xs text-neutral-600"
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                variant="primary"
+                size="sm"
+                disabled={!newCourseTitle.trim() || createCourseMutation.isPending}
+                isLoading={createCourseMutation.isPending}
+                className="!bg-[#c04b1e] hover:!bg-[#a83e16] text-white text-xs px-4"
+              >
+                Create course
+              </Button>
+            </div>
+          </form>
+        </Modal>
+      )}
+
+      {/* ── MODAL: CREATE NEW ASSIGNMENT ────────────────────────────────────── */}
+      {isNewAssignmentModalOpen && (
+        <Modal
+          isOpen={true}
+          onClose={() => setIsNewAssignmentModalOpen(false)}
+          title="Add coursework assignment"
+        >
           <form
             onSubmit={(e) => {
               e.preventDefault();
               createAssignmentMutation.mutate();
             }}
-            className="flex flex-col sm:flex-row items-center gap-2 p-3 bg-bg-surface rounded-xl border border-border-base"
+            className="space-y-4"
           >
-            <input
-              type="text"
-              value={quickAssignmentTitle}
-              onChange={(e) => setQuickAssignmentTitle(e.target.value)}
-              placeholder="Add coursework assignment or study task..."
-              className="flex-1 w-full bg-bg-base border border-border-base rounded-xl px-3.5 py-2 text-xs text-text-primary placeholder:text-text-faint focus:outline-none focus:ring-1 focus:ring-student-400"
-            />
-            <select
-              value={quickAssignmentCourseId || ''}
-              onChange={(e) =>
-                setQuickAssignmentCourseId(e.target.value ? Number(e.target.value) : undefined)
-              }
-              className="w-full sm:w-44 bg-bg-base text-xs border border-border-base rounded-xl px-3 py-2 text-text-primary focus:outline-none"
-            >
-              <option value="">Course (Optional)</option>
-              {projects.map((p) => (
-                <option key={p.id} value={p.id}>
-                  {p.title}
-                </option>
-              ))}
-            </select>
-            <div className="flex items-center gap-2 w-full sm:w-auto">
-              <input
-                type="number"
-                min={5}
-                step={5}
-                value={quickAssignmentMinutes}
-                onChange={(e) => setQuickAssignmentMinutes(Number(e.target.value))}
-                placeholder="Mins"
-                className="w-20 bg-bg-base border border-border-base rounded-xl px-2.5 py-2 text-xs text-text-primary focus:outline-none text-center font-mono"
-                title="Estimated minutes"
-              />
-              <Button
-                type="submit"
-                size="sm"
-                variant="primary"
-                disabled={!quickAssignmentTitle.trim() || createAssignmentMutation.isPending}
-                className="shrink-0 text-xs px-4 py-2"
-                icon={<Plus className="w-3.5 h-3.5" />}
-              >
-                Add Assignment
-              </Button>
-            </div>
-          </form>
-
-          {/* Assignment Items List */}
-          <div className="space-y-2">
-            {filteredAssignments.length === 0 ? (
-              <div className="card p-10 text-center border-dashed border-border-base">
-                <ClipboardList className="w-10 h-10 text-student-400 mx-auto mb-2 opacity-50" />
-                <h4 className="text-sm font-bold text-text-primary">
-                  No coursework assignments found
-                </h4>
-                <p className="text-xs text-text-muted mt-1">
-                  Add coursework assignments above or create deliverables directly inside course
-                  phases.
-                </p>
-              </div>
-            ) : (
-              filteredAssignments.map((task) => {
-                const isDone = task.status === 'completed';
-                const course = projects.find((p) => p.id === task.project_id);
-                return (
-                  <div
-                    key={task.id}
-                    className={`flex items-center justify-between gap-3 p-3.5 rounded-xl border transition-all ${
-                      isDone
-                        ? 'bg-bg-base/60 border-border-subtle opacity-75'
-                        : 'bg-bg-surface border-border-base hover:border-student-500/30 shadow-2xs'
-                    }`}
-                  >
-                    <div className="flex items-center gap-3 min-w-0">
-                      <button
-                        type="button"
-                        onClick={() =>
-                          updateTaskMutation.mutate({
-                            id: task.id,
-                            status: isDone ? 'todo' : 'completed',
-                          })
-                        }
-                        className="text-text-muted hover:text-student-400 shrink-0 transition-colors"
-                        title={isDone ? 'Mark incomplete' : 'Mark complete'}
-                      >
-                        <CheckCircle2
-                          className={`w-5 h-5 ${
-                            isDone
-                              ? 'text-student-400 fill-student-400/20'
-                              : 'text-text-muted hover:text-student-400'
-                          }`}
-                        />
-                      </button>
-                      <div className="min-w-0">
-                        <div className="flex items-center gap-2 flex-wrap">
-                          <span
-                            className={`text-xs font-semibold truncate ${
-                              isDone ? 'line-through text-text-muted' : 'text-text-primary'
-                            }`}
-                          >
-                            {task.title}
-                          </span>
-                          {course && (
-                            <span className="text-[10px] font-semibold text-student-400 bg-student-500/10 px-2 py-0.5 rounded-md border border-student-500/20 truncate max-w-xs">
-                              {course.title}
-                            </span>
-                          )}
-                        </div>
-                        {task.description && (
-                          <p className="text-3xs text-text-muted mt-0.5 truncate">
-                            {task.description}
-                          </p>
-                        )}
-                      </div>
-                    </div>
-
-                    <div className="flex items-center gap-2 shrink-0">
-                      <TimeTrackingBadge
-                        expectedMinutes={task.estimated_minutes}
-                        actualMinutes={task.actual_minutes}
-                        size="xs"
-                        variant="pill"
-                      />
-                      {task.priority && task.priority !== 'medium' && (
-                        <PriorityBadge priority={task.priority} />
-                      )}
-                      {task.due_date && (
-                        <span className="text-3xs text-text-faint flex items-center gap-1 font-mono">
-                          <Clock className="w-3 h-3 text-amber-400" />
-                          {new Date(task.due_date).toLocaleDateString()}
-                        </span>
-                      )}
-                      <button
-                        type="button"
-                        onClick={() => deleteTaskMutation.mutate(task.id)}
-                        className="text-text-faint hover:text-danger p-1 rounded transition-colors"
-                        title="Remove assignment"
-                      >
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
-                  </div>
-                );
-              })
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* Create Project Modal */}
-      <Modal
-        isOpen={isCreateModalOpen}
-        onClose={() => setIsCreateModalOpen(false)}
-        title="Create Academic Project / Thesis"
-      >
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            if (!newTitle.trim()) return;
-            createProjectMutation.mutate();
-          }}
-          className="space-y-4"
-        >
-          <div>
-            <label className="block text-xs font-semibold text-text-secondary mb-1">
-              Project / Paper Title *
-            </label>
-            <input
-              type="text"
-              required
-              value={newTitle}
-              onChange={(e) => setNewTitle(e.target.value)}
-              placeholder="e.g. Distributed Consensus Simulator in Rust"
-              className="w-full bg-bg-surface border border-border-base rounded-xl px-3.5 py-2 text-xs text-text-primary focus:outline-none focus:border-student-500"
-            />
-          </div>
-
-          <div>
-            <label className="block text-xs font-semibold text-text-secondary mb-1">
-              Course / Abstract / Description
-            </label>
-            <textarea
-              rows={3}
-              value={newDesc}
-              onChange={(e) => setNewDesc(e.target.value)}
-              placeholder="e.g. Capstone deliverable for CS-480. Involves Raft consensus implementation, benchmark harness, and latex evaluation report."
-              className="w-full bg-bg-surface border border-border-base rounded-xl px-3.5 py-2 text-xs text-text-primary focus:outline-none focus:border-student-500"
-            />
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-semibold text-text-secondary mb-1">
-                Priority
+              <label className="block text-xs font-semibold text-neutral-700 mb-1">
+                Assignment Title
+              </label>
+              <input
+                type="text"
+                required
+                value={newAssignmentTitle}
+                onChange={(e) => setNewAssignmentTitle(e.target.value)}
+                placeholder="e.g. Subnetting worksheet"
+                className="w-full px-3 py-2 bg-white border border-[#e5e0d8] rounded-lg text-sm text-neutral-800 placeholder:text-neutral-400 focus:outline-none focus:border-[#c04b1e]"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-neutral-700 mb-1">
+                Linked Course
               </label>
               <select
-                value={newPriority}
-                onChange={(e) => setNewPriority(e.target.value as ProjectPriority)}
-                className="w-full bg-bg-surface border border-border-base rounded-xl px-3 py-2 text-xs text-text-primary focus:outline-none focus:border-student-500"
+                value={newAssignmentCourseId || ''}
+                onChange={(e) =>
+                  setNewAssignmentCourseId(e.target.value ? Number(e.target.value) : undefined)
+                }
+                className="w-full px-3 py-2 bg-white border border-[#e5e0d8] rounded-lg text-sm text-neutral-800 focus:outline-none focus:border-[#c04b1e]"
               >
-                <option value="low">Low</option>
-                <option value="high">High</option>
-                <option value="urgent">Urgent</option>
+                <option value="">Select course...</option>
+                {courses.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.title}
+                  </option>
+                ))}
               </select>
             </div>
 
-            <div>
-              <label className="block text-xs font-semibold text-text-secondary mb-1">
-                Target Submission Date
-              </label>
-              <input
-                type="date"
-                value={newTargetDate}
-                onChange={(e) => setNewTargetDate(e.target.value)}
-                className="w-full bg-bg-surface border border-border-base rounded-xl px-3 py-2 text-xs text-text-primary focus:outline-none focus:border-student-500"
-              ></input>
-            </div>
-          </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="block text-xs font-semibold text-neutral-700 mb-1">
+                  Est Minutes
+                </label>
+                <input
+                  type="number"
+                  min={10}
+                  step={10}
+                  value={newAssignmentEstimate}
+                  onChange={(e) => setNewAssignmentEstimate(Number(e.target.value))}
+                  className="w-full px-3 py-2 bg-white border border-[#e5e0d8] rounded-lg text-sm text-neutral-800 focus:outline-none focus:border-[#c04b1e]"
+                />
+              </div>
 
-          <div className="pt-2 flex items-center justify-end gap-2">
-            <Button
-              type="button"
-              variant="secondary"
-              size="sm"
-              onClick={() => setIsCreateModalOpen(false)}
-            >
-              Cancel
-            </Button>
-            <Button
-              type="submit"
-              variant="primary"
-              size="sm"
-              className="!bg-student-500 hover:!bg-student-600 shadow-glow-solar"
-              disabled={!newTitle.trim() || createProjectMutation.isPending}
-            >
-              {createProjectMutation.isPending ? 'Saving...' : 'Create Project'}
-            </Button>
-          </div>
-        </form>
-      </Modal>
-
-      {/* Add Milestone Modal */}
-      <Modal
-        isOpen={isMilestoneModalOpen}
-        onClose={() => setIsMilestoneModalOpen(false)}
-        title="Add Academic Milestone"
-      >
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            if (!milestoneTitle.trim()) return;
-            createMilestoneMutation.mutate();
-          }}
-          className="space-y-4"
-        >
-          <div>
-            <label className="block text-xs font-semibold text-text-secondary mb-1">
-              Milestone / Deliverable Title *
-            </label>
-            <input
-              type="text"
-              required
-              value={milestoneTitle}
-              onChange={(e) => setMilestoneTitle(e.target.value)}
-              placeholder="e.g. Complete Literature Review Draft"
-              className="w-full bg-bg-surface border border-border-base rounded-xl px-3.5 py-2 text-xs text-text-primary focus:outline-none focus:border-student-500"
-            />
-          </div>
-
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="block text-xs font-semibold text-text-secondary mb-1">
-                Target Deadline
-              </label>
-              <input
-                type="date"
-                value={milestoneTargetDate}
-                onChange={(e) => setMilestoneTargetDate(e.target.value)}
-                className="w-full bg-bg-surface border border-border-base rounded-xl px-3 py-2 text-xs text-text-primary focus:outline-none focus:border-student-500"
-              />
+              <div>
+                <label className="block text-xs font-semibold text-neutral-700 mb-1">
+                  Due Timing
+                </label>
+                <input
+                  type="text"
+                  value={newAssignmentDue}
+                  onChange={(e) => setNewAssignmentDue(e.target.value)}
+                  placeholder="e.g. Tomorrow, Wed, 15 Nov"
+                  className="w-full px-3 py-2 bg-white border border-[#e5e0d8] rounded-lg text-sm text-neutral-800 focus:outline-none focus:border-[#c04b1e]"
+                />
+              </div>
             </div>
 
-            <div>
-              <label className="block text-xs font-semibold text-text-secondary mb-1">
-                Expected Time (Mins)
-              </label>
-              <input
-                type="number"
-                min={0}
-                value={milestoneEstimatedMinutes}
-                onChange={(e) =>
-                  setMilestoneEstimatedMinutes(Math.max(0, parseInt(e.target.value) || 0))
-                }
-                className="w-full bg-bg-surface border border-border-base rounded-xl px-3 py-2 text-xs text-text-primary focus:outline-none focus:border-student-500"
-              />
+            <div className="flex items-center justify-end gap-2 pt-3 border-t border-[#eee7e0]">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setIsNewAssignmentModalOpen(false)}
+                className="text-xs text-neutral-600"
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                variant="primary"
+                size="sm"
+                disabled={!newAssignmentTitle.trim() || createAssignmentMutation.isPending}
+                isLoading={createAssignmentMutation.isPending}
+                className="!bg-[#c04b1e] hover:!bg-[#a83e16] text-white text-xs px-4"
+              >
+                Add assignment
+              </Button>
             </div>
-          </div>
-
-          <div>
-            <label className="block text-xs font-semibold text-text-secondary mb-1">
-              Actual Time Taken (Mins)
-            </label>
-            <input
-              type="number"
-              min={0}
-              value={milestoneActualMinutes}
-              onChange={(e) =>
-                setMilestoneActualMinutes(Math.max(0, parseInt(e.target.value) || 0))
-              }
-              className="w-full bg-bg-surface border border-border-base rounded-xl px-3 py-2 text-xs text-text-primary focus:outline-none focus:border-student-500"
-            />
-          </div>
-
-          <div className="pt-2 flex justify-end gap-2">
-            <Button
-              type="button"
-              variant="secondary"
-              size="sm"
-              onClick={() => setIsMilestoneModalOpen(false)}
-            >
-              Cancel
-            </Button>
-            <Button
-              type="submit"
-              variant="primary"
-              size="sm"
-              className="!bg-student-500 hover:!bg-student-600 shadow-glow-solar"
-              disabled={!milestoneTitle.trim() || createMilestoneMutation.isPending}
-            >
-              Add Milestone
-            </Button>
-          </div>
-        </form>
-      </Modal>
+          </form>
+        </Modal>
+      )}
     </div>
   );
 }

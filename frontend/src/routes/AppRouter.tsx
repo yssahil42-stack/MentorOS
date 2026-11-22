@@ -165,11 +165,11 @@ export function AppRouter() {
             <Route path="dashboard" element={<StudentDashboard />} />
             <Route path="study-plan" element={<StudyPlanPage />} />
             <Route path="ai-tutor" element={<StudyPlanPage />} />
-            <Route path="assignments" element={<Navigate to="/app/student/projects" replace />} />
+            <Route path="assignments" element={<AcademicProjects />} />
             <Route path="projects" element={<AcademicProjects />} />
             <Route path="courses" element={<AcademicProjects />} />
             <Route path="calendar" element={<StudentCalendar />} />
-            <Route path="tasks" element={<Navigate to="/app/student/projects" replace />} />
+            <Route path="tasks" element={<AcademicProjects />} />
             <Route path="notes" element={<StudentNotes />} />
             <Route path="progress" element={<Navigate to="/app/student/dashboard" replace />} />
             <Route path="settings" element={<StudentSettings />} />
