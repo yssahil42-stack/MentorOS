@@ -293,8 +293,8 @@ def create_milestone(
         title=ms_in.title,
         description=ms_in.description,
         target_date=ms_in.target_date,
-        estimated_minutes=ms_in.estimated_minutes or 0,
-        actual_minutes=ms_in.actual_minutes or 0,
+        estimated_minutes=getattr(ms_in, "estimated_minutes", None) or 0,
+        actual_minutes=getattr(ms_in, "actual_minutes", None) or 0,
         status="pending",
     )
     db.add(ms)

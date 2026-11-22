@@ -44,10 +44,23 @@ function notifyToast(message: string, type: 'success' | 'error' | 'warning' | 'i
 
 export async function approveProposalItems(
   proposal: AIProposal,
-  req: ApproveProposalRequest
+  req: ApproveProposalRequest,
+  suppressToasts = false
 ): Promise<ApprovalResult> {
   const itemResults: import('../types/aiProposal').ApprovalItemResult[] = [];
   const validApprovedIds: number[] = [];
+
+  // If proposal has no valid ID, fail early without calling backend
+  if (!proposal.id || proposal.id <= 0) {
+    return {
+      created_tasks: [],
+      created_projects: [],
+      created_milestones: [],
+      created_events: [],
+      created_notes: [],
+      results: [],
+    };
+  }
 
   // 1. Validate each item payload before sending
   for (const itemId of req.approved_item_ids) {
@@ -60,7 +73,9 @@ export async function approveProposalItems(
         status: 'failed',
         reason: 'Item not found in proposal',
       });
-      notifyToast(`✗ Failed: Item #${itemId} (Item not found in proposal)`, 'error');
+      if (!suppressToasts) {
+        notifyToast(`✗ Failed: Item #${itemId} (Item not found in proposal)`, 'error');
+      }
       continue;
     }
 
@@ -91,7 +106,9 @@ export async function approveProposalItems(
         status: 'failed',
         reason: failureReason,
       });
-      notifyToast(`✗ Failed: ${fallbackTitle} (${failureReason})`, 'error');
+      if (!suppressToasts) {
+        notifyToast(`✗ Failed: ${fallbackTitle} (${failureReason})`, 'error');
+      }
     } else {
       validApprovedIds.push(itemId);
     }
@@ -131,7 +148,9 @@ export async function approveProposalItems(
         title,
         status: 'success',
       });
-      notifyToast(`✓ Created ${item.item_type}: ${title}`, 'success');
+      if (!suppressToasts) {
+        notifyToast(`✓ Created ${item.item_type}: ${title}`, 'success');
+      }
     }
 
     res.results = itemResults;
@@ -148,7 +167,9 @@ export async function approveProposalItems(
         status: 'failed',
         reason,
       });
-      notifyToast(`✗ Failed: ${title} (${reason})`, 'error');
+      if (!suppressToasts) {
+        notifyToast(`✗ Failed: ${title} (${reason})`, 'error');
+      }
     }
     throw err;
   }

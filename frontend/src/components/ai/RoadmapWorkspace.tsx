@@ -337,6 +337,42 @@ export function RoadmapWorkspace({ isOpen, onClose, initialPrompt = '' }: Roadma
     handleGenerate(projectPrompt);
   };
 
+  // Toggle selection for an individual task in a phase
+  const toggleTaskSelection = (phaseIndex: number, taskIndex: number) => {
+    setPhases((prev) =>
+      prev.map((p, pIdx) => {
+        if (pIdx !== phaseIndex) return p;
+        return {
+          ...p,
+          tasks: p.tasks.map((t, tIdx) => {
+            if (tIdx !== taskIndex) return t;
+            return { ...t, selected: !t.selected };
+          }),
+        };
+      })
+    );
+  };
+
+  // Toggle all tasks in a phase
+  const togglePhaseTasks = (phaseIndex: number) => {
+    setPhases((prev) =>
+      prev.map((p, pIdx) => {
+        if (pIdx !== phaseIndex) return p;
+        const allSelected = p.tasks.every((t) => t.selected !== false);
+        return {
+          ...p,
+          tasks: p.tasks.map((t) => ({ ...t, selected: !allSelected })),
+        };
+      })
+    );
+  };
+
+  const totalTasksCount = phases.reduce((acc, p) => acc + (p.tasks?.length || 0), 0);
+  const selectedTasksCount = phases.reduce(
+    (acc, p) => acc + (p.tasks?.filter((t) => t.selected !== false).length || 0),
+    0
+  );
+
   // Save roadmap and its items into workspace
   const handleSaveToWorkspace = async () => {
     if (!activeProposal || isSaving) return;
@@ -347,20 +383,46 @@ export function RoadmapWorkspace({ isOpen, onClose, initialPrompt = '' }: Roadma
 
       // 1. If activeProposal has items, attempt to approve them through the backend API
       if (activeProposal.items && activeProposal.items.length > 0) {
-        const allItemIds = activeProposal.items.map((i) => i.id);
-        try {
-          const res = await approveProposalItems(activeProposal, {
-            approved_item_ids: allItemIds,
+        const selectedTaskIds = new Set<number>();
+        phases.forEach((p) => {
+          p.tasks.forEach((t) => {
+            if (t.selected !== false && t.id) {
+              selectedTaskIds.add(t.id);
+            }
           });
+        });
 
-          totalCreated =
-            res.created_tasks.length +
-            res.created_projects.length +
-            res.created_milestones.length +
-            res.created_events.length +
-            res.created_notes.length;
-        } catch {
-          // If approval fails or returns 0, proceed to direct workspace creation below
+        // Filter activeProposal.items: only approve projects, milestones, notes, calendar events,
+        // and ONLY the tasks that the user kept checked!
+        const approvedItemIds = activeProposal.items
+          .filter((item) => {
+            if (item.item_type === 'task') {
+              return selectedTaskIds.size === 0 || selectedTaskIds.has(item.id);
+            }
+            return true;
+          })
+          .map((i) => i.id);
+
+        if (approvedItemIds.length > 0) {
+          try {
+            const res = await approveProposalItems(
+              activeProposal,
+              { approved_item_ids: approvedItemIds },
+              true // Suppress individual toasts so we handle notifications cleanly
+            );
+
+            totalCreated =
+              res.created_tasks.length +
+              res.created_projects.length +
+              res.created_milestones.length +
+              res.created_events.length +
+              res.created_notes.length;
+          } catch (approvalErr) {
+            console.warn(
+              'Backend proposal approval failed, falling back to direct creation',
+              approvalErr
+            );
+          }
         }
       }
 
@@ -373,57 +435,77 @@ export function RoadmapWorkspace({ isOpen, onClose, initialPrompt = '' }: Roadma
           `${role.charAt(0).toUpperCase() + role.slice(1)} Roadmap`;
         const projectTitle = rawTitle.length > 80 ? `${rawTitle.slice(0, 77)}...` : rawTitle;
 
-        const newProj = await createProject({
-          title: projectTitle,
-          description: strategicGuidance?.slice(0, 300) || `Roadmap plan for ${projectTitle}`,
-          priority: 'high',
-          role: role,
-        });
+        try {
+          const newProj = await createProject({
+            title: projectTitle,
+            description: strategicGuidance?.slice(0, 300) || `Roadmap plan for ${projectTitle}`,
+            priority: 'high',
+            role: role,
+          });
 
-        if (newProj && newProj.id) {
-          totalCreated += 1;
+          if (newProj && newProj.id) {
+            totalCreated += 1;
 
-          for (let pIdx = 0; pIdx < phases.length; pIdx++) {
-            const phase = phases[pIdx];
-            const newMilestone = await createMilestone({
-              project_id: newProj.id,
-              title: phase.title || `Phase ${pIdx + 1}`,
-              description: phase.description,
-              role: role,
-            });
-            if (newMilestone) totalCreated += 1;
-
-            for (const task of phase.tasks) {
-              if (task.selected !== false) {
-                const newTask = await createTask({
-                  title: task.title,
-                  description: task.description || `Phase ${pIdx + 1}: ${phase.title}`,
+            for (let pIdx = 0; pIdx < phases.length; pIdx++) {
+              const phase = phases[pIdx];
+              let newMilestone: any = null;
+              try {
+                newMilestone = await createMilestone({
                   project_id: newProj.id,
-                  priority: (task.priority as any) || 'medium',
-                  estimated_minutes: task.estimatedMinutes || 60,
+                  title: phase.title || `Phase ${pIdx + 1}`,
+                  description: phase.description,
                   role: role,
                 });
-                if (newTask) totalCreated += 1;
+                if (newMilestone) totalCreated += 1;
+              } catch (mErr) {
+                console.warn('Failed to save milestone:', mErr);
+              }
+
+              for (const task of phase.tasks) {
+                if (task.selected !== false) {
+                  try {
+                    const newTask = await createTask({
+                      title: task.title,
+                      description: task.description || `Phase ${pIdx + 1}: ${phase.title}`,
+                      project_id: newProj.id,
+                      priority: (task.priority as any) || 'medium',
+                      estimated_minutes: task.estimatedMinutes || 60,
+                      role: role,
+                    });
+                    if (newTask) totalCreated += 1;
+                  } catch (tErr) {
+                    console.warn('Failed to save task:', tErr);
+                  }
+                }
               }
             }
           }
+        } catch (projErr) {
+          console.warn('Direct project creation failed:', projErr);
         }
       }
 
-      setSavedCount(totalCreated);
-      setIsSavedSuccess(true);
-      showToast(`Successfully saved ${totalCreated} items into your workspace!`, 'success');
+      if (totalCreated > 0) {
+        setSavedCount(totalCreated);
+        setIsSavedSuccess(true);
+        showToast(`Successfully saved ${totalCreated} items into your workspace!`, 'success');
 
-      // Refresh calendar, dashboard, tasks and project queries
-      await Promise.all([
-        queryClient.invalidateQueries({ queryKey: ['calendar'] }),
-        queryClient.invalidateQueries({ queryKey: ['dashboard'] }),
-        queryClient.invalidateQueries({ queryKey: ['projects'] }),
-        queryClient.invalidateQueries({ queryKey: ['tasks'] }),
-        queryClient.invalidateQueries({ queryKey: ['milestones'] }),
-        queryClient.invalidateQueries(),
-      ]);
-      setSidebarRefreshKey((k) => k + 1);
+        // Refresh calendar, dashboard, tasks and project queries
+        await Promise.all([
+          queryClient.invalidateQueries({ queryKey: ['calendar'] }),
+          queryClient.invalidateQueries({ queryKey: ['dashboard'] }),
+          queryClient.invalidateQueries({ queryKey: ['projects'] }),
+          queryClient.invalidateQueries({ queryKey: ['tasks'] }),
+          queryClient.invalidateQueries({ queryKey: ['milestones'] }),
+          queryClient.invalidateQueries(),
+        ]);
+        setSidebarRefreshKey((k) => k + 1);
+      } else {
+        showToast(
+          'Could not save roadmap to workspace. Please check your connection and try again.',
+          'error'
+        );
+      }
     } catch (err: any) {
       showToast(err.message || 'Failed to save roadmap to workspace', 'error');
     } finally {
@@ -943,8 +1025,8 @@ export function RoadmapWorkspace({ isOpen, onClose, initialPrompt = '' }: Roadma
                         <span>Curriculum &amp; Milestone Phases</span>
                       </h3>
                       <span className="text-[11px] font-semibold text-text-muted bg-slate-100 dark:bg-bg-elevated px-2.5 py-0.5 rounded-full border border-border-base/70">
-                        {phases.length} phases •{' '}
-                        {phases.reduce((acc, p) => acc + p.tasks.length, 0)} tasks
+                        {phases.length} phases • {selectedTasksCount} of {totalTasksCount} tasks
+                        selected
                       </span>
                     </div>
 
@@ -992,33 +1074,75 @@ export function RoadmapWorkspace({ isOpen, onClose, initialPrompt = '' }: Roadma
 
                         {phase.tasks && phase.tasks.length > 0 && (
                           <div className="pt-2 space-y-2">
-                            <span className="text-[10px] uppercase font-bold tracking-wider text-text-muted block">
-                              Milestone Tasks ({phase.tasks.length})
-                            </span>
+                            <div className="flex items-center justify-between">
+                              <span className="text-[10px] uppercase font-bold tracking-wider text-text-muted">
+                                Milestone Tasks (
+                                {phase.tasks.filter((t) => t.selected !== false).length}/
+                                {phase.tasks.length})
+                              </span>
+                              <button
+                                type="button"
+                                onClick={() => togglePhaseTasks(pIdx)}
+                                className="text-[11px] font-semibold text-[#c04b1e] hover:text-[#9e3a14] dark:text-solar-400 dark:hover:text-solar-300 transition-colors cursor-pointer"
+                              >
+                                {phase.tasks.every((t) => t.selected !== false)
+                                  ? 'Deselect all'
+                                  : 'Select all'}
+                              </button>
+                            </div>
                             <div className="grid grid-cols-1 gap-2">
-                              {phase.tasks.map((task, tIdx) => (
-                                <div
-                                  key={task.id || tIdx}
-                                  className="p-3 rounded-xl bg-slate-50/80 dark:bg-bg-elevated/40 border border-border-base/60 dark:border-white/[0.04] flex items-center justify-between gap-3 text-xs hover:border-solar-500/30 transition-colors"
-                                >
-                                  <div className="flex items-center gap-2.5 min-w-0">
-                                    <div className="w-4 h-4 rounded-md border border-solar-500/40 bg-solar-500/10 flex items-center justify-center text-solar-600 shrink-0">
-                                      <Check className="w-2.5 h-2.5 stroke-[2.5]" />
-                                    </div>
-                                    <span className="font-medium text-text-primary truncate">
-                                      {task.title}
-                                    </span>
-                                  </div>
-                                  <div className="flex items-center gap-2 shrink-0">
-                                    {task.estimatedMinutes && (
-                                      <span className="text-[10px] text-text-muted flex items-center gap-1 bg-white dark:bg-bg-surface px-2 py-0.5 rounded-md border border-border-base/60">
-                                        <Clock className="w-3 h-3 text-text-faint" />
-                                        {task.estimatedMinutes}m
+                              {phase.tasks.map((task, tIdx) => {
+                                const isSelected = task.selected !== false;
+                                return (
+                                  <div
+                                    key={task.id || tIdx}
+                                    role="checkbox"
+                                    aria-checked={isSelected}
+                                    tabIndex={0}
+                                    onClick={() => toggleTaskSelection(pIdx, tIdx)}
+                                    onKeyDown={(e) => {
+                                      if (e.key === ' ' || e.key === 'Enter') {
+                                        e.preventDefault();
+                                        toggleTaskSelection(pIdx, tIdx);
+                                      }
+                                    }}
+                                    className={`p-3 rounded-xl border flex items-center justify-between gap-3 text-xs transition-all cursor-pointer select-none ${
+                                      isSelected
+                                        ? 'bg-solar-500/[0.04] dark:bg-solar-500/[0.08] border-[#c04b1e]/30 dark:border-solar-500/40 shadow-xs'
+                                        : 'bg-slate-50/50 dark:bg-bg-elevated/20 border-border-base/40 dark:border-white/[0.03] opacity-65 hover:opacity-90'
+                                    }`}
+                                  >
+                                    <div className="flex items-center gap-2.5 min-w-0">
+                                      <div
+                                        className={`w-4 h-4 rounded-md border flex items-center justify-center shrink-0 transition-colors ${
+                                          isSelected
+                                            ? 'border-[#c04b1e] bg-[#c04b1e] text-white dark:border-solar-500 dark:bg-solar-500 dark:text-white'
+                                            : 'border-slate-300 dark:border-white/30 bg-white dark:bg-bg-surface text-transparent'
+                                        }`}
+                                      >
+                                        <Check
+                                          className={`w-2.5 h-2.5 stroke-[3] transition-opacity ${isSelected ? 'opacity-100' : 'opacity-0'}`}
+                                        />
+                                      </div>
+                                      <span
+                                        className={`font-medium truncate transition-colors ${
+                                          isSelected ? 'text-text-primary' : 'text-text-muted'
+                                        }`}
+                                      >
+                                        {task.title}
                                       </span>
-                                    )}
+                                    </div>
+                                    <div className="flex items-center gap-2 shrink-0">
+                                      {task.estimatedMinutes && (
+                                        <span className="text-[10px] text-text-muted flex items-center gap-1 bg-white dark:bg-bg-surface px-2 py-0.5 rounded-md border border-border-base/60">
+                                          <Clock className="w-3 h-3 text-text-faint" />
+                                          {task.estimatedMinutes}m
+                                        </span>
+                                      )}
+                                    </div>
                                   </div>
-                                </div>
-                              ))}
+                                );
+                              })}
                             </div>
                           </div>
                         )}
@@ -1078,7 +1202,11 @@ export function RoadmapWorkspace({ isOpen, onClose, initialPrompt = '' }: Roadma
                 ) : (
                   <>
                     <Zap className="w-3.5 h-3.5" />
-                    <span>Save to workspace</span>
+                    <span>
+                      {selectedTasksCount > 0
+                        ? `Save ${selectedTasksCount} task${selectedTasksCount === 1 ? '' : 's'} to workspace`
+                        : 'Save to workspace'}
+                    </span>
                   </>
                 )}
               </button>

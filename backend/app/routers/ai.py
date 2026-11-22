@@ -1439,6 +1439,7 @@ def approve_proposal(
                 priority=payload.get("priority", "medium"),
                 target_date=payload.get("target_date"),
                 progress=0,
+                status=payload.get("status", "active"),
             )
             db.add(p)
             db.flush()
