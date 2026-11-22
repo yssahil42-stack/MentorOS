@@ -17,782 +17,126 @@ def synthesize_smart_roadmap(prompt: str, role: str) -> Dict[str, Any]:
     p_lower = prompt.lower()
     now = datetime.utcnow()
 
-    # Check for duration (e.g. "3 months", "6 weeks", "30 days")
-    months_match = re.search(r'(\d+)\s*(?:month|mo)', p_lower)
-    weeks_match = re.search(r'(\d+)\s*(?:week|wk)', p_lower)
-    days_match = re.search(r'(\d+)\s*(?:day)', p_lower)
-
-    total_days = 90
-    duration_label = "3-Month"
-    if months_match:
-        m = int(months_match.group(1))
-        total_days = max(m * 30, 14)
-        duration_label = f"{m}-Month"
-    elif weeks_match:
-        w = int(weeks_match.group(1))
-        total_days = max(w * 7, 7)
-        duration_label = f"{w}-Week"
-    elif days_match:
-        d = int(days_match.group(1))
-        total_days = max(d, 3)
-        duration_label = f"{d}-Day"
+    # Check for duration with standard library regex
+    dur_match = re.search(r'(\d+)\s*(month|mo|week|wk|day)', p_lower)
+    if dur_match:
+        val, unit = int(dur_match.group(1)), dur_match.group(2)
+        if unit.startswith(('month', 'mo')):
+            total_days, duration_label = max(val * 30, 14), f"{val}-Month"
+        elif unit.startswith(('week', 'wk')):
+            total_days, duration_label = max(val * 7, 7), f"{val}-Week"
+        else:
+            total_days, duration_label = max(val, 3), f"{val}-Day"
+    else:
+        total_days, duration_label = 90, "3-Month"
 
     target_dt = (now + timedelta(days=total_days)).strftime("%Y-%m-%d")
     m1_dt = (now + timedelta(days=max(int(total_days * 0.33), 3))).strftime("%Y-%m-%d")
     m2_dt = (now + timedelta(days=max(int(total_days * 0.66), 7))).strftime("%Y-%m-%d")
     m3_dt = target_dt
 
-    # Check role context
-    role_ctx = "BSc CS student and interested in AI/full-stack development" if role in ["student", "developer"] else f"{role.replace('_', ' ')} striving for career mastery"
+    role_ctx = (
+        "BSc CS student and interested in AI/full-stack development"
+        if role in ["student", "developer"]
+        else f"{role.replace('_', ' ')} striving for career mastery"
+    )
 
-    # Subject 1: Python
     if "python" in p_lower:
         subject = "Python"
         proj_title = f"{duration_label} Python Mastery Roadmap"
-
-        roadmap_text = f"""Absolutely. If your goal is to become genuinely comfortable with Python in 3 months—not just memorize syntax—we can structure it around learning + coding practice + projects.
-Since you’re a {role_ctx}, I’d recommend a path that eventually leads into backend development, data handling, and AI development.
-
-### 3-Month Python Roadmap
-| Month | Focus | What you'll be able to do |
-| :--- | :--- | :--- |
-| **Month 1** | Python Fundamentals | Write programs confidently |
-| **Month 2** | Core Application Development | Build useful applications |
-| **Month 3** | Advanced + Projects | Build real-world Python projects |
-
----
-
-### Month 1 — Python Fundamentals
-#### Week 1: Python Basics
-- Installing Python / VS Code
-- Python syntax
-- Variables
-- Data types
-- int, float, str, bool
-- Input/output
-- Type conversion
-- Operators
-- Comments
-**Practice:**
-- Calculator
-- Unit converter
-- Simple bill calculator
-- Age calculator
-
-#### Week 2: Decision Making
-- if
-- elif
-- else
-- Nested conditions
-- Comparison operators
-- Logical operators
-**Practice:**
-- Grade calculator
-- Login system
-- Number checker
-- Simple ATM program
-
-#### Week 3: Loops
-- for
-- while
-- range()
-- break
-- continue
-- Nested loops
-**Practice:**
-- Multiplication table
-- Number guessing game
-- Pattern programs
-- Simple quiz
-
-#### Week 4: Data Structures
-- Lists
-- Tuples
-- Sets
-- Dictionaries
-- Indexing
-- Slicing
-- Adding/removing/updating elements
-- Looping through collections
-**Mini-project: Student Management System**
-- Add student
-- View students
-- Search student
-- Update student
-- Delete student
-- Calculate average marks
-
----
-
-### Month 2 — Core Application Development
-#### Week 5: Functions
-- Creating functions
-- Parameters
-- Arguments
-- Return values
-- Default arguments
-- Keyword arguments
-- Scope
-- Lambda functions
-*You should start writing programs as reusable functions rather than putting everything inside one large script.*
-
-#### Week 6: Files + Error Handling
-- Reading files
-- Writing files
-- CSV
-- JSON
-- try
-- except
-- finally
-- Raising exceptions
-**Project: Expense Tracker**
-Store expenses in a JSON/CSV file and provide:
-- Add expense
-- Delete expense
-- View expenses
-- Category-wise expenses
-- Total expenses
-- Monthly summary
-
-#### Week 7: Object-Oriented Programming
-**Learn:**
-- Classes
-- Objects
-- Attributes
-- Methods
-- __init__
-- Encapsulation
-- Inheritance
-- Polymorphism
-**Project: Library Management System**
-
-#### Week 8: Modules + Professional Python
-**Learn:**
-- Modules
-- Packages
-- pip
-- Virtual environments
-- requirements.txt
-- Environment variables
-- datetime
-- os
-- pathlib
-- random
-- collections
-**Also start using:**
-- venv
-- Git
-- GitHub
-- VS Code debugging
-
----
-
-### Month 3 — Advanced Python + Real Projects
-#### Week 9: Advanced Python
-**Learn:**
-- List comprehensions
-- Dictionary comprehensions
-- *args
-- **kwargs
-- Iterators
-- Generators
-- Decorators
-- map()
-- filter()
-- zip()
-- enumerate()
-*Don't try to memorize these. Build small programs with them.*
-
-#### Week 10: APIs + Database
-*This is particularly important for your career direction.*
-**Learn:**
-- HTTP basics
-- REST APIs
-- JSON
-- requests
-- Databases & SQL
-- SQL basics
-- CRUD
-- Python + database
-**Build: Python API + Database Application**
-For example: Users, Products, Tasks, Categories with CRUD operations.
-
-#### Week 11: FastAPI
-*Since you're already interested in AI/backend development, this is where Python becomes directly useful for your projects.*
-**Learn:**
-- FastAPI
-- Routes
-- GET
-- POST
-- PUT
-- DELETE
-- Request body
-- Query parameters
-- Path parameters
-- Pydantic
-- API validation
-- Connecting database
-- API documentation
-**Build: Task Management REST API**
-- POST   /tasks
-- GET    /tasks
-- GET    /tasks/{{id}}
-- PUT    /tasks/{{id}}
-- DELETE /tasks/{{id}}
-
-#### Week 12: Final Project
-*Build one complete project instead of doing another collection of tiny exercises.*
-**For you, I would recommend: AI Productivity Workspace Backend**
-Python handles:
-- User management
-- Tasks
-- Projects
-- Notes
-- Goals
-- Productivity statistics
-- Database
-- REST API
-- AI integration
-
-**Architecture:**
-```
-Frontend
-   ↓
-FastAPI
-   ↓
-Python Business Logic
-   ↓
-Database Layer
-   ↓
-AI Model / API
-```
-*By the end of the third month, you should be able to understand and modify a backend like this rather than simply copying code.*
-
----
-
-### Daily Schedule
-You don't need 6–8 hours every day.
-Aim for 1.5–2 hours/day, 6 days/week.
-
-A good session:
-- 20 min → Learn concept
-- 30 min → Follow examples
-- 40 min → Solve problems yourself
-- 20 min → Build/improve project
-- 10 min → Review
-
-> The most important rule: Don't spend 2 hours watching Python tutorials. Spend 2 hours writing Python.
-
-For every concept, use this cycle:
-```
-Learn
-  ↓
-Understand why
-  ↓
-Write code yourself
-  ↓
-Break the code
-  ↓
-Fix it
-  ↓
-Build something
-```
-
-### Your progression
-You should think of the 3 months like this:
-```
-MONTH 1
-Python syntax
-     ↓
-Problem solving
-     ↓
-Small programs
-
-MONTH 2
-Functions
-     ↓
-OOP
-     ↓
-Files
-     ↓
-Modules
-     ↓
-Medium projects
-
-MONTH 3
-APIs
-     ↓
-Database
-     ↓
-FastAPI
-     ↓
-Real project
-     ↓
-Portfolio
-```
-If you follow this consistently, 3 months is enough to reach a solid practical Python level, although mastery obviously takes longer."""
-
-        milestones = [
-            {
-                "project_title": proj_title,
-                "title": "Month 1: Python Fundamentals & Problem Solving (Weeks 1–4)",
-                "description": "Master variables, data types, conditionals, loops, functions, and collections with small CLI programs.",
-                "target_date": m1_dt,
-            },
-            {
-                "project_title": proj_title,
-                "title": "Month 2: Core Applications, OOP & File Systems (Weeks 5–8)",
-                "description": "Deep dive into reusable functions, JSON/CSV file handling, OOP class hierarchies, and virtualenv/Git.",
-                "target_date": m2_dt,
-            },
-            {
-                "project_title": proj_title,
-                "title": "Month 3: Advanced Python, FastAPI & AI Backend Capstone (Weeks 9–12)",
-                "description": "Master comprehensions, databases, FastAPI REST endpoints, and build the AI Workspace Backend.",
-                "target_date": m3_dt,
-            }
+        phases_meta = [
+            ("Month 1", "Python Fundamentals & Problem Solving", "Master variables, data types, conditionals, loops, functions, and collections with small CLI programs.", m1_dt),
+            ("Month 2", "Core Applications, OOP & File Systems", "Deep dive into reusable functions, JSON/CSV file handling, OOP class hierarchies, and virtualenv/Git.", m2_dt),
+            ("Month 3", "Advanced Python, FastAPI & AI Backend Capstone", "Master comprehensions, databases, FastAPI REST endpoints, and build the AI Workspace Backend.", m3_dt),
         ]
-
-        tasks = [
-            {
-                "project_title": proj_title,
-                "title": "Week 1: Python Basics — Build Calculator & Unit Converter",
-                "description": "Set up VS Code & Python. Write Calculator, Unit converter, Bill calculator, and Age calculator.",
-                "priority": "urgent",
-                "estimated_minutes": 60,
-                "due_date": (now + timedelta(days=7)).strftime("%Y-%m-%d"),
-            },
-            {
-                "project_title": proj_title,
-                "title": "Week 2: Decision Making — Grade Calculator, Login & ATM Program",
-                "description": "Master if/elif/else, comparison & logical operators. Build Login and ATM flow programs.",
-                "priority": "high",
-                "estimated_minutes": 60,
-                "due_date": (now + timedelta(days=14)).strftime("%Y-%m-%d"),
-            },
-            {
-                "project_title": proj_title,
-                "title": "Week 3: Loops Mastery — Multiplication Table & Guessing Game",
-                "description": "Practice for/while, range, break, and continue. Implement number guessing game and pattern programs.",
-                "priority": "high",
-                "estimated_minutes": 60,
-                "due_date": (now + timedelta(days=21)).strftime("%Y-%m-%d"),
-            },
-            {
-                "project_title": proj_title,
-                "title": "Week 4 Mini-Project: Student Management System (Full CRUD)",
-                "description": "Lists, dicts, indexing, slicing. Build CLI system: Add, View, Search, Update, Delete students.",
-                "priority": "urgent",
-                "estimated_minutes": 90,
-                "due_date": (now + timedelta(days=28)).strftime("%Y-%m-%d"),
-            },
-            {
-                "project_title": proj_title,
-                "title": "Week 5: Modularize Programs into Reusable Functions & Scope",
-                "description": "Parameters, return values, default/keyword args, scope, and lambdas. Refactor scripts into functions.",
-                "priority": "high",
-                "estimated_minutes": 60,
-                "due_date": (now + timedelta(days=35)).strftime("%Y-%m-%d"),
-            },
-            {
-                "project_title": proj_title,
-                "title": "Week 6 Project: JSON/CSV Expense Tracker with Error Handling",
-                "description": "File I/O, try/except, CSV & JSON persistence. Add, delete, and summarize monthly expenses.",
-                "priority": "high",
-                "estimated_minutes": 90,
-                "due_date": (now + timedelta(days=42)).strftime("%Y-%m-%d"),
-            },
-            {
-                "project_title": proj_title,
-                "title": "Week 7 Project: Library Management System with OOP Hierarchy",
-                "description": "Classes, objects, __init__, encapsulation, inheritance, and methods for Book & Member management.",
-                "priority": "high",
-                "estimated_minutes": 90,
-                "due_date": (now + timedelta(days=49)).strftime("%Y-%m-%d"),
-            },
-            {
-                "project_title": proj_title,
-                "title": "Week 8: Set Up Professional venv, Git, GitHub & VS Code Debugger",
-                "description": "Modules, packages, pip, virtual environments, requirements.txt, datetime, and Git commit workflow.",
-                "priority": "high",
-                "estimated_minutes": 60,
-                "due_date": (now + timedelta(days=56)).strftime("%Y-%m-%d"),
-            },
-            {
-                "project_title": proj_title,
-                "title": "Week 9: Build Advanced Drills with Comprehensions & Decorators",
-                "description": "List/dict comprehensions, *args/**kwargs, generators, decorators, map(), filter(), and zip().",
-                "priority": "high",
-                "estimated_minutes": 75,
-                "due_date": (now + timedelta(days=63)).strftime("%Y-%m-%d"),
-            },
-            {
-                "project_title": proj_title,
-                "title": "Week 10: Build CRUD Database Service with requests API",
-                "description": "HTTP basics, REST APIs, JSON, database integration, SQL CRUD operations for Users & Tasks.",
-                "priority": "high",
-                "estimated_minutes": 90,
-                "due_date": (now + timedelta(days=70)).strftime("%Y-%m-%d"),
-            },
-            {
-                "project_title": proj_title,
-                "title": "Week 11: Develop Task Management REST API with FastAPI & Pydantic",
-                "description": "Endpoints GET/POST/PUT/DELETE /tasks, Pydantic schemas, database dependency, and Swagger docs.",
-                "priority": "urgent",
-                "estimated_minutes": 105,
-                "due_date": (now + timedelta(days=77)).strftime("%Y-%m-%d"),
-            },
-            {
-                "project_title": proj_title,
-                "title": "Week 12 Capstone: Build AI Productivity Workspace Backend",
-                "description": "Multi-entity backend (Users, Tasks, Projects, Notes, AI integrations) connecting relational database.",
-                "priority": "urgent",
-                "estimated_minutes": 120,
-                "due_date": (now + timedelta(days=85)).strftime("%Y-%m-%d"),
-            }
+        task_tuples = [
+            ("Week 1: Python Basics — Build Calculator & Unit Converter", "Set up VS Code & Python. Write Calculator, Unit converter, Bill calculator, and Age calculator.", "urgent", 60, 7),
+            ("Week 2: Decision Making — Grade Calculator, Login & ATM Program", "Master if/elif/else, comparison & logical operators. Build Login and ATM flow programs.", "high", 60, 14),
+            ("Week 3: Loops Mastery — Multiplication Table & Guessing Game", "Practice for/while, range, break, and continue. Implement number guessing game and pattern programs.", "high", 60, 21),
+            ("Week 4 Mini-Project: Student Management System (Full CRUD)", "Lists, dicts, indexing, slicing. Build CLI system: Add, View, Search, Update, Delete students.", "urgent", 90, 28),
+            ("Week 5: Modularize Programs into Reusable Functions & Scope", "Parameters, return values, default/keyword args, scope, and lambdas. Refactor scripts into functions.", "high", 60, 35),
+            ("Week 6 Project: JSON/CSV Expense Tracker with Error Handling", "File I/O, try/except, CSV & JSON persistence. Add, delete, and summarize monthly expenses.", "high", 90, 42),
+            ("Week 7 Project: Library Management System with OOP Hierarchy", "Classes, objects, __init__, encapsulation, inheritance, and methods for Book & Member management.", "high", 90, 49),
+            ("Week 8: Set Up Professional venv, Git, GitHub & VS Code Debugger", "Modules, packages, pip, virtual environments, requirements.txt, datetime, and Git commit workflow.", "high", 60, 56),
+            ("Week 9: Build Advanced Drills with Comprehensions & Decorators", "List/dict comprehensions, *args/**kwargs, generators, decorators, map(), filter(), and zip().", "high", 75, 63),
+            ("Week 10: Build CRUD Database Service with requests API", "HTTP basics, REST APIs, JSON, database integration, SQL CRUD operations for Users & Tasks.", "high", 90, 70),
+            ("Week 11: Develop Task Management REST API with FastAPI & Pydantic", "Endpoints GET/POST/PUT/DELETE /tasks, Pydantic schemas, database dependency, and Swagger docs.", "urgent", 105, 77),
+            ("Week 12 Capstone: Build AI Productivity Workspace Backend", "Multi-entity backend (Users, Tasks, Projects, Notes, AI integrations) connecting relational database.", "urgent", 120, 85),
         ]
-
-    # Subject 2: Web Development / React / Frontend
     elif any(k in p_lower for k in ["web", "react", "frontend", "javascript", "html", "css", "fullstack"]):
         subject = "Web Development & Frontend"
         proj_title = f"{duration_label} Web Development Mastery Roadmap"
-
-        roadmap_text = f"""Absolutely. If your goal is to master modern web development with HTML, CSS, JavaScript, React and TypeScript in {duration_label.lower()}, we can structure it around learning + active component building + production applications.
-Since you’re a {role_ctx}, I’d recommend a path leading from core web foundations (HTML/CSS/JS) into modern React, state management, and full-stack API integration.
-
-### {duration_label} Web Development Roadmap
-| Phase | Focus | What you'll be able to do |
-| :--- | :--- | :--- |
-| **Phase 1** | Modern Web Fundamentals (HTML/CSS/JS) | Build clean interactive components |
-| **Phase 2** | Hooks, State & Routing | Develop multi-page applications with APIs |
-| **Phase 3** | Full-Stack Integration & Capstone | Build production-ready portfolio apps |
-
----
-
-### Phase 1 — Modern JavaScript & React Fundamentals (Weeks 1–4)
-#### Week 1: JavaScript ES6+ Foundations
-- Modern syntax: `let`/`const`, arrow functions, template literals
-- Destructuring, spread/rest operators (`...`)
-- Array methods: `map()`, `filter()`, `reduce()`, `find()`
-- Promises, `async`/`await`, and `fetch()`
-**Practice:**
-- Array manipulation exercises
-- Async weather fetch CLI/browser script
-- DOM event listener interactive widget
-
-#### Week 2: React Core & Component Architecture
-- Vite + React + TypeScript setup
-- JSX syntax, expressions & conditional rendering
-- Components, props, and children composition
-- Styling with Tailwind CSS
-**Practice:**
-- Profile card showcase component
-- Interactive product catalog listing
-- Pricing tier switcher
-
-#### Week 3: State & Interactive UI
-- `useState` hook in depth
-- Event handling & synthetic events
-- Controlled form inputs vs uncontrolled
-- Lifting state up to parent components
-**Practice:**
-- Dynamic Todo list with filters (all, active, completed)
-- Form validation interactive widget
-- Interactive accordion & modal dialogs
-
-#### Week 4: Mini-Project: Personal Developer Portfolio
-- Responsive navbar with mobile drawer
-- Hero section, skills grid, and project showcase
-- Contact form with local state validation
-- Dark/light mode theme toggle
-
----
-
-### Phase 2 — Advanced Hooks, State & APIs (Weeks 5–8)
-#### Week 5: Side Effects & Lifecycle (`useEffect`)
-- `useEffect` mechanics and dependency array rules
-- Data fetching from REST APIs
-- Cleanup functions & preventing race conditions
-- Custom hooks for data fetching (`useFetch`)
-**Practice:**
-- Live GitHub user profile explorer
-- Crypto price tracker with auto-refresh
-
-#### Week 6: Client-Side Routing (React Router v6/v7)
-- `BrowserRouter`, `Routes`, `Route`, `Link`, `NavLink`
-- Dynamic route params (`/projects/:id`)
-- Nested layouts, Outlet, and 404 catch-all
-- Protected route guards for authenticated views
-**Practice:**
-- Multi-page e-commerce storefront prototype
-- Role-gated dashboard navigation
-
-#### Week 7: Global State Management (Zustand / Context)
-- Prop drilling pitfalls vs Context API
-- Modern lightweight state with Zustand
-- Store selectors, actions, and persistence middleware
-**Project: Interactive Shopping Cart & Checkout**
-- Global cart store, item quantity toggling, checkout summary
-
-#### Week 8: Production Tooling & TypeScript Mastery
-- TypeScript interfaces, types, generics, and React event typing
-- Component testing basics with Vitest/Jest
-- Linting, formatting, and VS Code productivity setups
-
----
-
-### Phase 3 — Production Capstone & Architecture (Weeks 9–12)
-#### Week 9: Performance & Advanced Patterns
-- `useMemo`, `useCallback`, and `React.memo`
-- Code splitting with `React.lazy` and `Suspense`
-- Optimistic UI updates
-
-#### Week 10: Full-Stack Integration
-- Connecting to FastAPI or Node REST API
-- JWT authentication flow (Login, Register, Bearer tokens)
-- Error boundaries & toast notification system
-
-#### Week 11: Polish & Animations
-- Fluid transitions with Framer Motion
-- Keyboard shortcuts & command palettes (`Cmd+K`)
-- Accessible form controls (ARIA, focus management)
-
-#### Week 12: Final Capstone Project
-**Recommended Capstone: Collaborative AI Project Management Workspace**
-- Full Kanban board with drag-and-drop
-- Live API integration with FastAPI/PostgreSQL
-- Role-based views, dark mode, and Vercel/Netlify deployment.
-
----
-
-### ⏱️ Daily Schedule
-Aim for **1.5–2 hours/day, 6 days/week**.
-- 20 min → Learn new concept
-- 30 min → Dissect live code examples
-- 40 min → Build components from scratch
-- 20 min → Integrate into weekly project
-- 10 min → Code review & Git commit
-
-**The most important rule:**
-> **Don't spend 2 hours watching React tutorials. Spend 2 hours building components.**"""
-
-        milestones = [
-            {
-                "project_title": proj_title,
-                "title": "Phase 1: Modern JS & React Component Architecture (Weeks 1–4)",
-                "description": "ES6+, JSX, components, props, useState, Tailwind, and Personal Portfolio.",
-                "target_date": m1_dt,
-            },
-            {
-                "project_title": proj_title,
-                "title": "Phase 2: Hooks, React Router & Global State (Weeks 5–8)",
-                "description": "useEffect, custom hooks, dynamic routing, protected routes, and Zustand state.",
-                "target_date": m2_dt,
-            },
-            {
-                "project_title": proj_title,
-                "title": "Phase 3: Full-Stack API Integration & Portfolio Capstone (Weeks 9–12)",
-                "description": "JWT auth, FastAPI backend integration, animations, and SaaS capstone deployment.",
-                "target_date": m3_dt,
-            }
+        phases_meta = [
+            ("Phase 1", "Modern JS & React Component Architecture (Weeks 1–4)", "ES6+, JSX, components, props, useState, Tailwind, and Personal Portfolio.", m1_dt),
+            ("Phase 2", "Hooks, React Router & Global State (Weeks 5–8)", "useEffect, custom hooks, dynamic routing, protected routes, and Zustand state.", m2_dt),
+            ("Phase 3", "Full-Stack API Integration & Portfolio Capstone (Weeks 9–12)", "JWT auth, FastAPI backend integration, animations, and SaaS capstone deployment.", m3_dt),
         ]
-
-        tasks = [
-            {
-                "project_title": proj_title,
-                "title": "Week 1: Modern JavaScript ES6+ & Async Practice Drills",
-                "description": "Master arrow functions, destructuring, array methods (map, filter, reduce), and async/await.",
-                "priority": "urgent",
-                "estimated_minutes": 60,
-                "due_date": (now + timedelta(days=7)).strftime("%Y-%m-%d"),
-            },
-            {
-                "project_title": proj_title,
-                "title": "Week 2: Vite + React + TypeScript Component Architecture",
-                "description": "Build reusable UI components with props, TypeScript interfaces, and Tailwind styling.",
-                "priority": "high",
-                "estimated_minutes": 60,
-                "due_date": (now + timedelta(days=14)).strftime("%Y-%m-%d"),
-            },
-            {
-                "project_title": proj_title,
-                "title": "Week 3: State Management with useState & Form Handling",
-                "description": "Implement interactive todo list, controlled form inputs, and modal dialogs.",
-                "priority": "high",
-                "estimated_minutes": 60,
-                "due_date": (now + timedelta(days=21)).strftime("%Y-%m-%d"),
-            },
-            {
-                "project_title": proj_title,
-                "title": "Week 4 Project: Responsive Developer Portfolio Site",
-                "description": "Complete portfolio with navigation, skills grid, projects showcase, and dark mode.",
-                "priority": "urgent",
-                "estimated_minutes": 90,
-                "due_date": (now + timedelta(days=28)).strftime("%Y-%m-%d"),
-            },
-            {
-                "project_title": proj_title,
-                "title": "Week 5: API Integration with useEffect & Custom useFetch Hook",
-                "description": "Fetch REST data, handle loading & error states, build GitHub user explorer widget.",
-                "priority": "high",
-                "estimated_minutes": 60,
-                "due_date": (now + timedelta(days=35)).strftime("%Y-%m-%d"),
-            },
-            {
-                "project_title": proj_title,
-                "title": "Week 6: Multi-Page Navigation with React Router v6/v7",
-                "description": "Implement dynamic route params, nested layouts, Outlet, and protected auth guards.",
-                "priority": "high",
-                "estimated_minutes": 60,
-                "due_date": (now + timedelta(days=42)).strftime("%Y-%m-%d"),
-            },
-            {
-                "project_title": proj_title,
-                "title": "Week 7 Project: Global Shopping Cart Store with Zustand",
-                "description": "Zustand store with selectors, actions, local storage persistence, and cart UI.",
-                "priority": "high",
-                "estimated_minutes": 90,
-                "due_date": (now + timedelta(days=49)).strftime("%Y-%m-%d"),
-            },
-            {
-                "project_title": proj_title,
-                "title": "Week 8: Full-Stack JWT Authentication & API Integration",
-                "description": "Connect React frontend to backend auth routes with Bearer token storage and headers.",
-                "priority": "urgent",
-                "estimated_minutes": 90,
-                "due_date": (now + timedelta(days=56)).strftime("%Y-%m-%d"),
-            },
-            {
-                "project_title": proj_title,
-                "title": "Week 12 Capstone: Production AI Workspace Web Application",
-                "description": "Deploy complete full-stack portfolio capstone with responsive design and docs.",
-                "priority": "urgent",
-                "estimated_minutes": 120,
-                "due_date": (now + timedelta(days=85)).strftime("%Y-%m-%d"),
-            }
+        task_tuples = [
+            ("Week 1: Modern JavaScript ES6+ & Async Practice Drills", "Master arrow functions, destructuring, array methods (map, filter, reduce), and async/await.", "urgent", 60, 7),
+            ("Week 2: Vite + React + TypeScript Component Architecture", "Build reusable UI components with props, TypeScript interfaces, and Tailwind styling.", "high", 60, 14),
+            ("Week 3: State Management with useState & Form Handling", "Implement interactive todo list, controlled form inputs, and modal dialogs.", "high", 60, 21),
+            ("Week 4 Project: Responsive Developer Portfolio Site", "Complete portfolio with navigation, skills grid, projects showcase, and dark mode.", "urgent", 90, 28),
+            ("Week 5: API Integration with useEffect & Custom useFetch Hook", "Fetch REST data, handle loading & error states, build GitHub user explorer widget.", "high", 60, 35),
+            ("Week 6: Multi-Page Navigation with React Router v6/v7", "Implement dynamic route params, nested layouts, Outlet, and protected auth guards.", "high", 60, 42),
+            ("Week 7 Project: Global Shopping Cart Store with Zustand", "Zustand store with selectors, actions, local storage persistence, and cart UI.", "high", 90, 49),
+            ("Week 8: Full-Stack JWT Authentication & API Integration", "Connect React frontend to backend auth routes with Bearer token storage and headers.", "urgent", 90, 56),
+            ("Week 12 Capstone: Production AI Workspace Web Application", "Deploy complete full-stack portfolio capstone with responsive design and docs.", "urgent", 120, 85),
         ]
-
-    # Subject 3: General Domain or Custom Prompt
     else:
         subject = prompt[:35].strip() or "Professional Skill"
         proj_title = f"{duration_label} {subject} Roadmap"
+        phases_meta = [
+            ("Phase 1", f"{subject} Foundations & Discovery", f"Master basic principles, tools, and foundational concepts for {subject}.", m1_dt),
+            ("Phase 2", f"Core Execution & Hands-on Practice", f"Work through practical problem sets, benchmarks, and active implementation.", m2_dt),
+            ("Phase 3", f"Capstone Deliverable & Verification", f"Synthesize knowledge into a complete portfolio-ready project or review benchmark.", m3_dt),
+        ]
+        task_tuples = [
+            (f"Set up workspace and resources for {subject}", "Gather curriculum, documentation, and tools.", "urgent", 45, 2),
+            (f"Complete foundational exercises in {subject}", "Solidify understanding with focused practice drills.", "high", 90, 10),
+            (f"Finalize capstone milestone review for {subject}", "Assess learning outcomes and review deliverables.", "high", 120, total_days - 5),
+        ]
 
-        roadmap_text = f"""Absolutely. If your goal is to master {subject} in {duration_label.lower()}—not just review surface concepts—we can structure it around learning + coding practice + projects.
-Since you’re a {role_ctx}, I’d recommend a progression moving systematically from core foundations to practical applications and portfolio-ready capstones.
+    milestones = [
+        {
+            "project_title": proj_title,
+            "title": f"{name}: {focus}",
+            "description": desc,
+            "target_date": dt,
+        }
+        for name, focus, desc, dt in phases_meta
+    ]
 
-### {duration_label} {subject} Roadmap
+    tasks = [
+        {
+            "project_title": proj_title,
+            "title": title,
+            "description": desc,
+            "priority": prio,
+            "estimated_minutes": mins,
+            "due_date": (now + timedelta(days=days_offset)).strftime("%Y-%m-%d"),
+        }
+        for title, desc, prio, mins, days_offset in task_tuples
+    ]
+
+    phase_rows = "\n".join(f"| **{name}** | {focus} | {desc} |" for name, focus, desc, _ in phases_meta)
+    roadmap_text = f"""### {duration_label} {subject} Mastery Roadmap
+Since you're a {role_ctx}, this progression moves systematically from foundational syntax to practical applications and portfolio capstones.
+
 | Phase | Focus | What you'll be able to do |
 | :--- | :--- | :--- |
-| **Phase 1** | Core Fundamentals & Tooling | Execute foundational tasks with confidence |
-| **Phase 2** | Core Architecture & Practical Applications | Build structured, functional applications |
-| **Phase 3** | Advanced Mastery & Capstone | Deliver a complete production-grade deliverable |
+{phase_rows}
 
 ---
 
-### Phase 1 — Foundations & Environment (Weeks 1–4)
-#### Concepts & Tooling:
-- Setup modern workspace, configuration, and dependencies
-- Master core syntax, data models, and fundamental execution patterns
-- Understand inputs, outputs, error handling, and debugging
-**Practice:**
-- 4 foundational coding drills and test scripts
-- Mini-project: Interactive CLI or data validation tool
+### Recommended Schedule
+Aim for **1.5–2 hours/day, 6 days/week**:
+- 20 min -> Learn core concept
+- 30 min -> Follow interactive code examples
+- 40 min -> Solve problems and drills independently
+- 20 min -> Build and refine weekly project deliverables
+- 10 min -> Code review and Git commit
 
----
-
-### Phase 2 — Core Architecture & Application Execution (Weeks 5–8)
-#### Concepts & Tooling:
-- Reusable modular architecture, separation of concerns
-- Data persistence, API integrations, and external services
-- Testing, automated verification, and performance profiling
-**Practice:**
-- Integration project with local storage or database
-- Error resilience and validation test suite
-
----
-
-### Phase 3 — Advanced Real-World Capstone (Weeks 9–12)
-#### Concepts & Tooling:
-- Advanced language/framework idioms and optimization
-- Complete end-to-end project deliverable
-- Documentation, deployment, and portfolio packaging
-
-**Architecture:**
-```
-Input / Interface → Core Engine Logic → Persistence / API → Output Delivery
-```
-
----
-
-### ⏱️ Daily Schedule
-Aim for **1.5–2 hours/day, 6 days/week**.
-- 20 min → Learn concept
-- 30 min → Study examples
-- 40 min → Solve problems yourself
-- 20 min → Build project
-- 10 min → Review & commit
-
-**The most important rule:**
-> **Don't spend 2 hours watching tutorials. Spend 2 hours writing code.**
-
----
-
-### 📈 Your Progression
-```
-PHASE 1: Syntax & Tools → Problem Solving → Small Programs
-   ↓
-PHASE 2: Modularity → Persistence & APIs → Medium Projects
-   ↓
-PHASE 3: Advanced Architecture → Real Capstone Deliverable
-```"""
-
-        milestones = [
-            {
-                "project_title": proj_title,
-                "title": f"Phase 1: {subject} Foundations & Discovery",
-                "description": f"Master basic principles, tools, and foundational concepts for {subject}.",
-                "target_date": m1_dt,
-            },
-            {
-                "project_title": proj_title,
-                "title": f"Phase 2: Core Execution & Hands-on Practice",
-                "description": f"Work through practical problem sets, benchmarks, and active implementation.",
-                "target_date": m2_dt,
-            },
-            {
-                "project_title": proj_title,
-                "title": f"Phase 3: Capstone Deliverable & Verification",
-                "description": f"Synthesize knowledge into a complete portfolio-ready project or review benchmark.",
-                "target_date": m3_dt,
-            }
-        ]
-
-        tasks = [
-            {
-                "project_title": proj_title,
-                "title": f"Set up workspace and resources for {subject}",
-                "description": "Gather curriculum, documentation, and tools.",
-                "priority": "urgent",
-                "estimated_minutes": 45,
-                "due_date": (now + timedelta(days=2)).strftime("%Y-%m-%d"),
-            },
-            {
-                "project_title": proj_title,
-                "title": f"Complete foundational exercises in {subject}",
-                "description": "Solidify understanding with focused practice drills.",
-                "priority": "high",
-                "estimated_minutes": 90,
-                "due_date": (now + timedelta(days=10)).strftime("%Y-%m-%d"),
-            },
-            {
-                "project_title": proj_title,
-                "title": f"Finalize capstone milestone review for {subject}",
-                "description": "Assess learning outcomes and review deliverables.",
-                "priority": "high",
-                "estimated_minutes": 120,
-                "due_date": (now + timedelta(days=total_days - 5)).strftime("%Y-%m-%d"),
-            }
-        ]
+> **Core Rule**: Spend time actively writing and testing code rather than passively watching tutorials."""
 
     return {
         "summary": roadmap_text,
@@ -818,14 +162,14 @@ PHASE 3: Advanced Architecture → Real Capstone Deliverable
                 "start_at": (now + timedelta(days=4)).replace(hour=14, minute=0).isoformat(),
                 "end_at": (now + timedelta(days=4)).replace(hour=16, minute=30).isoformat(),
                 "event_type": "study_block",
-            }
+            },
         ],
         "notes": [
             {
                 "title": f"{duration_label} {subject} Study Curriculum & Guide",
                 "content": roadmap_text,
             }
-        ]
+        ],
     }
 
 
@@ -834,69 +178,36 @@ def sanitize_roadmap_topic_labels(data: Dict[str, Any]) -> Dict[str, Any]:
     if not isinstance(data, dict):
         return data
 
+    replacements = (
+        (r'(?i)\bintermediate python\b', 'Core Application Python'),
+        (r'(?i)\bintermediate architecture\b', 'Core Architecture'),
+        (r'(?i)\bintermediate execution\b', 'Applied Execution'),
+        (r'(?i)\bintermediate logic\b', 'Application Logic'),
+        (r'(?i)\bintermediate paradigms\b', 'Modular paradigms'),
+        (r'(?i)\bintermediate level\b', 'Applied stage'),
+        (r'(?i)\bintermediate\b', 'Applied'),
+        (r'(?i)\b(topic|subject|phase|module)\s+(?:should be|is)\s+(?:high|low|intermediate)\b', r'\1 is core'),
+        (r'(?i)\b(?:high|low|intermediate)[ -]priority topic\b', 'Core topic'),
+        (r'(?i)\b(?:high|low|intermediate) topic\b', 'Topic'),
+        (r'(?i)\bfocus on high-priority deliverables first\b', 'focus on milestone deliverables in sequence'),
+    )
+
     def clean_text(text: str) -> str:
-        if not isinstance(text, str):
-            return text
-        text = re.sub(r'(?i)\bintermediate python\b', 'Core Application Python', text)
-        text = re.sub(r'(?i)\bintermediate architecture\b', 'Core Architecture', text)
-        text = re.sub(r'(?i)\bintermediate execution\b', 'Applied Execution', text)
-        text = re.sub(r'(?i)\bintermediate logic\b', 'Application Logic', text)
-        text = re.sub(r'(?i)\bintermediate paradigms\b', 'Modular paradigms', text)
-        text = re.sub(r'(?i)\bintermediate level\b', 'Applied stage', text)
-        text = re.sub(r'(?i)\bintermediate\b', 'Applied', text)
-        text = re.sub(
-            r'(?i)\b(topic|subject|phase|module)\s+(?:should be|is)\s+(?:high|low|intermediate)\b',
-            r'\1 is core',
-            text,
-        )
-        text = re.sub(r'(?i)\b(?:high|low|intermediate)[ -]priority topic\b', 'Core topic', text)
-        text = re.sub(r'(?i)\b(?:high|low|intermediate) topic\b', 'Topic', text)
-        text = re.sub(
-            r'(?i)\bfocus on high-priority deliverables first\b',
-            'focus on milestone deliverables in sequence',
-            text,
-        )
+        for pat, repl in replacements:
+            text = re.sub(pat, repl, text)
         return text
 
-    if "summary" in data and isinstance(data["summary"], str):
-        data["summary"] = clean_text(data["summary"])
+    def clean_obj(obj: Any) -> Any:
+        if isinstance(obj, str):
+            return clean_text(obj)
+        if isinstance(obj, dict):
+            return {k: clean_obj(v) for k, v in obj.items()}
+        if isinstance(obj, list):
+            return [clean_obj(item) for item in obj]
+        return obj
 
-    for proj in data.get("projects", []):
-        if isinstance(proj, dict):
-            if "title" in proj:
-                proj["title"] = clean_text(proj["title"])
-            if "description" in proj:
-                proj["description"] = clean_text(proj["description"])
+    return clean_obj(data)
 
-    for m in data.get("milestones", []):
-        if isinstance(m, dict):
-            if "title" in m:
-                m["title"] = clean_text(m["title"])
-            if "description" in m:
-                m["description"] = clean_text(m["description"])
-
-    for t in data.get("tasks", []):
-        if isinstance(t, dict):
-            if "title" in t:
-                t["title"] = clean_text(t["title"])
-            if "description" in t:
-                t["description"] = clean_text(t["description"])
-
-    for n in data.get("notes", []):
-        if isinstance(n, dict):
-            if "title" in n:
-                n["title"] = clean_text(n["title"])
-            if "content" in n:
-                n["content"] = clean_text(n["content"])
-
-    for ev in data.get("calendar_events", []):
-        if isinstance(ev, dict):
-            if "title" in ev:
-                ev["title"] = clean_text(ev["title"])
-            if "description" in ev:
-                ev["description"] = clean_text(ev["description"])
-
-    return data
 
 
 @router.get("/health")
