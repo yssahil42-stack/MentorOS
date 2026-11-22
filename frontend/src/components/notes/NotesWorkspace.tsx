@@ -67,13 +67,13 @@ export const MODULE_NOTE_CONFIGS: Record<WorkspaceModuleRole, ModuleNotesConfig>
     title: 'Study notes',
     subtitle: 'Lecture summaries, formula sheets and lab records in one place.',
     searchPlaceholder: 'Search notes, formulas, concepts',
-    defaultCategories: ['DBMS', 'Operating systems', 'Maths', 'Computer Networks', 'Algorithms'],
+    defaultCategories: ['Lecture Notes', 'Formula Sheet', 'Lab Record', 'Study Guide'],
     templates: [
       {
         id: 'lecture-summary',
         title: 'Lecture summary',
         subtitle: 'Key points from a class',
-        category: 'DBMS',
+        category: 'Lecture Notes',
         icon: BookOpen,
         defaultTitle: 'Lecture Summary: [Topic Name]',
         content: `## Lecture: [Subject / Topic Name]
@@ -94,7 +94,7 @@ export const MODULE_NOTE_CONFIGS: Record<WorkspaceModuleRole, ModuleNotesConfig>
         id: 'formula-sheet',
         title: 'Formula sheet',
         subtitle: 'Quick-reference equations',
-        category: 'Maths',
+        category: 'Formula Sheet',
         icon: Calculator,
         defaultTitle: 'Formula sheet: [Topic Name]',
         content: `## Formula Sheet: [Subject / Topic]
@@ -116,7 +116,7 @@ export const MODULE_NOTE_CONFIGS: Record<WorkspaceModuleRole, ModuleNotesConfig>
         id: 'lab-record',
         title: 'Lab record',
         subtitle: 'Aim, steps, observations',
-        category: 'Operating systems',
+        category: 'Lab Record',
         icon: FlaskConical,
         defaultTitle: 'Lab experiment: [Experiment Title]',
         content: `## Lab Experiment: [Experiment Title]
@@ -453,7 +453,6 @@ export function NotesWorkspace({ role = 'student' }: NotesWorkspaceProps) {
   // Search & Filter state
   const [search, setSearch] = useState('');
   const [filterType, setFilterType] = useState<'all' | 'pinned'>('all');
-  const [selectedCategory, setSelectedCategory] = useState<string>('All');
 
   // Modals
   const [isEditorModalOpen, setIsEditorModalOpen] = useState(false);
@@ -648,12 +647,10 @@ Return valid markdown.`;
         category.toLowerCase().includes(search.toLowerCase());
 
       const matchesPin = filterType === 'all' || (filterType === 'pinned' && n.is_pinned);
-      const matchesCategory =
-        selectedCategory === 'All' || category.toLowerCase() === selectedCategory.toLowerCase();
 
-      return matchesSearch && matchesPin && matchesCategory;
+      return matchesSearch && matchesPin;
     });
-  }, [notes, search, filterType, selectedCategory, config]);
+  }, [notes, search, filterType, config]);
 
   const pinnedNotesCount = useMemo(() => notes.filter((n) => n.is_pinned).length, [notes]);
 
@@ -764,39 +761,7 @@ Return valid markdown.`;
           </div>
         </div>
 
-        {/* 3. Category Filter Pills */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
-          <button
-            type="button"
-            onClick={() => setSelectedCategory('All')}
-            className={`px-3.5 py-1 rounded-full text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${
-              selectedCategory === 'All'
-                ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900 shadow-2xs'
-                : 'bg-white dark:bg-bg-surface border border-border-base text-text-secondary hover:text-text-primary hover:border-text-muted'
-            }`}
-          >
-            All
-          </button>
-          {allCategories.map((category) => {
-            const isSelected = selectedCategory.toLowerCase() === category.toLowerCase();
-            return (
-              <button
-                key={category}
-                type="button"
-                onClick={() => setSelectedCategory(category)}
-                className={`px-3.5 py-1 rounded-full text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${
-                  isSelected
-                    ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900 shadow-2xs'
-                    : 'bg-white dark:bg-bg-surface border border-border-base text-text-secondary hover:text-text-primary hover:border-text-muted'
-                }`}
-              >
-                {category}
-              </button>
-            );
-          })}
-        </div>
-
-        {/* 4. Notes Grid or Empty State */}
+        {/* 3. Notes Grid or Empty State */}
         {isLoading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
             <LoadingSkeleton className="h-40 rounded-2xl" />
@@ -946,22 +911,13 @@ Return valid markdown.`;
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div className="flex items-center gap-2">
               <label className="text-xs font-bold text-text-secondary shrink-0">Category:</label>
-              <div className="flex items-center gap-1.5 flex-wrap">
-                {allCategories.slice(0, 5).map((cat) => (
-                  <button
-                    key={cat}
-                    type="button"
-                    onClick={() => setFormCategory(cat)}
-                    className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition-all ${
-                      formCategory.toLowerCase() === cat.toLowerCase()
-                        ? 'bg-[#c04b1e] text-white shadow-2xs'
-                        : 'bg-slate-100 dark:bg-bg-elevated text-text-secondary hover:text-text-primary'
-                    }`}
-                  >
-                    {cat}
-                  </button>
-                ))}
-              </div>
+              <input
+                type="text"
+                value={formCategory}
+                onChange={(e) => setFormCategory(e.target.value)}
+                placeholder="e.g. Lecture Notes, Study, Python"
+                className="h-8 px-3 rounded-lg border border-border-base bg-white dark:bg-bg-surface text-xs text-text-primary focus:outline-none focus:ring-1 focus:ring-[#c04b1e] focus:border-[#c04b1e]"
+              />
             </div>
 
             <label className="flex items-center gap-2 text-xs font-medium text-text-secondary cursor-pointer select-none">
