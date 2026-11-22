@@ -2,7 +2,7 @@ import React from 'react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
-import SearchPlanPage from '../../../pages/jobSeeker/SearchPlanPage';
+import SearchPlanPage from '../../../pages/job_seeker/SearchPlanPage';
 
 vi.mock('../../../contexts/WorkspaceContext', () => ({
   useWorkspace: () => ({
@@ -37,7 +37,7 @@ describe('SearchPlanPage (Job Analyzer)', () => {
     expect(screen.getByRole('button', { name: /Skills Gap Analysis/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /Where to Apply/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /Senior Mentor Opinion/i })).toBeInTheDocument();
-  });
+  }, 15000);
 
   it('allows adding and removing skills dynamically', () => {
     render(

@@ -38,9 +38,9 @@ describe('Breadcrumb Component', () => {
 
     expect(screen.getByText('Home')).toBeInTheDocument();
     expect(screen.getByText('Student')).toBeInTheDocument();
-    expect(screen.getByText('Courses & Assignments')).toBeInTheDocument();
+    expect(screen.getByText('Courses')).toBeInTheDocument();
 
-    const currentPageItem = screen.getByText('Courses & Assignments').closest('li');
+    const currentPageItem = screen.getByText('Courses').closest('li');
     expect(currentPageItem).toHaveAttribute('aria-current', 'page');
   });
 
@@ -77,7 +77,7 @@ describe('Breadcrumb Component', () => {
 
     expect(screen.getByText('Home')).toBeInTheDocument();
     expect(screen.getByText('Student')).toBeInTheDocument();
-    expect(screen.getByText('Courses & Assignments')).toBeInTheDocument();
+    expect(screen.getByText('Courses')).toBeInTheDocument();
   });
 
   it('adapts to different role configurations such as developer', () => {

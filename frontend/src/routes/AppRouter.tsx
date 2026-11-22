@@ -30,21 +30,15 @@ const AppShell = lazy(() => import('../components/layout/AppShell'));
 // ── Student ──
 const StudentDashboard = lazy(() => import('../pages/student/StudentDashboard'));
 const StudyPlanPage = lazy(() => import('../pages/student/StudyPlanPage'));
-const AssignmentsPage = lazy(() => import('../pages/student/AssignmentsPage'));
 const AcademicProjects = lazy(() => import('../pages/student/AcademicProjectsPage'));
 const StudentCalendar = lazy(() => import('../pages/student/StudentCalendarPage'));
-const StudentTasks = lazy(() => import('../pages/student/StudentTasksPage'));
 const StudentNotes = lazy(() => import('../pages/student/StudentNotesPage'));
-const StudentProgress = lazy(() => import('../pages/student/StudentProgressPage'));
 const StudentSettings = lazy(() => import('../pages/student/StudentSettingsPage'));
 
 // ── Freelancer ──
 const FreelancerDashboard = lazy(() => import('../pages/freelancer/FreelancerDashboard'));
-const WorkPlansPage = lazy(() => import('../pages/freelancer/WorkPlansPage'));
-const DeliverablesPage = lazy(() => import('../pages/freelancer/DeliverablesPage'));
 const FreelancerProjects = lazy(() => import('../pages/freelancer/FreelancerProjectsPage'));
 const FreelancerCalendar = lazy(() => import('../pages/freelancer/FreelancerCalendarPage'));
-const FreelancerTasks = lazy(() => import('../pages/freelancer/FreelancerTasksPage'));
 const FreelancerNotes = lazy(() => import('../pages/freelancer/FreelancerNotesPage'));
 const FreelancerProgress = lazy(() => import('../pages/freelancer/FreelancerProgressPage'));
 const FreelancerSettings = lazy(() => import('../pages/freelancer/FreelancerSettingsPage'));
@@ -57,7 +51,6 @@ const DeveloperDashboard = lazy(() => import('../pages/developer/DeveloperDashbo
 const BuildPlanPage = lazy(() => import('../pages/developer/BuildPlanPage'));
 const DevProjectsPage = lazy(() => import('../pages/developer/DevProjectsPage'));
 const MilestonesPage = lazy(() => import('../pages/developer/MilestonesPage'));
-const DevTasksPage = lazy(() => import('../pages/developer/DevTasksPage'));
 const DevCalendarPage = lazy(() => import('../pages/developer/DevCalendarPage'));
 const DevNotesPage = lazy(() => import('../pages/developer/DevNotesPage'));
 const DevApiKeysPage = lazy(() => import('../pages/developer/DevApiKeysPage'));
@@ -74,15 +67,14 @@ const PublicCaseStudyPage = lazy(() => import('../pages/public/PublicCaseStudyPa
 
 // ── Job Seeker ──
 const JobSeekerDashboard = lazy(() => import('../pages/job_seeker/JobSeekerDashboard'));
-const SearchPlanPage = lazy(() => import('../pages/jobSeeker/SearchPlanPage'));
-const ApplicationsPage = lazy(() => import('../pages/jobSeeker/ApplicationsPage'));
+const SearchPlanPage = lazy(() => import('../pages/job_seeker/SearchPlanPage'));
 const ApplicationTrackerPage = lazy(() => import('../pages/job_seeker/ApplicationTrackerPage'));
-const PortfolioTasksPage = lazy(() => import('../pages/jobSeeker/PortfolioTasksPage'));
+const PortfolioTasksPage = lazy(() => import('../pages/job_seeker/PortfolioTasksPage'));
 const InterviewPrepPage = lazy(() => import('../pages/job_seeker/InterviewPrepPage'));
-const JobCalendarPage = lazy(() => import('../pages/jobSeeker/JobCalendarPage'));
-const JobNotesPage = lazy(() => import('../pages/jobSeeker/JobNotesPage'));
-const JobProgressPage = lazy(() => import('../pages/jobSeeker/JobProgressPage'));
-const JobSettingsPage = lazy(() => import('../pages/jobSeeker/JobSettingsPage'));
+const JobCalendarPage = lazy(() => import('../pages/job_seeker/JobCalendarPage'));
+const JobNotesPage = lazy(() => import('../pages/job_seeker/JobNotesPage'));
+const JobProgressPage = lazy(() => import('../pages/job_seeker/JobProgressPage'));
+const JobSettingsPage = lazy(() => import('../pages/job_seeker/JobSettingsPage'));
 const ResumeGeneratorPage = lazy(() => import('../pages/job_seeker/ResumeGeneratorPage'));
 
 // ─── Router ──────────────────────────────────────────────────────────────────

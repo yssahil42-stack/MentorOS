@@ -271,10 +271,12 @@ def forgot_password(
     if user:
         now = datetime.datetime.utcnow()
         expire = now + datetime.timedelta(minutes=RESET_TOKEN_EXPIRE_MINUTES)
+        jti = secrets.token_hex(16)
         token_payload = {
             "sub": str(user.id),
             "email": user.email,
             "purpose": "password_reset",
+            "jti": jti,
             "iat": now,
             "exp": expire,
         }
@@ -308,6 +310,15 @@ def verify_reset_token(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Invalid reset token purpose.",
         )
+
+    jti = decoded.get("jti")
+    if jti:
+        revoked = db.query(models.RevokedToken).filter(models.RevokedToken.jti == jti).first()
+        if revoked:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="This password reset link has already been used. Please request a new one.",
+            )
 
     user_id = decoded.get("sub")
     user = db.query(models.User).filter(models.User.id == int(user_id)).first()
@@ -348,6 +359,15 @@ def reset_password(
             detail="Invalid reset token purpose.",
         )
 
+    jti = decoded.get("jti")
+    if jti:
+        revoked = db.query(models.RevokedToken).filter(models.RevokedToken.jti == jti).first()
+        if revoked:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="This password reset link has already been used. Please request a new one.",
+            )
+
     user_id = decoded.get("sub")
     user = db.query(models.User).filter(models.User.id == int(user_id)).first()
     if not user:
@@ -360,6 +380,15 @@ def reset_password(
     profile = dict(user.profile_data or {})
     profile["has_password"] = True
     user.profile_data = profile
+
+    if jti:
+        exp_ts = decoded.get("exp")
+        exp_dt = (
+            datetime.datetime.utcfromtimestamp(exp_ts)
+            if exp_ts
+            else datetime.datetime.utcnow() + datetime.timedelta(minutes=RESET_TOKEN_EXPIRE_MINUTES)
+        )
+        db.add(models.RevokedToken(jti=jti, user_id=user.id, expires_at=exp_dt))
 
     db.commit()
     db.refresh(user)

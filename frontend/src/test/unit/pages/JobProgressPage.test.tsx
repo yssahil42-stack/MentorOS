@@ -3,7 +3,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import JobProgressPage from '../../../pages/jobSeeker/JobProgressPage';
+import JobProgressPage from '../../../pages/job_seeker/JobProgressPage';
 
 // Mock TanStack Query data
 const mockProjects = [
