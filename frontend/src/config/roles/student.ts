@@ -14,7 +14,7 @@ export const studentConfig: RoleConfig = {
 
   navigation: [
     { to: '/app/student/dashboard', label: 'Dashboard', icon: 'LayoutDashboard' },
-    { to: '/app/student/projects', label: 'Courses & Assignments', icon: 'BookOpen' },
+    { to: '/app/student/projects', label: 'Courses', icon: 'BookOpen' },
     { to: '/app/student/notes', label: 'Notes', icon: 'FileText' },
     { to: '/app/student/settings', label: 'Settings', icon: 'Settings' },
   ],

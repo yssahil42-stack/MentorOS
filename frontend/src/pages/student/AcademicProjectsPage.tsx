@@ -1,14 +1,13 @@
 import React, { useState, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useNavigate } from 'react-router-dom';
 import {
   BookOpen,
   Plus,
   Search,
   Clock,
-  List,
-  Columns3,
-  Calendar,
   CheckCircle2,
+  Circle,
   Trash2,
   X,
   Timer,
@@ -16,6 +15,7 @@ import {
   ChevronUp,
   GraduationCap,
   Sparkles,
+  Calendar,
 } from 'lucide-react';
 import { useWorkspace } from '../../contexts/WorkspaceContext';
 import { fetchProjects, createProject, deleteProject } from '../../services/projectService';
@@ -25,141 +25,6 @@ import { Modal } from '../../components/ui/Modal';
 import { cn } from '../../utils/cn';
 import type { Project } from '../../types/project';
 import type { Task, TaskStatus } from '../../types/task';
-
-// ── Baseline Starter Data (Matches Mockup when DB is unpopulated) ─────────────
-const STARTER_COURSES: Project[] = [
-  {
-    id: 1,
-    user_id: 1,
-    role: 'student',
-    title: 'Computer networks',
-    description: 'Network architecture, subnetting, CIDR, and routing protocols.',
-    priority: 'high',
-    status: 'active',
-    progress: 33,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  },
-  {
-    id: 2,
-    user_id: 1,
-    role: 'student',
-    title: 'Database management',
-    description: 'Relational algebra, normalization, query optimization, and transactions.',
-    priority: 'high',
-    status: 'active',
-    progress: 50,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  },
-  {
-    id: 3,
-    user_id: 1,
-    role: 'student',
-    title: 'Operating systems',
-    description: 'Process scheduling, virtual memory, synchronization, and kernel design.',
-    priority: 'medium',
-    status: 'active',
-    progress: 40,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  },
-  {
-    id: 4,
-    user_id: 1,
-    role: 'student',
-    title: 'Engineering maths',
-    description: 'Linear algebra, matrices, rank, eigenvalues, and Fourier analysis.',
-    priority: 'medium',
-    status: 'active',
-    progress: 20,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  },
-];
-
-const STARTER_TASKS: Task[] = [
-  {
-    id: 101,
-    user_id: 1,
-    role: 'student',
-    project_id: 1,
-    project_title: 'Computer networks',
-    title: 'Subnetting worksheet',
-    description: 'CIDR masks and variable-length subnet calculations.',
-    status: 'todo',
-    priority: 'high',
-    due_date: 'Yesterday',
-    estimated_minutes: 60, // 1h
-    actual_minutes: 20, // 20m
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  },
-  {
-    id: 102,
-    user_id: 1,
-    role: 'student',
-    project_id: 2,
-    project_title: 'Database management',
-    title: 'DBMS lab record',
-    description: 'Triggers, store procedures, and index execution plans.',
-    status: 'in_progress',
-    priority: 'high',
-    due_date: 'Tomorrow',
-    estimated_minutes: 120, // 2h
-    actual_minutes: 160, // 2h 40m (+40m)
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  },
-  {
-    id: 103,
-    user_id: 1,
-    role: 'student',
-    project_id: 3,
-    project_title: 'Operating systems',
-    title: 'OS assignment 3',
-    description: 'Round-robin CPU scheduler simulation implementation.',
-    status: 'in_progress',
-    priority: 'high',
-    due_date: 'Wed',
-    estimated_minutes: 180, // 3h
-    actual_minutes: 75, // 1h 15m
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  },
-  {
-    id: 104,
-    user_id: 1,
-    role: 'student',
-    project_id: 4,
-    project_title: 'Engineering maths',
-    title: 'Matrices quiz prep',
-    description: 'Eigenvalues, eigenvectors, and diagonalisation shortcuts.',
-    status: 'todo',
-    priority: 'medium',
-    due_date: 'Fri',
-    estimated_minutes: 90, // 1h 30m
-    actual_minutes: 0,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  },
-  {
-    id: 105,
-    user_id: 1,
-    role: 'student',
-    project_id: 2,
-    project_title: 'Database management',
-    title: 'ER diagram exercise',
-    description: 'Conceptual data model to logical schema translation.',
-    status: 'completed',
-    priority: 'medium',
-    due_date: '12 Nov',
-    estimated_minutes: 120, // 2h
-    actual_minutes: 100, // 1h 40m (-20m)
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  },
-];
 
 // ── Time & Date Helpers ──────────────────────────────────────────────────────
 function formatMins(mins?: number | null): string {
@@ -171,51 +36,11 @@ function formatMins(mins?: number | null): string {
   return `${m}m`;
 }
 
-function getDelta(task: Task) {
-  const est = task.estimated_minutes || 0;
-  const actual = task.actual_minutes || 0;
-  if (actual > est && est > 0) {
-    const diff = actual - est;
-    return {
-      text: `+${formatMins(diff)}`,
-      className: 'text-[#991b1b]', // dark red / maroon
-    };
-  }
-  if (task.status === 'completed' && actual < est && actual > 0) {
-    const diff = est - actual;
-    return {
-      text: `-${formatMins(diff)}`,
-      className: 'text-[#16a34a]', // green
-    };
-  }
-  return null;
-}
-
-function getProgressBar(task: Task) {
-  const est = task.estimated_minutes || 60;
-  const actual = task.actual_minutes || 0;
-  const isOvertime = actual > est;
-  const isCompleted = task.status === 'completed';
-  const percent = est > 0 ? Math.min(100, Math.round((actual / est) * 100)) : 0;
-
-  if (isOvertime) {
-    return { percent: 100, color: 'bg-[#7f1d1d]' }; // dark maroon
-  }
-  if (isCompleted) {
-    return { percent: 100, color: 'bg-[#c04b1e]' }; // terracotta
-  }
-  if (actual > 0) {
-    return { percent, color: 'bg-[#c04b1e]' }; // terracotta
-  }
-  return { percent: 0, color: 'bg-transparent' };
-}
-
 function isTaskOverdue(task: Task): boolean {
   if (task.status === 'completed') return false;
   if (!task.due_date) return false;
   const lower = task.due_date.toLowerCase();
   if (lower.includes('yesterday')) return true;
-  // If ISO date string
   const d = new Date(task.due_date);
   if (!isNaN(d.getTime())) {
     const today = new Date();
@@ -226,57 +51,82 @@ function isTaskOverdue(task: Task): boolean {
 }
 
 export default function AcademicProjectsPage() {
+  const navigate = useNavigate();
   const { showToast } = useWorkspace();
   const queryClient = useQueryClient();
 
-  const [activeTab, setActiveTab] = useState<'courses' | 'assignments'>('assignments');
-  const [viewMode, setViewMode] = useState<'both' | 'list' | 'board'>('both');
   const [search, setSearch] = useState('');
+  const [expandedCourses, setExpandedCourses] = useState<Record<number, boolean>>({});
 
   // Modals state
   const [isNewCourseModalOpen, setIsNewCourseModalOpen] = useState(false);
   const [newCourseTitle, setNewCourseTitle] = useState('');
   const [newCourseDesc, setNewCourseDesc] = useState('');
 
-  const [isNewAssignmentModalOpen, setIsNewAssignmentModalOpen] = useState(false);
-  const [newAssignmentTitle, setNewAssignmentTitle] = useState('');
-  const [newAssignmentCourseId, setNewAssignmentCourseId] = useState<number | undefined>(undefined);
-  const [newAssignmentEstimate, setNewAssignmentEstimate] = useState<number>(60);
-  const [newAssignmentDue, setNewAssignmentDue] = useState<string>('Tomorrow');
+  const [isNewTaskModalOpen, setIsNewTaskModalOpen] = useState(false);
+  const [newTaskTitle, setNewTaskTitle] = useState('');
+  const [newTaskCourseId, setNewTaskCourseId] = useState<number | undefined>(undefined);
+  const [newTaskEstimate, setNewTaskEstimate] = useState<number>(60);
+  const [newTaskDue, setNewTaskDue] = useState<string>('Tomorrow');
 
   // Log Time Modal state
   const [selectedTaskForLog, setSelectedTaskForLog] = useState<Task | null>(null);
   const [logTimeMinutesToAdd, setLogTimeMinutesToAdd] = useState<number>(30);
   const [logTimeStatus, setLogTimeStatus] = useState<TaskStatus>('in_progress');
 
-  // Queries
-  const { data: dbProjects = [] } = useQuery<Project[]>({
+  // Queries - Real user data ONLY, never fallback to hallucinated/mock data
+  const { data: dbProjects = [], isLoading: isLoadingCourses } = useQuery<Project[]>({
     queryKey: ['projects', 'student'],
     queryFn: () => fetchProjects('student'),
   });
 
-  const { data: dbTasks = [] } = useQuery<Task[]>({
+  const { data: dbTasks = [], isLoading: isLoadingTasks } = useQuery<Task[]>({
     queryKey: ['tasks', 'student'],
     queryFn: () => fetchTasks({ role: 'student' }),
   });
 
-  // Blend with starter items if unpopulated
-  const courses = useMemo(() => {
-    if (dbProjects.length > 0) return dbProjects;
-    return STARTER_COURSES;
-  }, [dbProjects]);
+  const courses = dbProjects;
+  const tasks = dbTasks;
 
-  const tasks = useMemo(() => {
-    if (dbTasks.length > 0) return dbTasks;
-    return STARTER_TASKS;
-  }, [dbTasks]);
+  // Toggle course expanded view (default open if only 1 or 2 courses)
+  const isCourseExpanded = (courseId: number) => {
+    if (expandedCourses[courseId] !== undefined) {
+      return expandedCourses[courseId];
+    }
+    // Auto-expand courses by default so tasks are immediately visible
+    return true;
+  };
 
-  // Map courses lookup for quick project_title resolution
-  const courseLookup = useMemo(() => {
-    const map = new Map<number, string>();
-    courses.forEach((c) => map.set(c.id, c.title));
-    return map;
-  }, [courses]);
+  const toggleCourseExpand = (courseId: number) => {
+    setExpandedCourses((prev) => ({
+      ...prev,
+      [courseId]: !isCourseExpanded(courseId),
+    }));
+  };
+
+  // Filter courses based on search
+  const filteredCourses = useMemo(() => {
+    if (!search.trim()) return courses;
+    const q = search.toLowerCase();
+    return courses.filter(
+      (c) =>
+        c.title.toLowerCase().includes(q) ||
+        (c.description && c.description.toLowerCase().includes(q))
+    );
+  }, [courses, search]);
+
+  // Real course tasks due this week
+  const dueThisWeekCount = useMemo(() => {
+    return tasks.filter((t) => {
+      if (t.status === 'completed') return false;
+      const isBelongingToCourse = courses.some(
+        (c) =>
+          c.id === t.project_id ||
+          (t.project_title && t.project_title.trim().toLowerCase() === c.title.trim().toLowerCase())
+      );
+      return isBelongingToCourse && !isTaskOverdue(t);
+    }).length;
+  }, [tasks, courses]);
 
   // Mutations
   const createCourseMutation = useMutation({
@@ -301,26 +151,51 @@ export default function AcademicProjectsPage() {
     },
   });
 
-  const createAssignmentMutation = useMutation({
+  const createTaskMutation = useMutation({
     mutationFn: async () => {
-      if (!newAssignmentTitle.trim()) return;
+      if (!newTaskTitle.trim()) return;
       return createTask({
-        title: newAssignmentTitle.trim(),
-        project_id: newAssignmentCourseId,
-        estimated_minutes: newAssignmentEstimate,
-        due_date: newAssignmentDue,
+        title: newTaskTitle.trim(),
+        project_id: newTaskCourseId,
+        estimated_minutes: newTaskEstimate,
+        due_date: newTaskDue,
         role: 'student',
         status: 'todo',
       });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tasks'] });
-      setIsNewAssignmentModalOpen(false);
-      setNewAssignmentTitle('');
-      showToast('Assignment added! 📝', 'success');
+      setIsNewTaskModalOpen(false);
+      setNewTaskTitle('');
+      showToast('Task added to course! 📝', 'success');
     },
     onError: () => {
-      showToast('Failed to add assignment', 'error');
+      showToast('Failed to add task', 'error');
+    },
+  });
+
+  const toggleTaskStatusMutation = useMutation({
+    mutationFn: async (task: Task) => {
+      const nextStatus: TaskStatus = task.status === 'completed' ? 'todo' : 'completed';
+      return updateTask(task.id, { status: nextStatus });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tasks'] });
+      showToast('Task updated!', 'success');
+    },
+    onError: () => {
+      showToast('Failed to update task status', 'error');
+    },
+  });
+
+  const deleteTaskMutation = useMutation({
+    mutationFn: async (id: number) => deleteTask(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tasks'] });
+      showToast('Task removed', 'info');
+    },
+    onError: () => {
+      showToast('Failed to delete task', 'error');
     },
   });
 
@@ -340,14 +215,7 @@ export default function AcademicProjectsPage() {
       showToast('Study time logged! ⏱️', 'success');
     },
     onError: () => {
-      // If task was a client starter task, update local task reflection
-      if (selectedTaskForLog) {
-        selectedTaskForLog.actual_minutes =
-          (selectedTaskForLog.actual_minutes || 0) + logTimeMinutesToAdd;
-        selectedTaskForLog.status = logTimeStatus;
-        setSelectedTaskForLog(null);
-        showToast('Study time logged! ⏱️', 'success');
-      }
+      showToast('Failed to log time', 'error');
     },
   });
 
@@ -358,72 +226,27 @@ export default function AcademicProjectsPage() {
       queryClient.invalidateQueries({ queryKey: ['tasks'] });
       showToast('Course removed', 'info');
     },
+    onError: () => {
+      showToast('Failed to delete course', 'error');
+    },
   });
-
-  // Filter tasks based on search
-  const filteredTasks = useMemo(() => {
-    return tasks.filter((t) => {
-      const courseName = (
-        t.project_title ||
-        (t.project_id ? courseLookup.get(t.project_id) : '') ||
-        ''
-      ).toLowerCase();
-      const matchesSearch =
-        t.title.toLowerCase().includes(search.toLowerCase()) ||
-        courseName.includes(search.toLowerCase()) ||
-        (t.description && t.description.toLowerCase().includes(search.toLowerCase()));
-      return matchesSearch;
-    });
-  }, [tasks, search, courseLookup]);
-
-  // Aggregate Metrics
-  const totalExpected = useMemo(() => {
-    return filteredTasks.reduce((sum, t) => sum + (t.estimated_minutes || 0), 0);
-  }, [filteredTasks]);
-
-  const totalLogged = useMemo(() => {
-    return filteredTasks.reduce((sum, t) => sum + (t.actual_minutes || 0), 0);
-  }, [filteredTasks]);
-
-  // Groupings
-  const overdueTasks = useMemo(() => {
-    return filteredTasks.filter((t) => isTaskOverdue(t));
-  }, [filteredTasks]);
-
-  const thisWeekTasks = useMemo(() => {
-    return filteredTasks.filter((t) => !isTaskOverdue(t) && t.status !== 'completed');
-  }, [filteredTasks]);
-
-  const completedTasks = useMemo(() => {
-    return filteredTasks.filter((t) => t.status === 'completed');
-  }, [filteredTasks]);
-
-  // Board Columns
-  const todoBoardTasks = useMemo(() => {
-    return filteredTasks.filter((t) => t.status === 'todo');
-  }, [filteredTasks]);
-
-  const inProgressBoardTasks = useMemo(() => {
-    return filteredTasks.filter((t) => t.status === 'in_progress');
-  }, [filteredTasks]);
-
-  const doneBoardTasks = useMemo(() => {
-    return filteredTasks.filter((t) => t.status === 'completed');
-  }, [filteredTasks]);
 
   return (
     <div className="max-w-5xl mx-auto py-8 px-4 sm:px-6 animate-fade-in space-y-6">
-      {/* ── Main White Container Card ────────────────────────────────────────── */}
+      {/* ── Main Container Card ─────────────────────────────────────────────── */}
       <div className="bg-white rounded-2xl border border-[#eee7e0] p-6 sm:p-8 shadow-xs">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
           <div>
             <h1 className="text-2xl sm:text-3xl font-bold text-neutral-900 tracking-tight">
-              Courses and assignments
+              Courses
             </h1>
             <p className="text-sm text-neutral-500 mt-1">
-              {courses.length} active courses · {thisWeekTasks.length + overdueTasks.length} tasks
-              due this week
+              {courses.length === 0
+                ? 'No active courses yet · Get started by creating your first course or generating an academic roadmap with AI'
+                : `${courses.length} active course${courses.length === 1 ? '' : 's'}${
+                    dueThisWeekCount > 0 ? ` · ${dueThisWeekCount} tasks due this week` : ' · 0 tasks due this week'
+                  }`}
             </p>
           </div>
 
@@ -439,621 +262,299 @@ export default function AcademicProjectsPage() {
           </div>
         </div>
 
-        {/* Tab Row */}
-        <div className="flex items-center gap-6 border-b border-[#eee7e0] mt-6">
-          <button
-            type="button"
-            onClick={() => setActiveTab('courses')}
-            className={cn(
-              'text-sm pb-2.5 transition-colors cursor-pointer flex items-center gap-1.5',
-              activeTab === 'courses'
-                ? 'font-semibold text-neutral-900 border-b-2 border-[#c04b1e]'
-                : 'font-medium text-neutral-500 hover:text-neutral-800'
-            )}
-          >
-            <span>Courses</span>
-            <span className="text-xs font-semibold">{courses.length}</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setActiveTab('assignments')}
-            className={cn(
-              'text-sm pb-2.5 transition-colors cursor-pointer flex items-center gap-1.5',
-              activeTab === 'assignments'
-                ? 'font-semibold text-neutral-900 border-b-2 border-[#c04b1e]'
-                : 'font-medium text-neutral-500 hover:text-neutral-800'
-            )}
-          >
-            <span>Assignments</span>
-            <span className="text-xs font-semibold">{tasks.length}</span>
-          </button>
-        </div>
-
-        {/* ── TAB 1: ASSIGNMENTS (Matches Target Mockup) ───────────────────────── */}
-        {activeTab === 'assignments' && (
-          <div className="mt-5 space-y-6">
-            {/* Search and View Switchers */}
-            <div className="flex items-center justify-between gap-3">
-              <div className="relative flex-1 max-w-xl">
-                <Search className="w-4 h-4 text-neutral-400 absolute left-3 top-1/2 -translate-y-1/2" />
-                <input
-                  type="text"
-                  placeholder="Search assignments"
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  className="w-full pl-9 pr-4 py-2 bg-white border border-[#e5e0d8] rounded-lg text-sm text-neutral-800 placeholder:text-neutral-400 focus:outline-none focus:border-[#c04b1e] focus:ring-1 focus:ring-[#c04b1e]"
-                />
-              </div>
-
-              <div className="flex items-center gap-1.5">
-                <button
-                  type="button"
-                  title="List View"
-                  onClick={() => setViewMode(viewMode === 'list' ? 'both' : 'list')}
-                  className={cn(
-                    'p-2 rounded-lg border text-sm transition-colors cursor-pointer',
-                    viewMode === 'list' || viewMode === 'both'
-                      ? 'border-[#c04b1e] bg-[#fbf5f2] text-[#c04b1e]'
-                      : 'border-[#e5e0d8] bg-white text-neutral-500 hover:text-neutral-800'
-                  )}
-                >
-                  <List className="w-4 h-4" />
-                </button>
-
-                <button
-                  type="button"
-                  title="Board View"
-                  onClick={() => setViewMode(viewMode === 'board' ? 'both' : 'board')}
-                  className={cn(
-                    'p-2 rounded-lg border text-sm transition-colors cursor-pointer',
-                    viewMode === 'board' || viewMode === 'both'
-                      ? 'border-[#c04b1e] bg-[#fbf5f2] text-[#c04b1e]'
-                      : 'border-[#e5e0d8] bg-white text-neutral-500 hover:text-neutral-800'
-                  )}
-                >
-                  <Columns3 className="w-4 h-4" />
-                </button>
-              </div>
+        {/* Search bar (when courses exist) */}
+        {courses.length > 0 && (
+          <div className="mt-6">
+            <div className="relative max-w-md">
+              <Search className="w-4 h-4 text-neutral-400 absolute left-3 top-1/2 -translate-y-1/2" />
+              <input
+                type="text"
+                placeholder="Search courses..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="w-full pl-9 pr-4 py-2 bg-white border border-[#e5e0d8] rounded-lg text-sm text-neutral-800 placeholder:text-neutral-400 focus:outline-none focus:border-[#c04b1e] focus:ring-1 focus:ring-[#c04b1e]"
+              />
             </div>
-
-            {/* Time Summary Row */}
-            <div className="flex items-center gap-2 text-sm text-neutral-600">
-              <Clock className="w-4 h-4 text-neutral-400 shrink-0" />
-              <span>
-                Expected{' '}
-                <span className="font-bold text-neutral-900">{formatMins(totalExpected)}</span> ·
-                Logged <span className="font-bold text-neutral-900">{formatMins(totalLogged)}</span>
-              </span>
-            </div>
-
-            {/* ── LIST VIEW SECTIONS ────────────────────────────────────────── */}
-            {(viewMode === 'list' || viewMode === 'both') && (
-              <div className="space-y-6">
-                {/* 1. Overdue Group */}
-                {overdueTasks.length > 0 && (
-                  <div>
-                    <h3 className="text-sm font-semibold text-[#b91c1c] mb-3">
-                      Overdue {overdueTasks.length}
-                    </h3>
-                    <div className="space-y-2.5">
-                      {overdueTasks.map((task) => {
-                        const courseName =
-                          task.project_title ||
-                          (task.project_id ? courseLookup.get(task.project_id) : '') ||
-                          'General Studies';
-                        const bar = getProgressBar(task);
-                        const delta = getDelta(task);
-
-                        return (
-                          <div
-                            key={task.id}
-                            className="rounded-xl border border-[#eee7e0] bg-white p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 transition-all hover:border-[#ded5cb]"
-                          >
-                            <div className="flex-1 min-w-[180px]">
-                              <h4 className="font-semibold text-neutral-900 text-sm sm:text-base leading-snug">
-                                {task.title}
-                              </h4>
-                              <p className="text-xs text-neutral-500 mt-0.5">{courseName}</p>
-                            </div>
-
-                            <div className="sm:w-28 shrink-0 text-left sm:text-center">
-                              <span className="text-sm font-bold text-[#b91c1c]">
-                                {task.due_date || 'Yesterday'}
-                              </span>
-                            </div>
-
-                            <div className="sm:w-48 shrink-0 flex flex-col justify-center">
-                              <div className="flex items-center justify-between text-xs text-neutral-500">
-                                <span>
-                                  Est{' '}
-                                  <strong className="text-neutral-900 font-bold">
-                                    {formatMins(task.estimated_minutes)}
-                                  </strong>
-                                </span>
-                                <span>
-                                  Logged{' '}
-                                  <strong className="text-neutral-900 font-bold">
-                                    {task.actual_minutes ? formatMins(task.actual_minutes) : '—'}
-                                  </strong>
-                                </span>
-                              </div>
-                              {delta && (
-                                <div className="text-xs font-semibold mt-0.5">
-                                  <span className={delta.className}>{delta.text}</span>
-                                </div>
-                              )}
-                              <div className="w-full h-1.5 bg-[#f0ebe4] rounded-full overflow-hidden mt-1.5">
-                                <div
-                                  className={cn('h-full rounded-full transition-all', bar.color)}
-                                  style={{ width: `${bar.percent}%` }}
-                                />
-                              </div>
-                            </div>
-
-                            <div className="shrink-0">
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  setSelectedTaskForLog(task);
-                                  setLogTimeStatus(task.status);
-                                }}
-                                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[#dcd4ca] bg-white text-xs font-medium text-neutral-700 hover:bg-neutral-50 transition-colors shadow-2xs cursor-pointer"
-                              >
-                                <Timer className="w-3.5 h-3.5 text-neutral-500" />
-                                <span>Log time</span>
-                              </button>
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-                )}
-
-                {/* 2. This week Group */}
-                {thisWeekTasks.length > 0 && (
-                  <div>
-                    <h3 className="text-sm font-semibold text-neutral-800 mb-3">
-                      This week {thisWeekTasks.length}
-                    </h3>
-                    <div className="space-y-2.5">
-                      {thisWeekTasks.map((task) => {
-                        const courseName =
-                          task.project_title ||
-                          (task.project_id ? courseLookup.get(task.project_id) : '') ||
-                          'General Studies';
-                        const bar = getProgressBar(task);
-                        const delta = getDelta(task);
-
-                        return (
-                          <div
-                            key={task.id}
-                            className="rounded-xl border border-[#eee7e0] bg-white p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 transition-all hover:border-[#ded5cb]"
-                          >
-                            <div className="flex-1 min-w-[180px]">
-                              <h4 className="font-semibold text-neutral-900 text-sm sm:text-base leading-snug">
-                                {task.title}
-                              </h4>
-                              <p className="text-xs text-neutral-500 mt-0.5">{courseName}</p>
-                            </div>
-
-                            <div className="sm:w-28 shrink-0 text-left sm:text-center">
-                              <span className="text-sm font-bold text-neutral-800">
-                                {task.due_date || 'This week'}
-                              </span>
-                            </div>
-
-                            <div className="sm:w-48 shrink-0 flex flex-col justify-center">
-                              <div className="flex items-center justify-between text-xs text-neutral-500">
-                                <span>
-                                  Est{' '}
-                                  <strong className="text-neutral-900 font-bold">
-                                    {formatMins(task.estimated_minutes)}
-                                  </strong>
-                                </span>
-                                <span>
-                                  Logged{' '}
-                                  <strong className="text-neutral-900 font-bold">
-                                    {task.actual_minutes ? formatMins(task.actual_minutes) : '—'}
-                                  </strong>
-                                </span>
-                              </div>
-                              {delta && (
-                                <div className="text-xs font-semibold mt-0.5">
-                                  <span className={delta.className}>{delta.text}</span>
-                                </div>
-                              )}
-                              <div className="w-full h-1.5 bg-[#f0ebe4] rounded-full overflow-hidden mt-1.5">
-                                <div
-                                  className={cn('h-full rounded-full transition-all', bar.color)}
-                                  style={{ width: `${bar.percent}%` }}
-                                />
-                              </div>
-                            </div>
-
-                            <div className="shrink-0">
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  setSelectedTaskForLog(task);
-                                  setLogTimeStatus(task.status);
-                                }}
-                                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[#dcd4ca] bg-white text-xs font-medium text-neutral-700 hover:bg-neutral-50 transition-colors shadow-2xs cursor-pointer"
-                              >
-                                <Timer className="w-3.5 h-3.5 text-neutral-500" />
-                                <span>Log time</span>
-                              </button>
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-                )}
-
-                {/* 3. Completed Group */}
-                {completedTasks.length > 0 && (
-                  <div>
-                    <h3 className="text-sm font-semibold text-neutral-800 mb-3">
-                      Completed {completedTasks.length}
-                    </h3>
-                    <div className="space-y-2.5">
-                      {completedTasks.map((task) => {
-                        const courseName =
-                          task.project_title ||
-                          (task.project_id ? courseLookup.get(task.project_id) : '') ||
-                          'General Studies';
-                        const bar = getProgressBar(task);
-                        const delta = getDelta(task);
-
-                        return (
-                          <div
-                            key={task.id}
-                            className="rounded-xl border border-[#eee7e0] bg-white p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 transition-all hover:border-[#ded5cb]"
-                          >
-                            <div className="flex-1 min-w-[180px]">
-                              <h4 className="font-semibold text-neutral-900 text-sm sm:text-base leading-snug">
-                                {task.title}
-                              </h4>
-                              <p className="text-xs text-neutral-500 mt-0.5">{courseName}</p>
-                            </div>
-
-                            <div className="sm:w-28 shrink-0 text-left sm:text-center">
-                              <span className="text-sm font-bold text-neutral-800">
-                                {task.due_date || 'Completed'}
-                              </span>
-                            </div>
-
-                            <div className="sm:w-48 shrink-0 flex flex-col justify-center">
-                              <div className="flex items-center justify-between text-xs text-neutral-500">
-                                <span>
-                                  Est{' '}
-                                  <strong className="text-neutral-900 font-bold">
-                                    {formatMins(task.estimated_minutes)}
-                                  </strong>
-                                </span>
-                                <span>
-                                  Took{' '}
-                                  <strong className="text-neutral-900 font-bold">
-                                    {task.actual_minutes ? formatMins(task.actual_minutes) : '—'}
-                                  </strong>
-                                </span>
-                              </div>
-                              {delta && (
-                                <div className="text-xs font-semibold mt-0.5">
-                                  <span className={delta.className}>{delta.text}</span>
-                                </div>
-                              )}
-                              <div className="w-full h-1.5 bg-[#f0ebe4] rounded-full overflow-hidden mt-1.5">
-                                <div
-                                  className={cn('h-full rounded-full transition-all', bar.color)}
-                                  style={{ width: `${bar.percent}%` }}
-                                />
-                              </div>
-                            </div>
-
-                            <div className="shrink-0">
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  setSelectedTaskForLog(task);
-                                  setLogTimeStatus(task.status);
-                                }}
-                                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[#dcd4ca] bg-white text-xs font-medium text-neutral-700 hover:bg-neutral-50 transition-colors shadow-2xs cursor-pointer"
-                              >
-                                <Timer className="w-3.5 h-3.5 text-neutral-500" />
-                                <span>Log time</span>
-                              </button>
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-                )}
-              </div>
-            )}
           </div>
         )}
 
-        {/* ── TAB 2: COURSES VIEW ────────────────────────────────────────────── */}
-        {activeTab === 'courses' && (
-          <div className="mt-5 space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {courses.map((course) => {
-                const courseTasks = tasks.filter(
-                  (t) =>
-                    t.project_id === course.id ||
-                    (t.project_title &&
-                      t.project_title.trim().toLowerCase() === course.title.trim().toLowerCase())
-                );
-                const completedCourseTasks = courseTasks.filter(
-                  (t) => t.status === 'completed'
-                ).length;
-                const totalCourseMins = courseTasks.reduce(
-                  (sum, t) => sum + (t.actual_minutes || 0),
-                  0
-                );
-                const progressPct =
-                  courseTasks.length > 0
-                    ? Math.round((completedCourseTasks / courseTasks.length) * 100)
-                    : course.progress || 0;
+        {/* ── COURSES LIST ─────────────────────────────────────────────────── */}
+        <div className="mt-6 space-y-5">
+          {isLoadingCourses ? (
+            <div className="py-12 text-center text-sm text-neutral-500">
+              Loading courses...
+            </div>
+          ) : filteredCourses.length === 0 && courses.length > 0 ? (
+            <div className="py-10 text-center text-sm text-neutral-500">
+              No courses matching &quot;{search}&quot;
+            </div>
+          ) : courses.length === 0 ? (
+            /* Clean Empty State */
+            <div className="rounded-2xl border border-dashed border-[#e6dfd5] p-8 sm:p-12 text-center space-y-4 bg-[#faf8f5]">
+              <div className="w-12 h-12 rounded-2xl bg-[#fbf5f2] border border-[#f2ded5] text-[#c04b1e] flex items-center justify-center mx-auto shadow-2xs">
+                <BookOpen className="w-6 h-6 text-[#c04b1e]" />
+              </div>
+              <div className="max-w-md mx-auto space-y-1">
+                <h3 className="text-base font-bold text-neutral-900">Start your academic roadmap</h3>
+                <p className="text-xs text-neutral-500 leading-relaxed">
+                  Track your semester subjects, milestone tasks, and study progress with structured clarity.
+                </p>
+              </div>
+              <div className="flex items-center justify-center gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setIsNewCourseModalOpen(true)}
+                  className="px-4 py-2 rounded-lg bg-[#c04b1e] hover:bg-[#a83e16] text-white text-xs font-medium transition-colors shadow-2xs cursor-pointer flex items-center gap-1.5"
+                >
+                  <Plus className="w-4 h-4" />
+                  <span>Create course</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => navigate('/app/student/ai-planner')}
+                  className="px-4 py-2 rounded-lg bg-white border border-[#ded5cb] text-neutral-700 hover:bg-neutral-50 text-xs font-medium transition-colors shadow-2xs cursor-pointer flex items-center gap-1.5"
+                >
+                  <Sparkles className="w-4 h-4 text-[#c04b1e]" />
+                  <span>Generate with AI</span>
+                </button>
+              </div>
+            </div>
+          ) : (
+            filteredCourses.map((course) => {
+              // Strictly verify tasks belonging to this specific course only
+              const courseTasks = tasks.filter(
+                (t) =>
+                  t.project_id === course.id ||
+                  (t.project_title &&
+                    t.project_title.trim().toLowerCase() === course.title.trim().toLowerCase())
+              );
+              const completedCourseTasks = courseTasks.filter(
+                (t) => t.status === 'completed'
+              ).length;
+              const totalCourseMins = courseTasks.reduce(
+                (sum, t) => sum + (t.actual_minutes || 0),
+                0
+              );
+              const progressPct =
+                courseTasks.length > 0
+                  ? Math.round((completedCourseTasks / courseTasks.length) * 100)
+                  : course.progress || 0;
+              const expanded = isCourseExpanded(course.id);
 
-                return (
-                  <div
-                    key={course.id}
-                    className="rounded-xl border border-[#eee7e0] bg-white p-5 hover:border-[#ded5cb] transition-all shadow-2xs flex flex-col justify-between"
-                  >
-                    <div>
-                      <div className="flex items-start justify-between gap-2">
-                        <div className="flex items-center gap-2">
-                          <span className="p-1.5 rounded-lg bg-[#fbf5f2] text-[#c04b1e] border border-[#f2ded5]">
-                            <BookOpen className="w-4 h-4" />
-                          </span>
-                          <h3 className="font-bold text-neutral-900 text-base">{course.title}</h3>
-                        </div>
-                        <button
-                          type="button"
-                          onClick={() => deleteCourseMutation.mutate(course.id)}
-                          className="text-neutral-400 hover:text-red-600 transition-colors p-1"
-                          title="Delete course"
-                        >
-                          <Trash2 className="w-3.5 h-3.5" />
-                        </button>
+              return (
+                <div
+                  key={course.id}
+                  className="rounded-xl border border-[#eee7e0] bg-white p-5 sm:p-6 hover:border-[#ded5cb] transition-all shadow-2xs space-y-4"
+                >
+                  {/* Top Bar of Course Card */}
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex items-start gap-3">
+                      <span className="p-2 rounded-xl bg-[#fbf5f2] text-[#c04b1e] border border-[#f2ded5] shrink-0 mt-0.5">
+                        <BookOpen className="w-4 h-4" />
+                      </span>
+                      <div>
+                        <h3 className="font-bold text-neutral-900 text-base leading-snug">
+                          {course.title}
+                        </h3>
+                        {course.description && (
+                          <p className="text-xs text-neutral-500 mt-1 line-clamp-3 leading-relaxed">
+                            {course.description}
+                          </p>
+                        )}
                       </div>
+                    </div>
 
-                      {course.description && (
-                        <p className="text-xs text-neutral-500 mt-2 leading-relaxed">
-                          {course.description}
-                        </p>
-                      )}
+                    <div className="flex items-center gap-1 shrink-0">
+                      <button
+                        type="button"
+                        onClick={() => toggleCourseExpand(course.id)}
+                        className="text-neutral-400 hover:text-neutral-700 transition-colors p-1.5 rounded-lg hover:bg-neutral-100"
+                        title={expanded ? 'Collapse tasks' : 'Expand tasks'}
+                      >
+                        {expanded ? (
+                          <ChevronUp className="w-4 h-4" />
+                        ) : (
+                          <ChevronDown className="w-4 h-4" />
+                        )}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (window.confirm(`Delete course "${course.title}"?`)) {
+                            deleteCourseMutation.mutate(course.id);
+                          }
+                        }}
+                        className="text-neutral-400 hover:text-red-600 transition-colors p-1.5 rounded-lg hover:bg-red-50"
+                        title="Delete course"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
 
-                      <div className="mt-4 pt-3 border-t border-[#f2ede6] flex items-center justify-between text-xs text-neutral-600">
+                  {/* Course Progress & Metrics Row */}
+                  <div className="pt-2 border-t border-[#f2ede6] space-y-2">
+                    <div className="flex items-center justify-between text-xs text-neutral-600">
+                      <div className="flex items-center gap-4">
                         <span>
                           Tasks:{' '}
-                          <strong className="text-neutral-900">
+                          <strong className="text-neutral-900 font-semibold">
                             {completedCourseTasks}/{courseTasks.length}
                           </strong>
                         </span>
                         <span>
-                          Logged:{' '}
-                          <strong className="text-neutral-900">
+                          Time Logged:{' '}
+                          <strong className="text-neutral-900 font-semibold">
                             {formatMins(totalCourseMins)}
                           </strong>
                         </span>
-                        <span className="font-semibold text-[#c04b1e]">{progressPct}%</span>
                       </div>
-
-                      <div className="w-full h-1.5 bg-[#f0ebe4] rounded-full overflow-hidden mt-2">
-                        <div
-                          className="h-full bg-[#c04b1e] rounded-full transition-all duration-300"
-                          style={{ width: `${progressPct}%` }}
-                        />
-                      </div>
+                      <span className="font-bold text-[#c04b1e]">{progressPct}%</span>
                     </div>
 
-                    <div className="mt-4 pt-3 border-t border-[#f2ede6] flex items-center justify-between">
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setNewAssignmentCourseId(course.id);
-                          setIsNewAssignmentModalOpen(true);
-                        }}
-                        className="text-xs font-semibold text-[#c04b1e] hover:underline flex items-center gap-1 cursor-pointer"
-                      >
-                        <Plus className="w-3.5 h-3.5" />
-                        <span>Add assignment</span>
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setActiveTab('assignments')}
-                        className="text-xs font-medium text-neutral-500 hover:text-neutral-900"
-                      >
-                        View all tasks →
-                      </button>
+                    <div className="w-full h-1.5 bg-[#f0ebe4] rounded-full overflow-hidden">
+                      <div
+                        className="h-full bg-[#c04b1e] rounded-full transition-all duration-300"
+                        style={{ width: `${progressPct}%` }}
+                      />
                     </div>
                   </div>
-                );
-              })}
-            </div>
-          </div>
-        )}
-      </div>
 
-      {/* ── BOARD VIEW CONTAINER (Matches Target Mockup Bottom Section) ──────── */}
-      {activeTab === 'assignments' && (viewMode === 'board' || viewMode === 'both') && (
-        <div className="mt-8 space-y-2">
-          <div className="text-xs font-semibold text-neutral-600 px-1">Board view</div>
-
-          <div className="bg-[#f5f2ed] border border-[#e6dfd5] rounded-2xl p-4 sm:p-5">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {/* Column 1: To do */}
-              <div>
-                <div className="text-xs font-semibold text-neutral-700 mb-3 px-1">
-                  To do {todoBoardTasks.length}
-                </div>
-                <div className="space-y-3">
-                  {todoBoardTasks.map((task) => {
-                    const courseName =
-                      task.project_title ||
-                      (task.project_id ? courseLookup.get(task.project_id) : '') ||
-                      'General Studies';
-                    const bar = getProgressBar(task);
-
-                    return (
-                      <div
-                        key={task.id}
-                        onClick={() => {
-                          setSelectedTaskForLog(task);
-                          setLogTimeStatus(task.status);
-                        }}
-                        className="bg-white rounded-xl border border-[#eee7e0] p-4 shadow-2xs hover:border-[#ded5cb] transition-all cursor-pointer space-y-1.5"
-                      >
-                        <h4 className="font-semibold text-sm text-neutral-900 leading-snug">
-                          {task.title}
-                        </h4>
-                        <p className="text-xs text-neutral-500">
-                          {courseName} · {task.due_date || 'Upcoming'}
-                        </p>
-                        <div className="text-xs text-neutral-600 pt-0.5">
-                          Est {formatMins(task.estimated_minutes)}
-                          {task.actual_minutes ? ` · Logged ${formatMins(task.actual_minutes)}` : ''}
-                        </div>
-                        {bar.percent > 0 && (
-                          <div className="w-full h-1 bg-[#f0ebe4] rounded-full overflow-hidden mt-1">
-                            <div
-                              className={cn('h-full rounded-full', bar.color)}
-                              style={{ width: `${bar.percent}%` }}
-                            />
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-
-              {/* Column 2: In progress */}
-              <div>
-                <div className="text-xs font-semibold text-neutral-700 mb-3 px-1">
-                  In progress {inProgressBoardTasks.length}
-                </div>
-                <div className="space-y-3">
-                  {inProgressBoardTasks.map((task) => {
-                    const courseName =
-                      task.project_title ||
-                      (task.project_id ? courseLookup.get(task.project_id) : '') ||
-                      'General Studies';
-                    const bar = getProgressBar(task);
-                    const isOvertime =
-                      (task.actual_minutes || 0) > (task.estimated_minutes || 0) &&
-                      (task.estimated_minutes || 0) > 0;
-
-                    return (
-                      <div
-                        key={task.id}
-                        onClick={() => {
-                          setSelectedTaskForLog(task);
-                          setLogTimeStatus(task.status);
-                        }}
-                        className="bg-white rounded-xl border border-[#eee7e0] p-4 shadow-2xs hover:border-[#ded5cb] transition-all cursor-pointer space-y-1.5"
-                      >
-                        <h4 className="font-semibold text-sm text-neutral-900 leading-snug">
-                          {task.title}
-                        </h4>
-                        <p className="text-xs text-neutral-500">
-                          {courseName} · {task.due_date || 'In progress'}
-                        </p>
-                        <div
-                          className={cn(
-                            'text-xs pt-0.5 font-medium',
-                            isOvertime ? 'text-[#7f1d1d]' : 'text-neutral-600'
-                          )}
+                  {/* Expanded Milestone Tasks Section */}
+                  {expanded && (
+                    <div className="pt-3 border-t border-[#f2ede6] space-y-3">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[11px] font-bold uppercase tracking-wider text-neutral-500">
+                          Milestone Tasks ({courseTasks.length})
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setNewTaskCourseId(course.id);
+                            setIsNewTaskModalOpen(true);
+                          }}
+                          className="text-xs font-semibold text-[#c04b1e] hover:underline flex items-center gap-1 cursor-pointer"
                         >
-                          Est {formatMins(task.estimated_minutes)} · Logged{' '}
-                          {formatMins(task.actual_minutes)}
-                        </div>
-                        <div className="w-full h-1 bg-[#f0ebe4] rounded-full overflow-hidden mt-1">
-                          <div
-                            className={cn('h-full rounded-full', bar.color)}
-                            style={{ width: `${bar.percent}%` }}
-                          />
-                        </div>
+                          <Plus className="w-3.5 h-3.5" />
+                          <span>Add task</span>
+                        </button>
                       </div>
-                    );
-                  })}
-                </div>
-              </div>
 
-              {/* Column 3: Done */}
-              <div>
-                <div className="text-xs font-semibold text-neutral-700 mb-3 px-1">
-                  Done {doneBoardTasks.length}
-                </div>
-                <div className="space-y-3">
-                  {doneBoardTasks.map((task) => {
-                    const courseName =
-                      task.project_title ||
-                      (task.project_id ? courseLookup.get(task.project_id) : '') ||
-                      'General Studies';
-                    const delta = getDelta(task);
-
-                    return (
-                      <div
-                        key={task.id}
-                        onClick={() => {
-                          setSelectedTaskForLog(task);
-                          setLogTimeStatus(task.status);
-                        }}
-                        className="bg-white rounded-xl border border-[#eee7e0] p-4 shadow-2xs hover:border-[#ded5cb] transition-all cursor-pointer space-y-1.5"
-                      >
-                        <h4 className="font-semibold text-sm text-neutral-900 leading-snug">
-                          {task.title}
-                        </h4>
-                        <p className="text-xs text-neutral-500">
-                          {courseName} · {task.due_date || 'Completed'}
-                        </p>
-                        <div className="text-xs text-neutral-600 pt-0.5 flex items-center gap-1.5">
-                          <span>
-                            Est {formatMins(task.estimated_minutes)} · Took{' '}
-                            {formatMins(task.actual_minutes)}
-                          </span>
-                          {delta && (
-                            <span className={cn('font-semibold', delta.className)}>
-                              {delta.text}
-                            </span>
-                          )}
+                      {courseTasks.length === 0 ? (
+                        <div className="py-4 px-3 rounded-lg bg-[#faf8f5] border border-dashed border-[#e6dfd5] text-center text-xs text-neutral-500">
+                          No tasks created for this course yet.{' '}
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setNewTaskCourseId(course.id);
+                              setIsNewTaskModalOpen(true);
+                            }}
+                            className="font-semibold text-[#c04b1e] hover:underline cursor-pointer"
+                          >
+                            Add a task
+                          </button>{' '}
+                          to start tracking your milestones.
                         </div>
-                      </div>
-                    );
-                  })}
+                      ) : (
+                        <div className="space-y-2">
+                          {courseTasks.map((task) => {
+                            const isCompleted = task.status === 'completed';
+                            return (
+                              <div
+                                key={task.id}
+                                className={cn(
+                                  'flex items-center justify-between gap-3 p-3 rounded-xl border transition-all',
+                                  isCompleted
+                                    ? 'bg-[#faf8f5] border-[#eee7e0] text-neutral-400'
+                                    : 'bg-white border-[#eee7e0] hover:border-[#ded5cb] text-neutral-800'
+                                )}
+                              >
+                                <div className="flex items-center gap-3 min-w-0">
+                                  {/* Tickmark / Checkbox */}
+                                  <button
+                                    type="button"
+                                    onClick={() => toggleTaskStatusMutation.mutate(task)}
+                                    className="shrink-0 cursor-pointer text-neutral-400 hover:text-[#c04b1e] transition-colors"
+                                    title={isCompleted ? 'Mark as to do' : 'Mark as done'}
+                                  >
+                                    {isCompleted ? (
+                                      <CheckCircle2 className="w-5 h-5 text-[#c04b1e]" />
+                                    ) : (
+                                      <Circle className="w-5 h-5 text-neutral-300 hover:text-[#c04b1e]" />
+                                    )}
+                                  </button>
+
+                                  <div className="min-w-0">
+                                    <span
+                                      className={cn(
+                                        'text-xs sm:text-sm font-medium leading-snug block truncate',
+                                        isCompleted
+                                          ? 'line-through text-neutral-400'
+                                          : 'text-neutral-900'
+                                      )}
+                                    >
+                                      {task.title}
+                                    </span>
+                                    <div className="flex items-center gap-2.5 text-[11px] text-neutral-500 mt-0.5">
+                                      {task.due_date && (
+                                        <span className="flex items-center gap-1">
+                                          <Calendar className="w-3 h-3 text-neutral-400" />
+                                          <span>{task.due_date}</span>
+                                        </span>
+                                      )}
+                                      <span>
+                                        Est {formatMins(task.estimated_minutes)}
+                                        {task.actual_minutes ? ` · Logged ${formatMins(task.actual_minutes)}` : ''}
+                                      </span>
+                                    </div>
+                                  </div>
+                                </div>
+
+                                <div className="flex items-center gap-1.5 shrink-0">
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      setSelectedTaskForLog(task);
+                                      setLogTimeStatus(task.status);
+                                    }}
+                                    className="flex items-center gap-1 px-2.5 py-1 rounded-lg border border-[#e5e0d8] bg-white text-xs font-medium text-neutral-700 hover:bg-neutral-50 transition-colors shadow-2xs cursor-pointer"
+                                    title="Log study time"
+                                  >
+                                    <Timer className="w-3 h-3 text-neutral-500" />
+                                    <span>Log time</span>
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => deleteTaskMutation.mutate(task.id)}
+                                    className="p-1 text-neutral-400 hover:text-red-600 transition-colors rounded"
+                                    title="Delete task"
+                                  >
+                                    <Trash2 className="w-3.5 h-3.5" />
+                                  </button>
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
-              </div>
-            </div>
-          </div>
+              );
+            })
+          )}
         </div>
-      )}
+      </div>
 
       {/* ── MODAL: LOG TIME ─────────────────────────────────────────────────── */}
       {selectedTaskForLog && (
         <Modal
           isOpen={true}
           onClose={() => setSelectedTaskForLog(null)}
-          title={`Log time · ${selectedTaskForLog.title}`}
+          title={`Log study time · ${selectedTaskForLog.title}`}
         >
           <div className="space-y-5">
             <div className="p-3 bg-[#faf8f5] rounded-xl border border-[#eee7e0] text-xs space-y-1">
-              <div className="text-neutral-500">
-                Course:{' '}
-                <strong className="text-neutral-900 font-semibold">
-                  {selectedTaskForLog.project_title ||
-                    (selectedTaskForLog.project_id
-                      ? courseLookup.get(selectedTaskForLog.project_id)
-                      : '') ||
-                    'General Studies'}
-                </strong>
-              </div>
               <div className="text-neutral-500">
                 Current:{' '}
                 <strong className="text-neutral-900 font-semibold">
@@ -1171,7 +672,7 @@ export default function AcademicProjectsPage() {
                 required
                 value={newCourseTitle}
                 onChange={(e) => setNewCourseTitle(e.target.value)}
-                placeholder="e.g. Distributed Systems & Algorithms"
+                placeholder="e.g. Python &amp; Data Science Fundamentals"
                 className="w-full px-3 py-2 bg-white border border-[#e5e0d8] rounded-lg text-sm text-neutral-800 placeholder:text-neutral-400 focus:outline-none focus:border-[#c04b1e]"
               />
             </div>
@@ -1184,7 +685,7 @@ export default function AcademicProjectsPage() {
                 rows={3}
                 value={newCourseDesc}
                 onChange={(e) => setNewCourseDesc(e.target.value)}
-                placeholder="Course outline, key chapters, professor notes or grading criteria..."
+                placeholder="Course outline, key chapters, notes or milestones..."
                 className="w-full px-3 py-2 bg-white border border-[#e5e0d8] rounded-lg text-sm text-neutral-800 placeholder:text-neutral-400 focus:outline-none focus:border-[#c04b1e]"
               />
             </div>
@@ -1213,30 +714,30 @@ export default function AcademicProjectsPage() {
         </Modal>
       )}
 
-      {/* ── MODAL: CREATE NEW ASSIGNMENT ────────────────────────────────────── */}
-      {isNewAssignmentModalOpen && (
+      {/* ── MODAL: CREATE NEW TASK ────────────────────────────────────────── */}
+      {isNewTaskModalOpen && (
         <Modal
           isOpen={true}
-          onClose={() => setIsNewAssignmentModalOpen(false)}
-          title="Add coursework assignment"
+          onClose={() => setIsNewTaskModalOpen(false)}
+          title="Add task to course"
         >
           <form
             onSubmit={(e) => {
               e.preventDefault();
-              createAssignmentMutation.mutate();
+              createTaskMutation.mutate();
             }}
             className="space-y-4"
           >
             <div>
               <label className="block text-xs font-semibold text-neutral-700 mb-1">
-                Assignment Title
+                Task Title
               </label>
               <input
                 type="text"
                 required
-                value={newAssignmentTitle}
-                onChange={(e) => setNewAssignmentTitle(e.target.value)}
-                placeholder="e.g. Subnetting worksheet"
+                value={newTaskTitle}
+                onChange={(e) => setNewTaskTitle(e.target.value)}
+                placeholder="e.g. Week 1: Python Basics &amp; Exercises"
                 className="w-full px-3 py-2 bg-white border border-[#e5e0d8] rounded-lg text-sm text-neutral-800 placeholder:text-neutral-400 focus:outline-none focus:border-[#c04b1e]"
               />
             </div>
@@ -1246,9 +747,9 @@ export default function AcademicProjectsPage() {
                 Linked Course
               </label>
               <select
-                value={newAssignmentCourseId || ''}
+                value={newTaskCourseId || ''}
                 onChange={(e) =>
-                  setNewAssignmentCourseId(e.target.value ? Number(e.target.value) : undefined)
+                  setNewTaskCourseId(e.target.value ? Number(e.target.value) : undefined)
                 }
                 className="w-full px-3 py-2 bg-white border border-[#e5e0d8] rounded-lg text-sm text-neutral-800 focus:outline-none focus:border-[#c04b1e]"
               >
@@ -1270,8 +771,8 @@ export default function AcademicProjectsPage() {
                   type="number"
                   min={10}
                   step={10}
-                  value={newAssignmentEstimate}
-                  onChange={(e) => setNewAssignmentEstimate(Number(e.target.value))}
+                  value={newTaskEstimate}
+                  onChange={(e) => setNewTaskEstimate(Number(e.target.value))}
                   className="w-full px-3 py-2 bg-white border border-[#e5e0d8] rounded-lg text-sm text-neutral-800 focus:outline-none focus:border-[#c04b1e]"
                 />
               </div>
@@ -1282,9 +783,9 @@ export default function AcademicProjectsPage() {
                 </label>
                 <input
                   type="text"
-                  value={newAssignmentDue}
-                  onChange={(e) => setNewAssignmentDue(e.target.value)}
-                  placeholder="e.g. Tomorrow, Wed, 15 Nov"
+                  value={newTaskDue}
+                  onChange={(e) => setNewTaskDue(e.target.value)}
+                  placeholder="e.g. Tomorrow, Fri, Week 1"
                   className="w-full px-3 py-2 bg-white border border-[#e5e0d8] rounded-lg text-sm text-neutral-800 focus:outline-none focus:border-[#c04b1e]"
                 />
               </div>
@@ -1294,7 +795,7 @@ export default function AcademicProjectsPage() {
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => setIsNewAssignmentModalOpen(false)}
+                onClick={() => setIsNewTaskModalOpen(false)}
                 className="text-xs text-neutral-600"
               >
                 Cancel
@@ -1303,11 +804,11 @@ export default function AcademicProjectsPage() {
                 type="submit"
                 variant="primary"
                 size="sm"
-                disabled={!newAssignmentTitle.trim() || createAssignmentMutation.isPending}
-                loading={createAssignmentMutation.isPending}
+                disabled={!newTaskTitle.trim() || createTaskMutation.isPending}
+                loading={createTaskMutation.isPending}
                 className="!bg-[#c04b1e] hover:!bg-[#a83e16] text-white text-xs px-4"
               >
-                Add assignment
+                Add task
               </Button>
             </div>
           </form>
