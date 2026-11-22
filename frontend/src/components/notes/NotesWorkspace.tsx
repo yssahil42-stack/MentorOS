@@ -612,7 +612,7 @@ Return valid markdown.`;
         undefined
       );
 
-      const generatedContent = reply.reply || reply.text || 'No content generated.';
+      const generatedContent = reply.reply || 'No content generated.';
       const lines = generatedContent.split('\n').filter((l: string) => l.trim().length > 0);
       const firstLine = lines[0]?.replace(/^[#\s*]+/, '').trim() || text;
 
