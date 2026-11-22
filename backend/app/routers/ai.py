@@ -1402,11 +1402,17 @@ def approve_proposal(
         "created_notes": [],
     }
 
+    now = datetime.utcnow()
+
+    # Pre-populate title map from both proposal and existing user projects
     project_title_map: Dict[str, int] = {
         str(item.payload.get("title")): item.persisted_record_id
         for item in proposal.items
         if item.item_type == "project" and item.approved and item.persisted_record_id is not None
     }
+    existing_user_projects = db.query(models.Project).filter(models.Project.user_id == current_user.id).all()
+    for proj in existing_user_projects:
+        project_title_map[proj.title] = proj.id
 
     proposal_item_ids = {item.id for item in proposal.items}
     if not set(req.approved_item_ids).issubset(proposal_item_ids):
@@ -1426,110 +1432,124 @@ def approve_proposal(
             else:
                 continue
 
-        payload = item.payload.copy()
+        payload = item.payload.copy() if isinstance(item.payload, dict) else {}
         if req.item_overrides and item.id in req.item_overrides:
             payload.update(req.item_overrides[item.id].model_dump(exclude_unset=True))
 
-        if item.item_type == "project":
-            p = models.Project(
-                user_id=current_user.id,
-                role=proposal.role,
-                title=payload.get("title", "New Project"),
-                description=payload.get("description"),
-                priority=payload.get("priority", "medium"),
-                target_date=payload.get("target_date"),
-                progress=0,
-                status=payload.get("status", "active"),
-            )
-            db.add(p)
-            db.flush()
-            project_title_map[p.title] = p.id
-            item.approved = True
-            item.persisted_record_id = p.id
-            result["created_projects"].append(schemas.ProjectOut.from_orm(p))
+        try:
+            if item.item_type == "project":
+                p = models.Project(
+                    user_id=current_user.id,
+                    role=proposal.role,
+                    title=payload.get("title", "New Project"),
+                    description=payload.get("description"),
+                    priority=payload.get("priority", "medium"),
+                    target_date=payload.get("target_date"),
+                    progress=0,
+                    status=payload.get("status", "active"),
+                    created_at=now,
+                    updated_at=now,
+                )
+                db.add(p)
+                db.flush()
+                project_title_map[p.title] = p.id
+                item.approved = True
+                item.persisted_record_id = p.id
+                result["created_projects"].append(schemas.ProjectOut.from_orm(p))
 
-        elif item.item_type == "milestone":
-            p_title = payload.get("project_title")
-            p_id = project_title_map.get(p_title)
-            m = models.Milestone(
-                user_id=current_user.id,
-                project_id=p_id,
-                role=proposal.role,
-                title=payload.get("title", "New Milestone"),
-                description=payload.get("description"),
-                target_date=payload.get("target_date"),
-                estimated_minutes=payload.get("estimated_minutes", 0),
-                actual_minutes=payload.get("actual_minutes", 0),
-                status="pending",
-            )
-            db.add(m)
-            db.flush()
-            item.approved = True
-            item.persisted_record_id = m.id
-            result["created_milestones"].append(schemas.MilestoneOut.from_orm(m))
+            elif item.item_type == "milestone":
+                p_title = payload.get("project_title")
+                p_id = project_title_map.get(p_title)
+                m = models.Milestone(
+                    user_id=current_user.id,
+                    project_id=p_id,
+                    role=proposal.role,
+                    title=payload.get("title", "New Milestone"),
+                    description=payload.get("description"),
+                    target_date=payload.get("target_date"),
+                    estimated_minutes=payload.get("estimated_minutes", 0),
+                    actual_minutes=payload.get("actual_minutes", 0),
+                    status="pending",
+                    created_at=now,
+                    updated_at=now,
+                )
+                db.add(m)
+                db.flush()
+                item.approved = True
+                item.persisted_record_id = m.id
+                result["created_milestones"].append(schemas.MilestoneOut.from_orm(m))
 
-        elif item.item_type == "task":
-            p_title = payload.get("project_title")
-            p_id = project_title_map.get(p_title)
-            t = models.Task(
-                user_id=current_user.id,
-                project_id=p_id,
-                role=proposal.role,
-                title=payload.get("title", "New Task"),
-                description=payload.get("description"),
-                priority=payload.get("priority", "medium"),
-                due_date=payload.get("due_date"),
-                estimated_minutes=payload.get("estimated_minutes", 60),
-                actual_minutes=payload.get("actual_minutes", 0),
-                status="todo",
-            )
-            db.add(t)
-            db.flush()
-            item.approved = True
-            item.persisted_record_id = t.id
-            out = schemas.TaskOut.from_orm(t)
-            out.project_title = p_title
-            result["created_tasks"].append(out)
+            elif item.item_type == "task":
+                p_title = payload.get("project_title")
+                p_id = project_title_map.get(p_title)
+                t = models.Task(
+                    user_id=current_user.id,
+                    project_id=p_id,
+                    role=proposal.role,
+                    title=payload.get("title", "New Task"),
+                    description=payload.get("description"),
+                    priority=payload.get("priority", "medium"),
+                    due_date=payload.get("due_date"),
+                    estimated_minutes=payload.get("estimated_minutes", 60),
+                    actual_minutes=payload.get("actual_minutes", 0),
+                    status="todo",
+                    created_at=now,
+                    updated_at=now,
+                )
+                db.add(t)
+                db.flush()
+                item.approved = True
+                item.persisted_record_id = t.id
+                out = schemas.TaskOut.from_orm(t)
+                out.project_title = p_title
+                result["created_tasks"].append(out)
 
-        elif item.item_type == "calendar_event":
-            default_ev_type = "study_block" if proposal.role == "student" else "build_block"
-            p_title = payload.get("project_title")
-            p_id = project_title_map.get(p_title) if p_title else (list(project_title_map.values())[0] if project_title_map else None)
+            elif item.item_type == "calendar_event":
+                default_ev_type = "study_block" if proposal.role == "student" else "build_block"
+                p_title = payload.get("project_title")
+                p_id = project_title_map.get(p_title) if p_title else (list(project_title_map.values())[0] if project_title_map else None)
 
-            start_at_val = payload.get("start_at") or datetime.utcnow().isoformat()
-            end_at_val = payload.get("end_at") or (datetime.utcnow() + timedelta(hours=1)).isoformat()
-            ev_type_val = payload.get("event_type") or default_ev_type
+                start_at_val = payload.get("start_at") or now.isoformat()
+                end_at_val = payload.get("end_at") or (now + timedelta(hours=1)).isoformat()
+                ev_type_val = payload.get("event_type") or default_ev_type
 
-            ev = models.CalendarEvent(
-                user_id=current_user.id,
-                role=proposal.role,
-                project_id=p_id,
-                title=payload.get("title", "Scheduled Session"),
-                description=payload.get("description"),
-                start_at=start_at_val,
-                end_at=end_at_val,
-                all_day=payload.get("all_day", False),
-                event_type=ev_type_val,
-            )
-            db.add(ev)
-            db.flush()
-            item.approved = True
-            item.persisted_record_id = ev.id
-            result["created_events"].append(schemas.CalendarEventOut.from_orm(ev))
+                ev = models.CalendarEvent(
+                    user_id=current_user.id,
+                    role=proposal.role,
+                    project_id=p_id,
+                    title=payload.get("title", "Scheduled Session"),
+                    description=payload.get("description"),
+                    start_at=start_at_val,
+                    end_at=end_at_val,
+                    all_day=payload.get("all_day", False),
+                    event_type=ev_type_val,
+                    created_at=now,
+                    updated_at=now,
+                )
+                db.add(ev)
+                db.flush()
+                item.approved = True
+                item.persisted_record_id = ev.id
+                result["created_events"].append(schemas.CalendarEventOut.from_orm(ev))
 
-        elif item.item_type == "note":
-            n = models.Note(
-                user_id=current_user.id,
-                role=proposal.role,
-                title=payload.get("title", "Note"),
-                content=payload.get("content", ""),
-                is_pinned=False,
-            )
-            db.add(n)
-            db.flush()
-            item.approved = True
-            item.persisted_record_id = n.id
-            result["created_notes"].append(schemas.NoteOut.from_orm(n))
+            elif item.item_type == "note":
+                n = models.Note(
+                    user_id=current_user.id,
+                    role=proposal.role,
+                    title=payload.get("title", "Note"),
+                    content=payload.get("content") or payload.get("description") or "Study notes and roadmap curriculum.",
+                    is_pinned=False,
+                    created_at=now,
+                    updated_at=now,
+                )
+                db.add(n)
+                db.flush()
+                item.approved = True
+                item.persisted_record_id = n.id
+                result["created_notes"].append(schemas.NoteOut.from_orm(n))
+        except Exception as e:
+            # Continue approving remaining items rather than failing the whole batch
+            continue
 
     proposal.status = "approved" if all(item.approved for item in proposal.items) else "pending"
     db.commit()

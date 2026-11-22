@@ -172,8 +172,8 @@ class TaskOut(BaseModel):
     estimated_minutes: Optional[int] = None
     actual_minutes: Optional[int] = None
     completed_at: Optional[datetime] = None
-    created_at: datetime
-    updated_at: datetime
+    created_at: Optional[datetime] = None
+    updated_at: Optional[datetime] = None
     project_title: Optional[str] = None
 
     class Config:
@@ -210,8 +210,8 @@ class MilestoneOut(BaseModel):
     estimated_minutes: Optional[int] = None
     actual_minutes: Optional[int] = None
     completed_at: Optional[datetime] = None
-    created_at: datetime
-    updated_at: datetime
+    created_at: Optional[datetime] = None
+    updated_at: Optional[datetime] = None
 
     class Config:
         from_attributes = True
@@ -244,8 +244,8 @@ class ProjectOut(BaseModel):
     milestone_count: Optional[int] = 0
     completed_milestone_count: Optional[int] = 0
     task_count: Optional[int] = 0
-    created_at: datetime
-    updated_at: datetime
+    created_at: Optional[datetime] = None
+    updated_at: Optional[datetime] = None
 
     class Config:
         from_attributes = True
@@ -287,8 +287,8 @@ class CalendarEventOut(BaseModel):
     end_at: str
     all_day: bool
     event_type: str
-    created_at: datetime
-    updated_at: datetime
+    created_at: Optional[datetime] = None
+    updated_at: Optional[datetime] = None
 
     class Config:
         from_attributes = True
@@ -315,8 +315,8 @@ class NoteOut(BaseModel):
     title: str
     content: str
     is_pinned: bool
-    created_at: datetime
-    updated_at: datetime
+    created_at: Optional[datetime] = None
+    updated_at: Optional[datetime] = None
 
     class Config:
         from_attributes = True

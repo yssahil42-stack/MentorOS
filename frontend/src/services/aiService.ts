@@ -156,10 +156,10 @@ export async function approveProposalItems(
     res.results = itemResults;
     return res;
   } catch (err: any) {
+    const reason = err.message || 'Server approval error';
     for (const itemId of validApprovedIds) {
       const item = proposal.items.find((i) => i.id === itemId);
       const title = (item?.payload as any)?.title || `Item #${itemId}`;
-      const reason = err.message || 'Server approval error';
       itemResults.push({
         id: itemId,
         item_type: item?.item_type || 'task',
@@ -167,9 +167,9 @@ export async function approveProposalItems(
         status: 'failed',
         reason,
       });
-      if (!suppressToasts) {
-        notifyToast(`✗ Failed: ${title} (${reason})`, 'error');
-      }
+    }
+    if (!suppressToasts) {
+      notifyToast(`Failed to save items to workspace: ${reason}`, 'error');
     }
     throw err;
   }
