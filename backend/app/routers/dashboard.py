@@ -2,7 +2,7 @@ from datetime import date, datetime, timedelta
 from typing import Optional
 
 from fastapi import APIRouter, Depends
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 
 from .. import models, schemas
 from ..auth import get_current_user
@@ -34,7 +34,7 @@ def get_dashboard_summary(
     active_role = role or current_user.role
     today = datetime.utcnow().date()
 
-    tasks = db.query(models.Task).filter(
+    tasks = db.query(models.Task).options(joinedload(models.Task.project)).filter(
         models.Task.user_id == current_user.id,
         models.Task.role == active_role,
     ).order_by(models.Task.created_at.desc()).all()
@@ -50,7 +50,7 @@ def get_dashboard_summary(
     ).all()
     active_projects = [project for project in projects if project.status in ("active", "planning")]
 
-    events = db.query(models.CalendarEvent).filter(
+    events = db.query(models.CalendarEvent).options(joinedload(models.CalendarEvent.project)).filter(
         models.CalendarEvent.user_id == current_user.id,
         models.CalendarEvent.role == active_role,
     ).all()
@@ -59,7 +59,7 @@ def get_dashboard_summary(
         if (event_date := _date(event.start_at)) is not None and event_date >= today
     ]
 
-    milestones = db.query(models.Milestone).filter(
+    milestones = db.query(models.Milestone).options(joinedload(models.Milestone.project)).filter(
         models.Milestone.user_id == current_user.id,
         models.Milestone.role == active_role,
     ).all()

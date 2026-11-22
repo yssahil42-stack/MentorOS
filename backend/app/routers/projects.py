@@ -1,7 +1,7 @@
 from typing import List, Optional
 from datetime import datetime
 from fastapi import APIRouter, Depends, HTTPException, status, Response
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, selectinload, joinedload
 from ..database import get_db
 from .. import models, schemas
 from ..auth import get_current_user
@@ -31,6 +31,10 @@ def get_projects(
     query = query.order_by(models.Project.created_at.desc())
     if page is not None and page_size is not None and page > 0 and page_size > 0:
         query = query.offset((page - 1) * page_size).limit(page_size)
+    query = query.options(
+        selectinload(models.Project.milestones),
+        selectinload(models.Project.tasks),
+    )
     projects = query.all()
 
     result = []

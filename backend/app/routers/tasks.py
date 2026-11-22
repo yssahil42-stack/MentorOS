@@ -1,7 +1,7 @@
 from typing import List, Optional
 from datetime import datetime
 from fastapi import APIRouter, Depends, HTTPException, status, Response
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from ..database import get_db
 from .. import models, schemas
 from ..auth import get_current_user
@@ -40,6 +40,7 @@ def get_tasks(
     elif page_size is not None and page_size > 0:
         clamped_size = min(page_size, MAX_PAGE_SIZE)
         query = query.limit(clamped_size)
+    query = query.options(joinedload(models.Task.project))
     tasks = query.all()
 
     # Populate project_title

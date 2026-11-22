@@ -14,21 +14,27 @@ from .routers import auth, tasks, projects, calendar, notes, dashboard, ai, invo
 logger = logging.getLogger(__name__)
 
 # Initialize database schema and baseline demo data (non-production only)
-Base.metadata.create_all(bind=engine)
-try:
-    with engine.connect() as conn:
-        cursor = conn.connection.cursor()
-        cursor.execute("PRAGMA table_info(milestones)")
-        cols = [c[1] for c in cursor.fetchall()]
-        if "estimated_minutes" not in cols:
-            cursor.execute("ALTER TABLE milestones ADD COLUMN estimated_minutes INTEGER DEFAULT 0")
-        if "actual_minutes" not in cols:
-            cursor.execute("ALTER TABLE milestones ADD COLUMN actual_minutes INTEGER DEFAULT 0")
-        conn.connection.commit()
-except Exception as exc:
-    logger.debug("Schema column auto-migration: %s", exc)
-
 if settings.APP_ENV != "production":
+    try:
+        Base.metadata.create_all(bind=engine)
+        with engine.connect() as conn:
+            cursor = conn.connection.cursor()
+            if "sqlite" in str(engine.url):
+                cursor.execute("PRAGMA table_info(milestones)")
+                cols = [c[1] for c in cursor.fetchall()]
+                if "estimated_minutes" not in cols:
+                    cursor.execute("ALTER TABLE milestones ADD COLUMN estimated_minutes INTEGER DEFAULT 0")
+                if "actual_minutes" not in cols:
+                    cursor.execute("ALTER TABLE milestones ADD COLUMN actual_minutes INTEGER DEFAULT 0")
+            else:
+                cursor.execute("""
+                    ALTER TABLE milestones ADD COLUMN IF NOT EXISTS estimated_minutes INTEGER DEFAULT 0;
+                    ALTER TABLE milestones ADD COLUMN IF NOT EXISTS actual_minutes INTEGER DEFAULT 0;
+                """)
+            conn.connection.commit()
+    except Exception as exc:
+        logger.debug("Schema initialization: %s", exc)
+
     try:
         seed_initial_data(SessionLocal())
     except Exception as exc:

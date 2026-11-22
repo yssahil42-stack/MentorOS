@@ -43,7 +43,7 @@ export const queryClient = new QueryClient({
         if (status && [401, 403, 404].includes(status)) return false;
         return failureCount < 2;
       },
-      refetchOnWindowFocus: true,
+      refetchOnWindowFocus: false,
     },
     mutations: {
       retry: false,

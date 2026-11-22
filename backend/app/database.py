@@ -1,5 +1,7 @@
+import os
 from sqlalchemy import create_engine, event
 from sqlalchemy.orm import declarative_base, sessionmaker
+from sqlalchemy.pool import NullPool
 from .config import settings
 
 db_url = settings.DATABASE_URL
@@ -11,12 +13,21 @@ elif db_url.startswith("postgresql://") and not db_url.startswith("postgresql+")
 # If sqlite, set check_same_thread=False
 connect_args = {"check_same_thread": False} if db_url.startswith("sqlite") else {}
 
+is_serverless = os.environ.get("VERCEL") == "1"
+
 engine_kwargs = {
     "connect_args": connect_args,
-    "pool_pre_ping": True,
 }
-if not db_url.startswith("sqlite"):
+if db_url.startswith("sqlite"):
+    engine_kwargs["pool_pre_ping"] = True
+elif is_serverless:
+    # On Vercel serverless functions with Supabase PgBouncer pooler (port 6543):
+    # NullPool avoids connection state corruption across frozen lambdas
+    # and reduces connection handshake latency
+    engine_kwargs["poolclass"] = NullPool
+else:
     engine_kwargs.update({
+        "pool_pre_ping": True,
         "pool_size": 5,
         "max_overflow": 10,
         "pool_recycle": 300,
