@@ -1138,7 +1138,7 @@ export default function AcademicProjectsPage() {
                 variant="primary"
                 size="sm"
                 onClick={() => logTimeMutation.mutate()}
-                isLoading={logTimeMutation.isPending}
+                loading={logTimeMutation.isPending}
                 className="!bg-[#c04b1e] hover:!bg-[#a83e16] text-white text-xs px-4"
               >
                 Save time
@@ -1203,7 +1203,7 @@ export default function AcademicProjectsPage() {
                 variant="primary"
                 size="sm"
                 disabled={!newCourseTitle.trim() || createCourseMutation.isPending}
-                isLoading={createCourseMutation.isPending}
+                loading={createCourseMutation.isPending}
                 className="!bg-[#c04b1e] hover:!bg-[#a83e16] text-white text-xs px-4"
               >
                 Create course
@@ -1304,7 +1304,7 @@ export default function AcademicProjectsPage() {
                 variant="primary"
                 size="sm"
                 disabled={!newAssignmentTitle.trim() || createAssignmentMutation.isPending}
-                isLoading={createAssignmentMutation.isPending}
+                loading={createAssignmentMutation.isPending}
                 className="!bg-[#c04b1e] hover:!bg-[#a83e16] text-white text-xs px-4"
               >
                 Add assignment

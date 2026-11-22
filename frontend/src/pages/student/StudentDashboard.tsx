@@ -47,7 +47,7 @@ export default function StudentDashboard() {
   });
   const { data: milestones = [] } = useQuery({
     queryKey: ['milestones', 'student'],
-    queryFn: ({ signal }) => milestonesApi.get('student', { signal }),
+    queryFn: ({ signal }) => milestonesApi.get({ role: 'student' }, signal),
   });
 
   const invalidate = () =>

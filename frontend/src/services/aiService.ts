@@ -215,3 +215,11 @@ export async function askChatbot(
     { signal }
   );
 }
+
+export async function askAI(
+  message: string,
+  role = 'developer',
+  signal?: AbortSignal
+): Promise<AskChatbotResponse> {
+  return askChatbot({ message, role }, signal);
+}

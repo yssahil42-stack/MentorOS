@@ -1065,16 +1065,7 @@ Return valid markdown.`;
         <Modal
           isOpen={isReaderModalOpen}
           onClose={() => setIsReaderModalOpen(false)}
-          title={
-            <div className="flex items-center gap-2">
-              <span className="bg-[#fef3c7] text-[#92400e] dark:bg-amber-950/40 dark:text-amber-300 border border-amber-200/60 dark:border-amber-800/40 text-[10px] font-semibold px-2.5 py-0.5 rounded-full">
-                {extractNoteMetadata(selectedNote, config.defaultCategories[0]).category}
-              </span>
-              <span className="truncate">
-                {extractNoteMetadata(selectedNote, config.defaultCategories[0]).cleanTitle}
-              </span>
-            </div>
-          }
+          title={extractNoteMetadata(selectedNote, config.defaultCategories[0]).cleanTitle}
           size="lg"
         >
           <div className="space-y-4 pt-2">
