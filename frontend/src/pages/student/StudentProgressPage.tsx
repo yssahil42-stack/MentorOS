@@ -53,47 +53,46 @@ export default function StudentProgressPage() {
   const completedTasks = tasks.filter((t) => t.status === 'completed');
   const taskCompletionRate = tasks.length
     ? Math.round((completedTasks.length / tasks.length) * 100)
-    : 85;
+    : 0;
 
-  const currentGpa = 3.88;
-  const totalCredits = 120;
-  const earnedCredits = 96;
-  const studyHoursWeekly = roleSummary?.study_hours_this_week || 18.5;
+  const currentGpa = projects.length > 0 ? 3.88 : 0.0;
+  const totalCredits = projects.length * 4;
+  const earnedCredits = Math.round(totalCredits * (taskCompletionRate / 100));
+  const studyHoursWeekly = roleSummary?.study_hours_this_week || 0;
 
-  const courses = [
-    {
-      code: 'CS-480',
-      title: 'Distributed Systems & Cloud Computing',
-      credits: 4,
-      currentGrade: 'A',
-      percentage: 94,
-      status: 'On track',
-    },
-    {
-      code: 'CS-401',
-      title: 'Senior Capstone Engineering',
-      credits: 4,
-      currentGrade: 'A',
-      percentage: 96,
-      status: 'High performance',
-    },
-    {
-      code: 'MATH-320',
-      title: 'Advanced Linear Algebra & Optimization',
-      credits: 3,
-      currentGrade: 'A-',
-      percentage: 91,
-      status: 'Needs midterm focus',
-    },
-    {
-      code: 'PHYS-210',
-      title: 'Quantum Physics & Semiconductor Devices',
-      credits: 3,
-      currentGrade: 'B+',
-      percentage: 88,
-      status: 'Recommended study block',
-    },
-  ];
+  const courses = projects.map((p, idx) => {
+    const pTasks = tasks.filter(
+      (t) =>
+        t.project_id === p.id ||
+        (t.project_title && t.project_title.trim().toLowerCase() === p.title.trim().toLowerCase())
+    );
+    const pCompleted = pTasks.filter((t) => t.status === 'completed').length;
+    const pPct =
+      pTasks.length > 0 ? Math.round((pCompleted / pTasks.length) * 100) : p.progress || 0;
+    const grade =
+      pPct >= 93
+        ? 'A'
+        : pPct >= 90
+          ? 'A-'
+          : pPct >= 85
+            ? 'B+'
+            : pPct >= 80
+              ? 'B'
+              : pPct > 0
+                ? 'C'
+                : '—';
+    const code =
+      (p as any).code || (p.title.length <= 8 ? p.title.toUpperCase() : `CRS-${idx + 1}`);
+
+    return {
+      code,
+      title: p.title,
+      credits: (p as any).credits || 4,
+      currentGrade: grade,
+      percentage: pPct,
+      status: pPct >= 90 ? 'High performance' : pPct >= 70 ? 'On track' : 'Needs focus',
+    };
+  });
 
   const daysOfWeek = [
     { day: 'Mon', hours: 3.5 },
@@ -221,54 +220,72 @@ export default function StudentProgressPage() {
                 </p>
               </div>
               <span className="text-xs font-mono font-bold px-2 py-0.5 rounded bg-student-500/10 text-student-300">
-                14 Credits
+                {totalCredits} Credits
               </span>
             </div>
 
-            <div className="mt-4 space-y-3">
-              {courses.map((c) => (
-                <div
-                  key={c.code}
-                  className="p-3.5 rounded-xl bg-bg-surface border border-border-base space-y-2 hover:border-student-500/40 transition-colors"
-                >
-                  <div className="flex items-start justify-between">
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <span className="text-2xs font-mono font-bold px-2 py-0.5 rounded bg-bg-base text-student-400 border border-border-base">
-                          {c.code}
-                        </span>
-                        <h4 className="text-xs font-bold text-text-primary">{c.title}</h4>
-                      </div>
-                      <span className="text-2xs text-text-muted mt-0.5 block">
-                        {c.credits} Credits • Status: {c.status}
-                      </span>
-                    </div>
-
-                    <div className="text-right">
-                      <span className="text-base font-extrabold text-student-400">
-                        {c.currentGrade}
-                      </span>
-                      <span className="text-2xs text-text-faint block font-mono">
-                        {c.percentage}%
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Progress bar */}
-                  <div className="w-full bg-bg-base h-2 rounded-full overflow-hidden border border-border-base">
-                    <div
-                      className={`h-full rounded-full transition-all duration-500 ${
-                        c.percentage >= 93
-                          ? 'bg-student-500'
-                          : c.percentage >= 90
-                            ? 'bg-amber-400'
-                            : 'bg-orange-400'
-                      }`}
-                      style={{ width: `${c.percentage}%` }}
-                    />
-                  </div>
+            <div className="mt-4">
+              {courses.length === 0 ? (
+                <div className="py-8 text-center text-text-muted">
+                  <BookOpen className="w-8 h-8 mx-auto mb-2 opacity-30 text-student-400" />
+                  <p className="text-xs font-semibold text-text-primary">No enrolled courses</p>
+                  <p className="text-2xs text-text-secondary mt-0.5 max-w-xs mx-auto">
+                    Add courses in Academic Projects to track predicted grades and degree credits.
+                  </p>
+                  <Link
+                    to="/app/student/projects"
+                    className="inline-flex items-center gap-1.5 mt-3 px-3.5 py-1.5 rounded-xl bg-student-500 hover:bg-student-600 text-white text-xs font-semibold transition-colors"
+                  >
+                    <span>Add a Course</span>
+                  </Link>
                 </div>
-              ))}
+              ) : (
+                <div className="space-y-3">
+                  {courses.map((c) => (
+                    <div
+                      key={c.code}
+                      className="p-3.5 rounded-xl bg-bg-surface border border-border-base space-y-2 hover:border-student-500/40 transition-colors"
+                    >
+                      <div className="flex items-start justify-between">
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <span className="text-2xs font-mono font-bold px-2 py-0.5 rounded bg-bg-base text-student-400 border border-border-base">
+                              {c.code}
+                            </span>
+                            <h4 className="text-xs font-bold text-text-primary">{c.title}</h4>
+                          </div>
+                          <span className="text-2xs text-text-muted mt-0.5 block">
+                            {c.credits} Credits • Status: {c.status}
+                          </span>
+                        </div>
+
+                        <div className="text-right">
+                          <span className="text-base font-extrabold text-student-400">
+                            {c.currentGrade}
+                          </span>
+                          <span className="text-2xs text-text-faint block font-mono">
+                            {c.percentage}%
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Progress bar */}
+                      <div className="w-full bg-bg-base h-2 rounded-full overflow-hidden border border-border-base">
+                        <div
+                          className={`h-full rounded-full transition-all duration-500 ${
+                            c.percentage >= 93
+                              ? 'bg-student-500'
+                              : c.percentage >= 90
+                                ? 'bg-amber-400'
+                                : 'bg-orange-400'
+                          }`}
+                          style={{ width: `${c.percentage}%` }}
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </Card>
         </div>

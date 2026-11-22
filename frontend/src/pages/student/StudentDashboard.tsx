@@ -16,7 +16,7 @@ import {
 import { useWorkspace } from '../../contexts/WorkspaceContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { fetchDashboardSummary } from '../../services/dashboardService';
-import { tasksApi, projectsApi } from '../../services/apiClient';
+import { tasksApi, projectsApi, milestonesApi } from '../../services/apiClient';
 import { DashboardSkeleton } from '../../components/ui/LoadingSkeleton';
 import { DailyStandupWidget } from '../../components/dashboard/DailyStandupWidget';
 import type { TaskStatus } from '../../types/task';
@@ -44,6 +44,10 @@ export default function StudentDashboard() {
   const { data: projects = [], isLoading: pLoad } = useQuery({
     queryKey: ['projects', 'student', { page: 1, pageSize: TASK_PAGE_SIZE }],
     queryFn: ({ signal }) => projectsApi.get('student', { signal }),
+  });
+  const { data: milestones = [] } = useQuery({
+    queryKey: ['milestones', 'student'],
+    queryFn: ({ signal }) => milestonesApi.get('student', { signal }),
   });
 
   const invalidate = () =>
@@ -126,88 +130,79 @@ export default function StudentDashboard() {
   const isCurrentMonth = today.getFullYear() === year && today.getMonth() === month;
   const currentDayNum = today.getDate();
 
-  // Dynamic courses mapping
-  const coursesList =
-    projects.length > 0
-      ? projects.slice(0, 5).map((p, idx) => {
-          const codes = ['CS-480', 'CS-401', 'MATH-320', 'PHYS-210', 'ENG-301'];
-          const grades = ['A', 'A', 'A-', 'B+', 'A'];
-          const pTasks = tasks.filter(
-            (t) =>
-              t.project_id === p.id ||
-              (t.project_title &&
-                t.project_title.trim().toLowerCase() === p.title.trim().toLowerCase())
-          );
-          const pComp = pTasks.filter((t) => t.status === 'completed').length;
-          const pct =
-            pTasks.length > 0 ? Math.round((pComp / pTasks.length) * 100) : p.progress || 88;
-          return {
-            id: p.id,
-            code: codes[idx % codes.length],
-            title: p.title,
-            subtitle: pct >= 90 ? 'High performance · 4 credits' : 'On track · 3 credits',
-            progress: pct,
-            grade: grades[idx % grades.length],
-          };
-        })
-      : [
-          {
-            id: 1,
-            code: 'CS-480',
-            title: 'Distributed Systems & Cloud Computing',
-            subtitle: 'On track · 4 credits',
-            progress: 94,
-            grade: 'A',
-          },
-          {
-            id: 2,
-            code: 'CS-401',
-            title: 'Senior Capstone Engineering',
-            subtitle: 'High performance · 4 credits',
-            progress: 96,
-            grade: 'A',
-          },
-          {
-            id: 3,
-            code: 'MATH-320',
-            title: 'Advanced Linear Algebra & Optimization',
-            subtitle: 'Needs midterm focus · 3 credits',
-            progress: 91,
-            grade: 'A-',
-          },
-          {
-            id: 4,
-            code: 'PHYS-210',
-            title: 'Quantum Physics & Semiconductor Devices',
-            subtitle: 'Add a study block · 3 credits',
-            progress: 88,
-            grade: 'B+',
-          },
-        ];
+  // Dynamic courses mapping - strictly real data without hallucinated fallbacks
+  const coursesList = projects.slice(0, 5).map((p, idx) => {
+    const pTasks = tasks.filter(
+      (t) =>
+        t.project_id === p.id ||
+        (t.project_title && t.project_title.trim().toLowerCase() === p.title.trim().toLowerCase())
+    );
+    const pComp = pTasks.filter((t) => t.status === 'completed').length;
+    const pct = pTasks.length > 0 ? Math.round((pComp / pTasks.length) * 100) : p.progress || 0;
+    const grade =
+      pct >= 93
+        ? 'A'
+        : pct >= 90
+          ? 'A-'
+          : pct >= 85
+            ? 'B+'
+            : pct >= 80
+              ? 'B'
+              : pct >= 70
+                ? 'C'
+                : pct > 0
+                  ? 'In Progress'
+                  : '—';
+    const code =
+      (p as any).code || (p.title.length <= 8 ? p.title.toUpperCase() : `CRS-${idx + 1}`);
 
-  // Activity bars for the week
-  const activityData = [
-    { day: 'Mon', value: 3.5 },
-    { day: 'Tue', value: 4 },
-    { day: 'Wed', value: 2.5 },
-    { day: 'Thu', value: 4.5 },
-    { day: 'Fri', value: 4, isCurrentDay: true },
-    { day: 'Sat', value: 0 },
-    { day: 'Sun', value: 0 },
-  ];
+    return {
+      id: p.id,
+      code,
+      title: p.title,
+      subtitle:
+        pTasks.length > 0
+          ? `${pComp}/${pTasks.length} assignments completed · ${pct}%`
+          : `${pct}% progress`,
+      progress: pct,
+      grade,
+    };
+  });
+
+  const studyHoursThisWeek =
+    (summary?.role_summary as any)?.study_hours_this_week ??
+    (tasks.length > 0
+      ? Math.round((tasks.reduce((acc, t) => acc + (t.actual_minutes || 0), 0) / 60) * 10) / 10
+      : 0);
+
+  // Activity bars for the week (Mon - Sun)
+  const currentDayOfWeek = today.getDay(); // 0 is Sun, 1 is Mon...
+  const monBasedDayIndex = currentDayOfWeek === 0 ? 6 : currentDayOfWeek - 1;
+  const daysList = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+
+  const activityData = daysList.map((day, idx) => ({
+    day,
+    value: 0,
+    isCurrentDay: idx === monBasedDayIndex,
+  }));
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto pb-14 font-sans text-stone-900 dark:text-stone-100 transition-colors">
       {/* ─── 1. TOP METRICS & GREETING ────────────────────────────────────────── */}
       <DashboardMetrics
         displayName={user?.full_name ? user.full_name.split(' ')[0] : 'Sahil'}
-        projectCount={projects.length || 4}
-        avgProjectProgress={avgProgress || 68}
+        projectCount={projects.length}
+        avgProjectProgress={avgProgress}
         pendingTaskCount={pending.length}
         completedTaskCount={completed.length}
         totalTaskCount={tasks.length}
         taskCompletionRate={compRate}
-        nextDeadlineTitle={(summary?.role_summary as any)?.next_deadline_title || 'Semester Review'}
+        nextDeadlineTitle={
+          (summary?.role_summary as any)?.next_deadline_title ||
+          (projects.length === 0 && tasks.length === 0
+            ? 'No upcoming deadlines'
+            : 'Semester Review')
+        }
         onPlanWithAI={() => openAIDrawer()}
       />
 
@@ -230,71 +225,91 @@ export default function StudentDashboard() {
 
           {/* Today's Tasks */}
           <div className="space-y-2.5">
-            {tasks.slice(0, 5).map((t, idx) => {
-              const isDone = t.status === 'completed';
-              const defaultCodes = ['CS-480', 'CS-401', 'MATH-320', 'PHYS-210'];
-              const code = defaultCodes[idx % defaultCodes.length];
-              const times = ['10:00', '14:00', '16:30', '18:00'];
-              const time = times[idx % times.length];
+            {tasks.length === 0 ? (
+              <div className="py-8 text-center text-stone-500 dark:text-stone-400">
+                <Check className="w-7 h-7 mx-auto mb-2 opacity-30 text-stone-400" />
+                <p className="text-xs font-semibold text-stone-700 dark:text-stone-300">
+                  No assignments due today
+                </p>
+                <p className="text-2xs text-stone-400 dark:text-stone-500 mt-0.5">
+                  Your schedule is clear. Add an assignment or study task below.
+                </p>
+              </div>
+            ) : (
+              tasks.slice(0, 5).map((t) => {
+                const isDone = t.status === 'completed';
+                const timeStr = t.due_date
+                  ? new Date(t.due_date).toLocaleTimeString([], {
+                      hour: '2-digit',
+                      minute: '2-digit',
+                    })
+                  : null;
 
-              return (
-                <div
-                  key={t.id}
-                  className="flex items-center justify-between p-3.5 rounded-xl bg-[#faf8f5]/80 dark:bg-stone-900/40 border border-[#f0eae1] dark:border-stone-800/60 hover:border-stone-300 dark:hover:border-stone-700 transition-all gap-3"
-                >
-                  <div className="flex items-center gap-3 min-w-0">
-                    <button
-                      type="button"
-                      onClick={() =>
-                        toggleMutation.mutate({
-                          id: t.id,
-                          status: isDone ? 'todo' : 'completed',
-                        })
-                      }
-                      className={cn(
-                        'w-5 h-5 rounded-full flex items-center justify-center shrink-0 transition-colors cursor-pointer',
-                        isDone
-                          ? 'bg-[#0d9488] text-white shadow-2xs'
-                          : 'border-2 border-stone-300 dark:border-stone-600 hover:border-[#c04b1e]'
-                      )}
-                      aria-label={isDone ? 'Mark as incomplete' : 'Mark as complete'}
-                    >
-                      {isDone && <Check className="w-3 h-3 stroke-[3]" />}
-                    </button>
-
-                    <div className="min-w-0">
-                      <div
+                return (
+                  <div
+                    key={t.id}
+                    className="flex items-center justify-between p-3.5 rounded-xl bg-[#faf8f5]/80 dark:bg-stone-900/40 border border-[#f0eae1] dark:border-stone-800/60 hover:border-stone-300 dark:hover:border-stone-700 transition-all gap-3"
+                  >
+                    <div className="flex items-center gap-3 min-w-0">
+                      <button
+                        type="button"
+                        onClick={() =>
+                          toggleMutation.mutate({
+                            id: t.id,
+                            status: isDone ? 'todo' : 'completed',
+                          })
+                        }
                         className={cn(
-                          'text-xs sm:text-sm font-semibold truncate',
+                          'w-5 h-5 rounded-full flex items-center justify-center shrink-0 transition-colors cursor-pointer',
                           isDone
-                            ? 'line-through text-stone-400 dark:text-stone-500'
-                            : 'text-stone-900 dark:text-stone-100'
+                            ? 'bg-[#0d9488] text-white shadow-2xs'
+                            : 'border-2 border-stone-300 dark:border-stone-600 hover:border-[#c04b1e]'
                         )}
+                        aria-label={isDone ? 'Mark as incomplete' : 'Mark as complete'}
                       >
-                        {t.title}
-                      </div>
-                      <div className="flex items-center gap-2 text-2xs text-stone-500 dark:text-stone-400 mt-0.5">
-                        <span className="font-semibold text-stone-600 dark:text-stone-300">
-                          {t.project_title || code}
-                        </span>
-                        <span>· about {t.estimated_minutes || 60}m</span>
+                        {isDone && <Check className="w-3 h-3 stroke-[3]" />}
+                      </button>
+
+                      <div className="min-w-0">
+                        <div
+                          className={cn(
+                            'text-xs sm:text-sm font-semibold truncate',
+                            isDone
+                              ? 'line-through text-stone-400 dark:text-stone-500'
+                              : 'text-stone-900 dark:text-stone-100'
+                          )}
+                        >
+                          {t.title}
+                        </div>
+                        <div className="flex items-center gap-2 text-2xs text-stone-500 dark:text-stone-400 mt-0.5">
+                          <span className="font-semibold text-stone-600 dark:text-stone-300 truncate">
+                            {t.project_title || 'General'}
+                          </span>
+                          <span>· ~{t.estimated_minutes || 60}m</span>
+                        </div>
                       </div>
                     </div>
-                  </div>
 
-                  <div className="shrink-0 flex items-center gap-2">
-                    {!isDone && (
-                      <span className="text-2xs font-semibold px-2 py-0.5 rounded-full bg-orange-100/70 text-[#c04b1e] border border-orange-200/60 dark:bg-orange-950/40 dark:text-orange-300 dark:border-orange-900/40">
-                        Due 23:59
-                      </span>
-                    )}
-                    <span className="text-xs font-mono text-stone-400 dark:text-stone-500">
-                      {time}
-                    </span>
+                    <div className="shrink-0 flex items-center gap-2">
+                      {!isDone && t.due_date && (
+                        <span className="text-2xs font-semibold px-2 py-0.5 rounded-full bg-orange-100/70 text-[#c04b1e] border border-orange-200/60 dark:bg-orange-950/40 dark:text-orange-300 dark:border-orange-900/40">
+                          Due{' '}
+                          {new Date(t.due_date).toLocaleDateString([], {
+                            month: 'short',
+                            day: 'numeric',
+                          })}
+                        </span>
+                      )}
+                      {timeStr && (
+                        <span className="text-xs font-mono text-stone-400 dark:text-stone-500">
+                          {timeStr}
+                        </span>
+                      )}
+                    </div>
                   </div>
-                </div>
-              );
-            })}
+                );
+              })
+            )}
           </div>
 
           {/* Inline Quick Add */}
@@ -373,7 +388,11 @@ export default function StudentDashboard() {
             {Array.from({ length: daysInMonth }).map((_, i) => {
               const dayNum = i + 1;
               const isToday = isCurrentMonth && dayNum === currentDayNum;
-              const hasTask = dayNum % 3 === 0 || dayNum === currentDayNum;
+              const hasTask = tasks.some((t) => {
+                if (!t.due_date) return false;
+                const d = new Date(t.due_date);
+                return d.getFullYear() === year && d.getMonth() === month && d.getDate() === dayNum;
+              });
 
               return (
                 <div key={dayNum} className="flex flex-col items-center justify-center">
@@ -418,49 +437,70 @@ export default function StudentDashboard() {
             </Link>
           </div>
 
-          <div className="grid grid-cols-12 text-2xs font-semibold text-stone-400 dark:text-stone-500 uppercase tracking-wider pb-2 border-b border-[#eee7e0] dark:border-stone-800/80">
-            <div className="col-span-2">CODE</div>
-            <div className="col-span-5">COURSE</div>
-            <div className="col-span-3 text-center">PROGRESS</div>
-            <div className="col-span-2 text-right">GRADE</div>
-          </div>
-
-          <div className="divide-y divide-[#f2ede6] dark:divide-stone-800/60">
-            {coursesList.map((c) => (
-              <div
-                key={c.id}
-                className="grid grid-cols-12 items-center py-3 text-xs gap-2 hover:bg-stone-50/50 dark:hover:bg-stone-900/30 rounded-lg px-1 transition-colors"
+          {coursesList.length === 0 ? (
+            <div className="py-8 text-center text-stone-500 dark:text-stone-400">
+              <BookOpen className="w-8 h-8 mx-auto mb-2 opacity-30 text-stone-400" />
+              <p className="text-xs font-semibold text-stone-700 dark:text-stone-300">
+                No courses enrolled
+              </p>
+              <p className="text-2xs text-stone-400 dark:text-stone-500 mt-0.5 max-w-xs mx-auto">
+                You haven&apos;t added any courses or academic projects yet.
+              </p>
+              <Link
+                to="/app/student/projects"
+                className="inline-flex items-center gap-1.5 mt-3 px-3.5 py-1.5 rounded-xl bg-[#c04b1e] hover:bg-[#a83f17] text-white text-xs font-semibold transition-colors shadow-2xs"
               >
-                <div className="col-span-2 font-mono font-semibold text-stone-500 dark:text-stone-400 text-xs">
-                  {c.code}
-                </div>
-                <div className="col-span-5 min-w-0 pr-2">
-                  <div className="font-bold text-stone-900 dark:text-stone-100 truncate">
-                    {c.title}
-                  </div>
-                  <div className="text-2xs text-stone-500 dark:text-stone-400 truncate mt-0.5">
-                    {c.subtitle}
-                  </div>
-                </div>
-                <div className="col-span-3 flex items-center justify-center gap-2">
-                  <div className="w-16 sm:w-24 bg-stone-100 dark:bg-stone-800 h-1.5 rounded-full overflow-hidden">
-                    <div
-                      className="bg-[#0d9488] h-full rounded-full transition-all duration-500"
-                      style={{ width: `${Math.min(100, Math.max(0, c.progress))}%` }}
-                    />
-                  </div>
-                  <span className="font-mono text-2xs text-stone-500 font-medium">
-                    {c.progress}%
-                  </span>
-                </div>
-                <div className="col-span-2 text-right">
-                  <span className="font-bold text-sm text-stone-900 dark:text-stone-100">
-                    {c.grade}
-                  </span>
-                </div>
+                <span>Add your first course</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </Link>
+            </div>
+          ) : (
+            <>
+              <div className="grid grid-cols-12 text-2xs font-semibold text-stone-400 dark:text-stone-500 uppercase tracking-wider pb-2 border-b border-[#eee7e0] dark:border-stone-800/80">
+                <div className="col-span-2">CODE</div>
+                <div className="col-span-5">COURSE</div>
+                <div className="col-span-3 text-center">PROGRESS</div>
+                <div className="col-span-2 text-right">GRADE</div>
               </div>
-            ))}
-          </div>
+
+              <div className="divide-y divide-[#f2ede6] dark:divide-stone-800/60">
+                {coursesList.map((c) => (
+                  <div
+                    key={c.id}
+                    className="grid grid-cols-12 items-center py-3 text-xs gap-2 hover:bg-stone-50/50 dark:hover:bg-stone-900/30 rounded-lg px-1 transition-colors"
+                  >
+                    <div className="col-span-2 font-mono font-semibold text-stone-500 dark:text-stone-400 text-xs">
+                      {c.code}
+                    </div>
+                    <div className="col-span-5 min-w-0 pr-2">
+                      <div className="font-bold text-stone-900 dark:text-stone-100 truncate">
+                        {c.title}
+                      </div>
+                      <div className="text-2xs text-stone-500 dark:text-stone-400 truncate mt-0.5">
+                        {c.subtitle}
+                      </div>
+                    </div>
+                    <div className="col-span-3 flex items-center justify-center gap-2">
+                      <div className="w-16 sm:w-24 bg-stone-100 dark:bg-stone-800 h-1.5 rounded-full overflow-hidden">
+                        <div
+                          className="bg-[#0d9488] h-full rounded-full transition-all duration-500"
+                          style={{ width: `${Math.min(100, Math.max(0, c.progress))}%` }}
+                        />
+                      </div>
+                      <span className="font-mono text-2xs text-stone-500 font-medium">
+                        {c.progress}%
+                      </span>
+                    </div>
+                    <div className="col-span-2 text-right">
+                      <span className="font-bold text-sm text-stone-900 dark:text-stone-100">
+                        {c.grade}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </>
+          )}
         </div>
 
         {/* Right Column: Study time Bar Chart */}
@@ -470,7 +510,7 @@ export default function StudentDashboard() {
               Study time
             </h3>
             <span className="text-xs font-semibold text-stone-500 dark:text-stone-400">
-              18.5h of 20h
+              {studyHoursThisWeek}h {studyHoursThisWeek > 0 ? 'of 20h' : 'logged'}
             </span>
           </div>
 
@@ -479,7 +519,8 @@ export default function StudentDashboard() {
 
             <div className="flex items-end justify-between gap-2 h-36 px-2">
               {activityData.map((bar, idx) => {
-                const heightPercent = Math.max(12, Math.round((bar.value / 5) * 100));
+                const heightPercent =
+                  bar.value > 0 ? Math.max(12, Math.round((bar.value / 5) * 100)) : 8;
 
                 return (
                   <div key={idx} className="flex-1 flex flex-col items-center gap-1.5 z-10">
@@ -491,7 +532,9 @@ export default function StudentDashboard() {
                         'w-full max-w-[32px] rounded-t-lg transition-all duration-500',
                         bar.isCurrentDay
                           ? 'bg-[#c04b1e]'
-                          : 'bg-orange-300 dark:bg-orange-400/40 hover:bg-orange-400'
+                          : bar.value > 0
+                            ? 'bg-orange-300 dark:bg-orange-400/40 hover:bg-orange-400'
+                            : 'bg-stone-200/60 dark:bg-stone-800/60'
                       )}
                       style={{ height: `${heightPercent}%` }}
                     />
@@ -505,7 +548,9 @@ export default function StudentDashboard() {
           </div>
 
           <div className="text-2xs text-stone-500 dark:text-stone-400 pt-1 text-center">
-            Dashed line: 2.9h a day keeps you on pace for 20h.
+            {studyHoursThisWeek > 0
+              ? 'Dashed line: 2.9h a day keeps you on pace for 20h.'
+              : 'Log focus time on assignments to track your weekly study pacing.'}
           </div>
         </div>
       </div>
@@ -516,49 +561,38 @@ export default function StudentDashboard() {
           Milestones
         </h3>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="bg-white dark:bg-[#161922] border border-[#eee7e0] dark:border-stone-800/80 rounded-2xl p-4 shadow-xs flex items-center gap-3.5 transition-all hover:border-[#c04b1e]/30">
-            <div className="w-10 h-10 rounded-xl bg-orange-100/70 text-[#c04b1e] dark:bg-orange-950/40 dark:text-orange-300 flex items-center justify-center shrink-0">
-              <Star className="w-5 h-5 fill-current" />
-            </div>
-            <div className="min-w-0">
-              <div className="text-xs sm:text-sm font-bold text-stone-900 dark:text-stone-100 truncate">
-                Dean&apos;s List candidate
-              </div>
-              <div className="text-2xs text-stone-500 dark:text-stone-400 truncate mt-0.5">
-                3.88 GPA over the last two terms
-              </div>
-            </div>
+        {milestones.length === 0 ? (
+          <div className="bg-white dark:bg-[#161922] border border-dashed border-[#eee7e0] dark:border-stone-800/80 rounded-2xl p-6 text-center text-stone-500 dark:text-stone-400">
+            <Award className="w-8 h-8 mx-auto mb-2 opacity-30 text-stone-400" />
+            <p className="text-xs font-semibold text-stone-700 dark:text-stone-300">
+              No milestones set
+            </p>
+            <p className="text-2xs text-stone-400 dark:text-stone-500 mt-0.5">
+              Create major academic milestones like exams or thesis deadlines in Academic Projects.
+            </p>
           </div>
-
-          <div className="bg-white dark:bg-[#161922] border border-[#eee7e0] dark:border-stone-800/80 rounded-2xl p-4 shadow-xs flex items-center gap-3.5 transition-all hover:border-[#c04b1e]/30">
-            <div className="w-10 h-10 rounded-xl bg-teal-100/70 text-[#0d9488] dark:bg-teal-950/40 dark:text-teal-300 flex items-center justify-center shrink-0">
-              <Clock className="w-5 h-5" />
-            </div>
-            <div className="min-w-0">
-              <div className="text-xs sm:text-sm font-bold text-stone-900 dark:text-stone-100 truncate">
-                100h Study Club
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {milestones.slice(0, 3).map((m) => (
+              <div
+                key={m.id}
+                className="bg-white dark:bg-[#161922] border border-[#eee7e0] dark:border-stone-800/80 rounded-2xl p-4 shadow-xs flex items-center gap-3.5 transition-all hover:border-[#c04b1e]/30"
+              >
+                <div className="w-10 h-10 rounded-xl bg-orange-100/70 text-[#c04b1e] dark:bg-orange-950/40 dark:text-orange-300 flex items-center justify-center shrink-0">
+                  <Star className="w-5 h-5 fill-current" />
+                </div>
+                <div className="min-w-0">
+                  <div className="text-xs sm:text-sm font-bold text-stone-900 dark:text-stone-100 truncate">
+                    {m.title}
+                  </div>
+                  <div className="text-2xs text-stone-500 dark:text-stone-400 truncate mt-0.5">
+                    {m.target_date ? `Target: ${m.target_date}` : m.status || 'In progress'}
+                  </div>
+                </div>
               </div>
-              <div className="text-2xs text-stone-500 dark:text-stone-400 truncate mt-0.5">
-                182 total Pomodoro focus hours
-              </div>
-            </div>
+            ))}
           </div>
-
-          <div className="bg-white dark:bg-[#161922] border border-[#eee7e0] dark:border-stone-800/80 rounded-2xl p-4 shadow-xs flex items-center gap-3.5 transition-all hover:border-[#c04b1e]/30">
-            <div className="w-10 h-10 rounded-xl bg-amber-100/70 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300 flex items-center justify-center shrink-0">
-              <Check className="w-5 h-5 stroke-[2.5]" />
-            </div>
-            <div className="min-w-0">
-              <div className="text-xs sm:text-sm font-bold text-stone-900 dark:text-stone-100 truncate">
-                Early submitter
-              </div>
-              <div className="text-2xs text-stone-500 dark:text-stone-400 truncate mt-0.5">
-                Deliverables handed in 48h early
-              </div>
-            </div>
-          </div>
-        </div>
+        )}
       </div>
     </div>
   );

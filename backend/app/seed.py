@@ -204,23 +204,55 @@ def seed_initial_data(db: Session) -> None:
         for ev in student_events:
             db.add(ev)
 
-        # Student Notes
+        # Student Notes (Matching Notes Screenshot)
         student_notes = [
             models.Note(
                 user_id=1,
                 project_id=1,
                 role="student",
-                title="Distributed Systems Lecture 12: Raft vs Paxos",
-                content="# Raft Consensus Algorithm Notes\\n\\n- Leader Election: Randomized election timeouts prevent split votes.\\n- Log Replication: Strong leader invariant guarantees log matching.\\n- Safety: Overlapping majorities in elections guarantee commit durability.",
+                title="[DBMS] Normalization forms",
+                content="1NF to BCNF with examples and the common exam traps.\\n\\n### Core Rules\\n- 1NF: Atomic values, no repeating groups.\\n- 2NF: 1NF + no partial dependency on candidate keys.\\n- 3NF: 2NF + no transitive dependency.\\n- BCNF: For every functional dependency X -> Y, X must be a super key.",
                 is_pinned=True,
             ),
             models.Note(
                 user_id=1,
                 project_id=1,
                 role="student",
-                title="Exam Study Roadmap - Semester 6",
-                content="1. Computer Networks (Week 1-3)\\n2. Distributed Systems (Week 4-7)\\n3. Database Internals & LSM Trees (Week 8-11)",
+                title="[Maths] Formula sheet: matrices",
+                content="Determinant, inverse, rank and eigenvalue shortcuts.\\n\\n### Identities\\n- det(AB) = det(A)det(B)\\n- A^-1 = 1/det(A) * adj(A)\\n- Characteristic equation: det(A - lambda * I) = 0",
+                is_pinned=True,
+            ),
+            models.Note(
+                user_id=1,
+                project_id=1,
+                role="student",
+                title="[Operating systems] CPU scheduling",
+                content="FCFS, SJF, round robin and how to draw Gantt charts.\\n\\n### Key Metrics\\n- Turnaround Time = Completion Time - Arrival Time\\n- Waiting Time = Turnaround Time - Burst Time\\n- Round Robin: Time quantum selection balances responsiveness and context switch overhead.",
                 is_pinned=False,
+            ),
+            models.Note(
+                user_id=1,
+                project_id=1,
+                role="student",
+                title="[Computer Networks] TCP 3-Way Handshake & Flow Control",
+                content="SYN, SYN-ACK, ACK sequence and sliding window protocol.\\n\\n- Connection teardown: FIN, ACK, FIN, ACK\\n- Congestion avoidance: Slow start, congestion avoidance, fast retransmit.",
+                is_pinned=False,
+            ),
+            models.Note(
+                user_id=1,
+                project_id=1,
+                role="student",
+                title="[Algorithms] Dynamic Programming Fundamentals",
+                content="Memoization vs tabulation with classic 0/1 knapsack problems.\\n\\n- Optimal substructure and overlapping subproblems.\\n- Time complexity O(nW), space complexity O(nW) reducible to O(W).",
+                is_pinned=False,
+            ),
+            models.Note(
+                user_id=1,
+                project_id=1,
+                role="student",
+                title="[DBMS] Distributed Systems: Raft vs Paxos",
+                content="# Raft Consensus Algorithm Notes\\n\\n- Leader Election: Randomized election timeouts prevent split votes.\\n- Log Replication: Strong leader invariant guarantees log matching.\\n- Safety: Overlapping majorities in elections guarantee commit durability.",
+                is_pinned=True,
             ),
         ]
         for n in student_notes:
@@ -268,6 +300,35 @@ def seed_initial_data(db: Session) -> None:
         ]
         for dt in dev_tasks:
             db.add(dt)
+
+        dev_notes = [
+            models.Note(
+                user_id=2,
+                project_id=2,
+                role="developer",
+                title="[Architecture] Microservices Event Bus",
+                content="Kafka vs RabbitMQ trade-offs, partition strategy and idempotency guarantees.\\n\\n### Key Invariants\\n- Outbox pattern ensures atomic database updates and event publishing.\\n- Consumer groups handle partition balancing.",
+                is_pinned=True,
+            ),
+            models.Note(
+                user_id=2,
+                project_id=2,
+                role="developer",
+                title="[API Specs] Authentication Service v2",
+                content="OpenID Connect, JWT token rotation, refresh endpoints and OAuth flow.\\n\\n- Access token TTL: 15 minutes\\n- Refresh token rotation with family revocation detection.",
+                is_pinned=True,
+            ),
+            models.Note(
+                user_id=2,
+                project_id=2,
+                role="developer",
+                title="[DevOps] Kubernetes Ingress Runbook",
+                content="Cert-manager renewal, SSL termination and route debugging steps.\\n\\n- Inspect ingress: kubectl describe ingress api-ingress\\n- Check certificate order: kubectl get certificaterequest",
+                is_pinned=False,
+            ),
+        ]
+        for dn in dev_notes:
+            db.add(dn)
 
         # ── 4. Create Freelancer Workspace Data ───────────────────────────────
         free_proj = models.Project(
@@ -322,6 +383,35 @@ def seed_initial_data(db: Session) -> None:
         )
         db.add(invoice)
 
+        free_notes = [
+            models.Note(
+                user_id=3,
+                project_id=3,
+                role="freelancer",
+                title="[Client Briefs] Acme Corp Storefront Redesign",
+                content="Scope requirements, Figma assets link, brand palette and deliverables timeline.\\n\\n- 3-week sprint cycle\\n- Weekly progress report delivered every Friday afternoon.",
+                is_pinned=True,
+            ),
+            models.Note(
+                user_id=3,
+                project_id=3,
+                role="freelancer",
+                title="[Proposals] Q4 Retainer Agreement & Terms",
+                content="Deliverables schedule, revision limits, SLA terms and payment schedule.\\n\\n- 2 rounds of design revisions included.\\n- Invoices billed Net 30 upon milestone signoff.",
+                is_pinned=True,
+            ),
+            models.Note(
+                user_id=3,
+                project_id=3,
+                role="freelancer",
+                title="[Meeting Notes] Sprint Kickoff with Design Lead",
+                content="Key takeaways, color palette feedback, mobile breakpoints and next review date.\\n\\n- Adopt warm terracotta tone (#c04b1e).\\n- Ensure fluid responsive typography.",
+                is_pinned=False,
+            ),
+        ]
+        for fn in free_notes:
+            db.add(fn)
+
         # ── 5. Create Job Seeker Workspace Data ───────────────────────────────
         job_proj = models.Project(
             id=4,
@@ -362,6 +452,35 @@ def seed_initial_data(db: Session) -> None:
         ]
         for jt in job_tasks:
             db.add(jt)
+
+        job_notes = [
+            models.Note(
+                user_id=4,
+                project_id=4,
+                role="job_seeker",
+                title="[Behavioral (STAR)] System Outage Resolution",
+                content="Situation, Task, Action and quantifiable 99.99% uptime recovery impact.\\n\\n- Situation: Database connection leak during traffic spike.\\n- Task: Restore service in <15 mins.\\n- Action: Scaled read-replicas and patched connection pool leak.\\n- Result: 99.99% uptime maintained.",
+                is_pinned=True,
+            ),
+            models.Note(
+                user_id=4,
+                project_id=4,
+                role="job_seeker",
+                title="[Company Research] Stripe Engineering Dossier",
+                content="Core payments infrastructure, engineering principles and system design expectations.\\n\\n- High agency culture and rigorous API design principles.\\n- Deep focus on idempotency keys and transactional guarantees.",
+                is_pinned=True,
+            ),
+            models.Note(
+                user_id=4,
+                project_id=4,
+                role="job_seeker",
+                title="[Questions to Ask] Engineering Leadership Interview",
+                content="Questions regarding tech debt prioritization, release cadence, and engineering career ladders.\\n\\n- How does the team manage tech debt vs feature delivery?\\n- What does success look like in the first 90 days?",
+                is_pinned=False,
+            ),
+        ]
+        for jn in job_notes:
+            db.add(jn)
 
         db.commit()
     except Exception as e:

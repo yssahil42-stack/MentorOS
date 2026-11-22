@@ -55,53 +55,31 @@ export const StudentProgressSection: React.FC<StudentProgressSectionProps> = ({
           );
           const pCompleted = pTasks.filter((t) => t.status === 'completed').length;
           const pPct =
-            pTasks.length > 0 ? Math.round((pCompleted / pTasks.length) * 100) : p.progress || 88;
+            pTasks.length > 0 ? Math.round((pCompleted / pTasks.length) * 100) : p.progress || 0;
           const grade =
-            pPct >= 93 ? 'A' : pPct >= 90 ? 'A-' : pPct >= 85 ? 'B+' : pPct >= 80 ? 'B' : 'B-';
-          const defaultCodes = ['CS-480', 'CS-401', 'MATH-320', 'PHYS-210', 'ENG-301'];
+            pPct >= 93
+              ? 'A'
+              : pPct >= 90
+                ? 'A-'
+                : pPct >= 85
+                  ? 'B+'
+                  : pPct >= 80
+                    ? 'B'
+                    : pPct > 0
+                      ? 'C'
+                      : '—';
+          const code =
+            (p as any).code || (p.title.length <= 8 ? p.title.toUpperCase() : `CRS-${idx + 1}`);
           return {
-            code: defaultCodes[idx % defaultCodes.length],
+            code,
             title: p.title,
-            credits: 4,
+            credits: (p as any).credits || 4,
             currentGrade: grade,
             percentage: pPct,
-            status: pPct >= 90 ? 'High performance' : 'On track',
+            status: pPct >= 90 ? 'High performance' : pPct >= 70 ? 'On track' : 'Needs focus',
           };
         })
-      : [
-          {
-            code: 'CS-480',
-            title: 'Distributed Systems & Cloud Computing',
-            credits: 4,
-            currentGrade: 'A',
-            percentage: 94,
-            status: 'On track',
-          },
-          {
-            code: 'CS-401',
-            title: 'Senior Capstone Engineering',
-            credits: 4,
-            currentGrade: 'A',
-            percentage: 96,
-            status: 'High performance',
-          },
-          {
-            code: 'MATH-320',
-            title: 'Advanced Linear Algebra & Optimization',
-            credits: 3,
-            currentGrade: 'A-',
-            percentage: 91,
-            status: 'Needs midterm focus',
-          },
-          {
-            code: 'PHYS-210',
-            title: 'Quantum Physics & Semiconductor Devices',
-            credits: 3,
-            currentGrade: 'B+',
-            percentage: 88,
-            status: 'Recommended study block',
-          },
-        ];
+      : [];
 
   const totalCourseCredits = courses.reduce((sum, c) => sum + c.credits, 0);
 
@@ -222,50 +200,63 @@ export const StudentProgressSection: React.FC<StudentProgressSectionProps> = ({
               </span>
             </div>
 
-            <div className="mt-4 space-y-3">
-              {courses.map((c) => (
-                <div
-                  key={c.code}
-                  className="p-3.5 rounded-xl bg-bg-surface border border-border-base space-y-2 hover:border-student-500/40 transition-colors"
-                >
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="min-w-0">
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <span className="text-2xs font-mono font-bold px-2 py-0.5 rounded bg-bg-base text-student-400 border border-border-base">
-                          {c.code}
-                        </span>
-                        <h4 className="text-xs font-bold text-text-primary truncate">{c.title}</h4>
-                      </div>
-                      <span className="text-2xs text-text-muted mt-0.5 block">
-                        {c.credits} Credits • Standing: {c.status}
-                      </span>
-                    </div>
-
-                    <div className="text-right shrink-0">
-                      <span className="text-base font-extrabold text-student-400">
-                        {c.currentGrade}
-                      </span>
-                      <span className="text-2xs text-text-faint block font-mono">
-                        {c.percentage}%
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Visual Progress Bar */}
-                  <div className="w-full bg-bg-base h-2 rounded-full overflow-hidden border border-border-base">
-                    <div
-                      className={`h-full rounded-full transition-all duration-500 ${
-                        c.percentage >= 93
-                          ? 'bg-gradient-to-r from-student-500 to-emerald-400'
-                          : c.percentage >= 90
-                            ? 'bg-gradient-to-r from-student-500 to-amber-400'
-                            : 'bg-gradient-to-r from-amber-500 to-orange-400'
-                      }`}
-                      style={{ width: `${c.percentage}%` }}
-                    />
-                  </div>
+            <div className="mt-4">
+              {courses.length === 0 ? (
+                <div className="py-8 text-center text-text-muted">
+                  <p className="text-xs font-semibold text-text-primary">No enrolled courses</p>
+                  <p className="text-2xs text-text-secondary mt-0.5 max-w-xs mx-auto">
+                    Add courses in Academic Projects to track predicted grades and degree credits.
+                  </p>
                 </div>
-              ))}
+              ) : (
+                <div className="space-y-3">
+                  {courses.map((c) => (
+                    <div
+                      key={c.code}
+                      className="p-3.5 rounded-xl bg-bg-surface border border-border-base space-y-2 hover:border-student-500/40 transition-colors"
+                    >
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="min-w-0">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <span className="text-2xs font-mono font-bold px-2 py-0.5 rounded bg-bg-base text-student-400 border border-border-base">
+                              {c.code}
+                            </span>
+                            <h4 className="text-xs font-bold text-text-primary truncate">
+                              {c.title}
+                            </h4>
+                          </div>
+                          <span className="text-2xs text-text-muted mt-0.5 block">
+                            {c.credits} Credits • Standing: {c.status}
+                          </span>
+                        </div>
+
+                        <div className="text-right shrink-0">
+                          <span className="text-base font-extrabold text-student-400">
+                            {c.currentGrade}
+                          </span>
+                          <span className="text-2xs text-text-faint block font-mono">
+                            {c.percentage}%
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Visual Progress Bar */}
+                      <div className="w-full bg-bg-base h-2 rounded-full overflow-hidden border border-border-base">
+                        <div
+                          className={`h-full rounded-full transition-all duration-500 ${
+                            c.percentage >= 93
+                              ? 'bg-gradient-to-r from-student-500 to-emerald-400'
+                              : c.percentage >= 90
+                                ? 'bg-gradient-to-r from-student-500 to-amber-400'
+                                : 'bg-gradient-to-r from-amber-500 to-orange-400'
+                          }`}
+                          style={{ width: `${c.percentage}%` }}
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </Card>
         </div>
