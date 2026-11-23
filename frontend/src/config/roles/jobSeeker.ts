@@ -15,12 +15,11 @@ export const jobSeekerConfig: RoleConfig = {
   navigation: [
     { to: '/app/job-seeker/dashboard', label: 'Dashboard', icon: 'LayoutDashboard' },
     { to: '/app/job-seeker/applications', label: 'Applications', icon: 'Send' },
-    { to: '/app/job-seeker/search-plan', label: 'Job Analyzer', icon: 'Sparkles', badge: 'AI' },
+    { to: '/app/job-seeker/search-plan', label: 'Job Analyzer', icon: 'Sparkles' },
     {
       to: '/app/job-seeker/resume-generator',
       label: 'Resume Tailor',
       icon: 'FileText',
-      badge: 'AI',
     },
     { to: '/app/job-seeker/interview-prep', label: 'Mock Interviews', icon: 'MessageSquare' },
     { to: '/app/job-seeker/notes', label: 'Notes', icon: 'FileText' },
