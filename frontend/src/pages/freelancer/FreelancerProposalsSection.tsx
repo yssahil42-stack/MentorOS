@@ -149,8 +149,10 @@ export function FreelancerProposalsSection({ projects = [] }: FreelancerProposal
   };
 
   const handleDelete = (id: string) => {
-    setProposals((prev) => prev.filter((p) => p.id !== id));
-    showToast('Proposal removed', 'info');
+    if (window.confirm('Delete this proposal?')) {
+      setProposals((prev) => prev.filter((p) => p.id !== id));
+      showToast('Proposal removed', 'info');
+    }
   };
 
   const totalValue = proposals.reduce((acc, p) => acc + (p.status !== 'draft' ? p.budget : 0), 0);
@@ -273,7 +275,10 @@ export function FreelancerProposalsSection({ projects = [] }: FreelancerProposal
                 {statusBadge(prop.status)}
                 <button
                   type="button"
-                  onClick={() => handleDelete(prop.id)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleDelete(prop.id);
+                  }}
                   className="text-text-muted hover:text-danger p-1 rounded-lg hover:bg-slate-100 dark:hover:bg-bg-elevated transition-colors"
                   title="Remove proposal"
                 >

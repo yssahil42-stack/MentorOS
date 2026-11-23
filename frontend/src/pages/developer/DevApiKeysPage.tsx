@@ -115,8 +115,10 @@ export default function DevApiKeysPage() {
   };
 
   const handleRevoke = (id: string) => {
-    setKeys((prev) => prev.map((k) => (k.id === id ? { ...k, status: 'revoked' as const } : k)));
-    showToast('API Key revoked', 'info');
+    if (window.confirm('Are you sure you want to revoke this API key? This action cannot be undone.')) {
+      setKeys((prev) => prev.map((k) => (k.id === id ? { ...k, status: 'revoked' as const } : k)));
+      showToast('API Key revoked', 'info');
+    }
   };
 
   return (
@@ -330,7 +332,10 @@ export default function DevApiKeysPage() {
                   {!isRevoked && (
                     <button
                       type="button"
-                      onClick={() => handleRevoke(item.id)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleRevoke(item.id);
+                      }}
                       className="p-1.5 rounded-lg text-text-muted hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors"
                       title="Revoke Key"
                       aria-label="Revoke key"

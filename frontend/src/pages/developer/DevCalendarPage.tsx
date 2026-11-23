@@ -322,7 +322,12 @@ export default function DevCalendarPage() {
 
               <button
                 type="button"
-                onClick={() => deleteMutation.mutate(e.id)}
+                onClick={(evt) => {
+                  evt.stopPropagation();
+                  if (window.confirm(`Delete event "${e.title}"?`)) {
+                    deleteMutation.mutate(e.id);
+                  }
+                }}
                 className="p-2 text-text-faint hover:text-danger rounded-lg transition-colors opacity-0 group-hover:opacity-100"
                 title="Remove event"
               >

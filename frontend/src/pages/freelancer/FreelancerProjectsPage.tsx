@@ -715,7 +715,10 @@ export default function FreelancerProjectsPage() {
                         <Button
                           variant="ghost"
                           size="xs"
-                          onClick={() => handleDeleteProject(project.id)}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDeleteProject(project.id);
+                          }}
                           className="text-text-muted hover:text-red-400"
                         >
                           <Trash2 className="w-3.5 h-3.5" />
@@ -952,7 +955,12 @@ export default function FreelancerProjectsPage() {
                       )}
                       <button
                         type="button"
-                        onClick={() => deleteDeliverableMutation.mutate(m.id)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (window.confirm(`Delete deliverable "${m.title}"?`)) {
+                            deleteDeliverableMutation.mutate(m.id);
+                          }
+                        }}
                         className="text-text-faint hover:text-danger p-1 rounded transition-colors"
                         title="Remove deliverable"
                       >
@@ -1100,7 +1108,12 @@ export default function FreelancerProjectsPage() {
                                 </span>
                                 <button
                                   type="button"
-                                  onClick={() => deleteTaskMutation.mutate(t.id)}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    if (window.confirm(`Delete task "${t.title}"?`)) {
+                                      deleteTaskMutation.mutate(t.id);
+                                    }
+                                  }}
                                   className="text-text-faint hover:text-danger p-0.5"
                                   title="Delete task"
                                 >
@@ -1245,7 +1258,12 @@ export default function FreelancerProjectsPage() {
                         />
                         <button
                           type="button"
-                          onClick={() => deleteTaskMutation.mutate(t.id)}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            if (window.confirm(`Delete task "${t.title}"?`)) {
+                              deleteTaskMutation.mutate(t.id);
+                            }
+                          }}
                           className="text-text-faint hover:text-danger p-1 rounded"
                           title="Delete task"
                         >

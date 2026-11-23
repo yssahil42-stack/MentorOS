@@ -438,7 +438,8 @@ export default function BuildPlanPage() {
 
                     <button
                       type="button"
-                      onClick={() => {
+                      onClick={(e) => {
+                        e.stopPropagation();
                         if (window.confirm('Delete this milestone?')) {
                           deleteMilestoneMutation.mutate(m.id);
                         }

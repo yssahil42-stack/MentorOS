@@ -198,7 +198,12 @@ export default function DevProjectsPage() {
                       <PriorityBadge priority={p.priority} />
                       <button
                         type="button"
-                        onClick={() => deleteMutation.mutate(p.id)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (window.confirm(`Delete project "${p.title}"? This will remove all linked milestones and tasks.`)) {
+                            deleteMutation.mutate(p.id);
+                          }
+                        }}
                         className="p-1 text-text-muted hover:text-danger rounded transition-colors opacity-0 group-hover:opacity-100 cursor-pointer"
                         title="Delete project"
                       >

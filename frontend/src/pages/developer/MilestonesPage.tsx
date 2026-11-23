@@ -287,8 +287,13 @@ export default function MilestonesPage() {
 
                           <button
                             type="button"
-                            onClick={() => deleteMutation.mutate(m.id)}
-                            className="p-1.5 text-text-faint hover:text-danger rounded-lg transition-colors opacity-0 group-hover:opacity-100"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              if (window.confirm(`Delete milestone "${m.title}"?`)) {
+                                deleteMutation.mutate(m.id);
+                              }
+                            }}
+                            className="p-1.5 text-text-faint hover:text-danger rounded-lg transition-colors opacity-0 group-hover:opacity-100 cursor-pointer"
                             title="Delete milestone"
                           >
                             <Trash2 className="w-4 h-4" />

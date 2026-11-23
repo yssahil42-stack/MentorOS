@@ -543,8 +543,13 @@ export default function AcademicProjectsPage() {
                                   </button>
                                   <button
                                     type="button"
-                                    onClick={() => deleteTaskMutation.mutate(task.id)}
-                                    className="p-1 text-neutral-400 hover:text-red-600 transition-colors rounded"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      if (window.confirm(`Delete assignment "${task.title}"?`)) {
+                                        deleteTaskMutation.mutate(task.id);
+                                      }
+                                    }}
+                                    className="p-1 text-neutral-400 hover:text-red-600 transition-colors rounded cursor-pointer"
                                     title="Delete task"
                                   >
                                     <Trash2 className="w-3.5 h-3.5" />

@@ -239,10 +239,10 @@ ${analysisResult.mentorOpinion.strategicActionPlan
                 <button
                   key={preset.id}
                   onClick={() => handleSelectPreset(preset)}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all flex items-center gap-1.5 ${
+                  className={`px-3 py-1.5 rounded-xl text-xs font-medium transition-all flex items-center gap-1.5 cursor-pointer ${
                     isSelected
-                      ? 'bg-[#c04b1e] text-white shadow-sm ring-2 ring-emerald-500/30'
-                      : 'bg-surface-elevated hover:bg-border-subtle text-text-primary border border-border-subtle'
+                      ? 'bg-[#c04b1e] text-white shadow-xs ring-2 ring-[#c04b1e]/30'
+                      : 'bg-white dark:bg-stone-900 border border-border-base hover:bg-stone-50 dark:hover:bg-stone-800 text-text-primary'
                   }`}
                 >
                   {preset.label}
@@ -274,7 +274,7 @@ ${analysisResult.mentorOpinion.strategicActionPlan
               value={targetRole}
               onChange={(e) => setTargetRole(e.target.value)}
               placeholder="e.g. Data Analyst, Frontend Engineer..."
-              className="w-full px-3 py-2 text-sm rounded-lg bg-surface-elevated border border-border-subtle text-text-primary focus:outline-none focus:ring-2 focus:ring-emerald-500"
+              className="w-full h-10 px-3.5 text-xs rounded-xl bg-white dark:bg-stone-900 border border-border-base text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-[#c04b1e]/20 focus:border-[#c04b1e] transition-all"
             />
           </div>
 
@@ -285,7 +285,7 @@ ${analysisResult.mentorOpinion.strategicActionPlan
             <select
               value={seniority}
               onChange={(e) => setSeniority(e.target.value as SeniorityLevel)}
-              className="w-full px-3 py-2 text-sm rounded-lg bg-surface-elevated border border-border-subtle text-text-primary focus:outline-none focus:ring-2 focus:ring-emerald-500"
+              className="w-full h-10 px-3.5 text-xs rounded-xl bg-white dark:bg-stone-900 border border-border-base text-text-primary focus:outline-none focus:ring-2 focus:ring-[#c04b1e]/20 focus:border-[#c04b1e] transition-all"
             >
               <option value="fresher">Fresher / Student (0-1 yrs)</option>
               <option value="junior">Junior Analyst / Dev (1-2 yrs)</option>
@@ -301,7 +301,7 @@ ${analysisResult.mentorOpinion.strategicActionPlan
             <select
               value={locationPreference}
               onChange={(e) => setLocationPreference(e.target.value)}
-              className="w-full px-3 py-2 text-sm rounded-lg bg-surface-elevated border border-border-subtle text-text-primary focus:outline-none focus:ring-2 focus:ring-emerald-500"
+              className="w-full h-10 px-3.5 text-xs rounded-xl bg-white dark:bg-stone-900 border border-border-base text-text-primary focus:outline-none focus:ring-2 focus:ring-[#c04b1e]/20 focus:border-[#c04b1e] transition-all"
             >
               <option value="Remote">Remote Only</option>
               <option value="Hybrid">Hybrid</option>
@@ -323,7 +323,7 @@ ${analysisResult.mentorOpinion.strategicActionPlan
           </div>
 
           {/* Current Skills Chips */}
-          <div className="flex flex-wrap gap-1.5 min-h-[38px] p-2.5 rounded-lg bg-surface-elevated border border-border-subtle">
+          <div className="flex flex-wrap gap-1.5 min-h-[42px] p-3 rounded-xl bg-[#faf8f5]/80 dark:bg-stone-900/60 border border-border-base/90">
             {userSkills.length === 0 ? (
               <span className="text-xs text-text-faint italic py-1">
                 No skills added yet. Type below or select suggested skills.
@@ -332,12 +332,12 @@ ${analysisResult.mentorOpinion.strategicActionPlan
               userSkills.map((skill) => (
                 <span
                   key={skill}
-                  className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-medium bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-500/20"
+                  className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-500/20"
                 >
                   {skill}
                   <button
                     onClick={() => handleRemoveSkill(skill)}
-                    className="hover:text-red-500 p-0.5 rounded transition-colors"
+                    className="hover:text-red-500 p-0.5 rounded transition-colors cursor-pointer"
                     title={`Remove ${skill}`}
                   >
                     <X className="w-3 h-3" />
@@ -361,11 +361,11 @@ ${analysisResult.mentorOpinion.strategicActionPlan
                   }
                 }}
                 placeholder="Type a skill and press Enter (e.g. SQL, Power BI, Python, Excel)..."
-                className="flex-1 px-3 py-1.5 text-xs rounded-lg bg-surface-elevated border border-border-subtle text-text-primary focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                className="flex-1 h-10 px-3.5 text-xs rounded-xl bg-white dark:bg-stone-900 border border-border-base text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-[#c04b1e]/20 focus:border-[#c04b1e] transition-all"
               />
               <button
                 onClick={() => handleAddSkill()}
-                className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-[#c04b1e] hover:bg-[#a33d16] text-white transition-colors flex items-center gap-1"
+                className="h-10 px-4 text-xs font-semibold rounded-xl bg-[#c04b1e] hover:bg-[#a33d16] text-white shadow-xs transition-all active:translate-y-[1px] flex items-center gap-1.5 cursor-pointer"
               >
                 <Plus className="w-3.5 h-3.5" />
                 Add Skill
@@ -381,7 +381,7 @@ ${analysisResult.mentorOpinion.strategicActionPlan
                 <button
                   key={suggested}
                   onClick={() => handleAddSkill(suggested)}
-                  className="px-2 py-0.5 rounded text-[11px] font-medium bg-surface hover:bg-emerald-500/10 hover:text-[#c04b1e] border border-border-subtle text-text-secondary transition-colors flex items-center gap-1"
+                  className="px-2.5 py-1 rounded-lg text-[11px] font-medium bg-white dark:bg-stone-900/60 hover:bg-[#c04b1e]/10 hover:text-[#c04b1e] border border-border-base text-text-secondary transition-colors flex items-center gap-1 cursor-pointer"
                 >
                   <Plus className="w-2.5 h-2.5 text-[#c04b1e]" />
                   {suggested}
@@ -394,7 +394,7 @@ ${analysisResult.mentorOpinion.strategicActionPlan
           <div className="pt-2">
             <button
               onClick={() => setShowJdInput(!showJdInput)}
-              className="text-xs text-text-muted hover:text-text-primary flex items-center gap-1 underline"
+              className="text-xs text-text-muted hover:text-text-primary flex items-center gap-1 underline cursor-pointer"
             >
               {showJdInput
                 ? '− Hide Job Description'
@@ -406,7 +406,7 @@ ${analysisResult.mentorOpinion.strategicActionPlan
                 onChange={(e) => setJobDescription(e.target.value)}
                 rows={3}
                 placeholder="Paste the job description from LinkedIn, Indeed, or company site to benchmark against exact employer requirements..."
-                className="w-full mt-2 p-2.5 text-xs rounded-lg bg-surface-elevated border border-border-subtle text-text-primary focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                className="w-full mt-2 p-3 text-xs rounded-xl bg-white dark:bg-stone-900 border border-border-base text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-[#c04b1e]/20 focus:border-[#c04b1e] transition-all"
               />
             )}
           </div>
@@ -414,7 +414,7 @@ ${analysisResult.mentorOpinion.strategicActionPlan
       </div>
 
       {/* Analysis Results Summary Banner */}
-      <div className="card p-6 bg-gradient-to-br from-surface via-surface to-surface-elevated border border-border-subtle shadow-sm rounded-xl">
+      <div className="p-6 rounded-2xl border border-border-base/90 bg-[#faf8f5]/60 dark:bg-stone-900/40 shadow-xs">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
           {/* Readiness Score Radial/Meter */}
           <div className="flex items-center gap-5">
@@ -461,25 +461,25 @@ ${analysisResult.mentorOpinion.strategicActionPlan
 
           {/* Metric Stats Badges */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 lg:border-l lg:border-border-subtle lg:pl-6">
-            <div className="p-2.5 rounded-lg bg-surface-elevated border border-border-subtle text-center">
-              <span className="text-lg font-bold text-[#c04b1e] dark:text-emerald-400">
+            <div className="p-3 rounded-xl bg-white dark:bg-stone-900/60 border border-border-base text-center">
+              <span className="text-lg font-bold text-[#c04b1e] dark:text-[#f06e3b]">
                 {analysisResult.matchedSkills.length}
               </span>
               <p className="text-[10px] uppercase font-semibold text-text-muted">Skills You Have</p>
             </div>
-            <div className="p-2.5 rounded-lg bg-surface-elevated border border-border-subtle text-center">
+            <div className="p-3 rounded-xl bg-white dark:bg-stone-900/60 border border-border-base text-center">
               <span className="text-lg font-bold text-rose-600 dark:text-rose-400">
                 {analysisResult.missingSkills.filter((s) => s.priority === 'critical').length}
               </span>
               <p className="text-[10px] uppercase font-semibold text-text-muted">Critical Gaps</p>
             </div>
-            <div className="p-2.5 rounded-lg bg-surface-elevated border border-border-subtle text-center">
+            <div className="p-3 rounded-xl bg-white dark:bg-stone-900/60 border border-border-base text-center">
               <span className="text-lg font-bold text-amber-600 dark:text-amber-400">
                 {analysisResult.missingSkills.filter((s) => s.priority === 'high').length}
               </span>
               <p className="text-[10px] uppercase font-semibold text-text-muted">High-Value Gaps</p>
             </div>
-            <div className="p-2.5 rounded-lg bg-surface-elevated border border-border-subtle text-center">
+            <div className="p-3 rounded-xl bg-white dark:bg-stone-900/60 border border-border-base text-center">
               <span className="text-lg font-bold text-blue-600 dark:text-blue-400">
                 {analysisResult.whereToApply.targetIndustries.length}
               </span>
@@ -495,7 +495,7 @@ ${analysisResult.mentorOpinion.strategicActionPlan
           </p>
           <button
             onClick={handleCopyStrategy}
-            className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-surface hover:bg-surface-elevated border border-border-subtle text-text-primary transition-colors flex items-center gap-1.5 shadow-sm"
+            className="px-3.5 py-2 rounded-xl text-xs font-semibold bg-white dark:bg-stone-900 hover:bg-stone-50 dark:hover:bg-stone-800 border border-border-base text-text-primary transition-colors flex items-center gap-1.5 shadow-2xs cursor-pointer"
           >
             {isCopied ? (
               <Check className="w-3.5 h-3.5 text-[#c04b1e]" />
@@ -511,15 +511,15 @@ ${analysisResult.mentorOpinion.strategicActionPlan
       <div className="flex border-b border-border-subtle gap-2">
         <button
           onClick={() => setActiveTab('skills')}
-          className={`pb-3 px-3 text-sm font-semibold border-b-2 transition-colors flex items-center gap-2 ${
+          className={`pb-3 px-3 text-sm font-semibold border-b-2 transition-colors flex items-center gap-2 cursor-pointer ${
             activeTab === 'skills'
-              ? 'border-emerald-500 text-[#c04b1e] dark:text-emerald-400'
+              ? 'border-[#c04b1e] text-[#c04b1e]'
               : 'border-transparent text-text-muted hover:text-text-primary'
           }`}
         >
           <Code2 className="w-4 h-4" />
           Skills Gap Analysis
-          <span className="text-xs px-2 py-0.2 rounded-full bg-surface-elevated border border-border-subtle">
+          <span className="text-xs px-2 py-0.5 rounded-full bg-[#faf8f5] dark:bg-stone-800 border border-border-base text-text-secondary">
             {analysisResult.matchedSkills.length} Matched / {analysisResult.missingSkills.length}{' '}
             Gaps
           </span>
@@ -527,24 +527,24 @@ ${analysisResult.mentorOpinion.strategicActionPlan
 
         <button
           onClick={() => setActiveTab('where_to_apply')}
-          className={`pb-3 px-3 text-sm font-semibold border-b-2 transition-colors flex items-center gap-2 ${
+          className={`pb-3 px-3 text-sm font-semibold border-b-2 transition-colors flex items-center gap-2 cursor-pointer ${
             activeTab === 'where_to_apply'
-              ? 'border-emerald-500 text-[#c04b1e] dark:text-emerald-400'
+              ? 'border-[#c04b1e] text-[#c04b1e]'
               : 'border-transparent text-text-muted hover:text-text-primary'
           }`}
         >
           <Briefcase className="w-4 h-4" />
           Where to Apply
-          <span className="text-xs px-2 py-0.2 rounded-full bg-surface-elevated border border-border-subtle">
+          <span className="text-xs px-2 py-0.5 rounded-full bg-[#faf8f5] dark:bg-stone-800 border border-border-base text-text-secondary">
             6 Platforms & Sectors
           </span>
         </button>
 
         <button
           onClick={() => setActiveTab('mentor_opinion')}
-          className={`pb-3 px-3 text-sm font-semibold border-b-2 transition-colors flex items-center gap-2 ${
+          className={`pb-3 px-3 text-sm font-semibold border-b-2 transition-colors flex items-center gap-2 cursor-pointer ${
             activeTab === 'mentor_opinion'
-              ? 'border-emerald-500 text-[#c04b1e] dark:text-emerald-400'
+              ? 'border-[#c04b1e] text-[#c04b1e]'
               : 'border-transparent text-text-muted hover:text-text-primary'
           }`}
         >
@@ -558,10 +558,10 @@ ${analysisResult.mentorOpinion.strategicActionPlan
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Left Column: Skills You Have */}
           <div className="space-y-4">
-            <div className="card p-5 bg-surface border border-emerald-500/20 shadow-sm rounded-xl">
+            <div className="p-5 rounded-2xl border border-border-base/90 bg-[#faf8f5]/60 dark:bg-stone-900/40 shadow-xs">
               <div className="flex items-center justify-between pb-3 border-b border-border-subtle">
                 <div className="flex items-center gap-2">
-                  <span className="p-1 rounded-md bg-emerald-500/10 text-[#c04b1e]">
+                  <span className="p-1.5 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
                     <CheckCircle2 className="w-4 h-4" />
                   </span>
                   <div>
@@ -573,7 +573,7 @@ ${analysisResult.mentorOpinion.strategicActionPlan
                     </p>
                   </div>
                 </div>
-                <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300">
+                <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300">
                   {analysisResult.matchedSkills.length} Qualified
                 </span>
               </div>
@@ -588,11 +588,11 @@ ${analysisResult.mentorOpinion.strategicActionPlan
                   {analysisResult.matchedSkills.map((skill, idx) => (
                     <div
                       key={idx}
-                      className="p-3 rounded-lg bg-surface-elevated border border-border-subtle hover:border-emerald-500/30 transition-colors"
+                      className="p-3.5 rounded-xl bg-white dark:bg-stone-900/80 border border-border-base hover:border-[#c04b1e]/40 transition-colors"
                     >
                       <div className="flex items-center justify-between gap-2">
                         <div className="flex items-center gap-2">
-                          <CheckCircle2 className="w-4 h-4 text-[#c04b1e] flex-shrink-0" />
+                          <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 flex-shrink-0" />
                           <h4 className="text-xs font-bold text-text-primary">{skill.name}</h4>
                         </div>
                         <span
@@ -620,7 +620,7 @@ ${analysisResult.mentorOpinion.strategicActionPlan
             </div>
 
             {/* Strengths Pitch Box */}
-            <div className="card p-4 bg-emerald-500/5 border border-emerald-500/20 rounded-xl">
+            <div className="p-4 rounded-xl bg-emerald-500/5 border border-emerald-500/20">
               <h4 className="text-xs font-bold text-emerald-800 dark:text-emerald-300 flex items-center gap-1.5">
                 <Zap className="w-3.5 h-3.5 text-[#c04b1e]" />
                 How to Pitch Your Existing Skills
@@ -633,10 +633,10 @@ ${analysisResult.mentorOpinion.strategicActionPlan
 
           {/* Right Column: Skills You Lack / Need */}
           <div className="space-y-4">
-            <div className="card p-5 bg-surface border border-rose-500/20 shadow-sm rounded-xl">
+            <div className="p-5 rounded-2xl border border-border-base/90 bg-[#faf8f5]/60 dark:bg-stone-900/40 shadow-xs">
               <div className="flex items-center justify-between pb-3 border-b border-border-subtle">
                 <div className="flex items-center gap-2">
-                  <span className="p-1 rounded-md bg-rose-500/10 text-rose-600">
+                  <span className="p-1.5 rounded-lg bg-rose-500/10 text-rose-600">
                     <AlertCircle className="w-4 h-4" />
                   </span>
                   <div>
@@ -648,7 +648,7 @@ ${analysisResult.mentorOpinion.strategicActionPlan
                     </p>
                   </div>
                 </div>
-                <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-rose-100 dark:bg-rose-950 text-rose-800 dark:text-rose-300">
+                <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-rose-100 dark:bg-rose-950 text-rose-800 dark:text-rose-300">
                   {analysisResult.missingSkills.length} Actionable Gaps
                 </span>
               </div>
@@ -663,12 +663,12 @@ ${analysisResult.mentorOpinion.strategicActionPlan
                   {analysisResult.missingSkills.map((gap, idx) => (
                     <div
                       key={idx}
-                      className={`p-3.5 rounded-lg border transition-all ${
+                      className={`p-3.5 rounded-xl border transition-all ${
                         gap.priority === 'critical'
                           ? 'bg-rose-500/5 border-rose-500/30'
                           : gap.priority === 'high'
                             ? 'bg-amber-500/5 border-amber-500/30'
-                            : 'bg-surface-elevated border-border-subtle'
+                            : 'bg-white dark:bg-stone-900/80 border-border-base'
                       }`}
                     >
                       <div className="flex items-start justify-between gap-2">
@@ -705,7 +705,7 @@ ${analysisResult.mentorOpinion.strategicActionPlan
                         {/* 1-Click "I already know this" Button */}
                         <button
                           onClick={() => handleAddSkill(gap.name.split('(')[0].trim())}
-                          className="text-[10px] font-semibold px-2 py-1 rounded bg-surface hover:bg-emerald-500/10 hover:text-[#c04b1e] border border-border-subtle text-text-secondary transition-colors whitespace-nowrap flex items-center gap-1"
+                          className="text-[10px] font-semibold px-2.5 py-1 rounded-lg bg-white dark:bg-stone-800 hover:bg-[#c04b1e]/10 hover:text-[#c04b1e] border border-border-base text-text-secondary transition-colors whitespace-nowrap flex items-center gap-1 cursor-pointer"
                           title="Add to your skills if you already know this"
                         >
                           <Plus className="w-2.5 h-2.5 text-[#c04b1e]" />I know this
@@ -760,7 +760,7 @@ ${analysisResult.mentorOpinion.strategicActionPlan
                   href={portal.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="p-3.5 rounded-lg bg-surface-elevated border border-border-subtle hover:border-emerald-500 hover:shadow-sm transition-all group flex flex-col justify-between"
+                  className="p-4 rounded-xl bg-white dark:bg-stone-900/80 border border-border-base hover:border-[#c04b1e]/50 hover:shadow-xs transition-all group flex flex-col justify-between"
                 >
                   <div>
                     <div className="flex items-center justify-between mb-1">
@@ -778,7 +778,7 @@ ${analysisResult.mentorOpinion.strategicActionPlan
                       {portal.description}
                     </p>
                   </div>
-                  <div className="mt-3 pt-2 border-t border-border-subtle flex items-center justify-between text-[11px] font-semibold text-[#c04b1e] dark:text-emerald-400">
+                  <div className="mt-3 pt-2 border-t border-border-subtle flex items-center justify-between text-[11px] font-semibold text-[#c04b1e] dark:text-[#f06e3b]">
                     <span>Search Open Roles</span>
                     <ArrowRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
                   </div>
@@ -802,7 +802,7 @@ ${analysisResult.mentorOpinion.strategicActionPlan
               {analysisResult.whereToApply.targetIndustries.map((ind, idx) => (
                 <div
                   key={idx}
-                  className="p-4 rounded-lg bg-surface-elevated border border-border-subtle space-y-2.5"
+                  className="p-4 rounded-xl bg-white dark:bg-stone-900/80 border border-border-base space-y-2.5"
                 >
                   <div className="flex items-center justify-between">
                     <h4 className="text-xs font-bold text-text-primary">{ind.name}</h4>
@@ -841,17 +841,17 @@ ${analysisResult.mentorOpinion.strategicActionPlan
               {analysisResult.whereToApply.recommendedChannels.map((channel, idx) => (
                 <div
                   key={idx}
-                  className="p-3 rounded-lg bg-surface-elevated border border-border-subtle"
+                  className="p-3.5 rounded-xl bg-white dark:bg-stone-900/80 border border-border-base"
                 >
                   <div className="flex items-center justify-between text-xs font-bold text-text-primary mb-1">
                     <span>{channel.channel}</span>
-                    <span className="text-[#c04b1e] dark:text-emerald-400">
+                    <span className="text-[#c04b1e] dark:text-[#f06e3b]">
                       {channel.allocation}% of effort
                     </span>
                   </div>
                   <div className="w-full bg-border-subtle rounded-full h-1.5 mb-2 overflow-hidden">
                     <div
-                      className="bg-emerald-500 h-1.5 rounded-full"
+                      className="bg-[#c04b1e] h-1.5 rounded-full"
                       style={{ width: `${channel.allocation}%` }}
                     />
                   </div>
@@ -867,9 +867,9 @@ ${analysisResult.mentorOpinion.strategicActionPlan
       {activeTab === 'mentor_opinion' && (
         <div className="space-y-6">
           {/* Executive Verdict Card */}
-          <div className="card p-6 bg-surface border border-emerald-500/20 shadow-sm rounded-xl space-y-4">
+          <div className="p-6 rounded-2xl border border-border-base/90 bg-[#faf8f5]/60 dark:bg-stone-900/40 space-y-4 shadow-xs">
             <div className="flex items-center gap-2.5">
-              <span className="p-2 rounded-lg bg-emerald-500/10 text-[#c04b1e]">
+              <span className="p-2 rounded-xl bg-orange-500/10 text-[#c04b1e]">
                 <Sparkles className="w-5 h-5" />
               </span>
               <div>
@@ -883,7 +883,7 @@ ${analysisResult.mentorOpinion.strategicActionPlan
               </div>
             </div>
 
-            <div className="p-4 rounded-lg bg-surface-elevated border border-border-subtle text-xs text-text-secondary leading-relaxed space-y-2">
+            <div className="p-4 rounded-xl bg-white dark:bg-stone-900/80 border border-border-base text-xs text-text-secondary leading-relaxed space-y-2">
               <p>
                 <strong>The Reality Check:</strong> {analysisResult.mentorOpinion.executiveSummary}
               </p>
@@ -896,7 +896,7 @@ ${analysisResult.mentorOpinion.strategicActionPlan
             </div>
 
             {/* Single Best Portfolio Deliverable */}
-            <div className="p-4 rounded-lg bg-emerald-500/5 border border-emerald-500/20 space-y-1.5">
+            <div className="p-4 rounded-xl bg-emerald-500/5 border border-emerald-500/20 space-y-1.5">
               <h4 className="text-xs font-bold text-emerald-800 dark:text-emerald-300 flex items-center gap-1.5">
                 <BookOpen className="w-4 h-4 text-[#c04b1e]" />
                 The #1 Portfolio Asset That Will Get You Interviews
@@ -908,7 +908,7 @@ ${analysisResult.mentorOpinion.strategicActionPlan
           </div>
 
           {/* 30-Day Step-by-Step Strategic Roadmap */}
-          <div className="card p-6 bg-surface border border-border-subtle shadow-sm rounded-xl space-y-5">
+          <div className="p-6 rounded-2xl border border-border-base/90 bg-[#faf8f5]/60 dark:bg-stone-900/40 space-y-5 shadow-xs">
             <div className="flex items-center justify-between">
               <h3 className="text-sm font-bold text-text-primary flex items-center gap-2">
                 <Clock className="w-4 h-4 text-blue-500" />
@@ -921,7 +921,7 @@ ${analysisResult.mentorOpinion.strategicActionPlan
               {analysisResult.mentorOpinion.strategicActionPlan.map((phase, idx) => (
                 <div
                   key={idx}
-                  className="p-4 rounded-xl bg-surface-elevated border border-border-subtle hover:border-emerald-500/30 transition-all flex flex-col justify-between"
+                  className="p-4 rounded-xl bg-white dark:bg-stone-900/80 border border-border-base hover:border-[#c04b1e]/40 transition-all flex flex-col justify-between"
                 >
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
@@ -947,7 +947,7 @@ ${analysisResult.mentorOpinion.strategicActionPlan
 
           {/* Bottom Action Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="card p-5 bg-surface border border-border-subtle rounded-xl flex items-center justify-between">
+            <div className="p-5 rounded-2xl border border-border-base/90 bg-white dark:bg-stone-900/60 shadow-xs flex items-center justify-between">
               <div>
                 <h4 className="text-xs font-bold text-text-primary">
                   Tailor Resume for {analysisResult.targetRole}
@@ -959,14 +959,14 @@ ${analysisResult.mentorOpinion.strategicActionPlan
               </div>
               <button
                 onClick={() => navigate('/app/job-seeker/resume-generator')}
-                className="px-3.5 py-2 text-xs font-semibold rounded-lg bg-[#c04b1e] hover:bg-[#a33d16] text-white transition-colors flex items-center gap-1.5 shadow-sm whitespace-nowrap ml-3"
+                className="px-4 py-2 text-xs font-semibold rounded-xl bg-[#c04b1e] hover:bg-[#a33d16] text-white transition-colors flex items-center gap-1.5 shadow-xs whitespace-nowrap ml-3 cursor-pointer"
               >
                 Tailor Resume
                 <ArrowRight className="w-3 h-3" />
               </button>
             </div>
 
-            <div className="card p-5 bg-surface border border-border-subtle rounded-xl flex items-center justify-between">
+            <div className="p-5 rounded-2xl border border-border-base/90 bg-white dark:bg-stone-900/60 shadow-xs flex items-center justify-between">
               <div>
                 <h4 className="text-xs font-bold text-text-primary">Track Applications</h4>
                 <p className="text-[11px] text-text-muted mt-0.5">
@@ -976,7 +976,7 @@ ${analysisResult.mentorOpinion.strategicActionPlan
               </div>
               <button
                 onClick={() => navigate('/app/job-seeker/applications')}
-                className="px-3.5 py-2 text-xs font-semibold rounded-lg bg-surface-elevated hover:bg-border-subtle border border-border-subtle text-text-primary transition-colors flex items-center gap-1.5 shadow-sm whitespace-nowrap ml-3"
+                className="px-4 py-2 text-xs font-semibold rounded-xl bg-white dark:bg-stone-900/80 hover:bg-stone-50 dark:hover:bg-stone-800 border border-border-base text-text-primary transition-colors flex items-center gap-1.5 shadow-2xs whitespace-nowrap ml-3 cursor-pointer"
               >
                 Open Tracker
                 <ArrowRight className="w-3 h-3" />
