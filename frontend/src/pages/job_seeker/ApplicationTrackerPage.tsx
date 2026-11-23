@@ -19,7 +19,6 @@ import {
   Copy,
   Check,
   Building2,
-  DollarSign,
   MapPin,
   Filter,
 } from 'lucide-react';
@@ -826,7 +825,7 @@ export default function ApplicationTrackerPage() {
               <Input
                 value={formSalary}
                 onChange={(e) => setFormSalary(e.target.value)}
-                placeholder="e.g. $160k - $190k"
+                placeholder="e.g. ₹18L - ₹24L"
               />
             </div>
           </div>

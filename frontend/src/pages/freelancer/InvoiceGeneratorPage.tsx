@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   ArrowRight,
   ArrowLeftRight,
-  DollarSign,
+  IndianRupee,
   Coins,
   Plus,
   Minus,
@@ -395,7 +395,7 @@ export default function InvoiceGeneratorPage() {
                 <div className="flex items-start justify-between gap-2 mb-3">
                   <div className="flex items-center gap-2">
                     <div className="p-2 rounded-xl bg-amber-500/15 text-amber-400 border border-amber-500/25">
-                      <DollarSign className="w-4 h-4" />
+                      <IndianRupee className="w-4 h-4" />
                     </div>
                     <div>
                       <h4 className="text-sm font-bold text-text-primary truncate">
@@ -703,7 +703,7 @@ export default function InvoiceGeneratorPage() {
                     </Badge>
                   </div>
                   <div className="text-sm text-text-muted flex items-center gap-1 justify-end md:justify-start">
-                    <DollarSign className="w-4 h-4" />
+                    <IndianRupee className="w-4 h-4" />
                     <span>{preview.invoice.currency}</span>
                   </div>
                 </div>

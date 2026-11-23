@@ -7,7 +7,7 @@ import {
   Target,
   FileText,
   Calendar,
-  DollarSign,
+  IndianRupee,
   Bell,
 } from 'lucide-react';
 import { useWorkspace } from '../../contexts/WorkspaceContext';
@@ -24,8 +24,8 @@ export default function JobSettingsPage() {
   const [targetRole, setTargetRole] = useState('Senior Full Stack Engineer');
   const [targetIndustries, setTargetIndustries] = useState('SaaS, AI Tools, FinTech');
   const [preferredLocation, setPreferredLocation] = useState('Remote Only');
-  const [targetSalary, setTargetSalary] = useState('140,000');
-  const [currency, setCurrency] = useState('USD');
+  const [targetSalary, setTargetSalary] = useState('18,00,000');
+  const [currency, setCurrency] = useState('INR');
 
   const [weeklyApplicationGoal, setWeeklyApplicationGoal] = useState('5');
   const [followupDays, setFollowupDays] = useState('7');
@@ -194,13 +194,13 @@ export default function JobSettingsPage() {
                 <select
                   value={currency}
                   onChange={(e) => setCurrency(e.target.value)}
-                  className="w-24 bg-bg-surface border border-border-base rounded-xl px-2 py-2 text-xs text-text-primary focus:outline-none focus:border-[#c04b1e] focus:ring-2 focus:ring-[#c04b1e]/20 transition-all"
+                  className="w-28 bg-bg-surface border border-border-base rounded-xl px-2 py-2 text-xs text-text-primary focus:outline-none focus:border-[#c04b1e] focus:ring-2 focus:ring-[#c04b1e]/20 transition-all"
                 >
-                  <option value="USD">USD</option>
-                  <option value="EUR">EUR</option>
-                  <option value="GBP">GBP</option>
-                  <option value="CAD">CAD</option>
-                  <option value="INR">INR</option>
+                  <option value="INR">INR (₹)</option>
+                  <option value="USD">USD ($)</option>
+                  <option value="EUR">EUR (€)</option>
+                  <option value="GBP">GBP (£)</option>
+                  <option value="CAD">CAD (CA$)</option>
                 </select>
                 <input
                   type="text"

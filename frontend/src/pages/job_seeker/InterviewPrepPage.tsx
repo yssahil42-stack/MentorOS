@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import {
   Search,
   BookOpen,
-  DollarSign,
+  IndianRupee,
   ExternalLink,
   CheckCircle2,
   ChevronDown,
@@ -88,10 +88,10 @@ export default function InterviewPrepPage() {
   const [salCompany, setSalCompany] = useState('');
   const [salRole, setSalRole] = useState('');
   const [salLevel, setSalLevel] = useState('L4 / Mid-Level');
-  const [salLocation, setSalLocation] = useState('Remote US');
-  const [salBase, setSalBase] = useState(160000);
-  const [salStock, setSalStock] = useState(60000);
-  const [salBonus, setSalBonus] = useState(20000);
+  const [salLocation, setSalLocation] = useState('Bengaluru / Remote');
+  const [salBase, setSalBase] = useState(1800000);
+  const [salStock, setSalStock] = useState(600000);
+  const [salBonus, setSalBonus] = useState(200000);
   const [salNotes, setSalNotes] = useState('');
   const [salStrategy, setSalStrategy] = useState('');
 
@@ -172,7 +172,7 @@ export default function InterviewPrepPage() {
       stockGrantPerYear: Number(salStock || 0),
       bonus: Number(salBonus || 0),
       totalComp: computedTotalComp,
-      currency: 'USD',
+      currency: 'INR',
       levelsFyiUrl: generateLevelsFyiLink(salCompany.trim(), salRole.trim()),
       notes: salNotes.trim(),
       negotiationStrategy: salStrategy.trim(),
@@ -227,7 +227,7 @@ export default function InterviewPrepPage() {
                   : 'text-text-muted hover:text-text-primary'
               }`}
             >
-              <DollarSign className="w-3.5 h-3.5" />
+              <IndianRupee className="w-3.5 h-3.5" />
               <span>Salary benchmarks ({salaryEntries.length})</span>
             </button>
           </div>
@@ -559,25 +559,25 @@ export default function InterviewPrepPage() {
                     <div className="flex justify-between items-baseline text-2xs">
                       <span className="text-text-muted">Base Salary:</span>
                       <span className="font-mono font-semibold text-text-primary">
-                        ${entry.baseSalary.toLocaleString()}
+                        ₹{entry.baseSalary.toLocaleString('en-IN')}
                       </span>
                     </div>
                     <div className="flex justify-between items-baseline text-2xs">
                       <span className="text-text-muted">Stock / Equity (yr):</span>
                       <span className="font-mono font-semibold text-text-primary">
-                        ${entry.stockGrantPerYear.toLocaleString()}
+                        ₹{entry.stockGrantPerYear.toLocaleString('en-IN')}
                       </span>
                     </div>
                     <div className="flex justify-between items-baseline text-2xs">
                       <span className="text-text-muted">Annual Bonus:</span>
                       <span className="font-mono font-semibold text-text-primary">
-                        ${entry.bonus.toLocaleString()}
+                        ₹{entry.bonus.toLocaleString('en-IN')}
                       </span>
                     </div>
                     <div className="flex justify-between items-baseline pt-1 border-t border-border-base font-bold">
                       <span className="text-text-primary">Total Comp:</span>
                       <span className="font-mono text-sm text-[#c04b1e]">
-                        ${entry.totalComp.toLocaleString()}
+                        ₹{entry.totalComp.toLocaleString('en-IN')}
                       </span>
                     </div>
                   </div>
@@ -662,7 +662,7 @@ export default function InterviewPrepPage() {
           {/* Numeric Breakdown */}
           <div className="grid grid-cols-3 gap-2 p-3 rounded-xl bg-bg-base border border-border-base">
             <div>
-              <label className="block text-2xs font-semibold text-text-muted mb-1">Base ($)</label>
+              <label className="block text-2xs font-semibold text-text-muted mb-1">Base (₹)</label>
               <Input
                 type="number"
                 value={salBase}
@@ -671,7 +671,7 @@ export default function InterviewPrepPage() {
             </div>
             <div>
               <label className="block text-2xs font-semibold text-text-muted mb-1">
-                Stock/Yr ($)
+                Stock/Yr (₹)
               </label>
               <Input
                 type="number"
@@ -680,7 +680,7 @@ export default function InterviewPrepPage() {
               />
             </div>
             <div>
-              <label className="block text-2xs font-semibold text-text-muted mb-1">Bonus ($)</label>
+              <label className="block text-2xs font-semibold text-text-muted mb-1">Bonus (₹)</label>
               <Input
                 type="number"
                 value={salBonus}
@@ -694,7 +694,7 @@ export default function InterviewPrepPage() {
               Total Computed Compensation:
             </span>
             <span className="text-base font-extrabold font-mono text-[#c04b1e]">
-              ${computedTotalComp.toLocaleString()} / yr
+              ₹{computedTotalComp.toLocaleString('en-IN')} / yr
             </span>
           </div>
 
@@ -706,7 +706,7 @@ export default function InterviewPrepPage() {
               rows={2}
               value={salStrategy}
               onChange={(e) => setSalStrategy(e.target.value)}
-              placeholder="e.g. Counter with 75th percentile equity band if sign-on bonus is under $30k..."
+              placeholder="e.g. Counter with 75th percentile equity band if sign-on bonus is under ₹3,00,000..."
               className="w-full rounded-xl text-xs bg-bg-surface border border-border-base p-2.5 text-text-primary placeholder:text-text-faint focus:outline-none focus:border-emerald-500"
             />
           </div>

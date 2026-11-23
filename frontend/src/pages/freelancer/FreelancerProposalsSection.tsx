@@ -4,7 +4,6 @@ import {
   Plus,
   CheckCircle2,
   Clock,
-  DollarSign,
   Building2,
   Trash2,
   ArrowRight,

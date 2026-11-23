@@ -12,7 +12,6 @@ import {
   Edit,
   Trash2,
   Calendar,
-  DollarSign,
   Coins,
   Building2,
   PieChart,

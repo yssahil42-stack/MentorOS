@@ -3,7 +3,6 @@ import {
   Settings,
   Save,
   Briefcase,
-  DollarSign,
   Clock,
   Receipt,
   Bell,
