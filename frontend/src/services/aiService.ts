@@ -36,6 +36,10 @@ export async function requestAIProposal(
   return api.post<AIProposal>('/ai/propose', { ...data, role }, { signal });
 }
 
+export async function deleteProposal(id: number): Promise<void> {
+  await api.delete(`/ai/proposals/${id}`);
+}
+
 function notifyToast(message: string, type: 'success' | 'error' | 'warning' | 'info' = 'info') {
   if (typeof window !== 'undefined') {
     window.dispatchEvent(new CustomEvent('mentor:toast', { detail: { message, type } }));

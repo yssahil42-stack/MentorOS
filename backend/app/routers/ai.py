@@ -690,6 +690,24 @@ def list_proposals(
         .all()
     )
 
+@router.delete("/proposals/{proposal_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_proposal(
+    proposal_id: int,
+    current_user: models.User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    proposal = db.query(models.AIProposal).filter(
+        models.AIProposal.id == proposal_id,
+        models.AIProposal.user_id == current_user.id,
+    ).first()
+
+    if not proposal:
+        raise HTTPException(status_code=404, detail="Proposal not found")
+
+    db.delete(proposal)
+    db.commit()
+    return None
+
 @router.post("/proposals/{proposal_id}/approve", response_model=schemas.AIApprovalResult)
 def approve_proposal(
     proposal_id: int,

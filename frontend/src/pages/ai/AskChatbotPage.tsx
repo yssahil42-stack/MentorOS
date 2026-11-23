@@ -115,6 +115,11 @@ export default function AskChatbotPage() {
     showToast('Downloaded markdown file', 'info');
   };
 
+  const handleDeleteMessage = (idx: number) => {
+    setMessages((prev) => prev.filter((_, i) => i !== idx));
+    showToast('Deleted chat message', 'info');
+  };
+
   // Clean up streaming on unmount
   useEffect(() => {
     return () => {
@@ -351,7 +356,18 @@ export default function AskChatbotPage() {
                   )}
                 >
                   {msg.role === 'user' ? (
-                    <div className="whitespace-pre-wrap">{msg.content}</div>
+                    <div className="flex items-start justify-between gap-2 group">
+                      <div className="whitespace-pre-wrap flex-1">{msg.content}</div>
+                      <button
+                        type="button"
+                        onClick={() => handleDeleteMessage(idx)}
+                        className="opacity-0 group-hover:opacity-100 p-1 rounded hover:bg-black/15 transition-opacity text-stone-900 cursor-pointer shrink-0"
+                        title="Delete this message"
+                        aria-label="Delete this message"
+                      >
+                        <Trash2 className="w-3 h-3" />
+                      </button>
+                    </div>
                   ) : (
                     <div className="prose-chat relative">
                       <MarkdownRenderer content={msg.content} showCopyButton={false} />
@@ -406,6 +422,15 @@ export default function AskChatbotPage() {
                               title="Download markdown"
                             >
                               <Download className="w-3.5 h-3.5" />
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleDeleteMessage(idx)}
+                              className="p-1.5 rounded-lg text-text-muted hover:text-danger hover:bg-danger/10 transition-colors cursor-pointer"
+                              title="Delete this chat message"
+                              aria-label="Delete this chat message"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
                             </button>
                           </div>
                         </div>

@@ -459,6 +459,40 @@ class WorkspaceIsolationTests(unittest.TestCase):
         self.assertEqual(ms_resp.status_code, 400)
         self.assertIn("Project role mismatch", ms_resp.json()["detail"])
 
+    def test_delete_proposal_and_items_is_owner_scoped(self):
+        user_a = self.create_user("owner_a@example.test")
+        user_b = self.create_user("owner_b@example.test")
+
+        with self.session_factory() as db:
+            prop = models.AIProposal(
+                user_id=user_a.id,
+                role="student",
+                request_text="Roadmap to delete",
+                summary="Summary",
+                status="pending",
+            )
+            prop.items.append(models.AIProposalItem(
+                item_type="note",
+                payload={"title": "Note", "content": "Content"},
+            ))
+            db.add(prop)
+            db.commit()
+            db.refresh(prop)
+            prop_id = prop.id
+
+        # User B cannot delete User A's proposal
+        res_b = self.client.delete(f"/api/v1/ai/proposals/{prop_id}", headers=self.auth_headers(user_b))
+        self.assertEqual(res_b.status_code, 404)
+
+        # User A can delete
+        res_a = self.client.delete(f"/api/v1/ai/proposals/{prop_id}", headers=self.auth_headers(user_a))
+        self.assertEqual(res_a.status_code, 204)
+
+        # Verified deleted in DB and items cascade deleted
+        with self.session_factory() as db:
+            self.assertIsNone(db.query(models.AIProposal).filter(models.AIProposal.id == prop_id).first())
+            self.assertEqual(db.query(models.AIProposalItem).filter(models.AIProposalItem.proposal_id == prop_id).count(), 0)
+
 
 if __name__ == "__main__":
     unittest.main()

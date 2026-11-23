@@ -330,6 +330,15 @@ export function RoadmapWorkspace({ isOpen, onClose, initialPrompt = '' }: Roadma
     canvasScrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  // Delete a recent roadmap chat
+  const handleDeleteRecentRoadmap = (deletedProposalId: number) => {
+    if (activeProposal?.id === deletedProposalId) {
+      handleNewRoadmap();
+    }
+    showToast('Roadmap chat deleted', 'info');
+    setSidebarRefreshKey((k) => k + 1);
+  };
+
   // Select an active project from the sidebar to generate a roadmap for it
   const handleSelectProject = (project: Project) => {
     const projectPrompt = `Create a structured execution roadmap and milestone plan for project: "${project.title}" - ${project.description || ''}`;
@@ -625,6 +634,7 @@ export function RoadmapWorkspace({ isOpen, onClose, initialPrompt = '' }: Roadma
       <RoadmapSidebar
         activeProposalId={activeProposal?.id}
         onSelectRecentRoadmap={handleSelectRecentRoadmap}
+        onDeleteRecentRoadmap={handleDeleteRecentRoadmap}
         onNewRoadmap={handleNewRoadmap}
         onSelectProject={handleSelectProject}
         isMobileOpen={isMobileSidebarOpen}
