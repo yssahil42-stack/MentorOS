@@ -1,8 +1,9 @@
 import React from 'react';
-import { ChevronDown, ChevronRight, Plus } from 'lucide-react';
+import { ChevronDown, ChevronRight, Plus, Clock } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
 import { TimeTrackingBadge } from '../../components/ui/TimeTrackingBadge';
 import { TaskList } from './TaskList';
+import { formatDateTime } from '../../utils/dateUtils';
 import type { Project } from '../../types/project';
 import type { Task, TaskStatus } from '../../types/task';
 
@@ -105,7 +106,15 @@ export const CourseAccordion: React.FC<CourseAccordionProps> = ({
                   )}
                 </span>
                 <div className="min-w-0">
-                  <h4 className="text-xs font-bold text-text-primary truncate">{proj.title}</h4>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <h4 className="text-xs font-bold text-text-primary truncate">{proj.title}</h4>
+                    {proj.created_at && (
+                      <span className="inline-flex items-center gap-1 text-3xs font-mono text-text-muted shrink-0">
+                        <Clock className="w-2.5 h-2.5 text-orange-500" />
+                        Created {formatDateTime(proj.created_at)}
+                      </span>
+                    )}
+                  </div>
                   {proj.description && (
                     <p className="text-3xs text-text-muted truncate max-w-sm">{proj.description}</p>
                   )}

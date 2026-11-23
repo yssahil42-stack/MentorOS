@@ -312,38 +312,31 @@ export default function InvoiceGeneratorPage() {
   }
 
   return (
-    <div className="space-y-6 max-w-7xl mx-auto pb-10">
-      {/* ─── HEADER ───────────────────────────────────────────────────────────── */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-        <div className="space-y-1.5">
-          <div className="flex items-center gap-2 flex-wrap">
-            <span className="p-1.5 rounded-lg bg-amber-500/20 text-amber-400">
-              <FileText className="w-5 h-5" />
-            </span>
-            <span className="text-xs font-mono font-semibold px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20">
-              INVOICE GENERATOR
-            </span>
+    <div className="space-y-6 max-w-6xl mx-auto animate-fade-in pb-16 px-1 sm:px-4">
+      {/* ─── Main White Container Card Matching Notes & Dashboard ─── */}
+      <div className="bg-white dark:bg-[#161922] rounded-3xl border border-[#eee7e0] dark:border-stone-800/80 p-5 sm:p-8 space-y-6 shadow-xs">
+        {/* Header Row */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-text-primary">
+              Generate invoices
+            </h1>
+            <p className="text-xs text-text-secondary mt-1 font-medium">
+              Create professional invoices from completed project deliverables and milestones.
+            </p>
           </div>
-          <h1 className="text-2xl md:text-3xl font-extrabold text-text-primary">
-            Generate Invoices
-          </h1>
-          <p className="text-xs md:text-sm text-text-secondary max-w-2xl">
-            Create professional invoices from completed project deliverables and milestones.
-          </p>
-        </div>
 
-        <div className="flex items-center gap-3">
-          <Button
-            variant="secondary"
-            size="sm"
-            onClick={() => setShowConverterModal(true)}
-            className="border-amber-500/30 text-amber-500 hover:bg-amber-500/10 font-semibold"
-            icon={<ArrowLeftRight className="w-4 h-4" />}
-          >
-            Currency Converter
-          </Button>
+          <div className="flex items-center gap-2.5 shrink-0">
+            <button
+              type="button"
+              onClick={() => setShowConverterModal(true)}
+              className="h-10 px-4 rounded-xl border border-border-base bg-white dark:bg-bg-elevated hover:bg-slate-50 dark:hover:bg-bg-surface text-xs font-semibold text-text-primary flex items-center gap-2 shadow-2xs transition-all hover:border-[#c04b1e]/40 cursor-pointer active:translate-y-[1px]"
+            >
+              <ArrowLeftRight className="w-3.5 h-3.5 text-[#c04b1e]" />
+              <span>Currency Converter</span>
+            </button>
+          </div>
         </div>
-      </div>
 
       {/* ─── STEP 1: SELECT PROJECT ───────────────────────────────────────────── */}
       <Card3D
@@ -944,6 +937,7 @@ export default function InvoiceGeneratorPage() {
           </div>
         </Modal>
       )}
+      </div>
     </div>
   );
 }

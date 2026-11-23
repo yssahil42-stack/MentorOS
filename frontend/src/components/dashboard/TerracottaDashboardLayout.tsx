@@ -11,6 +11,7 @@ import {
   Calendar as CalendarIcon,
 } from 'lucide-react';
 import { cn } from '../../utils/cn';
+import { formatDateTime } from '../../utils/dateUtils';
 
 export interface TerracottaStat {
   title: string;
@@ -42,6 +43,7 @@ export interface TerracottaTableItem {
   progress: number;
   statusBadge: string;
   statusColor?: string;
+  created_at?: string;
 }
 
 export interface TerracottaActivityBar {
@@ -354,7 +356,7 @@ export const TerracottaDashboardLayout: React.FC<TerracottaDashboardLayoutProps>
               />
               <button
                 type="submit"
-                disabled={quickAddPending || !quickAddValue.trim()}
+                disabled={quickAddPending || !quickAddValue?.trim()}
                 className="bg-stone-950 dark:bg-stone-100 hover:bg-stone-800 dark:hover:bg-white text-white dark:text-stone-950 text-xs font-semibold px-3 py-1 rounded-full transition-colors disabled:opacity-40 cursor-pointer"
               >
                 Add
@@ -481,8 +483,17 @@ export const TerracottaDashboardLayout: React.FC<TerracottaDashboardLayoutProps>
                   <div className="font-bold text-stone-900 dark:text-stone-100 truncate">
                     {item.title}
                   </div>
-                  <div className="text-2xs text-stone-500 dark:text-stone-400 truncate mt-0.5">
-                    {item.subtitle}
+                  <div className="text-2xs text-stone-500 dark:text-stone-400 flex items-center gap-1.5 flex-wrap mt-0.5">
+                    <span className="truncate">{item.subtitle}</span>
+                    {item.created_at && (
+                      <>
+                        <span className="text-stone-300 dark:text-stone-600">&bull;</span>
+                        <span className="inline-flex items-center gap-1 text-stone-400 dark:text-stone-500 font-mono shrink-0">
+                          <Clock className="w-2.5 h-2.5 text-[#c04b1e]" />
+                          Created {formatDateTime(item.created_at)}
+                        </span>
+                      </>
+                    )}
                   </div>
                 </div>
 

@@ -176,57 +176,50 @@ ${analysisResult.mentorOpinion.strategicActionPlan
   };
 
   return (
-    <div className="space-y-6 pb-12 max-w-7xl mx-auto">
-      {/* Page Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-border-subtle pb-5">
-        <div>
-          <div className="flex items-center gap-2">
-            <span className="p-1.5 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
-              <Sparkles className="w-5 h-5" />
-            </span>
-            <h1 className="text-2xl font-bold text-text-primary tracking-tight">Job Analyzer</h1>
-            <span className="text-xs px-2 py-0.5 rounded-full font-medium bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800">
-              AI Market Intelligence
-            </span>
+    <div className="space-y-6 max-w-6xl mx-auto animate-fade-in pb-16 px-1 sm:px-4">
+      {/* ─── Main White Container Card Matching Notes & Dashboard ─── */}
+      <div className="bg-white dark:bg-[#161922] rounded-3xl border border-[#eee7e0] dark:border-stone-800/80 p-5 sm:p-8 space-y-6 shadow-xs">
+        {/* Header Row */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-text-primary">
+              Job analyzer
+            </h1>
+            <p className="text-xs text-text-secondary mt-1 font-medium">
+              Target any role to pinpoint your skill match, uncover critical gaps, and receive personalized senior mentor strategic advice.
+            </p>
           </div>
-          <p className="text-sm text-text-muted mt-1 max-w-3xl">
-            Target any role (e.g. <strong>Data Analyst</strong>) to pinpoint your exact skill match,
-            uncover critical gaps, discover where to apply, and receive personalized senior mentor
-            strategic advice.
-          </p>
-        </div>
 
-        {/* Action Shortcuts */}
-        <div className="flex items-center gap-2.5">
-          <button
-            onClick={() => navigate('/app/job-seeker/resume-generator')}
-            className="px-3.5 py-2 text-xs font-semibold rounded-lg bg-surface border border-border-subtle text-text-primary hover:bg-surface-elevated transition-colors shadow-sm flex items-center gap-1.5"
-            title="Open Resume Tailor with this role"
-          >
-            <Briefcase className="w-3.5 h-3.5 text-emerald-500" />
-            Resume Tailor
-          </button>
-          <button
-            onClick={() => navigate('/app/job-seeker/applications')}
-            className="px-3.5 py-2 text-xs font-semibold rounded-lg bg-surface border border-border-subtle text-text-primary hover:bg-surface-elevated transition-colors shadow-sm flex items-center gap-1.5"
-            title="Open Application Tracker"
-          >
-            <Target className="w-3.5 h-3.5 text-blue-500" />
-            Applications Tracker
-          </button>
+          <div className="flex items-center gap-2 flex-wrap">
+            <button
+              onClick={() => navigate('/app/job-seeker/resume-generator')}
+              className="h-10 px-4 rounded-xl border border-border-base bg-white dark:bg-bg-elevated hover:bg-slate-50 dark:hover:bg-bg-surface text-xs font-semibold text-text-primary flex items-center gap-2 shadow-2xs transition-all hover:border-[#c04b1e]/40 cursor-pointer active:translate-y-[1px]"
+              title="Open Resume Tailor with this role"
+            >
+              <Briefcase className="w-3.5 h-3.5 text-[#c04b1e]" />
+              <span>Resume tailor</span>
+            </button>
+            <button
+              onClick={() => navigate('/app/job-seeker/applications')}
+              className="h-10 px-4 rounded-xl bg-[#c04b1e] hover:bg-[#a33d16] text-white text-xs font-semibold flex items-center gap-2 shadow-xs transition-all active:translate-y-[1px] cursor-pointer"
+              title="Open Application Tracker"
+            >
+              <Target className="w-4 h-4 stroke-[2.5]" />
+              <span>Applications tracker</span>
+            </button>
+          </div>
         </div>
-      </div>
 
       {/* Target Role & Skills Configuration Card */}
-      <div className="card p-5 bg-surface border border-border-subtle shadow-sm rounded-xl space-y-5">
+      <div className="p-5 sm:p-6 rounded-2xl border border-border-base/90 bg-[#faf8f5]/60 dark:bg-stone-900/40 space-y-5">
         <div className="flex items-center justify-between">
           <h2 className="text-sm font-bold uppercase tracking-wider text-text-muted flex items-center gap-2">
-            <Filter className="w-4 h-4 text-emerald-500" />
+            <Filter className="w-4 h-4 text-[#c04b1e]" />
             Configure Target Job & Your Profile
           </h2>
           <button
             onClick={handleSyncProfile}
-            className="text-xs font-medium text-emerald-600 dark:text-emerald-400 hover:underline flex items-center gap-1"
+            className="text-xs font-medium text-[#c04b1e] dark:text-emerald-400 hover:underline flex items-center gap-1"
           >
             <Zap className="w-3.5 h-3.5" />
             Sync From Profile
@@ -248,7 +241,7 @@ ${analysisResult.mentorOpinion.strategicActionPlan
                   onClick={() => handleSelectPreset(preset)}
                   className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all flex items-center gap-1.5 ${
                     isSelected
-                      ? 'bg-emerald-600 text-white shadow-sm ring-2 ring-emerald-500/30'
+                      ? 'bg-[#c04b1e] text-white shadow-sm ring-2 ring-emerald-500/30'
                       : 'bg-surface-elevated hover:bg-border-subtle text-text-primary border border-border-subtle'
                   }`}
                 >
@@ -372,7 +365,7 @@ ${analysisResult.mentorOpinion.strategicActionPlan
               />
               <button
                 onClick={() => handleAddSkill()}
-                className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white transition-colors flex items-center gap-1"
+                className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-[#c04b1e] hover:bg-[#a33d16] text-white transition-colors flex items-center gap-1"
               >
                 <Plus className="w-3.5 h-3.5" />
                 Add Skill
@@ -388,9 +381,9 @@ ${analysisResult.mentorOpinion.strategicActionPlan
                 <button
                   key={suggested}
                   onClick={() => handleAddSkill(suggested)}
-                  className="px-2 py-0.5 rounded text-[11px] font-medium bg-surface hover:bg-emerald-500/10 hover:text-emerald-600 border border-border-subtle text-text-secondary transition-colors flex items-center gap-1"
+                  className="px-2 py-0.5 rounded text-[11px] font-medium bg-surface hover:bg-emerald-500/10 hover:text-[#c04b1e] border border-border-subtle text-text-secondary transition-colors flex items-center gap-1"
                 >
-                  <Plus className="w-2.5 h-2.5 text-emerald-500" />
+                  <Plus className="w-2.5 h-2.5 text-[#c04b1e]" />
                   {suggested}
                 </button>
               ))}
@@ -430,7 +423,7 @@ ${analysisResult.mentorOpinion.strategicActionPlan
                 <span className="text-2xl font-black text-text-primary tracking-tight">
                   {analysisResult.readinessScore}%
                 </span>
-                <span className="block text-[9px] uppercase font-bold text-emerald-600 dark:text-emerald-400">
+                <span className="block text-[9px] uppercase font-bold text-[#c04b1e] dark:text-emerald-400">
                   Readiness
                 </span>
               </div>
@@ -469,7 +462,7 @@ ${analysisResult.mentorOpinion.strategicActionPlan
           {/* Metric Stats Badges */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 lg:border-l lg:border-border-subtle lg:pl-6">
             <div className="p-2.5 rounded-lg bg-surface-elevated border border-border-subtle text-center">
-              <span className="text-lg font-bold text-emerald-600 dark:text-emerald-400">
+              <span className="text-lg font-bold text-[#c04b1e] dark:text-emerald-400">
                 {analysisResult.matchedSkills.length}
               </span>
               <p className="text-[10px] uppercase font-semibold text-text-muted">Skills You Have</p>
@@ -505,7 +498,7 @@ ${analysisResult.mentorOpinion.strategicActionPlan
             className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-surface hover:bg-surface-elevated border border-border-subtle text-text-primary transition-colors flex items-center gap-1.5 shadow-sm"
           >
             {isCopied ? (
-              <Check className="w-3.5 h-3.5 text-emerald-500" />
+              <Check className="w-3.5 h-3.5 text-[#c04b1e]" />
             ) : (
               <Copy className="w-3.5 h-3.5" />
             )}
@@ -520,7 +513,7 @@ ${analysisResult.mentorOpinion.strategicActionPlan
           onClick={() => setActiveTab('skills')}
           className={`pb-3 px-3 text-sm font-semibold border-b-2 transition-colors flex items-center gap-2 ${
             activeTab === 'skills'
-              ? 'border-emerald-500 text-emerald-600 dark:text-emerald-400'
+              ? 'border-emerald-500 text-[#c04b1e] dark:text-emerald-400'
               : 'border-transparent text-text-muted hover:text-text-primary'
           }`}
         >
@@ -536,7 +529,7 @@ ${analysisResult.mentorOpinion.strategicActionPlan
           onClick={() => setActiveTab('where_to_apply')}
           className={`pb-3 px-3 text-sm font-semibold border-b-2 transition-colors flex items-center gap-2 ${
             activeTab === 'where_to_apply'
-              ? 'border-emerald-500 text-emerald-600 dark:text-emerald-400'
+              ? 'border-emerald-500 text-[#c04b1e] dark:text-emerald-400'
               : 'border-transparent text-text-muted hover:text-text-primary'
           }`}
         >
@@ -551,11 +544,11 @@ ${analysisResult.mentorOpinion.strategicActionPlan
           onClick={() => setActiveTab('mentor_opinion')}
           className={`pb-3 px-3 text-sm font-semibold border-b-2 transition-colors flex items-center gap-2 ${
             activeTab === 'mentor_opinion'
-              ? 'border-emerald-500 text-emerald-600 dark:text-emerald-400'
+              ? 'border-emerald-500 text-[#c04b1e] dark:text-emerald-400'
               : 'border-transparent text-text-muted hover:text-text-primary'
           }`}
         >
-          <Sparkles className="w-4 h-4 text-emerald-500" />
+          <Sparkles className="w-4 h-4 text-[#c04b1e]" />
           Senior Mentor Opinion & Roadmap
         </button>
       </div>
@@ -568,7 +561,7 @@ ${analysisResult.mentorOpinion.strategicActionPlan
             <div className="card p-5 bg-surface border border-emerald-500/20 shadow-sm rounded-xl">
               <div className="flex items-center justify-between pb-3 border-b border-border-subtle">
                 <div className="flex items-center gap-2">
-                  <span className="p-1 rounded-md bg-emerald-500/10 text-emerald-600">
+                  <span className="p-1 rounded-md bg-emerald-500/10 text-[#c04b1e]">
                     <CheckCircle2 className="w-4 h-4" />
                   </span>
                   <div>
@@ -599,7 +592,7 @@ ${analysisResult.mentorOpinion.strategicActionPlan
                     >
                       <div className="flex items-center justify-between gap-2">
                         <div className="flex items-center gap-2">
-                          <CheckCircle2 className="w-4 h-4 text-emerald-500 flex-shrink-0" />
+                          <CheckCircle2 className="w-4 h-4 text-[#c04b1e] flex-shrink-0" />
                           <h4 className="text-xs font-bold text-text-primary">{skill.name}</h4>
                         </div>
                         <span
@@ -629,7 +622,7 @@ ${analysisResult.mentorOpinion.strategicActionPlan
             {/* Strengths Pitch Box */}
             <div className="card p-4 bg-emerald-500/5 border border-emerald-500/20 rounded-xl">
               <h4 className="text-xs font-bold text-emerald-800 dark:text-emerald-300 flex items-center gap-1.5">
-                <Zap className="w-3.5 h-3.5 text-emerald-600" />
+                <Zap className="w-3.5 h-3.5 text-[#c04b1e]" />
                 How to Pitch Your Existing Skills
               </h4>
               <p className="text-xs text-text-secondary mt-1">
@@ -661,7 +654,7 @@ ${analysisResult.mentorOpinion.strategicActionPlan
               </div>
 
               {analysisResult.missingSkills.length === 0 ? (
-                <div className="py-8 text-center text-xs text-emerald-600 font-medium">
+                <div className="py-8 text-center text-xs text-[#c04b1e] font-medium">
                   🎉 Outstanding! You cover all standard core and differentiator benchmarks for this
                   role.
                 </div>
@@ -712,10 +705,10 @@ ${analysisResult.mentorOpinion.strategicActionPlan
                         {/* 1-Click "I already know this" Button */}
                         <button
                           onClick={() => handleAddSkill(gap.name.split('(')[0].trim())}
-                          className="text-[10px] font-semibold px-2 py-1 rounded bg-surface hover:bg-emerald-500/10 hover:text-emerald-600 border border-border-subtle text-text-secondary transition-colors whitespace-nowrap flex items-center gap-1"
+                          className="text-[10px] font-semibold px-2 py-1 rounded bg-surface hover:bg-emerald-500/10 hover:text-[#c04b1e] border border-border-subtle text-text-secondary transition-colors whitespace-nowrap flex items-center gap-1"
                           title="Add to your skills if you already know this"
                         >
-                          <Plus className="w-2.5 h-2.5 text-emerald-500" />I know this
+                          <Plus className="w-2.5 h-2.5 text-[#c04b1e]" />I know this
                         </button>
                       </div>
 
@@ -745,11 +738,11 @@ ${analysisResult.mentorOpinion.strategicActionPlan
       {activeTab === 'where_to_apply' && (
         <div className="space-y-6">
           {/* Section: Direct 1-Click Search Portals */}
-          <div className="card p-5 bg-surface border border-border-subtle shadow-sm rounded-xl space-y-4">
+          <div className="p-5 sm:p-6 rounded-2xl border border-border-base/90 bg-[#faf8f5]/60 dark:bg-stone-900/40 space-y-4">
             <div className="flex items-center justify-between">
               <div>
                 <h3 className="text-sm font-bold text-text-primary flex items-center gap-2">
-                  <ExternalLink className="w-4 h-4 text-emerald-500" />
+                  <ExternalLink className="w-4 h-4 text-[#c04b1e]" />
                   Direct 1-Click Job Portals for {analysisResult.targetRole}
                 </h3>
                 <p className="text-xs text-text-muted">
@@ -771,9 +764,9 @@ ${analysisResult.mentorOpinion.strategicActionPlan
                 >
                   <div>
                     <div className="flex items-center justify-between mb-1">
-                      <h4 className="text-xs font-bold text-text-primary group-hover:text-emerald-600 transition-colors flex items-center gap-1.5">
+                      <h4 className="text-xs font-bold text-text-primary group-hover:text-[#c04b1e] transition-colors flex items-center gap-1.5">
                         {portal.platform}
-                        <ExternalLink className="w-3 h-3 text-text-faint group-hover:text-emerald-500 transition-colors" />
+                        <ExternalLink className="w-3 h-3 text-text-faint group-hover:text-[#c04b1e] transition-colors" />
                       </h4>
                       {portal.badge && (
                         <span className="text-[10px] font-semibold px-1.5 py-0.2 rounded bg-emerald-500/10 text-emerald-700 dark:text-emerald-300">
@@ -785,7 +778,7 @@ ${analysisResult.mentorOpinion.strategicActionPlan
                       {portal.description}
                     </p>
                   </div>
-                  <div className="mt-3 pt-2 border-t border-border-subtle flex items-center justify-between text-[11px] font-semibold text-emerald-600 dark:text-emerald-400">
+                  <div className="mt-3 pt-2 border-t border-border-subtle flex items-center justify-between text-[11px] font-semibold text-[#c04b1e] dark:text-emerald-400">
                     <span>Search Open Roles</span>
                     <ArrowRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
                   </div>
@@ -795,7 +788,7 @@ ${analysisResult.mentorOpinion.strategicActionPlan
           </div>
 
           {/* Section: Target Industries & Company Archetypes */}
-          <div className="card p-5 bg-surface border border-border-subtle shadow-sm rounded-xl space-y-4">
+          <div className="p-5 sm:p-6 rounded-2xl border border-border-base/90 bg-[#faf8f5]/60 dark:bg-stone-900/40 space-y-4">
             <h3 className="text-sm font-bold text-text-primary flex items-center gap-2">
               <Briefcase className="w-4 h-4 text-blue-500" />
               High-Hiring Industries & Target Companies for {analysisResult.targetRole}
@@ -835,9 +828,9 @@ ${analysisResult.mentorOpinion.strategicActionPlan
           </div>
 
           {/* Section: Application Channel Strategy */}
-          <div className="card p-5 bg-surface border border-border-subtle shadow-sm rounded-xl space-y-4">
+          <div className="p-5 sm:p-6 rounded-2xl border border-border-base/90 bg-[#faf8f5]/60 dark:bg-stone-900/40 space-y-4">
             <h3 className="text-sm font-bold text-text-primary flex items-center gap-2">
-              <Target className="w-4 h-4 text-emerald-500" />
+              <Target className="w-4 h-4 text-[#c04b1e]" />
               Recommended Application Channel Allocation
             </h3>
             <p className="text-xs text-text-muted">
@@ -852,7 +845,7 @@ ${analysisResult.mentorOpinion.strategicActionPlan
                 >
                   <div className="flex items-center justify-between text-xs font-bold text-text-primary mb-1">
                     <span>{channel.channel}</span>
-                    <span className="text-emerald-600 dark:text-emerald-400">
+                    <span className="text-[#c04b1e] dark:text-emerald-400">
                       {channel.allocation}% of effort
                     </span>
                   </div>
@@ -876,7 +869,7 @@ ${analysisResult.mentorOpinion.strategicActionPlan
           {/* Executive Verdict Card */}
           <div className="card p-6 bg-surface border border-emerald-500/20 shadow-sm rounded-xl space-y-4">
             <div className="flex items-center gap-2.5">
-              <span className="p-2 rounded-lg bg-emerald-500/10 text-emerald-600">
+              <span className="p-2 rounded-lg bg-emerald-500/10 text-[#c04b1e]">
                 <Sparkles className="w-5 h-5" />
               </span>
               <div>
@@ -905,7 +898,7 @@ ${analysisResult.mentorOpinion.strategicActionPlan
             {/* Single Best Portfolio Deliverable */}
             <div className="p-4 rounded-lg bg-emerald-500/5 border border-emerald-500/20 space-y-1.5">
               <h4 className="text-xs font-bold text-emerald-800 dark:text-emerald-300 flex items-center gap-1.5">
-                <BookOpen className="w-4 h-4 text-emerald-600" />
+                <BookOpen className="w-4 h-4 text-[#c04b1e]" />
                 The #1 Portfolio Asset That Will Get You Interviews
               </h4>
               <p className="text-xs text-text-secondary">
@@ -941,7 +934,7 @@ ${analysisResult.mentorOpinion.strategicActionPlan
                     <ul className="space-y-1.5 pt-1 text-[11px] text-text-muted">
                       {phase.tasks.map((task, tIdx) => (
                         <li key={tIdx} className="flex items-start gap-1.5">
-                          <Check className="w-3.5 h-3.5 text-emerald-500 mt-0.5 flex-shrink-0" />
+                          <Check className="w-3.5 h-3.5 text-[#c04b1e] mt-0.5 flex-shrink-0" />
                           <span>{task}</span>
                         </li>
                       ))}
@@ -966,7 +959,7 @@ ${analysisResult.mentorOpinion.strategicActionPlan
               </div>
               <button
                 onClick={() => navigate('/app/job-seeker/resume-generator')}
-                className="px-3.5 py-2 text-xs font-semibold rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white transition-colors flex items-center gap-1.5 shadow-sm whitespace-nowrap ml-3"
+                className="px-3.5 py-2 text-xs font-semibold rounded-lg bg-[#c04b1e] hover:bg-[#a33d16] text-white transition-colors flex items-center gap-1.5 shadow-sm whitespace-nowrap ml-3"
               >
                 Tailor Resume
                 <ArrowRight className="w-3 h-3" />
@@ -992,6 +985,7 @@ ${analysisResult.mentorOpinion.strategicActionPlan
           </div>
         </div>
       )}
+      </div>
     </div>
   );
 }

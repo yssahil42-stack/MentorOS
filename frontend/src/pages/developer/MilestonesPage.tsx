@@ -1,3 +1,4 @@
+import { cn } from '../../utils/cn';
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
@@ -126,53 +127,50 @@ export default function MilestonesPage() {
   }
 
   return (
-    <div className="space-y-6 max-w-5xl mx-auto animate-fade-in">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-2">
-            <span className="p-1.5 rounded-lg bg-amber-500/20 text-amber-400">
-              <Flag className="w-5 h-5" />
-            </span>
-            <span className="text-xs font-mono font-semibold text-amber-400">KEY DELIVERABLES</span>
+    <div className="space-y-6 max-w-5xl mx-auto animate-fade-in pb-16 px-1 sm:px-4">
+      {/* ─── Main White Container Card Matching Notes & Dashboard ─── */}
+      <div className="bg-white dark:bg-[#161922] rounded-3xl border border-[#eee7e0] dark:border-stone-800/80 p-5 sm:p-8 space-y-6 shadow-xs">
+        {/* Header Row */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-text-primary">
+              Sprint milestones
+            </h1>
+            <p className="text-xs text-text-secondary mt-1 font-medium">
+              Track major release gates, architectural deadlines, deliverables, and sprint checkpoints.
+            </p>
           </div>
-          <h1 className="text-2xl md:text-3xl font-extrabold text-text-primary mt-1">
-            Sprint Milestones
-          </h1>
-          <p className="text-xs md:text-sm text-text-muted">
-            Track major release gates, architectural deadlines, and deliverables.
-          </p>
+
+          <div className="flex items-center gap-2.5 shrink-0">
+            <button
+              type="button"
+              onClick={() => setIsModalOpen(true)}
+              className="h-10 px-4 rounded-xl bg-[#c04b1e] hover:bg-[#a33d16] text-white text-xs font-semibold flex items-center gap-2 shadow-xs transition-all active:translate-y-[1px] cursor-pointer"
+            >
+              <Plus className="w-4 h-4 stroke-[2.5]" />
+              <span>New milestone</span>
+            </button>
+          </div>
         </div>
 
-        <div className="flex items-center gap-2">
-          <Button
-            variant="primary"
-            size="sm"
-            className="!bg-amber-500 hover:!bg-amber-600 text-black font-semibold shadow-glow-amber"
-            onClick={() => setIsModalOpen(true)}
-            icon={<Plus className="w-4 h-4" />}
-          >
-            Add Milestone
-          </Button>
+        {/* Filter Tabs */}
+        <div className="flex items-center gap-1 bg-slate-100/80 dark:bg-bg-elevated p-1 rounded-xl border border-border-base/50 w-fit text-xs">
+          {(['all', 'in_progress', 'pending', 'completed'] as const).map((tab) => (
+            <button
+              key={tab}
+              type="button"
+              onClick={() => setFilter(tab)}
+              className={cn(
+                'px-3 py-1.5 rounded-lg capitalize font-medium transition-colors cursor-pointer',
+                filter === tab
+                  ? 'bg-white dark:bg-bg-surface text-text-primary shadow-2xs font-semibold'
+                  : 'text-text-muted hover:text-text-primary'
+              )}
+            >
+              {tab.replace('_', ' ')}
+            </button>
+          ))}
         </div>
-      </div>
-
-      {/* Filter Tabs */}
-      <div className="flex items-center gap-2 p-1.5 rounded-xl bg-bg-surface border border-border-base w-fit text-xs">
-        {(['all', 'in_progress', 'pending', 'completed'] as const).map((tab) => (
-          <button
-            key={tab}
-            onClick={() => setFilter(tab)}
-            className={`px-3 py-1.5 rounded-lg capitalize font-medium transition-colors ${
-              filter === tab
-                ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
-                : 'text-text-muted hover:text-text-primary'
-            }`}
-          >
-            {tab.replace('_', ' ')}
-          </button>
-        ))}
-      </div>
 
       {/* Timeline List */}
       <div className="relative border-l-2 border-border-base ml-4 pl-6 space-y-6">
@@ -346,6 +344,7 @@ export default function MilestonesPage() {
             );
           })
         )}
+      </div>
       </div>
 
       {/* Add Milestone Modal */}

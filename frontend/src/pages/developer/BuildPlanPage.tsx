@@ -181,153 +181,145 @@ export default function BuildPlanPage() {
   }
 
   return (
-    <div className="space-y-6 max-w-6xl mx-auto animate-fade-in pb-12">
-      {/* ─── Executive Header Banner ─────────────────────────────────── */}
-      <div className="rounded-2xl border border-border-base/80 bg-white dark:bg-bg-surface shadow-sm p-6 md:p-8 flex flex-col md:flex-row md:items-center md:justify-between gap-5 relative overflow-hidden backdrop-blur-xl">
-        <div className="space-y-2">
-          <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-indigo-500/10 border border-indigo-500/20 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0">
-              <GitPullRequest className="w-4 h-4" />
-            </div>
-            <span className="text-2xs font-mono font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20">
-              SYSTEM ARCHITECTURE &amp; SPRINT ROADMAP
-            </span>
-          </div>
-          <h1 className="text-2xl md:text-3xl font-extrabold text-text-primary tracking-tight">
-            Build Plan &amp; Roadmap
-          </h1>
-          <p className="text-xs md:text-sm text-text-secondary max-w-2xl font-normal">
-            Deconstruct engineering goals into architectural phases, track shippable milestones, and
-            review linked technical deliverables.
-          </p>
-        </div>
-
-        {/* Banner Action CTAs */}
-        <div className="flex items-center gap-2.5 flex-wrap shrink-0">
-          <Button
-            size="sm"
-            onClick={() => {
-              setNewProjectId(selectedProjectId !== 'all' ? selectedProjectId : projects[0]?.id);
-              setIsNewMilestoneOpen(true);
-            }}
-            className="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold shadow-sm"
-            icon={<Plus className="w-3.5 h-3.5" />}
-          >
-            New Milestone
-          </Button>
-        </div>
-      </div>
-
-      {/* ─── Sprint Metrics Bar ──────────────────────────────────────── */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-        <Card className="p-4 border-border-base/80 bg-white dark:bg-bg-surface">
-          <span className="text-2xs font-semibold uppercase tracking-wider text-text-muted">
-            Total Milestones
-          </span>
-          <p className="text-2xl font-extrabold text-text-primary mt-1">{totalMilestones}</p>
-        </Card>
-
-        <Card className="p-4 border-border-base/80 bg-white dark:bg-bg-surface">
-          <span className="text-2xs font-semibold uppercase tracking-wider text-indigo-500">
-            In Progress
-          </span>
-          <p className="text-2xl font-extrabold text-indigo-600 dark:text-indigo-400 mt-1">
-            {inProgressMilestones}
-          </p>
-        </Card>
-
-        <Card className="p-4 border-border-base/80 bg-white dark:bg-bg-surface">
-          <span className="text-2xs font-semibold uppercase tracking-wider text-emerald-500">
-            Shipped / Done
-          </span>
-          <p className="text-2xl font-extrabold text-emerald-600 dark:text-emerald-400 mt-1">
-            {completedMilestones}
-          </p>
-        </Card>
-
-        <Card className="p-4 border-border-base/80 bg-white dark:bg-bg-surface">
-          <div className="flex items-center justify-between text-2xs font-semibold uppercase tracking-wider text-text-muted">
-            <span>Sprint Completion</span>
-            <span className="text-indigo-600 dark:text-indigo-400 font-bold">
-              {overallProgress}%
-            </span>
-          </div>
-          <div className="w-full bg-slate-100 dark:bg-bg-elevated h-2 rounded-full overflow-hidden mt-3 border border-border-base/60">
-            <div
-              className="bg-indigo-600 h-full rounded-full transition-all duration-500"
-              style={{ width: `${overallProgress}%` }}
-            />
-          </div>
-        </Card>
-      </div>
-
-      {/* ─── Controls: Project Selector & Status Pills ───────────────── */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-2">
-        {/* Repository Filter */}
-        <div className="flex items-center gap-2 min-w-0">
-          <FolderGit2 className="w-4 h-4 text-indigo-500 shrink-0" />
-          <select
-            value={selectedProjectId}
-            onChange={(e) =>
-              setSelectedProjectId(e.target.value === 'all' ? 'all' : Number(e.target.value))
-            }
-            className="h-9 px-3 rounded-xl text-xs font-semibold bg-white dark:bg-bg-surface border border-border-base text-text-primary focus:outline-none focus:border-indigo-500 transition-colors shadow-2xs"
-          >
-            <option value="all">All Repositories ({projects.length})</option>
-            {projects.map((proj) => (
-              <option key={proj.id} value={proj.id}>
-                {proj.title}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        {/* Status Filters */}
-        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0">
-          {(['all', 'in_progress', 'pending', 'completed'] as const).map((status) => (
-            <button
-              key={status}
-              onClick={() => setStatusFilter(status)}
-              className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all whitespace-nowrap cursor-pointer ${
-                statusFilter === status
-                  ? 'bg-indigo-600 text-white shadow-2xs'
-                  : 'bg-white dark:bg-bg-surface border border-border-base/80 text-text-secondary hover:text-text-primary hover:bg-slate-50 dark:hover:bg-bg-elevated'
-              }`}
-            >
-              {status === 'all'
-                ? 'All Statuses'
-                : status === 'in_progress'
-                  ? 'In Progress'
-                  : status.charAt(0).toUpperCase() + status.slice(1)}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* ─── Milestones Roadmap List ─────────────────────────────────── */}
-      <div className="space-y-4">
-        {filteredMilestones.length === 0 ? (
-          <Card className="p-10 border-border-base text-center space-y-3 bg-white dark:bg-bg-surface">
-            <div className="w-12 h-12 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-500 flex items-center justify-center mx-auto">
-              <Flag className="w-6 h-6" />
-            </div>
-            <h3 className="text-sm font-bold text-text-primary">No Milestones Recorded</h3>
-            <p className="text-xs text-text-secondary max-w-sm mx-auto">
-              Break down your active repository into milestones, technical deliverables, and
-              shippable releases.
+    <div className="space-y-6 max-w-6xl mx-auto animate-fade-in pb-16 px-1 sm:px-4">
+      {/* ─── Main White Container Card Matching Notes & Dashboard ─── */}
+      <div className="bg-white dark:bg-[#161922] rounded-3xl border border-[#eee7e0] dark:border-stone-800/80 p-5 sm:p-8 space-y-6 shadow-xs">
+        {/* Header Row */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-text-primary">
+              Build plan &amp; roadmap
+            </h1>
+            <p className="text-xs text-text-secondary mt-1 font-medium">
+              Deconstruct engineering goals into architectural phases, track shippable milestones, and review linked technical deliverables.
             </p>
-            <div className="pt-2 flex items-center justify-center">
-              <Button
-                size="sm"
-                onClick={() => setIsNewMilestoneOpen(true)}
-                className="bg-indigo-600 hover:bg-indigo-700 text-white"
-                icon={<Plus className="w-3.5 h-3.5" />}
-              >
-                Create Milestone
-              </Button>
+          </div>
+
+          <div className="flex items-center gap-2.5 shrink-0">
+            <button
+              type="button"
+              onClick={() => {
+                setNewProjectId(selectedProjectId !== 'all' ? selectedProjectId : projects[0]?.id);
+                setIsNewMilestoneOpen(true);
+              }}
+              className="h-10 px-4 rounded-xl bg-[#c04b1e] hover:bg-[#a33d16] text-white text-xs font-semibold flex items-center gap-2 shadow-xs transition-all active:translate-y-[1px] cursor-pointer"
+            >
+              <Plus className="w-4 h-4 stroke-[2.5]" />
+              <span>New milestone</span>
+            </button>
+          </div>
+        </div>
+
+        {/* ─── Sprint Metrics Bar ─── */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+          <div className="p-4 rounded-2xl border border-border-base/90 bg-[#faf8f5]/80 dark:bg-stone-900/40">
+            <span className="text-[11px] font-semibold uppercase tracking-wider text-text-muted">
+              Total Milestones
+            </span>
+            <p className="text-2xl font-extrabold text-text-primary mt-1">{totalMilestones}</p>
+          </div>
+
+          <div className="p-4 rounded-2xl border border-border-base/90 bg-[#faf8f5]/80 dark:bg-stone-900/40">
+            <span className="text-[11px] font-semibold uppercase tracking-wider text-[#c04b1e]">
+              In Progress
+            </span>
+            <p className="text-2xl font-extrabold text-[#c04b1e] mt-1">
+              {inProgressMilestones}
+            </p>
+          </div>
+
+          <div className="p-4 rounded-2xl border border-border-base/90 bg-[#faf8f5]/80 dark:bg-stone-900/40">
+            <span className="text-[11px] font-semibold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
+              Shipped / Done
+            </span>
+            <p className="text-2xl font-extrabold text-emerald-600 dark:text-emerald-400 mt-1">
+              {completedMilestones}
+            </p>
+          </div>
+
+          <div className="p-4 rounded-2xl border border-border-base/90 bg-[#faf8f5]/80 dark:bg-stone-900/40">
+            <div className="flex items-center justify-between text-[11px] font-semibold uppercase tracking-wider text-text-muted">
+              <span>Sprint Completion</span>
+              <span className="text-[#c04b1e] font-bold">
+                {overallProgress}%
+              </span>
             </div>
-          </Card>
-        ) : (
+            <div className="w-full bg-slate-100 dark:bg-stone-800 h-2 rounded-full overflow-hidden mt-3 border border-border-base/60">
+              <div
+                className="bg-[#c04b1e] h-full rounded-full transition-all duration-500"
+                style={{ width: `${overallProgress}%` }}
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* ─── Controls: Project Selector & Status Pills ─── */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-1">
+          {/* Repository Filter */}
+          <div className="flex items-center gap-2 min-w-0">
+            <FolderGit2 className="w-4 h-4 text-[#c04b1e] shrink-0" />
+            <select
+              value={selectedProjectId}
+              onChange={(e) =>
+                setSelectedProjectId(e.target.value === 'all' ? 'all' : Number(e.target.value))
+              }
+              className="h-9 px-3 rounded-xl text-xs font-semibold bg-white dark:bg-stone-800 border border-border-base text-text-primary focus:outline-none focus:border-[#c04b1e] transition-colors shadow-2xs"
+            >
+              <option value="all">All Repositories ({projects.length})</option>
+              {projects.map((proj) => (
+                <option key={proj.id} value={proj.id}>
+                  {proj.title}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Status Filters */}
+          <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0">
+            {(['all', 'in_progress', 'pending', 'completed'] as const).map((status) => (
+              <button
+                key={status}
+                type="button"
+                onClick={() => setStatusFilter(status)}
+                className={`px-3 py-1 rounded-xl text-xs font-semibold transition-all whitespace-nowrap cursor-pointer border ${
+                  statusFilter === status
+                    ? 'bg-[#c04b1e] text-white border-[#c04b1e] shadow-2xs'
+                    : 'bg-white dark:bg-stone-800 border-border-base/80 text-text-secondary hover:text-text-primary'
+                }`}
+              >
+                {status === 'all'
+                  ? 'All Statuses'
+                  : status === 'in_progress'
+                    ? 'In Progress'
+                    : status.charAt(0).toUpperCase() + status.slice(1)}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* ─── Milestones Roadmap List ─── */}
+        <div className="space-y-4">
+          {filteredMilestones.length === 0 ? (
+            <div className="rounded-3xl border-2 border-dashed border-[#eee7e0] dark:border-stone-800 p-8 sm:p-12 text-center bg-white/50 dark:bg-bg-surface/50 space-y-3">
+              <div className="w-14 h-14 rounded-2xl bg-amber-100/80 dark:bg-amber-950/50 text-[#c04b1e] flex items-center justify-center mx-auto mb-4 border border-amber-200/60">
+                <Flag className="w-6 h-6" />
+              </div>
+              <h3 className="text-sm font-bold text-text-primary">No Milestones Recorded</h3>
+              <p className="text-xs text-text-secondary max-w-sm mx-auto">
+                Break down your active repository into milestones, technical deliverables, and shippable releases.
+              </p>
+              <div className="pt-2 flex items-center justify-center">
+                <button
+                  type="button"
+                  onClick={() => setIsNewMilestoneOpen(true)}
+                  className="h-10 px-4 rounded-xl bg-[#c04b1e] hover:bg-[#a33d16] text-white text-xs font-semibold flex items-center gap-2 shadow-xs transition-all active:translate-y-[1px] cursor-pointer"
+                >
+                  <Plus className="w-4 h-4 stroke-[2.5]" />
+                  <span>Create Milestone</span>
+                </button>
+              </div>
+            </div>
+          ) : (
           filteredMilestones.map((m) => {
             const isDone = m.status === 'completed';
             const isExpanded = !!expandedMilestones[m.id];
@@ -572,6 +564,7 @@ export default function BuildPlanPage() {
             );
           })
         )}
+      </div>
       </div>
 
       {/* ─── Modal: Create New Milestone ─────────────────────────────── */}

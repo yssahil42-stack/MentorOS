@@ -115,42 +115,34 @@ export default function FreelancerSettingsPage() {
   };
 
   return (
-    <div className="space-y-6 max-w-4xl mx-auto animate-fade-in pb-12">
-      {/* Header */}
-      <div>
-        <div className="flex items-center gap-2">
-          <span className="p-1.5 rounded-lg bg-orange-500/10 text-orange-500 border border-orange-500/20">
-            <Settings className="w-5 h-5 text-orange-500" />
-          </span>
-          <span className="text-xs font-mono font-bold text-orange-600 dark:text-orange-400">
-            FREELANCER STUDIO CONFIGURATION
-          </span>
+    <div className="space-y-6 max-w-4xl mx-auto animate-fade-in pb-16 px-1 sm:px-4">
+      {/* Header Container */}
+      <div className="bg-white dark:bg-[#161922] rounded-3xl border border-[#eee7e0] dark:border-stone-800/80 p-5 sm:p-8 space-y-6 shadow-xs">
+        <div>
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-text-primary">
+            Freelance &amp; client settings
+          </h1>
+          <p className="text-xs text-text-secondary mt-1 font-medium">
+            Configure business rates, billable capacity, milestone delivery terms, invoices, and application defaults.
+          </p>
         </div>
-        <h1 className="text-2xl md:text-3xl font-extrabold text-text-primary mt-1">
-          Freelance &amp; Client Settings
-        </h1>
-        <p className="text-xs md:text-sm text-text-muted">
-          Configure business rates, billable capacity, milestone delivery terms, invoices, and
-          application defaults.
-        </p>
-      </div>
 
-      <form onSubmit={handleSave} className="space-y-5">
-        {/* Business & Commercial Billing */}
-        <Card className="p-5 space-y-4">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-2 border-b border-border-base gap-3">
-            <div className="flex items-center gap-2.5">
-              <IndianRupee className="w-5 h-5 text-orange-500" />
-              <div>
-                <h3 className="text-sm font-bold text-text-primary">
-                  Commercial Rates &amp; Payment Terms
-                </h3>
-                <p className="text-xs text-text-muted">
-                  Applied to proposal generation, invoice creation, and client contract scoping
-                  (Default: INR ₹)
-                </p>
+        <form onSubmit={handleSave} className="space-y-6">
+          {/* Business & Commercial Billing */}
+          <div className="p-6 rounded-2xl border border-border-base/90 bg-[#faf8f5]/60 dark:bg-stone-900/40 space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-2 border-b border-border-base/60 gap-3">
+              <div className="flex items-center gap-2.5">
+                <IndianRupee className="w-5 h-5 text-[#c04b1e]" />
+                <div>
+                  <h3 className="text-sm font-bold text-text-primary">
+                    Commercial Rates &amp; Payment Terms
+                  </h3>
+                  <p className="text-xs text-text-muted">
+                    Applied to proposal generation, invoice creation, and client contract scoping
+                    (Default: INR ₹)
+                  </p>
+                </div>
               </div>
-            </div>
             <button
               type="button"
               onClick={() => setShowConverterModal(true)}
@@ -250,12 +242,12 @@ export default function FreelancerSettingsPage() {
               </select>
             </div>
           </div>
-        </Card>
+        </div>
 
         {/* Time Tracking & Capacity Management */}
-        <Card className="p-5 space-y-4">
-          <div className="flex items-center gap-2.5 pb-2 border-b border-border-base">
-            <Clock className="w-5 h-5 text-orange-500" />
+        <div className="p-6 rounded-2xl border border-border-base/90 bg-[#faf8f5]/60 dark:bg-stone-900/40 space-y-4">
+          <div className="flex items-center gap-2.5 pb-2 border-b border-border-base/60">
+            <Clock className="w-5 h-5 text-[#c04b1e]" />
             <div>
               <h3 className="text-sm font-bold text-text-primary">
                 Capacity &amp; Billable Time Tracking
@@ -315,12 +307,12 @@ export default function FreelancerSettingsPage() {
               </div>
             </label>
           </div>
-        </Card>
+        </div>
 
         {/* Client Invoicing & Delivery Workflow */}
-        <Card className="p-5 space-y-4">
-          <div className="flex items-center gap-2.5 pb-2 border-b border-border-base">
-            <Receipt className="w-5 h-5 text-orange-500" />
+        <div className="p-6 rounded-2xl border border-border-base/90 bg-[#faf8f5]/60 dark:bg-stone-900/40 space-y-4">
+          <div className="flex items-center gap-2.5 pb-2 border-b border-border-base/60">
+            <Receipt className="w-5 h-5 text-[#c04b1e]" />
             <div>
               <h3 className="text-sm font-bold text-text-primary">
                 Client Invoices &amp; Delivery Receipts
@@ -396,24 +388,24 @@ export default function FreelancerSettingsPage() {
               </label>
             </div>
           </div>
-        </Card>
+        </div>
 
         {/* Global Application & System Settings */}
         <AppSettingsSection />
 
         {/* Save Bar */}
         <div className="flex justify-end pt-2">
-          <Button
+          <button
             type="submit"
-            variant="primary"
             disabled={isSaving}
-            className="bg-orange-500 hover:bg-orange-600 active:bg-orange-700 text-white shadow-sm font-semibold"
-            leftIcon={<Save className="w-4 h-4" />}
+            className="h-10 px-5 rounded-xl bg-[#c04b1e] hover:bg-[#a33d16] text-white text-xs font-semibold flex items-center gap-2 shadow-xs transition-all active:translate-y-[1px] cursor-pointer disabled:opacity-50"
           >
-            {isSaving ? 'Saving Settings...' : 'Save Freelance Settings'}
-          </Button>
+            <Save className="w-4 h-4" />
+            <span>{isSaving ? 'Saving Settings...' : 'Save Freelance Settings'}</span>
+          </button>
         </div>
       </form>
+      </div>
 
       {/* ─── CURRENCY CONVERTER MODAL ─────────────────────────────────────── */}
       {showConverterModal && (

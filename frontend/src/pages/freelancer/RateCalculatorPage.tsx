@@ -117,7 +117,8 @@ export default function RateCalculatorPage() {
 
   // ─── Render ─────────────────────────────────────────────────────────────────
   return (
-    <div className="space-y-6 max-w-7xl mx-auto pb-10">
+    <div className="space-y-6 max-w-6xl mx-auto animate-fade-in pb-16 px-1 sm:px-4">
+      <div className="bg-white dark:bg-[#161922] rounded-3xl border border-[#eee7e0] dark:border-stone-800/80 p-5 sm:p-8 space-y-6 shadow-xs">
       {/* ─── HEADER ───────────────────────────────────────────────────────────── */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div className="space-y-1.5">
@@ -466,6 +467,7 @@ export default function RateCalculatorPage() {
             </div>
           </Card>
         </div>
+      </div>
       </div>
     </div>
   );

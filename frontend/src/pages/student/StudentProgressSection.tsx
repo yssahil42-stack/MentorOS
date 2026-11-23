@@ -16,6 +16,7 @@ import {
 import { Card } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
 import { useWorkspace } from '../../contexts/WorkspaceContext';
+import { formatDateTime } from '../../utils/dateUtils';
 import type { Project } from '../../types/project';
 import type { Task } from '../../types/task';
 
@@ -77,6 +78,7 @@ export const StudentProgressSection: React.FC<StudentProgressSectionProps> = ({
             currentGrade: grade,
             percentage: pPct,
             status: pPct >= 90 ? 'High performance' : pPct >= 70 ? 'On track' : 'Needs focus',
+            created_at: p.created_at,
           };
         })
       : [];
@@ -225,9 +227,18 @@ export const StudentProgressSection: React.FC<StudentProgressSectionProps> = ({
                               {c.title}
                             </h4>
                           </div>
-                          <span className="text-2xs text-text-muted mt-0.5 block">
-                            {c.credits} Credits • Standing: {c.status}
-                          </span>
+                          <div className="flex items-center gap-1.5 text-2xs text-text-muted mt-0.5 flex-wrap">
+                            <span>{c.credits} Credits • Standing: {c.status}</span>
+                            {c.created_at && (
+                              <>
+                                <span>•</span>
+                                <span className="inline-flex items-center gap-1 text-text-muted font-mono shrink-0">
+                                  <Clock className="w-2.5 h-2.5 text-student-400" />
+                                  Created {formatDateTime(c.created_at)}
+                                </span>
+                              </>
+                            )}
+                          </div>
                         </div>
 
                         <div className="text-right shrink-0">

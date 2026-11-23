@@ -1,3 +1,4 @@
+import { cn } from '../../utils/cn';
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -399,221 +400,177 @@ export default function FreelancerProjectsPage() {
   }
 
   return (
-    <div className="space-y-6 max-w-7xl mx-auto pb-10">
-      {/* ─── HEADER ────────────────────────────────────────────────────── */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-        <div className="space-y-1.5">
-          <div className="flex items-center gap-2 flex-wrap">
-            <span className="p-1.5 rounded-lg bg-amber-500/20 text-amber-500 dark:text-amber-400">
-              <Briefcase className="w-5 h-5" />
-            </span>
-            <span className="text-xs font-mono font-semibold px-2.5 py-0.5 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
-              CLIENT WORKSPACE SUITE
-            </span>
+    <div className="space-y-6 max-w-6xl mx-auto animate-fade-in pb-16 px-1 sm:px-4">
+      {/* ─── Main White Container Card Matching Notes & Dashboard ─── */}
+      <div className="bg-white dark:bg-[#161922] rounded-3xl border border-[#eee7e0] dark:border-stone-800/80 p-5 sm:p-8 space-y-6 shadow-xs">
+        {/* Header Row */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-text-primary">
+              Projects, deliverables &amp; tasks
+            </h1>
+            <p className="text-xs text-text-secondary mt-1 font-medium">
+              Manage client engagements, project deliverables, and execution tasks in one unified workspace.
+            </p>
           </div>
-          <h1 className="text-2xl md:text-3xl font-extrabold text-text-primary tracking-tight">
-            Projects, Deliverables &amp; Tasks
-          </h1>
-          <p className="text-xs md:text-sm text-text-secondary max-w-2xl">
-            Manage client engagements, project deliverables, and execution tasks in one unified
-            workspace.
-          </p>
+
+          <div className="flex items-center gap-2.5 shrink-0 flex-wrap">
+            <button
+              type="button"
+              onClick={() => {
+                setEditingProject({
+                  id: 0,
+                  user_id: 0,
+                  role: 'freelancer',
+                  title: '',
+                  description: '',
+                  status: 'planning',
+                  priority: 'medium',
+                  target_date: null,
+                  progress: 0,
+                  created_at: '',
+                  updated_at: '',
+                } as Project);
+              }}
+              className="h-10 px-4 rounded-xl bg-[#c04b1e] hover:bg-[#a33d16] text-white text-xs font-semibold flex items-center gap-2 shadow-xs transition-all active:translate-y-[1px] cursor-pointer"
+            >
+              <Plus className="w-4 h-4 stroke-[2.5]" />
+              <span>New project</span>
+            </button>
+          </div>
         </div>
 
-        <div className="flex items-center gap-2 shrink-0 flex-wrap">
-          <Button
-            variant="secondary"
-            size="sm"
-            onClick={() => setActiveTab('deliverables')}
-            icon={<Clock className="w-4 h-4 text-amber-500" />}
-          >
-            Deliverables
-          </Button>
-          <Button
-            variant="secondary"
-            size="sm"
-            onClick={() => setActiveTab('tasks')}
-            icon={<CheckSquare className="w-4 h-4 text-amber-500" />}
-          >
-            Task Board
-          </Button>
-          <Button
-            variant="primary"
-            size="sm"
-            onClick={() => {
-              setEditingProject({
-                id: 0,
-                user_id: 0,
-                role: 'freelancer',
-                title: '',
-                description: '',
-                status: 'planning',
-                priority: 'medium',
-                target_date: null,
-                progress: 0,
-                created_at: '',
-                updated_at: '',
-              } as Project);
-            }}
-            icon={<Plus className="w-4 h-4" />}
-            className="!bg-amber-500 hover:!bg-amber-600 text-stone-950 font-bold"
-          >
-            New Project
-          </Button>
-        </div>
-      </div>
-
-      {/* ─── METRICS ROW ───────────────────────────────────────────────── */}
-      <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4">
-        <Card3D
-          maxTilt={5}
-          depth={20}
-          variant="glass"
-          className="p-4 sm:p-5 border border-border-base/90 shadow-card"
-        >
-          <div className="flex items-center justify-between text-xs text-text-muted font-medium">
-            <span>Project Tasks</span>
-            <div className="p-2 rounded-xl bg-amber-500/15 text-amber-500 border border-amber-500/25">
-              <Building2 className="w-4 h-4" />
+        {/* ─── METRICS ROW ─── */}
+        <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4">
+          <div className="p-4 sm:p-5 rounded-2xl border border-border-base/90 bg-[#faf8f5]/80 dark:bg-stone-900/40">
+            <div className="flex items-center justify-between text-xs text-text-muted font-medium">
+              <span>Project Tasks</span>
+              <div className="p-2 rounded-xl bg-orange-100/70 text-[#c04b1e] border border-orange-200/60 dark:bg-orange-950/40 dark:text-orange-300">
+                <Building2 className="w-4 h-4" />
+              </div>
+            </div>
+            <div className="mt-3 flex items-baseline gap-1.5">
+              <span className="text-2xl sm:text-3xl font-extrabold text-text-primary font-mono tracking-tight">
+                {projects.length}
+              </span>
+              <span className="text-xs text-text-muted">total</span>
             </div>
           </div>
-          <div className="mt-3 flex items-baseline gap-1.5">
-            <span className="text-2xl sm:text-3xl font-extrabold text-text-primary font-mono tracking-tight">
+
+          <div className="p-4 sm:p-5 rounded-2xl border border-border-base/90 bg-[#faf8f5]/80 dark:bg-stone-900/40">
+            <div className="flex items-center justify-between text-xs text-text-muted font-medium">
+              <span>Deliverables</span>
+              <div className="p-2 rounded-xl bg-emerald-100/80 text-emerald-700 border border-emerald-200/60 dark:bg-emerald-950/40 dark:text-emerald-300">
+                <Clock className="w-4 h-4" />
+              </div>
+            </div>
+            <div className="mt-3 flex items-baseline gap-1.5">
+              <span className="text-2xl sm:text-3xl font-extrabold text-text-primary font-mono tracking-tight">
+                {completedMilestonesCount}
+              </span>
+              <span className="text-xs text-text-muted">/ {milestones.length} delivered</span>
+            </div>
+          </div>
+
+          <div className="p-4 sm:p-5 rounded-2xl border border-border-base/90 bg-[#faf8f5]/80 dark:bg-stone-900/40">
+            <div className="flex items-center justify-between text-xs text-text-muted font-medium">
+              <span>Client Tasks</span>
+              <div className="p-2 rounded-xl bg-teal-100/80 text-teal-700 border border-teal-200/60 dark:bg-teal-950/40 dark:text-teal-300">
+                <CheckSquare className="w-4 h-4" />
+              </div>
+            </div>
+            <div className="mt-3 flex items-baseline gap-1.5">
+              <span className="text-2xl sm:text-3xl font-extrabold text-text-primary font-mono tracking-tight">
+                {completedTasksCount}
+              </span>
+              <span className="text-xs text-text-muted">/ {tasks.length} done</span>
+            </div>
+          </div>
+
+          <div className="p-4 sm:p-5 rounded-2xl border border-border-base/90 bg-[#faf8f5]/80 dark:bg-stone-900/40">
+            <div className="flex items-center justify-between text-xs text-text-muted font-medium">
+              <span>Avg Progress</span>
+              <div className="p-2 rounded-xl bg-amber-100/80 text-amber-700 border border-amber-200/60 dark:bg-amber-950/40 dark:text-amber-300">
+                <PieChart className="w-4 h-4" />
+              </div>
+            </div>
+            <div className="mt-3 flex items-baseline gap-1.5">
+              <span className="text-2xl sm:text-3xl font-extrabold text-[#c04b1e] font-mono tracking-tight">
+                {avgProgress}%
+              </span>
+            </div>
+          </div>
+
+          <div className="p-4 sm:p-5 rounded-2xl border border-border-base/90 bg-[#faf8f5]/80 dark:bg-stone-900/40">
+            <div className="flex items-center justify-between text-xs text-text-muted font-medium">
+              <span>Pipeline Value</span>
+              <div className="p-2 rounded-xl bg-rose-100/80 text-rose-700 border border-rose-200/60 dark:bg-rose-950/40 dark:text-rose-300">
+                <Coins className="w-4 h-4" />
+              </div>
+            </div>
+            <div className="mt-3 flex items-baseline gap-1.5">
+              <span className="text-xl sm:text-2xl font-extrabold text-text-primary font-mono tracking-tight">
+                {formatCurrency(totalRevenue, 'INR')}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* ─── VIEW SWITCHER TABS ─── */}
+        <div className="flex items-center gap-1.5 bg-slate-100/80 dark:bg-bg-elevated p-1 rounded-xl border border-border-base/50 w-fit">
+          <button
+            type="button"
+            onClick={() => setActiveTab('projects')}
+            className={cn(
+              'flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer',
+              activeTab === 'projects'
+                ? 'bg-white dark:bg-bg-surface text-text-primary shadow-2xs'
+                : 'text-text-muted hover:text-text-primary'
+            )}
+          >
+            <Briefcase className="w-3.5 h-3.5" />
+            <span>Projects</span>
+            <span className="text-[10px] font-mono px-1.5 py-0.5 rounded-full bg-slate-100 dark:bg-stone-800 border border-border-base/50">
               {projects.length}
             </span>
-            <span className="text-xs text-text-muted">total</span>
-          </div>
-        </Card3D>
+          </button>
 
-        <Card3D
-          maxTilt={5}
-          depth={20}
-          variant="glass"
-          className="p-4 sm:p-5 border border-border-base/90 shadow-card"
-        >
-          <div className="flex items-center justify-between text-xs text-text-muted font-medium">
+          <button
+            type="button"
+            onClick={() => setActiveTab('deliverables')}
+            className={cn(
+              'flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer',
+              activeTab === 'deliverables'
+                ? 'bg-white dark:bg-bg-surface text-text-primary shadow-2xs'
+                : 'text-text-muted hover:text-text-primary'
+            )}
+          >
+            <Clock className="w-3.5 h-3.5" />
             <span>Deliverables</span>
-            <div className="p-2 rounded-xl bg-emerald-500/15 text-emerald-500 border border-emerald-500/25">
-              <Clock className="w-4 h-4" />
-            </div>
-          </div>
-          <div className="mt-3 flex items-baseline gap-1.5">
-            <span className="text-2xl sm:text-3xl font-extrabold text-text-primary font-mono tracking-tight">
-              {completedMilestonesCount}
+            <span className="text-[10px] font-mono px-1.5 py-0.5 rounded-full bg-slate-100 dark:bg-stone-800 border border-border-base/50">
+              {milestones.length}
             </span>
-            <span className="text-xs text-text-muted">/ {milestones.length} delivered</span>
-          </div>
-        </Card3D>
+          </button>
 
-        <Card3D
-          maxTilt={5}
-          depth={20}
-          variant="glass"
-          className="p-4 sm:p-5 border border-border-base/90 shadow-card"
-        >
-          <div className="flex items-center justify-between text-xs text-text-muted font-medium">
-            <span>Client Tasks</span>
-            <div className="p-2 rounded-xl bg-cyan-500/15 text-cyan-500 border border-cyan-500/25">
-              <CheckSquare className="w-4 h-4" />
-            </div>
-          </div>
-          <div className="mt-3 flex items-baseline gap-1.5">
-            <span className="text-2xl sm:text-3xl font-extrabold text-text-primary font-mono tracking-tight">
-              {completedTasksCount}
+          <button
+            type="button"
+            onClick={() => setActiveTab('tasks')}
+            className={cn(
+              'flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer',
+              activeTab === 'tasks'
+                ? 'bg-white dark:bg-bg-surface text-text-primary shadow-2xs'
+                : 'text-text-muted hover:text-text-primary'
+            )}
+          >
+            <CheckSquare className="w-3.5 h-3.5" />
+            <span>Tasks &amp; Board</span>
+            <span className="text-[10px] font-mono px-1.5 py-0.5 rounded-full bg-slate-100 dark:bg-stone-800 border border-border-base/50">
+              {tasks.length}
             </span>
-            <span className="text-xs text-text-muted">/ {tasks.length} done</span>
-          </div>
-        </Card3D>
+          </button>
+        </div>
 
-        <Card3D
-          maxTilt={5}
-          depth={20}
-          variant="glass"
-          className="p-4 sm:p-5 border border-border-base/90 shadow-card"
-        >
-          <div className="flex items-center justify-between text-xs text-text-muted font-medium">
-            <span>Avg Progress</span>
-            <div className="p-2 rounded-xl bg-solar-500/15 text-solar-500 border border-solar-500/25">
-              <PieChart className="w-4 h-4" />
-            </div>
-          </div>
-          <div className="mt-3 flex items-baseline gap-1.5">
-            <span className="text-2xl sm:text-3xl font-extrabold text-text-primary font-mono tracking-tight">
-              {avgProgress}%
-            </span>
-          </div>
-        </Card3D>
 
-        <Card3D
-          maxTilt={5}
-          depth={20}
-          variant="glass"
-          className="p-4 sm:p-5 border border-border-base/90 shadow-card"
-        >
-          <div className="flex items-center justify-between text-xs text-text-muted font-medium">
-            <span>Pipeline Value (INR)</span>
-            <div className="p-2 rounded-xl bg-purple-500/15 text-purple-500 border border-purple-500/25">
-              <Coins className="w-4 h-4" />
-            </div>
-          </div>
-          <div className="mt-3 flex items-baseline gap-1.5">
-            <span className="text-2xl sm:text-3xl font-extrabold text-text-primary font-mono tracking-tight">
-              {formatCurrency(totalRevenue, 'INR')}
-            </span>
-          </div>
-        </Card3D>
-      </div>
-
-      {/* ─── VIEW SWITCHER TABS ────────────────────────────────────────── */}
-      <div className="flex items-center gap-2 border-b border-border-base pb-3">
-        <button
-          type="button"
-          onClick={() => setActiveTab('projects')}
-          className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all ${
-            activeTab === 'projects'
-              ? 'bg-amber-500/15 text-amber-500 dark:text-amber-400 border border-amber-500/30 shadow-2xs'
-              : 'text-text-muted hover:text-text-primary hover:bg-bg-elevated'
-          }`}
-        >
-          <Briefcase className="w-4 h-4" />
-          <span>Project Tasks</span>
-          <span className="text-3xs font-mono px-1.5 py-0.5 rounded-full bg-bg-surface border border-border-base">
-            {projects.length}
-          </span>
-        </button>
-
-        <button
-          type="button"
-          onClick={() => setActiveTab('deliverables')}
-          className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all ${
-            activeTab === 'deliverables'
-              ? 'bg-amber-500/15 text-amber-500 dark:text-amber-400 border border-amber-500/30 shadow-2xs'
-              : 'text-text-muted hover:text-text-primary hover:bg-bg-elevated'
-          }`}
-        >
-          <Clock className="w-4 h-4" />
-          <span>Deliverables</span>
-          <span className="text-3xs font-mono px-1.5 py-0.5 rounded-full bg-bg-surface border border-border-base">
-            {milestones.length}
-          </span>
-        </button>
-
-        <button
-          type="button"
-          onClick={() => setActiveTab('tasks')}
-          className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all ${
-            activeTab === 'tasks'
-              ? 'bg-amber-500/15 text-amber-500 dark:text-amber-400 border border-amber-500/30 shadow-2xs'
-              : 'text-text-muted hover:text-text-primary hover:bg-bg-elevated'
-          }`}
-        >
-          <CheckSquare className="w-4 h-4" />
-          <span>Tasks &amp; Board</span>
-          <span className="text-3xs font-mono px-1.5 py-0.5 rounded-full bg-bg-surface border border-border-base">
-            {tasks.length}
-          </span>
-        </button>
-      </div>
 
       {/* ═════════════════════════════════════════════════════════════════════ */}
       {/* TAB 1: CLIENT PROJECTS                                                */}
@@ -1304,6 +1261,7 @@ export default function FreelancerProjectsPage() {
           )}
         </div>
       )}
+      </div>
 
       {/* ─── CREATE / EDIT PROJECT MODAL ───────────────────────────────── */}
       {editingProject && (

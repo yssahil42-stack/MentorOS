@@ -104,31 +104,35 @@ export default function JobSettingsPage() {
   };
 
   return (
-    <div className="space-y-6 max-w-4xl mx-auto animate-fade-in pb-12">
-      {/* Header */}
-      <div>
-        <div className="flex items-center gap-2">
-          <span className="p-1.5 rounded-lg bg-orange-500/10 text-orange-500 border border-orange-500/20">
-            <Settings className="w-5 h-5 text-orange-500" />
-          </span>
-          <span className="text-xs font-mono font-bold text-orange-600 dark:text-orange-400">
-            CAREER &amp; JOB SEARCH CONFIGURATION
-          </span>
+    <div className="space-y-6 max-w-6xl mx-auto animate-fade-in pb-16 px-1 sm:px-4">
+      {/* ─── Main White Container Card Matching Notes & Dashboard ─── */}
+      <div className="bg-white dark:bg-[#161922] rounded-3xl border border-[#eee7e0] dark:border-stone-800/80 p-5 sm:p-8 space-y-6 shadow-xs">
+        {/* Header Row */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-text-primary">
+              Career search settings
+            </h1>
+            <p className="text-xs text-text-secondary mt-1 font-medium">
+              Configure target roles, weekly application quotas, follow-up cadences, and interview preparation preferences.
+            </p>
+          </div>
+          <button
+            type="submit"
+            form="job-settings-form"
+            disabled={isSaving}
+            className="h-10 px-5 rounded-xl bg-[#c04b1e] hover:bg-[#a33d16] text-white text-xs font-semibold flex items-center gap-2 shadow-xs transition-all active:translate-y-[1px] cursor-pointer self-start sm:self-auto"
+          >
+            <Save className="w-4 h-4 stroke-[2.5]" />
+            <span>{isSaving ? 'Saving...' : 'Save settings'}</span>
+          </button>
         </div>
-        <h1 className="text-2xl md:text-3xl font-extrabold text-text-primary mt-1">
-          Career Search Settings
-        </h1>
-        <p className="text-xs md:text-sm text-text-muted">
-          Configure target roles, weekly application quotas, follow-up cadences, interview
-          preparation, and application behavior.
-        </p>
-      </div>
 
-      <form onSubmit={handleSave} className="space-y-5">
+        <form id="job-settings-form" onSubmit={handleSave} className="space-y-6">
         {/* Target Roles & Search Scope */}
-        <Card className="p-5 space-y-4">
+        <div className="p-5 sm:p-6 rounded-2xl border border-border-base/90 bg-[#faf8f5]/60 dark:bg-stone-900/40 space-y-4">
           <div className="flex items-center gap-2.5 pb-2 border-b border-border-base">
-            <Target className="w-5 h-5 text-orange-500" />
+            <Target className="w-5 h-5 text-[#c04b1e]" />
             <div>
               <h3 className="text-sm font-bold text-text-primary">
                 Target Roles &amp; Compensation Range
@@ -149,7 +153,7 @@ export default function JobSettingsPage() {
                 value={targetRole}
                 onChange={(e) => setTargetRole(e.target.value)}
                 placeholder="e.g. Senior Full Stack Engineer"
-                className="w-full bg-bg-surface border border-border-base rounded-xl px-3 py-2 text-xs text-text-primary focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition-all"
+                className="w-full bg-bg-surface border border-border-base rounded-xl px-3 py-2 text-xs text-text-primary focus:outline-none focus:border-[#c04b1e] focus:ring-2 focus:ring-[#c04b1e]/20 transition-all"
               />
             </div>
 
@@ -162,7 +166,7 @@ export default function JobSettingsPage() {
                 value={targetIndustries}
                 onChange={(e) => setTargetIndustries(e.target.value)}
                 placeholder="e.g. SaaS, AI Tools, FinTech"
-                className="w-full bg-bg-surface border border-border-base rounded-xl px-3 py-2 text-xs text-text-primary focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition-all"
+                className="w-full bg-bg-surface border border-border-base rounded-xl px-3 py-2 text-xs text-text-primary focus:outline-none focus:border-[#c04b1e] focus:ring-2 focus:ring-[#c04b1e]/20 transition-all"
               />
             </div>
 
@@ -173,7 +177,7 @@ export default function JobSettingsPage() {
               <select
                 value={preferredLocation}
                 onChange={(e) => setPreferredLocation(e.target.value)}
-                className="w-full bg-bg-surface border border-border-base rounded-xl px-3 py-2 text-xs text-text-primary focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition-all"
+                className="w-full bg-bg-surface border border-border-base rounded-xl px-3 py-2 text-xs text-text-primary focus:outline-none focus:border-[#c04b1e] focus:ring-2 focus:ring-[#c04b1e]/20 transition-all"
               >
                 <option value="Remote Only">Remote Only</option>
                 <option value="Hybrid">Hybrid</option>
@@ -190,7 +194,7 @@ export default function JobSettingsPage() {
                 <select
                   value={currency}
                   onChange={(e) => setCurrency(e.target.value)}
-                  className="w-24 bg-bg-surface border border-border-base rounded-xl px-2 py-2 text-xs text-text-primary focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition-all"
+                  className="w-24 bg-bg-surface border border-border-base rounded-xl px-2 py-2 text-xs text-text-primary focus:outline-none focus:border-[#c04b1e] focus:ring-2 focus:ring-[#c04b1e]/20 transition-all"
                 >
                   <option value="USD">USD</option>
                   <option value="EUR">EUR</option>
@@ -203,17 +207,17 @@ export default function JobSettingsPage() {
                   value={targetSalary}
                   onChange={(e) => setTargetSalary(e.target.value)}
                   placeholder="140,000"
-                  className="flex-1 bg-bg-surface border border-border-base rounded-xl px-3 py-2 text-xs text-text-primary focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition-all"
+                  className="flex-1 bg-bg-surface border border-border-base rounded-xl px-3 py-2 text-xs text-text-primary focus:outline-none focus:border-[#c04b1e] focus:ring-2 focus:ring-[#c04b1e]/20 transition-all"
                 />
               </div>
             </div>
           </div>
-        </Card>
+        </div>
 
         {/* Pipeline & Application Tracking Cadence */}
-        <Card className="p-5 space-y-4">
+        <div className="p-5 sm:p-6 rounded-2xl border border-border-base/90 bg-[#faf8f5]/60 dark:bg-stone-900/40 space-y-4">
           <div className="flex items-center gap-2.5 pb-2 border-b border-border-base">
-            <Briefcase className="w-5 h-5 text-orange-500" />
+            <Briefcase className="w-5 h-5 text-[#c04b1e]" />
             <div>
               <h3 className="text-sm font-bold text-text-primary">
                 Application Pipeline &amp; Outreach Quotas
@@ -235,7 +239,7 @@ export default function JobSettingsPage() {
                 value={weeklyApplicationGoal}
                 onChange={(e) => setWeeklyApplicationGoal(e.target.value)}
                 placeholder="5"
-                className="w-full bg-bg-surface border border-border-base rounded-xl px-3 py-2 text-xs text-text-primary focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition-all"
+                className="w-full bg-bg-surface border border-border-base rounded-xl px-3 py-2 text-xs text-text-primary focus:outline-none focus:border-[#c04b1e] focus:ring-2 focus:ring-[#c04b1e]/20 transition-all"
               />
             </div>
 
@@ -246,7 +250,7 @@ export default function JobSettingsPage() {
               <select
                 value={followupDays}
                 onChange={(e) => setFollowupDays(e.target.value)}
-                className="w-full bg-bg-surface border border-border-base rounded-xl px-3 py-2 text-xs text-text-primary focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition-all"
+                className="w-full bg-bg-surface border border-border-base rounded-xl px-3 py-2 text-xs text-text-primary focus:outline-none focus:border-[#c04b1e] focus:ring-2 focus:ring-[#c04b1e]/20 transition-all"
               >
                 <option value="5">5 Business Days</option>
                 <option value="7">7 Days (Standard)</option>
@@ -261,7 +265,7 @@ export default function JobSettingsPage() {
               <select
                 value={staleTimeoutDays}
                 onChange={(e) => setStaleTimeoutDays(e.target.value)}
-                className="w-full bg-bg-surface border border-border-base rounded-xl px-3 py-2 text-xs text-text-primary focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition-all"
+                className="w-full bg-bg-surface border border-border-base rounded-xl px-3 py-2 text-xs text-text-primary focus:outline-none focus:border-[#c04b1e] focus:ring-2 focus:ring-[#c04b1e]/20 transition-all"
               >
                 <option value="10">10 Days Inactive</option>
                 <option value="14">14 Days Inactive</option>
@@ -276,7 +280,7 @@ export default function JobSettingsPage() {
                 type="checkbox"
                 checked={notifyInterviews}
                 onChange={(e) => setNotifyInterviews(e.target.checked)}
-                className="rounded text-orange-500 bg-bg-surface border-border-base focus:ring-orange-500"
+                className="rounded text-[#c04b1e] bg-bg-surface border-border-base focus:ring-[#c04b1e]"
               />
               <div className="text-xs">
                 <span className="font-medium text-text-primary">
@@ -294,7 +298,7 @@ export default function JobSettingsPage() {
                 type="checkbox"
                 checked={notifyFollowups}
                 onChange={(e) => setNotifyFollowups(e.target.checked)}
-                className="rounded text-orange-500 bg-bg-surface border-border-base focus:ring-orange-500"
+                className="rounded text-[#c04b1e] bg-bg-surface border-border-base focus:ring-[#c04b1e]"
               />
               <div className="text-xs">
                 <span className="font-medium text-text-primary">Outreach Follow-up Reminders</span>
@@ -304,12 +308,12 @@ export default function JobSettingsPage() {
               </div>
             </label>
           </div>
-        </Card>
+        </div>
 
         {/* Resume & Portfolio Artifacts */}
-        <Card className="p-5 space-y-4">
+        <div className="p-5 sm:p-6 rounded-2xl border border-border-base/90 bg-[#faf8f5]/60 dark:bg-stone-900/40 space-y-4">
           <div className="flex items-center gap-2.5 pb-2 border-b border-border-base">
-            <FileText className="w-5 h-5 text-orange-500" />
+            <FileText className="w-5 h-5 text-[#c04b1e]" />
             <div>
               <h3 className="text-sm font-bold text-text-primary">
                 Resume &amp; Portfolio Versioning
@@ -330,7 +334,7 @@ export default function JobSettingsPage() {
                 value={resumeVersion}
                 onChange={(e) => setResumeVersion(e.target.value)}
                 placeholder="e.g. Alex_Senior_Engineer_2026_v3.pdf"
-                className="w-full bg-bg-surface border border-border-base rounded-xl px-3 py-2 text-xs text-text-primary focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition-all font-mono"
+                className="w-full bg-bg-surface border border-border-base rounded-xl px-3 py-2 text-xs text-text-primary focus:outline-none focus:border-[#c04b1e] focus:ring-2 focus:ring-[#c04b1e]/20 transition-all font-mono"
               />
             </div>
 
@@ -340,7 +344,7 @@ export default function JobSettingsPage() {
                   type="checkbox"
                   checked={autoTailorCoverLetters}
                   onChange={(e) => setAutoTailorCoverLetters(e.target.checked)}
-                  className="rounded text-orange-500 bg-bg-surface border-border-base focus:ring-orange-500"
+                  className="rounded text-[#c04b1e] bg-bg-surface border-border-base focus:ring-[#c04b1e]"
                 />
                 <div className="text-xs">
                   <span className="font-medium text-text-primary">
@@ -354,24 +358,24 @@ export default function JobSettingsPage() {
               </label>
             </div>
           </div>
-        </Card>
+        </div>
 
         {/* Global Application & System Settings */}
         <AppSettingsSection />
 
         {/* Save Bar */}
-        <div className="flex justify-end pt-2">
-          <Button
+        <div className="flex justify-end pt-4 border-t border-border-base/60">
+          <button
             type="submit"
-            variant="primary"
             disabled={isSaving}
-            className="bg-orange-500 hover:bg-orange-600 active:bg-orange-700 text-white shadow-sm font-semibold"
-            leftIcon={<Save className="w-4 h-4" />}
+            className="h-10 px-5 rounded-xl bg-[#c04b1e] hover:bg-[#a33d16] text-white text-xs font-semibold flex items-center gap-2 shadow-xs transition-all active:translate-y-[1px] cursor-pointer"
           >
-            {isSaving ? 'Saving Settings...' : 'Save Career Settings'}
-          </Button>
+            <Save className="w-4 h-4 stroke-[2.5]" />
+            <span>{isSaving ? 'Saving...' : 'Save settings'}</span>
+          </button>
         </div>
       </form>
+      </div>
     </div>
   );
 }

@@ -143,6 +143,7 @@ vi.mock('lucide-react', () => {
     'Zap',
     'Star',
     'Heart',
+    'Flame',
     'Download',
     'Upload',
     'RefreshCw',
@@ -517,7 +518,19 @@ vi.mock('lucide-react', () => {
     );
   });
 
-  return mockedIcons;
+  return new Proxy(mockedIcons, {
+    get: (target, prop) => {
+      if (typeof prop === 'string') {
+        if (!target[prop]) {
+          target[prop] = (props: React.SVGProps<SVGSVGElement>) => (
+            <svg {...props} data-testid={`icon-${prop.toLowerCase()}`} />
+          );
+        }
+        return target[prop];
+      }
+      return Reflect.get(target, prop);
+    },
+  });
 });
 
 // Mock window.matchMedia

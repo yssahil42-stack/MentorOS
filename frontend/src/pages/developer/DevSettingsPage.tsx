@@ -101,40 +101,32 @@ export default function DevSettingsPage() {
   };
 
   return (
-    <div className="space-y-6 max-w-4xl mx-auto animate-fade-in pb-12">
-      {/* Header */}
-      <div>
-        <div className="flex items-center gap-2">
-          <span className="p-1.5 rounded-lg bg-orange-500/10 text-orange-500 border border-orange-500/20">
-            <Settings className="w-5 h-5 text-orange-500" />
-          </span>
-          <span className="text-xs font-mono font-bold text-orange-600 dark:text-orange-400">
-            DEVELOPER WORKSPACE CONFIGURATION
-          </span>
+    <div className="space-y-6 max-w-4xl mx-auto animate-fade-in pb-16 px-1 sm:px-4">
+      {/* Header Container */}
+      <div className="bg-white dark:bg-[#161922] rounded-3xl border border-[#eee7e0] dark:border-stone-800/80 p-5 sm:p-8 space-y-6 shadow-xs">
+        <div>
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-text-primary">
+            Developer settings
+          </h1>
+          <p className="text-xs text-text-secondary mt-1 font-medium">
+            Configure Git repository defaults, local AI runtime, sprint cadences, CI/CD alerts, and system environment.
+          </p>
         </div>
-        <h1 className="text-2xl md:text-3xl font-extrabold text-text-primary mt-1">
-          Developer Settings
-        </h1>
-        <p className="text-xs md:text-sm text-text-muted">
-          Configure Git repository defaults, local AI runtime, sprint cadences, CI/CD alerts, and
-          system environment.
-        </p>
-      </div>
 
-      <form onSubmit={handleSave} className="space-y-5">
-        {/* Version Control & Git Repositories */}
-        <Card className="p-5 space-y-4">
-          <div className="flex items-center gap-2.5 pb-2 border-b border-border-base">
-            <GitBranch className="w-5 h-5 text-orange-500" />
-            <div>
-              <h3 className="text-sm font-bold text-text-primary">
-                Version Control &amp; Git Integration
-              </h3>
-              <p className="text-xs text-text-muted">
-                Branch conventions, issue linking, and commit standards for codebases
-              </p>
+        <form onSubmit={handleSave} className="space-y-6">
+          {/* Version Control & Git Repositories */}
+          <div className="p-6 rounded-2xl border border-border-base/90 bg-[#faf8f5]/60 dark:bg-stone-900/40 space-y-4">
+            <div className="flex items-center gap-2.5 pb-2 border-b border-border-base/60">
+              <GitBranch className="w-5 h-5 text-[#c04b1e]" />
+              <div>
+                <h3 className="text-sm font-bold text-text-primary">
+                  Version Control &amp; Git Integration
+                </h3>
+                <p className="text-xs text-text-muted">
+                  Branch conventions, issue linking, and commit standards for codebases
+                </p>
+              </div>
             </div>
-          </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-1.5">
@@ -201,12 +193,12 @@ export default function DevSettingsPage() {
               </div>
             </label>
           </div>
-        </Card>
+        </div>
 
         {/* Local AI Engine & Inference */}
-        <Card className="p-5 space-y-4">
-          <div className="flex items-center gap-2.5 pb-2 border-b border-border-base">
-            <Bot className="w-5 h-5 text-orange-500" />
+        <div className="p-6 rounded-2xl border border-border-base/90 bg-[#faf8f5]/60 dark:bg-stone-900/40 space-y-4">
+          <div className="flex items-center gap-2.5 pb-2 border-b border-border-base/60">
+            <Bot className="w-5 h-5 text-[#c04b1e]" />
             <div>
               <h3 className="text-sm font-bold text-text-primary">
                 AI Copilot &amp; Local Inference Engine
@@ -283,12 +275,12 @@ export default function DevSettingsPage() {
               </div>
             </div>
           </div>
-        </Card>
+        </div>
 
         {/* Agile Sprints & Velocity */}
-        <Card className="p-5 space-y-4">
-          <div className="flex items-center gap-2.5 pb-2 border-b border-border-base">
-            <Layers className="w-5 h-5 text-orange-500" />
+        <div className="p-6 rounded-2xl border border-border-base/90 bg-[#faf8f5]/60 dark:bg-stone-900/40 space-y-4">
+          <div className="flex items-center gap-2.5 pb-2 border-b border-border-base/60">
+            <Layers className="w-5 h-5 text-[#c04b1e]" />
             <div>
               <h3 className="text-sm font-bold text-text-primary">
                 Sprint Cycles &amp; Issue Velocity
@@ -307,7 +299,7 @@ export default function DevSettingsPage() {
               <select
                 value={sprintCadence}
                 onChange={(e) => setSprintCadence(e.target.value)}
-                className="w-full bg-bg-surface border border-border-base rounded-xl px-3 py-2 text-xs text-text-primary focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition-all"
+                className="w-full bg-white dark:bg-stone-800 border border-border-base rounded-xl px-3 py-2 text-xs text-text-primary focus:outline-none focus:border-[#c04b1e] transition-all"
               >
                 <option value="1-week">1 Week Sprints</option>
                 <option value="2-weeks">2 Weeks Sprints (Standard)</option>
@@ -322,7 +314,7 @@ export default function DevSettingsPage() {
               <select
                 value={estimationScale}
                 onChange={(e) => setEstimationScale(e.target.value)}
-                className="w-full bg-bg-surface border border-border-base rounded-xl px-3 py-2 text-xs text-text-primary focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition-all"
+                className="w-full bg-white dark:bg-stone-800 border border-border-base rounded-xl px-3 py-2 text-xs text-text-primary focus:outline-none focus:border-[#c04b1e] transition-all"
               >
                 <option value="fibonacci">Fibonacci (1, 2, 3, 5, 8)</option>
                 <option value="linear">Linear (1, 2, 3, 4, 5)</option>
@@ -339,28 +331,28 @@ export default function DevSettingsPage() {
                 value={wipLimit}
                 onChange={(e) => setWipLimit(e.target.value)}
                 placeholder="4"
-                className="w-full bg-bg-surface border border-border-base rounded-xl px-3 py-2 text-xs text-text-primary focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition-all"
+                className="w-full bg-white dark:bg-stone-800 border border-border-base rounded-xl px-3 py-2 text-xs text-text-primary focus:outline-none focus:border-[#c04b1e] transition-all"
               />
             </div>
           </div>
-        </Card>
+        </div>
 
         {/* Global Application & System Settings */}
         <AppSettingsSection />
 
         {/* Save Bar */}
         <div className="flex justify-end pt-2">
-          <Button
+          <button
             type="submit"
-            variant="primary"
             disabled={isSaving}
-            className="bg-orange-500 hover:bg-orange-600 active:bg-orange-700 text-white shadow-sm font-semibold"
-            leftIcon={<Save className="w-4 h-4" />}
+            className="h-10 px-5 rounded-xl bg-[#c04b1e] hover:bg-[#a33d16] text-white text-xs font-semibold flex items-center gap-2 shadow-xs transition-all active:translate-y-[1px] cursor-pointer disabled:opacity-50"
           >
-            {isSaving ? 'Saving Settings...' : 'Save Developer Settings'}
-          </Button>
+            <Save className="w-4 h-4" />
+            <span>{isSaving ? 'Saving Settings...' : 'Save Developer Settings'}</span>
+          </button>
         </div>
       </form>
+      </div>
     </div>
   );
 }

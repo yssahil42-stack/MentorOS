@@ -23,6 +23,7 @@ import { fetchTasks, createTask, updateTask, deleteTask } from '../../services/t
 import { Button } from '../../components/ui/Button';
 import { Modal } from '../../components/ui/Modal';
 import { cn } from '../../utils/cn';
+import { formatDateTime } from '../../utils/dateUtils';
 import type { Project } from '../../types/project';
 import type { Task, TaskStatus } from '../../types/task';
 
@@ -353,9 +354,17 @@ export default function AcademicProjectsPage() {
                         <BookOpen className="w-4 h-4" />
                       </span>
                       <div>
-                        <h3 className="font-bold text-neutral-900 text-base leading-snug">
-                          {course.title}
-                        </h3>
+                        <div className="flex items-center gap-2.5 flex-wrap">
+                          <h3 className="font-bold text-neutral-900 text-base leading-snug">
+                            {course.title}
+                          </h3>
+                          {course.created_at && (
+                            <span className="inline-flex items-center gap-1 text-[11px] font-mono text-neutral-600 dark:text-neutral-300 bg-[#fbf5f2] border border-[#f2ded5] px-2 py-0.5 rounded-md shadow-2xs">
+                              <Clock className="w-3 h-3 text-[#c04b1e]" />
+                              <span>Created {formatDateTime(course.created_at)}</span>
+                            </span>
+                          )}
+                        </div>
                         {course.description && (
                           <p className="text-xs text-neutral-500 mt-1 line-clamp-3 leading-relaxed">
                             {course.description}
@@ -394,8 +403,8 @@ export default function AcademicProjectsPage() {
 
                   {/* Course Progress & Metrics Row */}
                   <div className="pt-2 border-t border-[#f2ede6] space-y-2">
-                    <div className="flex items-center justify-between text-xs text-neutral-600">
-                      <div className="flex items-center gap-4">
+                    <div className="flex items-center justify-between text-xs text-neutral-600 flex-wrap gap-2">
+                      <div className="flex items-center gap-4 flex-wrap">
                         <span>
                           Tasks:{' '}
                           <strong className="text-neutral-900 font-semibold">
@@ -408,6 +417,15 @@ export default function AcademicProjectsPage() {
                             {formatMins(totalCourseMins)}
                           </strong>
                         </span>
+                        {course.created_at && (
+                          <span className="flex items-center gap-1 text-neutral-500">
+                            <Clock className="w-3 h-3 text-neutral-400" />
+                            <span>Created:</span>{' '}
+                            <strong className="text-neutral-800 font-medium">
+                              {formatDateTime(course.created_at)}
+                            </strong>
+                          </span>
+                        )}
                       </div>
                       <span className="font-bold text-[#c04b1e]">{progressPct}%</span>
                     </div>

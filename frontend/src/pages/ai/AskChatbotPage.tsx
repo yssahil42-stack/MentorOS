@@ -272,61 +272,51 @@ export default function AskChatbotPage() {
   }
 
   return (
-    <div className="space-y-5 max-w-7xl mx-auto pb-8">
-      {/* ─── Header ───────────────────────────────────────────────────────────── */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-2 border-b border-border-base">
-        <div className="space-y-1">
-          <div className="flex items-center gap-2 flex-wrap">
-            <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-orange-500 to-amber-500 flex items-center justify-center text-stone-950 shadow-sm shrink-0">
-              <Bot className="w-4 h-4" />
-            </div>
-            <div className="flex items-center gap-2">
-              <h1 className="text-xl sm:text-2xl font-extrabold text-text-primary tracking-tight">
-                Ask
-              </h1>
-              <span className="text-xs font-mono font-bold px-2.5 py-0.5 rounded-full bg-orange-500/10 text-orange-600 dark:text-orange-400 border border-orange-500/25">
-                Conversational AI &bull; Q&amp;A
-              </span>
-            </div>
+    <div className="space-y-6 max-w-6xl mx-auto animate-fade-in pb-16 px-1 sm:px-4">
+      {/* ─── Main White Container Card Matching Notes & Dashboard ─── */}
+      <div className="bg-white dark:bg-[#161922] rounded-3xl border border-[#eee7e0] dark:border-stone-800/80 p-5 sm:p-8 space-y-6 shadow-xs">
+        {/* Header Row */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-text-primary">
+              Ask Mentor AI
+            </h1>
+            <p className="text-xs text-text-secondary mt-1 font-medium">
+              Conversational assistant for queries, doubts, debugging, and concept explanations.
+            </p>
           </div>
-          <p className="text-xs sm:text-sm text-text-secondary max-w-2xl">
-            Conversational assistant for queries, doubts, debugging, and concept explanations. (Not
-            a roadmap generator).
-          </p>
-        </div>
 
-        <div className="flex items-center gap-2.5 flex-wrap">
-          {/* Role Filter Selector */}
-          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-bg-surface border border-border-base text-xs font-medium">
-            <span className="text-3xs uppercase font-semibold text-text-muted">Context:</span>
-            <select
-              value={selectedRole}
-              onChange={(e) => setSelectedRole(e.target.value as SupportedAskRole)}
-              className="bg-transparent text-xs font-bold text-text-primary focus:outline-none cursor-pointer capitalize"
+          <div className="flex items-center gap-2.5 flex-wrap">
+            {/* Role Filter Selector */}
+            <div className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-[#faf8f5] dark:bg-stone-900 border border-border-base text-xs font-medium">
+              <span className="text-[11px] font-semibold text-text-muted">Context:</span>
+              <select
+                value={selectedRole}
+                onChange={(e) => setSelectedRole(e.target.value as SupportedAskRole)}
+                className="bg-transparent text-xs font-bold text-text-primary focus:outline-none cursor-pointer capitalize"
+              >
+                <option value="developer" className="bg-white dark:bg-stone-900 text-text-primary">
+                  Developer
+                </option>
+                <option value="student" className="bg-white dark:bg-stone-900 text-text-primary">
+                  Student
+                </option>
+                <option value="freelancer" className="bg-white dark:bg-stone-900 text-text-primary">
+                  Freelancer
+                </option>
+              </select>
+            </div>
+
+            <button
+              type="button"
+              onClick={handleClearThread}
+              className="h-10 px-4 rounded-xl border border-border-base bg-white dark:bg-bg-elevated hover:bg-slate-50 dark:hover:bg-bg-surface text-xs font-semibold text-text-primary flex items-center gap-2 shadow-2xs transition-all hover:border-[#c04b1e]/40 cursor-pointer active:translate-y-[1px]"
             >
-              <option value="developer" className="bg-bg-surface text-text-primary">
-                Developer
-              </option>
-              <option value="student" className="bg-bg-surface text-text-primary">
-                Student
-              </option>
-              <option value="freelancer" className="bg-bg-surface text-text-primary">
-                Freelancer
-              </option>
-            </select>
+              <Trash2 className="w-3.5 h-3.5 text-text-muted" />
+              <span>Clear chat</span>
+            </button>
           </div>
-
-          <Button
-            variant="secondary"
-            size="sm"
-            onClick={handleClearThread}
-            className="text-xs font-semibold hover:text-danger hover:border-danger/30"
-            icon={<Trash2 className="w-3.5 h-3.5" />}
-          >
-            Clear Chat
-          </Button>
         </div>
-      </div>
 
       {/* ─── Conversational Chat Viewport ───────────────────────────────────── */}
       <div className="max-w-4xl mx-auto space-y-4">
@@ -342,7 +332,7 @@ export default function AskChatbotPage() {
                 )}
               >
                 {msg.role === 'assistant' && (
-                  <div className="w-8 h-8 rounded-xl bg-orange-500/15 border border-orange-500/30 text-orange-600 dark:text-orange-400 flex items-center justify-center shrink-0 mt-0.5 shadow-2xs">
+                  <div className="w-8 h-8 rounded-xl bg-amber-100/80 dark:bg-amber-950/50 border border-amber-200/60 text-[#c04b1e] flex items-center justify-center shrink-0 mt-0.5 shadow-2xs">
                     <Bot className="w-4 h-4" />
                   </div>
                 )}
@@ -351,8 +341,8 @@ export default function AskChatbotPage() {
                   className={cn(
                     'max-w-[85%] rounded-2xl p-4 text-xs leading-relaxed shadow-2xs',
                     msg.role === 'user'
-                      ? 'bg-gradient-to-r from-orange-500 to-amber-500 text-stone-950 font-medium ml-10'
-                      : 'bg-slate-50 dark:bg-bg-elevated border border-border-base text-text-primary'
+                      ? 'bg-[#c04b1e] text-white font-medium ml-10'
+                      : 'bg-[#faf8f5]/90 dark:bg-stone-900/60 border border-border-base/90 text-text-primary'
                   )}
                 >
                   {msg.role === 'user' ? (
@@ -385,7 +375,7 @@ export default function AskChatbotPage() {
                             <button
                               type="button"
                               onClick={() => handleOpenSaveModal('task', msg.content, idx)}
-                              className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold bg-orange-500/10 hover:bg-orange-500/20 text-orange-600 dark:text-orange-400 border border-orange-500/25 transition-colors cursor-pointer"
+                              className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold bg-[#c04b1e]/10 hover:bg-[#c04b1e]/20 text-[#c04b1e] border border-[#c04b1e]/25 transition-colors cursor-pointer"
                               title="Review and save as a task"
                             >
                               <CheckSquare className="w-3.5 h-3.5" />
@@ -442,7 +432,7 @@ export default function AskChatbotPage() {
                     <div
                       className={cn(
                         'text-[10px] mt-2 text-right font-mono',
-                        msg.role === 'user' ? 'text-stone-800/70' : 'text-text-muted'
+                        msg.role === 'user' ? 'text-white/80' : 'text-text-muted'
                       )}
                     >
                       {msg.timestamp}
@@ -455,7 +445,7 @@ export default function AskChatbotPage() {
             {/* Typing / Loading Indicator */}
             {isLoading && (
               <div className="flex gap-3 items-center animate-in fade-in duration-200">
-                <div className="w-8 h-8 rounded-xl bg-orange-500/15 border border-orange-500/30 text-orange-600 dark:text-orange-400 flex items-center justify-center shrink-0 shadow-2xs">
+                <div className="w-8 h-8 rounded-xl bg-amber-100/80 dark:bg-amber-950/50 border border-amber-200/60 text-[#c04b1e] flex items-center justify-center shrink-0 shadow-2xs">
                   <Bot className="w-4 h-4 animate-bounce" />
                 </div>
                 <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-bg-elevated border border-border-base flex items-center gap-2">
@@ -476,7 +466,7 @@ export default function AskChatbotPage() {
 
           {/* Chat Input Dock */}
           <div className="p-4 bg-white dark:bg-bg-surface border-t border-border-base shrink-0">
-            <div className="relative flex items-end gap-2 bg-slate-50 dark:bg-bg-base border border-border-base rounded-xl p-2.5 focus-within:border-orange-500/70 focus-within:ring-1 focus-within:ring-orange-500/50 transition-all">
+            <div className="relative flex items-end gap-2 bg-slate-50 dark:bg-bg-base border border-border-base rounded-xl p-2.5 focus-within:border-[#c04b1e] focus-within:ring-2 focus-within:ring-[#c04b1e]/20 transition-all">
               <textarea
                 ref={inputRef}
                 value={input}
@@ -495,7 +485,7 @@ export default function AskChatbotPage() {
                 className={cn(
                   'p-2.5 rounded-xl font-bold transition-all shrink-0 cursor-pointer flex items-center gap-1.5',
                   input.trim() && !isLoading && !isStreaming
-                    ? 'bg-orange-500 hover:bg-orange-600 text-white shadow-sm'
+                    ? 'bg-[#c04b1e] hover:bg-[#a33d16] text-white shadow-xs'
                     : 'bg-slate-200 dark:bg-bg-elevated text-text-muted cursor-not-allowed'
                 )}
                 aria-label="Send message"
@@ -508,9 +498,9 @@ export default function AskChatbotPage() {
         </div>
 
         {/* Assistant Info Footer */}
-        <Card className="p-3.5 border-border-base/70 bg-gradient-to-br from-bg-surface to-bg-base flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs text-text-muted">
+        <Card className="p-3.5 rounded-2xl border border-border-base/90 bg-[#faf8f5]/60 dark:bg-stone-900/40 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs text-text-muted">
           <div className="flex items-center gap-2 text-text-primary font-semibold">
-            <Info className="w-4 h-4 text-orange-500 shrink-0" />
+            <Info className="w-4 h-4 text-[#c04b1e] shrink-0" />
             <span>Ask AI Mentorship</span>
           </div>
           <span className="text-3xs sm:text-xs text-text-muted">
@@ -529,6 +519,7 @@ export default function AskChatbotPage() {
         initialContent={saveModalConfig.content}
         role={selectedRole}
       />
+      </div>
     </div>
   );
 }

@@ -493,6 +493,27 @@ class WorkspaceIsolationTests(unittest.TestCase):
             self.assertIsNone(db.query(models.AIProposal).filter(models.AIProposal.id == prop_id).first())
             self.assertEqual(db.query(models.AIProposalItem).filter(models.AIProposalItem.proposal_id == prop_id).count(), 0)
 
+    def test_project_created_at_is_present(self):
+        user = self.create_user("course_creator@example.test")
+        res = self.client.post(
+            "/api/v1/projects",
+            headers=self.auth_headers(user),
+            json={"title": "Data Structures Course", "role": "student"},
+        )
+        self.assertEqual(res.status_code, 200)
+        data = res.json()
+        self.assertIn("created_at", data)
+        self.assertIsNotNone(data["created_at"])
+
+        get_res = self.client.get(
+            "/api/v1/projects?role=student",
+            headers=self.auth_headers(user),
+        )
+        self.assertEqual(get_res.status_code, 200)
+        items = get_res.json()
+        self.assertTrue(len(items) >= 1)
+        self.assertIsNotNone(items[0]["created_at"])
+
 
 if __name__ == "__main__":
     unittest.main()

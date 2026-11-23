@@ -190,52 +190,48 @@ export default function InterviewPrepPage() {
   };
 
   return (
-    <div className="space-y-6 max-w-7xl mx-auto pb-12 animate-in fade-in duration-300">
-      {/* ─── HEADER ─────────────────────────────────────────────────────────── */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-2 border-b border-border-base">
-        <div>
-          <div className="flex items-center gap-2 mb-1">
-            <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-text-primary">
-              Interview Prep &amp; Compensation Guide
+    <div className="space-y-6 max-w-6xl mx-auto animate-fade-in pb-16 px-1 sm:px-4">
+      {/* ─── Main White Container Card Matching Notes & Dashboard ─── */}
+      <div className="bg-white dark:bg-[#161922] rounded-3xl border border-[#eee7e0] dark:border-stone-800/80 p-5 sm:p-8 space-y-6 shadow-xs">
+        {/* Header Row */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-text-primary">
+              Interview prep &amp; compensation
             </h1>
-            <span className="px-2 py-0.5 rounded-full text-2xs font-bold uppercase tracking-wider bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
-              STAR &amp; Levels.fyi
-            </span>
+            <p className="text-xs text-text-secondary mt-1 font-medium">
+              Curated company question banks (STAR method, system design) and Levels.fyi salary benchmarks.
+            </p>
           </div>
-          <p className="text-xs sm:text-sm text-text-muted">
-            Curated company question banks (STAR method, system design) and Levels.fyi salary
-            benchmarks.
-          </p>
-        </div>
 
-        {/* View Mode Tabs */}
-        <div className="flex items-center gap-1.5 bg-bg-base p-1 rounded-xl border border-border-base">
-          <button
-            type="button"
-            onClick={() => setActiveTab('questions')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${
-              activeTab === 'questions'
-                ? 'bg-emerald-500 text-white shadow-2xs'
-                : 'text-text-muted hover:text-text-primary'
-            }`}
-          >
-            <BookOpen className="w-3.5 h-3.5" />
-            <span>Question Banks ({CURATED_QUESTIONS.length})</span>
-          </button>
-          <button
-            type="button"
-            onClick={() => setActiveTab('salary')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${
-              activeTab === 'salary'
-                ? 'bg-emerald-500 text-white shadow-2xs'
-                : 'text-text-muted hover:text-text-primary'
-            }`}
-          >
-            <DollarSign className="w-3.5 h-3.5" />
-            <span>Salary &amp; Levels.fyi ({salaryEntries.length})</span>
-          </button>
+          {/* Segmented Filter Pills */}
+          <div className="bg-slate-100/80 dark:bg-bg-elevated p-1 rounded-xl flex items-center gap-1 border border-border-base/50 self-start sm:self-auto">
+            <button
+              type="button"
+              onClick={() => setActiveTab('questions')}
+              className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer ${
+                activeTab === 'questions'
+                  ? 'bg-white dark:bg-bg-surface text-text-primary shadow-2xs'
+                  : 'text-text-muted hover:text-text-primary'
+              }`}
+            >
+              <BookOpen className="w-3.5 h-3.5" />
+              <span>Questions ({CURATED_QUESTIONS.length})</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setActiveTab('salary')}
+              className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer ${
+                activeTab === 'salary'
+                  ? 'bg-white dark:bg-bg-surface text-text-primary shadow-2xs'
+                  : 'text-text-muted hover:text-text-primary'
+              }`}
+            >
+              <DollarSign className="w-3.5 h-3.5" />
+              <span>Salary benchmarks ({salaryEntries.length})</span>
+            </button>
+          </div>
         </div>
-      </div>
 
       {/* ─── TAB 1: CURATED QUESTION BANKS ──────────────────────────────────── */}
       {activeTab === 'questions' && (
@@ -279,7 +275,7 @@ export default function InterviewPrepPage() {
                   onClick={() => setSelectedCompany(company)}
                   className={`px-2.5 py-1 rounded-lg text-2xs font-medium transition-colors ${
                     selectedCompany === company
-                      ? 'bg-emerald-500 text-white font-bold shadow-2xs'
+                      ? 'bg-[#c04b1e] text-white font-bold shadow-2xs'
                       : 'bg-bg-surface border border-border-base text-text-muted hover:text-text-primary'
                   }`}
                 >
@@ -298,7 +294,7 @@ export default function InterviewPrepPage() {
                   onClick={() => setSelectedCategory(cat.id)}
                   className={`px-2.5 py-1 rounded-lg text-2xs font-medium transition-colors ${
                     selectedCategory === cat.id
-                      ? 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/40 font-bold'
+                      ? 'bg-[#c04b1e]/20 text-[#c04b1e] dark:text-emerald-400 border border-emerald-500/40 font-bold'
                       : 'bg-bg-surface border border-border-base text-text-muted hover:text-text-primary'
                   }`}
                 >
@@ -325,7 +321,7 @@ export default function InterviewPrepPage() {
                     key={q.id}
                     variant="secondary"
                     className={`p-4 sm:p-5 border transition-all text-xs space-y-3 ${
-                      isMastered ? 'border-emerald-500/30 bg-emerald-500/5' : 'border-border-base'
+                      isMastered ? 'border-emerald-500/30 bg-[#c04b1e]/5' : 'border-border-base'
                     }`}
                   >
                     {/* Question Header & Meta Badges */}
@@ -345,7 +341,7 @@ export default function InterviewPrepPage() {
                                 ? 'bg-red-500/10 text-red-500'
                                 : q.difficulty === 'medium'
                                   ? 'bg-amber-500/10 text-amber-500'
-                                  : 'bg-emerald-500/10 text-emerald-500'
+                                  : 'bg-[#c04b1e]/10 text-[#c04b1e]'
                             }`}
                           >
                             {q.difficulty}
@@ -364,7 +360,7 @@ export default function InterviewPrepPage() {
                         onClick={() => handleToggleMastered(q.id)}
                         className={`flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-2xs font-bold transition-all shrink-0 ${
                           isMastered
-                            ? 'bg-emerald-500 text-white shadow-2xs'
+                            ? 'bg-[#c04b1e] text-white shadow-2xs'
                             : 'bg-bg-elevated border border-border-base text-text-muted hover:text-text-primary'
                         }`}
                       >
@@ -388,27 +384,27 @@ export default function InterviewPrepPage() {
                     {/* STAR Framework Breakdown (if available) */}
                     {q.starFramework && (
                       <div className="p-3.5 rounded-xl bg-bg-surface border border-emerald-500/20 space-y-2">
-                        <div className="flex items-center gap-1.5 text-2xs font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">
+                        <div className="flex items-center gap-1.5 text-2xs font-bold text-[#c04b1e] dark:text-emerald-400 uppercase tracking-wider">
                           <Star className="w-3.5 h-3.5" />
                           <span>STAR Method Framework Guide</span>
                         </div>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-2xs">
                           <div className="p-2 rounded-lg bg-bg-base border border-border-base">
-                            <strong className="text-emerald-500 block mb-0.5">
+                            <strong className="text-[#c04b1e] block mb-0.5">
                               S — Situation:
                             </strong>
                             <p className="text-text-muted">{q.starFramework.situation}</p>
                           </div>
                           <div className="p-2 rounded-lg bg-bg-base border border-border-base">
-                            <strong className="text-emerald-500 block mb-0.5">T — Task:</strong>
+                            <strong className="text-[#c04b1e] block mb-0.5">T — Task:</strong>
                             <p className="text-text-muted">{q.starFramework.task}</p>
                           </div>
                           <div className="p-2 rounded-lg bg-bg-base border border-border-base">
-                            <strong className="text-emerald-500 block mb-0.5">A — Action:</strong>
+                            <strong className="text-[#c04b1e] block mb-0.5">A — Action:</strong>
                             <p className="text-text-muted">{q.starFramework.action}</p>
                           </div>
                           <div className="p-2 rounded-lg bg-bg-base border border-border-base">
-                            <strong className="text-emerald-500 block mb-0.5">R — Result:</strong>
+                            <strong className="text-[#c04b1e] block mb-0.5">R — Result:</strong>
                             <p className="text-text-muted">{q.starFramework.result}</p>
                           </div>
                         </div>
@@ -421,7 +417,7 @@ export default function InterviewPrepPage() {
                         <button
                           type="button"
                           onClick={() => toggleExpand(q.id)}
-                          className="flex items-center gap-1 text-2xs font-semibold text-emerald-600 dark:text-emerald-400 hover:underline cursor-pointer"
+                          className="flex items-center gap-1 text-2xs font-semibold text-[#c04b1e] dark:text-emerald-400 hover:underline cursor-pointer"
                         >
                           <span>
                             {isExpanded
@@ -469,7 +465,7 @@ export default function InterviewPrepPage() {
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div>
                 <h2 className="text-sm font-bold text-text-primary flex items-center gap-2">
-                  <TrendingUp className="w-4 h-4 text-emerald-500" />
+                  <TrendingUp className="w-4 h-4 text-[#c04b1e]" />
                   <span>Levels.fyi Real-Time Compensation Reference</span>
                 </h2>
                 <p className="text-2xs text-text-muted">
@@ -482,7 +478,7 @@ export default function InterviewPrepPage() {
                   variant="primary"
                   size="sm"
                   onClick={() => setIsSalaryModalOpen(true)}
-                  className="bg-emerald-500 hover:bg-emerald-600 text-white font-bold"
+                  className="bg-[#c04b1e] hover:bg-[#a33d16] text-white font-bold"
                   icon={<Plus className="w-4 h-4" />}
                 >
                   <span>Add Salary Target</span>
@@ -517,7 +513,7 @@ export default function InterviewPrepPage() {
                   href={generateLevelsFyiLink(searchLevelsCompany, searchLevelsRole)}
                   target="_blank"
                   rel="noreferrer"
-                  className="w-full inline-flex items-center justify-center gap-1.5 h-9 px-4 rounded-xl text-xs font-bold bg-bg-surface border border-emerald-500/40 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/10 transition-colors shadow-2xs"
+                  className="w-full inline-flex items-center justify-center gap-1.5 h-9 px-4 rounded-xl text-xs font-bold bg-bg-surface border border-emerald-500/40 text-[#c04b1e] dark:text-emerald-400 hover:bg-[#c04b1e]/10 transition-colors shadow-2xs"
                 >
                   <span>Open {searchLevelsCompany || 'Company'} on Levels.fyi</span>
                   <ExternalLink className="w-3.5 h-3.5" />
@@ -580,7 +576,7 @@ export default function InterviewPrepPage() {
                     </div>
                     <div className="flex justify-between items-baseline pt-1 border-t border-border-base font-bold">
                       <span className="text-text-primary">Total Comp:</span>
-                      <span className="font-mono text-sm text-emerald-500">
+                      <span className="font-mono text-sm text-[#c04b1e]">
                         ${entry.totalComp.toLocaleString()}
                       </span>
                     </div>
@@ -600,7 +596,7 @@ export default function InterviewPrepPage() {
                     href={entry.levelsFyiUrl}
                     target="_blank"
                     rel="noreferrer"
-                    className="inline-flex items-center gap-1 text-2xs text-emerald-600 dark:text-emerald-400 font-semibold hover:underline"
+                    className="inline-flex items-center gap-1 text-2xs text-[#c04b1e] dark:text-emerald-400 font-semibold hover:underline"
                   >
                     <span>Verify on Levels.fyi</span>
                     <ExternalLink className="w-3 h-3" />
@@ -693,11 +689,11 @@ export default function InterviewPrepPage() {
             </div>
           </div>
 
-          <div className="p-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-between">
-            <span className="text-2xs font-semibold text-emerald-600 dark:text-emerald-400">
+          <div className="p-2.5 rounded-xl bg-[#c04b1e]/10 border border-emerald-500/20 flex items-center justify-between">
+            <span className="text-2xs font-semibold text-[#c04b1e] dark:text-emerald-400">
               Total Computed Compensation:
             </span>
-            <span className="text-base font-extrabold font-mono text-emerald-500">
+            <span className="text-base font-extrabold font-mono text-[#c04b1e]">
               ${computedTotalComp.toLocaleString()} / yr
             </span>
           </div>
@@ -723,13 +719,14 @@ export default function InterviewPrepPage() {
               variant="primary"
               size="sm"
               onClick={handleSaveSalary}
-              className="bg-emerald-500 hover:bg-emerald-600 text-white font-bold"
+              className="bg-[#c04b1e] hover:bg-[#a33d16] text-white font-bold"
             >
               Save Benchmark
             </Button>
           </div>
         </div>
       </Modal>
+      </div>
     </div>
   );
 }

@@ -22,6 +22,7 @@ import { DailyStandupWidget } from '../../components/dashboard/DailyStandupWidge
 import type { TaskStatus } from '../../types/task';
 import { DashboardMetrics } from './DashboardMetrics';
 import { cn } from '../../utils/cn';
+import { formatDateTime } from '../../utils/dateUtils';
 
 export default function StudentDashboard() {
   const { openAIDrawer, showToast } = useWorkspace();
@@ -160,6 +161,7 @@ export default function StudentDashboard() {
       id: p.id,
       code,
       title: p.title,
+      created_at: p.created_at,
       subtitle:
         pTasks.length > 0
           ? `${pComp}/${pTasks.length} assignments completed · ${pct}%`
@@ -476,8 +478,17 @@ export default function StudentDashboard() {
                       <div className="font-bold text-stone-900 dark:text-stone-100 truncate">
                         {c.title}
                       </div>
-                      <div className="text-2xs text-stone-500 dark:text-stone-400 truncate mt-0.5">
-                        {c.subtitle}
+                      <div className="text-2xs text-stone-500 dark:text-stone-400 flex items-center gap-1.5 flex-wrap mt-0.5">
+                        <span className="truncate">{c.subtitle}</span>
+                        {c.created_at && (
+                          <>
+                            <span className="text-stone-300 dark:text-stone-600">&bull;</span>
+                            <span className="inline-flex items-center gap-1 text-stone-500 dark:text-stone-400 font-mono shrink-0">
+                              <Clock className="w-2.5 h-2.5 text-[#c04b1e]" />
+                              Created {formatDateTime(c.created_at)}
+                            </span>
+                          </>
+                        )}
                       </div>
                     </div>
                     <div className="col-span-3 flex items-center justify-center gap-2">

@@ -1,3 +1,4 @@
+import { cn } from '../../utils/cn';
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
@@ -125,139 +126,136 @@ export default function DevCalendarPage() {
   const days = Array.from({ length: daysInMonth }, (_, i) => i + 1);
 
   return (
-    <div className="space-y-6 max-w-6xl mx-auto animate-fade-in">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-2">
-            <span className="p-1.5 rounded-lg bg-purple-500/20 text-purple-400">
-              <CalendarIcon className="w-5 h-5" />
-            </span>
-            <span className="text-xs font-mono font-semibold text-purple-400">
-              SCHEDULE &amp; RELEASES
-            </span>
+    <div className="space-y-6 max-w-6xl mx-auto animate-fade-in pb-16 px-1 sm:px-4">
+      {/* ─── Main White Container Card Matching Notes & Dashboard ─── */}
+      <div className="bg-white dark:bg-[#161922] rounded-3xl border border-[#eee7e0] dark:border-stone-800/80 p-5 sm:p-8 space-y-6 shadow-xs">
+        {/* Header Row */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-text-primary">
+              Sprint calendar
+            </h1>
+            <p className="text-xs text-text-secondary mt-1 font-medium">
+              Track milestone deadlines, scheduled deep-work build blocks, and release windows.
+            </p>
           </div>
-          <h1 className="text-2xl md:text-3xl font-extrabold text-text-primary mt-1">
-            Sprint Calendar
-          </h1>
-          <p className="text-xs md:text-sm text-text-muted">
-            Track milestone deadlines, scheduled deep-work build blocks, and release windows.
-          </p>
-        </div>
 
-        <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => {
-              if (events.length === 0) {
-                showToast('No sprint events to export', 'info');
-                return;
-              }
-              downloadICSFile(
-                events,
-                'dev-sprint-calendar.ics',
-                'MentorOS Developer Sprint Calendar'
-              );
-              showToast(`Exported ${events.length} sprint events to .ics file!`, 'success');
-            }}
-            icon={<Download className="w-4 h-4 text-purple-400" />}
-          >
-            Export (.ics)
-          </Button>
-          <Button
-            variant="primary"
-            size="sm"
-            className="!bg-purple-600 hover:!bg-purple-700 text-white"
-            onClick={() => {
-              setStartDate(new Date().toISOString().split('T')[0]);
-              setIsModalOpen(true);
-            }}
-            icon={<Plus className="w-4 h-4" />}
-          >
-            Schedule Block
-          </Button>
-        </div>
-      </div>
-
-      {/* Calendar Controls */}
-      <div className="flex items-center justify-between p-3 rounded-2xl bg-bg-surface border border-border-base">
-        <div className="flex items-center gap-2">
-          <button
-            type="button"
-            onClick={() => setCurrentDate(new Date(year, month - 1, 1))}
-            className="p-1.5 rounded-lg text-text-muted hover:text-text-primary hover:bg-bg-elevated transition-colors"
-          >
-            <ChevronLeft className="w-4 h-4" />
-          </button>
-          <span className="text-sm font-bold text-text-primary min-w-[140px] text-center">
-            {monthName}
-          </span>
-          <button
-            type="button"
-            onClick={() => setCurrentDate(new Date(year, month + 1, 1))}
-            className="p-1.5 rounded-lg text-text-muted hover:text-text-primary hover:bg-bg-elevated transition-colors"
-          >
-            <ChevronRight className="w-4 h-4" />
-          </button>
-        </div>
-
-        <div className="flex items-center gap-1 bg-bg-base p-1 rounded-xl border border-border-base text-xs">
-          {(['month', 'agenda'] as const).map((v) => (
+          <div className="flex items-center gap-2.5 shrink-0">
             <button
-              key={v}
-              onClick={() => setView(v)}
-              className={`px-3 py-1 rounded-lg capitalize font-medium transition-colors ${
-                view === v
-                  ? 'bg-purple-500/20 text-purple-300 font-semibold'
-                  : 'text-text-muted hover:text-text-primary'
-              }`}
+              type="button"
+              onClick={() => {
+                if (events.length === 0) {
+                  showToast('No sprint events to export', 'info');
+                  return;
+                }
+                downloadICSFile(
+                  events,
+                  'dev-sprint-calendar.ics',
+                  'MentorOS Developer Sprint Calendar'
+                );
+                showToast(`Exported ${events.length} sprint events to .ics file!`, 'success');
+              }}
+              className="h-10 px-4 rounded-xl border border-border-base bg-white dark:bg-bg-elevated hover:bg-slate-50 dark:hover:bg-bg-surface text-xs font-semibold text-text-primary flex items-center gap-2 shadow-2xs transition-all hover:border-[#c04b1e]/40 cursor-pointer active:translate-y-[1px]"
             >
-              {v}
+              <Download className="w-3.5 h-3.5 text-[#c04b1e]" />
+              <span>Export (.ics)</span>
             </button>
-          ))}
-        </div>
-      </div>
 
-      {/* Month View Grid */}
-      {view === 'month' ? (
-        <Card className="p-4 border border-border-base overflow-hidden">
-          <div className="grid grid-cols-7 gap-1 text-center text-xs font-semibold text-text-faint pb-2 border-b border-border-base">
-            {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((d) => (
-              <div key={d} className="py-1">
-                {d}
-              </div>
-            ))}
+            <button
+              type="button"
+              onClick={() => {
+                setStartDate(new Date().toISOString().split('T')[0]);
+                setIsModalOpen(true);
+              }}
+              className="h-10 px-4 rounded-xl bg-[#c04b1e] hover:bg-[#a33d16] text-white text-xs font-semibold flex items-center gap-2 shadow-xs transition-all active:translate-y-[1px] cursor-pointer"
+            >
+              <Plus className="w-4 h-4 stroke-[2.5]" />
+              <span>Schedule block</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Calendar Controls */}
+        <div className="flex items-center justify-between p-3 rounded-2xl bg-[#faf8f5]/60 dark:bg-stone-900/40 border border-border-base/80">
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setCurrentDate(new Date(year, month - 1, 1))}
+              className="p-1.5 rounded-lg border border-border-base bg-white dark:bg-stone-800 text-text-muted hover:text-text-primary hover:border-[#c04b1e]/40 transition-colors cursor-pointer"
+            >
+              <ChevronLeft className="w-4 h-4" />
+            </button>
+            <span className="text-sm font-bold text-text-primary min-w-[140px] text-center">
+              {monthName}
+            </span>
+            <button
+              type="button"
+              onClick={() => setCurrentDate(new Date(year, month + 1, 1))}
+              className="p-1.5 rounded-lg border border-border-base bg-white dark:bg-stone-800 text-text-muted hover:text-text-primary hover:border-[#c04b1e]/40 transition-colors cursor-pointer"
+            >
+              <ChevronRight className="w-4 h-4" />
+            </button>
           </div>
 
-          <div className="grid grid-cols-7 gap-1 pt-2">
-            {/* Blank slots for previous month offset */}
-            {Array.from({ length: firstDay }).map((_, idx) => (
-              <div
-                key={`empty-${idx}`}
-                className="min-h-[85px] p-1.5 rounded-xl bg-bg-base/20 border border-transparent"
-              />
+          <div className="flex items-center gap-1 bg-slate-100/80 dark:bg-stone-800 p-1 rounded-xl border border-border-base/50 text-xs">
+            {(['month', 'agenda'] as const).map((v) => (
+              <button
+                key={v}
+                type="button"
+                onClick={() => setView(v)}
+                className={cn(
+                  'px-3 py-1 rounded-lg capitalize font-medium transition-colors cursor-pointer',
+                  view === v
+                    ? 'bg-white dark:bg-stone-900 text-text-primary shadow-2xs font-semibold'
+                    : 'text-text-muted hover:text-text-primary'
+                )}
+              >
+                {v}
+              </button>
             ))}
+          </div>
+        </div>
 
-            {/* Month days */}
-            {days.map((d) => {
-              const dayStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
-              const dayEvents = events.filter((e) => e.start_at.startsWith(dayStr));
-              const isToday = new Date().toDateString() === new Date(year, month, d).toDateString();
+        {/* Month View Grid */}
+        {view === 'month' ? (
+          <Card className="p-4 border border-border-base overflow-hidden bg-white dark:bg-stone-900/40">
+            <div className="grid grid-cols-7 gap-1 text-center text-xs font-semibold text-text-muted pb-2 border-b border-border-base/60">
+              {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((d) => (
+                <div key={d} className="py-1">
+                  {d}
+                </div>
+              ))}
+            </div>
 
-              return (
+            <div className="grid grid-cols-7 gap-1 pt-2">
+              {/* Blank slots for previous month offset */}
+              {Array.from({ length: firstDay }).map((_, idx) => (
                 <div
-                  key={d}
-                  className={`min-h-[85px] p-1.5 rounded-xl border transition-colors flex flex-col justify-between ${
-                    isToday
-                      ? 'bg-purple-500/10 border-purple-500/30'
-                      : 'bg-bg-surface/50 border-border-base/50 hover:border-border-hover'
-                  }`}
-                >
-                  <div className="flex items-center justify-between">
-                    <span
-                      className={`text-xs font-mono font-bold ${
-                        isToday ? 'text-purple-400' : 'text-text-muted'
+                  key={`empty-${idx}`}
+                  className="min-h-[85px] p-1.5 rounded-xl bg-slate-50/50 dark:bg-stone-950/20 border border-transparent"
+                />
+              ))}
+
+              {/* Month days */}
+              {days.map((d) => {
+                const dayStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+                const dayEvents = events.filter((e) => e.start_at.startsWith(dayStr));
+                const isToday =
+                  new Date().toDateString() === new Date(year, month, d).toDateString();
+
+                return (
+                  <div
+                    key={d}
+                    className={`min-h-[85px] p-1.5 rounded-xl border transition-colors flex flex-col justify-between ${
+                      isToday
+                        ? 'bg-orange-50/50 dark:bg-orange-950/20 border-[#c04b1e]/50 ring-1 ring-[#c04b1e]/40'
+                        : 'bg-white dark:bg-stone-900/20 border-border-base/60 hover:border-[#c04b1e]/40'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between">
+                      <span
+                        className={`text-xs font-mono font-bold ${
+                          isToday ? 'text-[#c04b1e]' : 'text-text-muted'
                       }`}
                     >
                       {d}
@@ -334,6 +332,7 @@ export default function DevCalendarPage() {
           ))}
         </div>
       )}
+      </div>
 
       {/* Schedule Event Modal */}
       <Modal

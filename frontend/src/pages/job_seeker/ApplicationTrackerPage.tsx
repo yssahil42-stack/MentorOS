@@ -86,7 +86,7 @@ const KANBAN_COLUMNS: ColumnConfig[] = [
     status: 'offer',
     label: 'Offers',
     icon: Award,
-    color: 'text-emerald-500',
+    color: 'text-[#c04b1e]',
     badgeBg: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20',
     description: 'Written & verbal offers in compensation negotiation',
   },
@@ -337,104 +337,101 @@ export default function ApplicationTrackerPage() {
   };
 
   return (
-    <div className="space-y-6 max-w-7xl mx-auto pb-12 animate-in fade-in duration-300">
-      {/* ─── HEADER & PRIMARY ACTIONS ────────────────────────────────────────────── */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-2 border-b border-border-base">
-        <div>
-          <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-text-primary mb-1">
-            Job Application Tracker
-          </h1>
-          <p className="text-xs sm:text-sm text-text-muted">
-            Kanban pipeline (Saved → Applied → Interview → Offer) with automatic 7-day and 14-day
-            follow-up cadences.
-          </p>
-        </div>
+    <div className="space-y-6 max-w-6xl mx-auto animate-fade-in pb-16 px-1 sm:px-4">
+      {/* ─── Main White Container Card Matching Notes & Dashboard ─── */}
+      <div className="bg-white dark:bg-[#161922] rounded-3xl border border-[#eee7e0] dark:border-stone-800/80 p-5 sm:p-8 space-y-6 shadow-xs">
+        {/* 1. Header Row */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-text-primary">
+              Job application tracker
+            </h1>
+            <p className="text-xs text-text-secondary mt-1 font-medium">
+              Kanban pipeline (Saved → Applied → Interview → Offer) with automatic 7-day and 14-day follow-up cadences.
+            </p>
+          </div>
 
-        <div className="flex items-center gap-2 flex-wrap">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleExportCsv}
-            icon={<Download className="w-3.5 h-3.5" />}
-          >
-            Export CSV
-          </Button>
-          <Button
-            variant="primary"
-            size="sm"
-            onClick={openCreateModal}
-            keyboardShortcut="⌘N"
-            tooltip="Add new job application (⌘N)"
-            className="bg-emerald-500 hover:bg-emerald-600 text-white font-bold shadow-2xs"
-            icon={<Plus className="w-4 h-4" />}
-          >
-            <span>Add Application</span>
-          </Button>
+          <div className="flex items-center gap-2 flex-wrap">
+            <button
+              type="button"
+              onClick={handleExportCsv}
+              className="h-10 px-4 rounded-xl border border-border-base bg-white dark:bg-bg-elevated hover:bg-slate-50 dark:hover:bg-bg-surface text-xs font-semibold text-text-primary flex items-center gap-2 shadow-2xs transition-all hover:border-[#c04b1e]/40 cursor-pointer active:translate-y-[1px]"
+            >
+              <Download className="w-3.5 h-3.5 text-text-muted" />
+              <span>Export CSV</span>
+            </button>
+            <button
+              type="button"
+              onClick={openCreateModal}
+              className="h-10 px-4 rounded-xl bg-[#c04b1e] hover:bg-[#a33d16] text-white text-xs font-semibold flex items-center gap-2 shadow-xs transition-all active:translate-y-[1px] cursor-pointer"
+            >
+              <Plus className="w-4 h-4 stroke-[2.5]" />
+              <span>Add application</span>
+            </button>
+          </div>
         </div>
-      </div>
 
       {/* ─── KPI METRICS STRIP ─────────────────────────────────────────────────── */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card3D variant="secondary" className="p-4 border border-border-base">
+        <div className="p-4 sm:p-5 rounded-2xl border border-border-base/90 bg-[#faf8f5]/80 dark:bg-stone-900/40">
           <div className="flex items-center justify-between">
-            <span className="text-2xs font-semibold uppercase tracking-wider text-text-muted">
-              Active Applications
+            <span className="text-[11px] font-semibold uppercase tracking-wider text-text-muted">
+              Active applications
             </span>
-            <Building2 className="w-4 h-4 text-emerald-500" />
+            <Building2 className="w-4 h-4 text-[#c04b1e]" />
           </div>
           <div className="mt-2 flex items-baseline gap-2">
-            <span className="text-2xl font-black text-text-primary">{metrics.total}</span>
-            <span className="text-2xs text-text-faint">{metrics.saved} saved</span>
+            <span className="text-2xl sm:text-3xl font-bold text-text-primary">{metrics.total}</span>
+            <span className="text-xs text-text-muted">{metrics.saved} saved</span>
           </div>
-        </Card3D>
+        </div>
 
-        <Card3D variant="secondary" className="p-4 border border-border-base">
+        <div className="p-4 sm:p-5 rounded-2xl border border-border-base/90 bg-[#faf8f5]/80 dark:bg-stone-900/40">
           <div className="flex items-center justify-between">
-            <span className="text-2xs font-semibold uppercase tracking-wider text-text-muted">
-              Submitted Pipeline
+            <span className="text-[11px] font-semibold uppercase tracking-wider text-text-muted">
+              Submitted pipeline
             </span>
-            <Send className="w-4 h-4 text-amber-500" />
+            <Send className="w-4 h-4 text-amber-600" />
           </div>
           <div className="mt-2 flex items-baseline gap-2">
-            <span className="text-2xl font-black text-amber-500">{metrics.applied}</span>
-            <span className="text-2xs text-text-muted">Awaiting feedback</span>
+            <span className="text-2xl sm:text-3xl font-bold text-text-primary">{metrics.applied}</span>
+            <span className="text-xs text-text-muted">Awaiting feedback</span>
           </div>
-        </Card3D>
+        </div>
 
-        <Card3D variant="secondary" className="p-4 border border-border-base">
+        <div className="p-4 sm:p-5 rounded-2xl border border-border-base/90 bg-[#faf8f5]/80 dark:bg-stone-900/40">
           <div className="flex items-center justify-between">
-            <span className="text-2xs font-semibold uppercase tracking-wider text-text-muted">
-              Interviews &amp; Offers
+            <span className="text-[11px] font-semibold uppercase tracking-wider text-text-muted">
+              Interviews &amp; offers
             </span>
-            <Award className="w-4 h-4 text-purple-500" />
+            <Award className="w-4 h-4 text-[#c04b1e]" />
           </div>
           <div className="mt-2 flex items-baseline gap-2">
-            <span className="text-2xl font-black text-purple-500">
+            <span className="text-2xl sm:text-3xl font-bold text-text-primary">
               {metrics.interview + metrics.offer}
             </span>
-            <span className="text-2xs text-emerald-500 font-semibold">{metrics.offer} offer</span>
+            <span className="text-xs text-amber-700 font-semibold">{metrics.offer} offer</span>
           </div>
-        </Card3D>
+        </div>
 
-        <Card3D
-          variant="secondary"
-          className={`p-4 border transition-all ${
-            reminders.length > 0 ? 'border-amber-500/40 bg-amber-500/5' : 'border-border-base'
+        <div
+          className={`p-4 sm:p-5 rounded-2xl border transition-all ${
+            reminders.length > 0 ? 'border-amber-500/40 bg-amber-500/5' : 'border-border-base/90 bg-[#faf8f5]/80 dark:bg-stone-900/40'
           }`}
         >
           <div className="flex items-center justify-between">
-            <span className="text-2xs font-semibold uppercase tracking-wider text-text-muted">
-              Follow-Up Cadence
+            <span className="text-[11px] font-semibold uppercase tracking-wider text-text-muted">
+              Follow-up cadence
             </span>
             <Clock
               className={`w-4 h-4 ${reminders.length > 0 ? 'text-amber-500 animate-pulse' : 'text-text-muted'}`}
             />
           </div>
           <div className="mt-2 flex items-baseline gap-2">
-            <span className="text-2xl font-black text-amber-500">{reminders.length}</span>
-            <span className="text-2xs text-text-muted">7d / 14d follow-ups due</span>
+            <span className="text-2xl sm:text-3xl font-bold text-text-primary">{reminders.length}</span>
+            <span className="text-xs text-text-muted">7d / 14d follow-ups due</span>
           </div>
-        </Card3D>
+        </div>
       </div>
 
       {/* ─── AUTOMATED 7D / 14D FOLLOW-UP ALERT BANNER ────────────────────────── */}
@@ -587,17 +584,17 @@ export default function ApplicationTrackerPage() {
                             ? 'border-rose-500/40 bg-rose-500/5'
                             : is7d
                               ? 'border-amber-500/40 bg-amber-500/5'
-                              : 'border-border-base/90 bg-bg-surface hover:border-emerald-500/40'
+                              : 'border-border-base/90 bg-bg-surface hover:border-[#c04b1e]/40'
                         }`}
                       >
                         {/* Company & Role Header with Monogram Avatar */}
                         <div className="flex items-start justify-between gap-2.5">
                           <div className="flex items-start gap-2.5 min-w-0">
-                            <span className="w-7 h-7 rounded-lg bg-bg-base border border-border-base text-text-primary font-bold text-xs flex items-center justify-center uppercase shrink-0 group-hover:text-emerald-500 group-hover:border-emerald-500/40 transition-colors shadow-2xs">
+                            <span className="w-7 h-7 rounded-lg bg-bg-base border border-border-base text-text-primary font-bold text-xs flex items-center justify-center uppercase shrink-0 group-hover:text-[#c04b1e] group-hover:border-[#c04b1e]/40 transition-colors shadow-2xs">
                               {companyInitial}
                             </span>
                             <div className="min-w-0 space-y-0.5">
-                              <span className="font-bold text-text-primary text-xs leading-snug line-clamp-1 block group-hover:text-emerald-500 transition-colors">
+                              <span className="font-bold text-text-primary text-xs leading-snug line-clamp-1 block group-hover:text-[#c04b1e] transition-colors">
                                 {app.company}
                               </span>
                               <div className="text-2xs font-medium text-text-muted line-clamp-1">
@@ -705,7 +702,7 @@ export default function ApplicationTrackerPage() {
                               href={app.url}
                               target="_blank"
                               rel="noreferrer"
-                              className="text-[10px] text-emerald-600 dark:text-emerald-400 hover:text-emerald-500 font-medium hover:underline flex items-center gap-1 px-1.5 py-0.5 rounded transition-colors"
+                              className="text-[10px] text-emerald-600 dark:text-emerald-400 hover:text-[#c04b1e] font-medium hover:underline flex items-center gap-1 px-1.5 py-0.5 rounded transition-colors"
                             >
                               <span>Listing</span>
                               <ExternalLink className="w-2.5 h-2.5" />
@@ -917,7 +914,7 @@ export default function ApplicationTrackerPage() {
               {emailModalData.app.contactEmail && (
                 <div className="flex items-center justify-between border-t border-border-base/50 pt-1.5">
                   <span className="text-2xs text-text-muted font-semibold">To:</span>
-                  <span className="text-2xs font-mono text-emerald-500">
+                  <span className="text-2xs font-mono text-[#c04b1e]">
                     {emailModalData.app.contactEmail}
                   </span>
                 </div>
@@ -969,6 +966,7 @@ export default function ApplicationTrackerPage() {
           </div>
         </Modal>
       )}
+      </div>
     </div>
   );
 }

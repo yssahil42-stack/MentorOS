@@ -82,6 +82,7 @@ def seed_initial_data(db: Session) -> None:
                 priority="high",
                 target_date=(now + datetime.timedelta(days=45)).strftime("%Y-%m-%d"),
                 progress=35,
+                created_at=now - datetime.timedelta(days=21, hours=4, minutes=15),
             ),
             models.Project(
                 id=2,
@@ -92,6 +93,7 @@ def seed_initial_data(db: Session) -> None:
                 priority="high",
                 target_date=(now + datetime.timedelta(days=40)).strftime("%Y-%m-%d"),
                 progress=60,
+                created_at=now - datetime.timedelta(days=18, hours=2, minutes=30),
             ),
             models.Project(
                 id=3,
@@ -102,6 +104,7 @@ def seed_initial_data(db: Session) -> None:
                 priority="medium",
                 target_date=(now + datetime.timedelta(days=50)).strftime("%Y-%m-%d"),
                 progress=45,
+                created_at=now - datetime.timedelta(days=14, hours=6, minutes=45),
             ),
             models.Project(
                 id=4,
@@ -112,6 +115,7 @@ def seed_initial_data(db: Session) -> None:
                 priority="medium",
                 target_date=(now + datetime.timedelta(days=35)).strftime("%Y-%m-%d"),
                 progress=25,
+                created_at=now - datetime.timedelta(days=10, hours=1, minutes=20),
             ),
         ]
         for c in student_courses:

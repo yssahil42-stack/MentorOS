@@ -107,40 +107,32 @@ export default function StudentSettingsPage() {
   };
 
   return (
-    <div className="space-y-6 max-w-4xl mx-auto animate-fade-in pb-12">
-      {/* Header */}
-      <div>
-        <div className="flex items-center gap-2">
-          <span className="p-1.5 rounded-lg bg-orange-500/10 text-orange-500 border border-orange-500/20">
-            <Settings className="w-5 h-5 text-orange-500" />
-          </span>
-          <span className="text-xs font-mono font-bold text-orange-600 dark:text-orange-400">
-            STUDENT ACADEMIC CONFIGURATION
-          </span>
+    <div className="space-y-6 max-w-4xl mx-auto animate-fade-in pb-16 px-1 sm:px-4">
+      {/* Header Container */}
+      <div className="bg-white dark:bg-[#161922] rounded-3xl border border-[#eee7e0] dark:border-stone-800/80 p-5 sm:p-8 space-y-6 shadow-xs">
+        <div>
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-text-primary">
+            Academic settings
+          </h1>
+          <p className="text-xs text-text-secondary mt-1 font-medium">
+            Configure degree pathways, target GPA goals, study intervals, exam alerts, and application behavior.
+          </p>
         </div>
-        <h1 className="text-2xl md:text-3xl font-extrabold text-text-primary mt-1">
-          Academic Settings
-        </h1>
-        <p className="text-xs md:text-sm text-text-muted">
-          Configure degree pathways, target GPA goals, study intervals, exam alerts, and application
-          behavior.
-        </p>
-      </div>
 
-      <form onSubmit={handleSave} className="space-y-5">
-        {/* Academic Program & Degree Goals */}
-        <Card className="p-5 space-y-4">
-          <div className="flex items-center gap-2.5 pb-2 border-b border-border-base">
-            <GraduationCap className="w-5 h-5 text-orange-500" />
-            <div>
-              <h3 className="text-sm font-bold text-text-primary">
-                Degree &amp; Academic Curriculum
-              </h3>
-              <p className="text-xs text-text-muted">
-                Aligns syllabus parsing, assignment priority, and study roadmap milestones
-              </p>
+        <form onSubmit={handleSave} className="space-y-6">
+          {/* Academic Program & Degree Goals */}
+          <div className="p-6 rounded-2xl border border-border-base/90 bg-[#faf8f5]/60 dark:bg-stone-900/40 space-y-4">
+            <div className="flex items-center gap-2.5 pb-2 border-b border-border-base/60">
+              <GraduationCap className="w-5 h-5 text-[#c04b1e]" />
+              <div>
+                <h3 className="text-sm font-bold text-text-primary">
+                  Degree &amp; Academic Curriculum
+                </h3>
+                <p className="text-xs text-text-muted">
+                  Aligns syllabus parsing, assignment priority, and study roadmap milestones
+                </p>
+              </div>
             </div>
-          </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-1.5">
@@ -225,12 +217,12 @@ export default function StudentSettingsPage() {
               </select>
             </div>
           </div>
-        </Card>
+        </div>
 
         {/* Study Sessions & Focus Strategy */}
-        <Card className="p-5 space-y-4">
-          <div className="flex items-center gap-2.5 pb-2 border-b border-border-base">
-            <Flame className="w-5 h-5 text-orange-500" />
+        <div className="p-6 rounded-2xl border border-border-base/90 bg-[#faf8f5]/60 dark:bg-stone-900/40 space-y-4">
+          <div className="flex items-center gap-2.5 pb-2 border-b border-border-base/60">
+            <Flame className="w-5 h-5 text-[#c04b1e]" />
             <div>
               <h3 className="text-sm font-bold text-text-primary">
                 Study Sessions &amp; Focus Intervals
@@ -307,12 +299,12 @@ export default function StudentSettingsPage() {
               </div>
             </label>
           </div>
-        </Card>
+        </div>
 
         {/* Academic Alerts & Reminders */}
-        <Card className="p-5 space-y-4">
-          <div className="flex items-center gap-2.5 pb-2 border-b border-border-base">
-            <Bell className="w-5 h-5 text-orange-500" />
+        <div className="p-6 rounded-2xl border border-border-base/90 bg-[#faf8f5]/60 dark:bg-stone-900/40 space-y-4">
+          <div className="flex items-center gap-2.5 pb-2 border-b border-border-base/60">
+            <Bell className="w-5 h-5 text-[#c04b1e]" />
             <div>
               <h3 className="text-sm font-bold text-text-primary">
                 Academic Alerts &amp; Deadlines
@@ -331,7 +323,7 @@ export default function StudentSettingsPage() {
               <select
                 value={notifyDeadlinesHours}
                 onChange={(e) => setNotifyDeadlinesHours(e.target.value)}
-                className="w-full bg-bg-surface border border-border-base rounded-xl px-3 py-2 text-xs text-text-primary focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition-all"
+                className="w-full bg-white dark:bg-stone-800 border border-border-base rounded-xl px-3 py-2 text-xs text-text-primary focus:outline-none focus:border-[#c04b1e] transition-all"
               >
                 <option value="12">12 Hours Prior</option>
                 <option value="24">24 Hours Prior</option>
@@ -347,7 +339,7 @@ export default function StudentSettingsPage() {
               <select
                 value={notifyExamsDays}
                 onChange={(e) => setNotifyExamsDays(e.target.value)}
-                className="w-full bg-bg-surface border border-border-base rounded-xl px-3 py-2 text-xs text-text-primary focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition-all"
+                className="w-full bg-white dark:bg-stone-800 border border-border-base rounded-xl px-3 py-2 text-xs text-text-primary focus:outline-none focus:border-[#c04b1e] transition-all"
               >
                 <option value="3">3 Days Before</option>
                 <option value="7">7 Days Before (Standard)</option>
@@ -356,40 +348,41 @@ export default function StudentSettingsPage() {
             </div>
           </div>
 
-          <div className="pt-2 border-t border-border-base">
+          <div className="pt-2 border-t border-border-base/60">
             <label className="flex items-center gap-3 cursor-pointer">
               <input
                 type="checkbox"
                 checked={courseLagWarning}
                 onChange={(e) => setCourseLagWarning(e.target.checked)}
-                className="rounded text-orange-500 bg-bg-surface border-border-base focus:ring-orange-500"
-              />
+                className="rounded text-[#c04b1e] bg-white dark:bg-stone-800 border-border-base focus:ring-[#c04b1e]"
+              >
+              </input>
               <div className="text-xs">
                 <span className="font-medium text-text-primary">Coursework Progress Warning</span>
-                <p className="text-3xs text-text-muted">
+                <p className="text-[11px] text-text-muted">
                   Notify if completion rate in any enrolled course falls below 60%
                 </p>
               </div>
             </label>
           </div>
-        </Card>
+        </div>
 
         {/* Global Application & System Settings */}
         <AppSettingsSection />
 
         {/* Save Bar */}
         <div className="flex justify-end pt-2">
-          <Button
+          <button
             type="submit"
-            variant="primary"
             disabled={isSaving}
-            className="bg-orange-500 hover:bg-orange-600 active:bg-orange-700 text-white shadow-sm font-semibold"
-            leftIcon={<Save className="w-4 h-4" />}
+            className="h-10 px-5 rounded-xl bg-[#c04b1e] hover:bg-[#a33d16] text-white text-xs font-semibold flex items-center gap-2 shadow-xs transition-all active:translate-y-[1px] cursor-pointer disabled:opacity-50"
           >
-            {isSaving ? 'Saving Settings...' : 'Save Academic Settings'}
-          </Button>
+            <Save className="w-4 h-4" />
+            <span>{isSaving ? 'Saving Settings...' : 'Save Academic Settings'}</span>
+          </button>
         </div>
       </form>
+      </div>
     </div>
   );
 }
