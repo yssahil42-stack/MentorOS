@@ -111,7 +111,9 @@ export function NotificationDropdown() {
   };
 
   const clearAll = () => {
-    setNotifications([]);
+    if (window.confirm('Clear all notifications?')) {
+      setNotifications([]);
+    }
   };
 
   const getIcon = (type: NotificationItem['type']) => {

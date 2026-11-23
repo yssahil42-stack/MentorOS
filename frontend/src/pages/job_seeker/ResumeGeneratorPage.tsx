@@ -1631,9 +1631,8 @@ export default function ResumeGeneratorPage() {
                 fullWidth
                 loading={isGenerating}
                 onClick={handleTailor}
-                keyboardShortcut="⌘G"
-                tooltip="Tailor resume to target role (⌘G)"
-                className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold shadow-2xs"
+                tooltip="Tailor resume to target role"
+                className="bg-[#c04b1e] hover:bg-[#a33d16] text-white font-bold shadow-2xs cursor-pointer"
                 icon={<FileText className="w-4 h-4" />}
               >
                 <span>{isGenerating ? 'Formatting Resume...' : 'Format & Tailor Resume'}</span>

@@ -136,6 +136,9 @@ export function AppSettingsSection({
   };
 
   const handleClearCache = () => {
+    if (!window.confirm('Clear temporary offline cache? Your login session will be preserved.')) {
+      return;
+    }
     try {
       // Clear offline keys only, preserve login token
       const token = localStorage.getItem('mentor_token');

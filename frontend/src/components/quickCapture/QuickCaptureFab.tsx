@@ -221,6 +221,7 @@ export function QuickCaptureFab({
   };
 
   const handleDeleteTask = async (id: number) => {
+    if (!window.confirm('Delete this task?')) return;
     setLocalTasks((prev) => prev.filter((t) => t.id !== id));
     showToast('Task removed', 'info');
 
@@ -472,7 +473,10 @@ export function QuickCaptureFab({
 
                       <button
                         type="button"
-                        onClick={() => handleDeleteTask(t.id)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDeleteTask(t.id);
+                        }}
                         className="text-text-faint hover:text-red-500 transition-colors p-1"
                         title="Delete task"
                       >

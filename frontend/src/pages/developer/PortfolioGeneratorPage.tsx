@@ -509,9 +509,8 @@ export default function PortfolioGeneratorPage() {
                 fullWidth
                 loading={isGenerating}
                 onClick={handleGenerate}
-                keyboardShortcut="⌘G"
-                tooltip="Generate README & Case Study (⌘G)"
-                className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold shadow-2xs"
+                tooltip="Generate README & Case Study"
+                className="bg-[#c04b1e] hover:bg-[#a33d16] text-white font-bold shadow-2xs cursor-pointer"
                 icon={<Code2 className="w-4 h-4" />}
               >
                 <span>{isGenerating ? 'Building Portfolio...' : 'Build Portfolio'}</span>

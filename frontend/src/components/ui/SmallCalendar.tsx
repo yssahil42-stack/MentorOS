@@ -430,7 +430,9 @@ export function SmallCalendar({ role }: SmallCalendarProps) {
                         type="button"
                         onClick={(e) => {
                           e.stopPropagation();
-                          deleteMutation.mutate(ev.id);
+                          if (window.confirm(`Delete calendar event "${ev.title}"?`)) {
+                            deleteMutation.mutate(ev.id);
+                          }
                         }}
                         className="p-1 text-text-muted hover:text-red-400 rounded-md transition-colors opacity-0 group-hover:opacity-100"
                         title="Delete event"
@@ -766,7 +768,12 @@ export function SmallCalendar({ role }: SmallCalendarProps) {
                               <span className={badge.className}>{badge.label}</span>
                               <button
                                 type="button"
-                                onClick={() => deleteMutation.mutate(ev.id)}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  if (window.confirm(`Delete calendar event "${ev.title}"?`)) {
+                                    deleteMutation.mutate(ev.id);
+                                  }
+                                }}
                                 className="p-1 text-text-muted hover:text-red-400 rounded transition-colors opacity-0 group-hover:opacity-100"
                                 title="Delete event"
                               >
@@ -837,7 +844,12 @@ export function SmallCalendar({ role }: SmallCalendarProps) {
                         <div className="flex items-center gap-2">
                           <button
                             type="button"
-                            onClick={() => deleteMutation.mutate(ev.id)}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              if (window.confirm(`Delete calendar event "${ev.title}"?`)) {
+                                deleteMutation.mutate(ev.id);
+                              }
+                            }}
                             className="p-2 text-text-muted hover:text-red-400 hover:bg-bg-elevated rounded-xl transition-colors"
                             title="Remove event"
                           >
@@ -1043,7 +1055,12 @@ export function SmallCalendar({ role }: SmallCalendarProps) {
             <div className="flex items-center justify-between pt-3 border-t border-border-base">
               <button
                 type="button"
-                onClick={() => deleteMutation.mutate(activeEventDetail.id)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (window.confirm(`Delete event "${activeEventDetail.title}"?`)) {
+                    deleteMutation.mutate(activeEventDetail.id);
+                  }
+                }}
                 className="text-xs text-red-400 hover:text-red-300 flex items-center gap-1"
               >
                 <Trash2 className="w-3.5 h-3.5" />

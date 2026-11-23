@@ -209,8 +209,10 @@ export default function InboxPage() {
 
   const handleDelete = useCallback(
     async (id: string) => {
-      await deleteCapture(id);
-      showToast('Deleted', 'info');
+      if (window.confirm('Delete this inbox item?')) {
+        await deleteCapture(id);
+        showToast('Deleted', 'info');
+      }
     },
     [deleteCapture, showToast]
   );
@@ -224,11 +226,13 @@ export default function InboxPage() {
   }, [selectedItems, archiveCapture, showToast]);
 
   const handleBulkDelete = useCallback(async () => {
-    for (const id of selectedItems) {
-      await deleteCapture(id);
+    if (window.confirm(`Delete ${selectedItems.size} selected items?`)) {
+      for (const id of selectedItems) {
+        await deleteCapture(id);
+      }
+      showToast(`Deleted ${selectedItems.size} items`, 'success');
+      setSelectedItems(new Set());
     }
-    showToast(`Deleted ${selectedItems.size} items`, 'success');
-    setSelectedItems(new Set());
   }, [selectedItems, deleteCapture, showToast]);
 
   const formatTime = useCallback((timestamp: number) => {
@@ -258,8 +262,7 @@ export default function InboxPage() {
           </div>
           <Button
             onClick={() => openCaptureModal('manual')}
-            keyboardShortcut="⌘K"
-            tooltip="Quick capture (⌘K)"
+            tooltip="Quick capture"
             icon={<Plus className="w-4 h-4" />}
           >
             Capture
@@ -295,8 +298,7 @@ export default function InboxPage() {
             variant="ghost"
             size="sm"
             onClick={() => openCaptureModal('manual')}
-            keyboardShortcut="⌘K"
-            tooltip="Quick capture (⌘K)"
+            tooltip="Quick capture"
             icon={<Plus className="w-4 h-4" />}
           >
             Capture
@@ -631,7 +633,10 @@ function CaptureCard({
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={onDelete}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onDelete();
+                }}
                 className="justify-start gap-2 text-danger hover:bg-danger/10"
                 icon={<Trash2 className="w-3.5 h-3.5" />}
               >

@@ -544,7 +544,12 @@ export default function StudentCalendarPage() {
                           </Button>
                           <button
                             type="button"
-                            onClick={() => deleteEventMutation.mutate(ev.id)}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              if (window.confirm(`Delete calendar event "${ev.title}"?`)) {
+                                deleteEventMutation.mutate(ev.id);
+                              }
+                            }}
                             className="p-1.5 text-text-muted hover:text-red-400 rounded-lg transition-colors opacity-0 group-hover:opacity-100"
                             title="Delete"
                           >
@@ -623,7 +628,12 @@ export default function StudentCalendarPage() {
                     <Button
                       size="sm"
                       variant="ghost"
-                      onClick={() => deleteEventMutation.mutate(ev.id)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (window.confirm(`Delete calendar event "${ev.title}"?`)) {
+                          deleteEventMutation.mutate(ev.id);
+                        }
+                      }}
                       className="text-text-muted hover:text-red-400 text-xs"
                       icon={<Trash2 className="w-3.5 h-3.5" />}
                     >
@@ -840,7 +850,12 @@ export default function StudentCalendarPage() {
                 variant="ghost"
                 size="sm"
                 className="text-red-400 hover:text-red-300"
-                onClick={() => deleteEventMutation.mutate(selectedEvent.id)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (window.confirm(`Delete event "${selectedEvent.title}"?`)) {
+                    deleteEventMutation.mutate(selectedEvent.id);
+                  }
+                }}
                 icon={<Trash2 className="w-4 h-4" />}
               >
                 Delete Event
