@@ -318,6 +318,7 @@ export default function ResumeGeneratorPage() {
   };
 
   const handleDeleteProject = (id: string) => {
+    if (!window.confirm('Delete this project entry?')) return;
     setForm((prev) => {
       const updated = { ...prev, projects: prev.projects.filter((p) => p.id !== id) };
       setResult(synthesizeTailoredResume(updated));
@@ -370,6 +371,7 @@ export default function ResumeGeneratorPage() {
   };
 
   const handleDeleteExperience = (id: string) => {
+    if (!window.confirm('Delete this experience position?')) return;
     setForm((prev) => {
       const updated = { ...prev, experiences: prev.experiences.filter((e) => e.id !== id) };
       setResult(synthesizeTailoredResume(updated));
@@ -495,6 +497,7 @@ export default function ResumeGeneratorPage() {
   };
 
   const handleDeleteEducation = (id: string) => {
+    if (!window.confirm('Delete this education entry?')) return;
     setForm((prev) => {
       const updated = { ...prev, education: prev.education.filter((e) => e.id !== id) };
       setResult(synthesizeTailoredResume(updated));

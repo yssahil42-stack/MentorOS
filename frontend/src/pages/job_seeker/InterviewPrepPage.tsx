@@ -184,6 +184,7 @@ export default function InterviewPrepPage() {
   };
 
   const handleDeleteSalary = (id: string) => {
+    if (!window.confirm('Delete this salary benchmark entry?')) return;
     deleteSalaryEntry(id);
     setSalaryEntries((prev) => prev.filter((s) => s.id !== id));
     showToast('Entry removed', 'info');
@@ -538,7 +539,10 @@ export default function InterviewPrepPage() {
                     </div>
                     <button
                       type="button"
-                      onClick={() => handleDeleteSalary(entry.id)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDeleteSalary(entry.id);
+                      }}
                       className="text-text-faint hover:text-red-500 p-1"
                       title="Delete Entry"
                     >

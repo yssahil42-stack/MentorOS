@@ -116,6 +116,7 @@ export default function AskChatbotPage() {
   };
 
   const handleDeleteMessage = (idx: number) => {
+    if (!window.confirm('Delete this message?')) return;
     setMessages((prev) => prev.filter((_, i) => i !== idx));
     showToast('Deleted chat message', 'info');
   };
@@ -252,6 +253,7 @@ export default function AskChatbotPage() {
   };
 
   const handleClearThread = () => {
+    if (!window.confirm('Clear entire conversation?')) return;
     if (streamingTimerRef.current) {
       clearInterval(streamingTimerRef.current);
       streamingTimerRef.current = null;

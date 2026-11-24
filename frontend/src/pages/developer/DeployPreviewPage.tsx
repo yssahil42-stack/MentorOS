@@ -454,12 +454,14 @@ export default function DeployPreviewPage() {
                     navigator.clipboard.writeText(preview.url);
                     showToast('URL copied', 'success');
                   }}
-                  onDelete={() =>
-                    deletePreviewMutation.mutate({
-                      projectId: selectedProject!,
-                      previewId: preview.id,
-                    })
-                  }
+                  onDelete={() => {
+                    if (window.confirm('Delete this preview deployment?')) {
+                      deletePreviewMutation.mutate({
+                        projectId: selectedProject!,
+                        previewId: preview.id,
+                      });
+                    }
+                  }}
                 />
               ))}
             </div>
@@ -601,9 +603,11 @@ export default function DeployPreviewPage() {
                       data,
                     })
                   }
-                  onDelete={() =>
-                    deleteDebtMutation.mutate({ projectId: selectedProject!, debtId: debt.id })
-                  }
+                  onDelete={() => {
+                    if (window.confirm('Delete this technical debt item?')) {
+                      deleteDebtMutation.mutate({ projectId: selectedProject!, debtId: debt.id });
+                    }
+                  }}
                 />
               ))}
             </div>
